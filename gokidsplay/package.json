@@ -1,0 +1,26 @@
+{
+  "name": "spinpin-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=web",
+    "build:render": "chmod +x render-build.sh && ./render-build.sh",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "turbo": "latest"
+  },
+  "packageManager": "npm@10.0.0",
+  "dependencies": {
+    "react-to-print": "^3.2.0"
+  }
+}

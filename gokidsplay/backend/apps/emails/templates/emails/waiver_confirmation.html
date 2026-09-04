@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms Confirmed — Go Kids Play</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+      <!-- HEADER -->
+      <tr><td style="background:linear-gradient(135deg,#4caf50,#2e7d32);border-radius:16px 16px 0 0;padding:40px 32px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:48px;">✅</p>
+        <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:800;letter-spacing:-0.5px;">Waiver Signed!</h1>
+        <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:15px;">You're all set to play at Go Kids Play</p>
+      </td></tr>
+
+      <!-- BODY -->
+      <tr><td style="background:#ffffff;padding:36px 32px;">
+        <p style="margin:0 0 20px;font-size:16px;color:#1a1a2e;">Hi <strong>{{ name }}</strong>,</p>
+        <p style="margin:0 0 24px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          Thank you for accepting the terms at Go Kids Play Coventry. We have successfully recorded your agreement.
+        </p>
+
+        <!-- DETAILS TABLE -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e8f0;border-radius:12px;overflow:hidden;margin-bottom:28px;">
+          <tr style="background:#f8f8fc;"><td colspan="2" style="padding:14px 20px;font-size:13px;font-weight:700;color:#2e7d32;text-transform:uppercase;letter-spacing:0.5px;">📝 Waiver Details</td></tr>
+          <tr style="border-top:1px solid #e8e8f0;">
+            <td style="padding:14px 20px;font-size:14px;color:#6b6b8a;font-weight:600;">Participant</td>
+            <td style="padding:14px 20px;font-size:14px;color:#1a1a2e;font-weight:700;text-align:right;">{{ name }}</td>
+          </tr>
+          <tr style="border-top:1px solid #e8e8f0;background:#fafafa;">
+            <td style="padding:14px 20px;font-size:14px;color:#6b6b8a;font-weight:600;">Date Signed</td>
+            <td style="padding:14px 20px;font-size:14px;color:#1a1a2e;font-weight:700;text-align:right;">{{ signed_at|date:"j M Y, H:i" }}</td>
+          </tr>
+          <tr style="border-top:1px solid #e8e8f0;">
+            <td style="padding:14px 20px;font-size:14px;color:#6b6b8a;font-weight:600;">Reference</td>
+            <td style="padding:14px 20px;font-size:14px;color:#1a1a2e;font-weight:700;text-align:right;">#{{ waiver_id }}</td>
+          </tr>
+          {% if booking_reference %}
+          <tr style="border-top:1px solid #e8e8f0;background:#fafafa;">
+            <td style="padding:14px 20px;font-size:14px;color:#6b6b8a;font-weight:600;">Booking</td>
+            <td style="padding:14px 20px;font-size:14px;color:#1a1a2e;font-weight:700;text-align:right;">{{ booking_reference }}</td>
+          </tr>
+          {% endif %}
+        </table>
+
+        <!-- IMPORTANT NOTE -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff3e0;border-left:4px solid #ff9800;border-radius:0 8px 8px 0;margin-bottom:28px;">
+          <tr><td style="padding:18px 20px;">
+            <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#e65100;">⚠️ Important Information</p>
+            <ul style="margin:0;padding-left:18px;font-size:14px;color:#5a3a00;line-height:1.8;">
+              <li>This waiver is required for entry to the rink.</li>
+              <li>Please have your booking confirmation ready at reception.</li>
+              <li>Socks must be worn by all participants.</li>
+            </ul>
+          </td></tr>
+        </table>
+
+      </td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background:#1a1a2e;border-radius:0 0 16px 16px;padding:28px 32px;text-align:center;">
+        <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#ffffff;">Spin Pin Leicester</p>
+        <p style="margin:0 0 12px;font-size:13px;color:rgba(255,255,255,0.6);">Roller Skating · Ten Pin Bowling · Arcade</p>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">📧 info@spinpin.co.uk &nbsp;|&nbsp; 📍 Navigation Street, Leicester LE1 3UR</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

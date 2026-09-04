@@ -1,0 +1,45 @@
+{
+  "include": [
+    "apps/**",
+    "ninja_backend/**"
+  ],
+  "exclude": [
+    "**/migrations/**",
+    "**/__pycache__/**",
+    "**/tests/**"
+  ],
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "pythonVersion": "3.11",
+
+  "typeCheckingMode": "basic",
+
+  "reportMissingTypeStubs": "none",
+  "reportMissingModuleSource": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownParameterType": "none",
+  "reportUnknownLambdaType": "none",
+
+  "reportAttributeAccessIssue": "none",
+  "reportGeneralTypeIssues": "none",
+  "reportOptionalMemberAccess": "none",
+  "reportCallIssue": "none",
+  "reportReturnType": "none",
+  "reportArgumentType": "none",
+  "reportOperatorIssue": "none",
+  "reportIndexIssue": "none",
+  "reportAbstractUsage": "none",
+
+  "reportPrivateUsage": "none",
+  "reportUndefinedVariable": "none",
+  "reportPossiblyUnbound": "none",
+
+  "useLibraryCodeForTypes": true,
+
+  "extraPaths": [
+    "."
+  ]
+}

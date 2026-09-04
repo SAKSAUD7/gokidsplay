@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enquiry Received — Go Kids Play</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+
+      <!-- HEADER -->
+      <tr><td style="background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:16px 16px 0 0;padding:40px 32px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:48px;">✉️</p>
+        <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:800;letter-spacing:-0.5px;">Message Received!</h1>
+        <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:15px;">We'll be in touch shortly</p>
+      </td></tr>
+
+      <!-- BODY -->
+      <tr><td style="background:#ffffff;padding:36px 32px;">
+        <p style="margin:0 0 20px;font-size:16px;color:#1a1a2e;">Hi <strong>{{ customer_name }}</strong>,</p>
+        <p style="margin:0 0 24px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          Thank you for reaching out to Go Kids Play. We have received your message regarding "<strong>{{ contact_message.subject }}</strong>".
+        </p>
+        <p style="margin:0 0 24px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          Our team will review your enquiry and get back to you as soon as possible, usually within 24–48 hours.
+        </p>
+
+        <!-- REF BOX -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff7ed;border:1px solid #fde68a;border-radius:12px;margin-bottom:28px;">
+          <tr><td style="padding:20px 24px;text-align:center;">
+            <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#b45309;font-weight:600;">Your Reference</p>
+            <p style="margin:0;font-size:24px;font-weight:800;color:#92400e;letter-spacing:2px;">{{ reference }}</p>
+          </td></tr>
+        </table>
+
+        <!-- MESSAGE ECHO -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e8f0;border-radius:12px;overflow:hidden;margin-bottom:28px;">
+          <tr style="background:#fef3c7;"><td style="padding:14px 20px;font-size:13px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.5px;">Your Message</td></tr>
+          <tr><td style="padding:20px;font-size:14px;color:#1a1a2e;line-height:1.6;">{{ contact_message.message|linebreaksbr }}</td></tr>
+        </table>
+
+      </td></tr>
+
+      <!-- FOOTER -->
+      <tr><td style="background:#1a1a2e;border-radius:0 0 16px 16px;padding:28px 32px;text-align:center;">
+        <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#ffffff;">Go Kids Play</p>
+        <p style="margin:0 0 12px;font-size:13px;color:rgba(255,255,255,0.6);">Indoor Soft Play · Toddler Zone · Party Packages · Special Events</p>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">📧 hello@gokidsplay.co.uk &nbsp;|&nbsp; 📍 Coventry, United Kingdom</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

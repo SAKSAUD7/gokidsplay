@@ -1,0 +1,332 @@
+"""
+Special Events API Views — Section 7: Events / Special Parties
+"""
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.response import Response
+from django.utils import timezone
+from django.db.models import Q, Sum, Count
+from .models import SpecialEvent, EventBooking, Customer
+from .serializers import SpecialEventSerializer, EventBookingSerializer
+from .permissions import IsStaffUser, IsSuperAdminOnly
+import logging
+from django.template.loader import render_to_string
+
+logger = logging.getLogger(__name__)
+
+
+class SpecialEventViewSet(viewsets.ModelViewSet):
+    """
+    Admin API for managing Special Events (Birthday, Christmas, Halloween etc.)
+    """
+    serializer_class = SpecialEventSerializer
+    permission_classes = [IsStaffUser]
+
+    def get_queryset(self):
+        qs = SpecialEvent.objects.all()
+        # Filtering
+        status_filter = self.request.query_params.get('status')
+        event_type = self.request.query_params.get('event_type')
+        date_from = self.request.query_params.get('date_from')
+        date_to = self.request.query_params.get('date_to')
+        search = self.request.query_params.get('search')
+
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if event_type:
+            qs = qs.filter(event_type=event_type)
+        if date_from:
+            qs = qs.filter(date__gte=date_from)
+        if date_to:
+            qs = qs.filter(date__lte=date_to)
+        if search:
+            qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
+
+        return qs.order_by('date', 'start_time')
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='publish')
+    def publish(self, request, pk=None):
+        """Publish an event (make it visible to public)."""
+        event = self.get_object()
+        event.status = 'PUBLISHED'
+        event.save()
+        return Response({'success': True, 'status': event.status})
+
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel(self, request, pk=None):
+        """Cancel an event."""
+        event = self.get_object()
+        reason = request.data.get('reason', '')
+        event.status = 'CANCELLED'
+        event.save()
+        # TODO: Send cancellation emails to all event_bookings
+        logger.info(f"Event {event.id} cancelled by {request.user.email}. Reason: {reason}")
+        return Response({'success': True, 'status': event.status})
+
+    @action(detail=True, methods=['post'], url_path='duplicate')
+    def duplicate(self, request, pk=None):
+        """Duplicate an event to a new date."""
+        event = self.get_object()
+        new_date = request.data.get('date')
+        if not new_date:
+            return Response({'error': 'date is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Clone
+        event.pk = None
+        event.uuid = None
+        event.slug = ''
+        event.date = new_date
+        event.status = 'DRAFT'
+        event.reserved_spots = 0
+        event.save()
+        serializer = self.get_serializer(event)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'], url_path='bookings')
+    def bookings(self, request, pk=None):
+        """Get all bookings for this event."""
+        event = self.get_object()
+        event_bookings = EventBooking.objects.filter(event=event).select_related('customer')
+        serializer = EventBookingSerializer(event_bookings, many=True)
+        return Response({
+            'event': self.get_serializer(event).data,
+            'bookings': serializer.data,
+            'total': event_bookings.count(),
+            'confirmed': event_bookings.filter(status='CONFIRMED').count(),
+            'cancelled': event_bookings.filter(status='CANCELLED').count(),
+        })
+
+    @action(detail=True, methods=['get'], url_path='stats')
+    def stats(self, request, pk=None):
+        event = self.get_object()
+        bookings = EventBooking.objects.filter(event=event)
+        total_revenue = bookings.filter(status__in=['CONFIRMED', 'COMPLETED']).aggregate(
+            total=Sum('amount_paid')
+        )['total'] or 0
+        return Response({
+            'total_capacity': event.total_capacity,
+            'reserved_spots': event.reserved_spots,
+            'available_spots': event.available_spots,
+            'is_sold_out': event.is_sold_out,
+            'confirmed_bookings': bookings.filter(status='CONFIRMED').count(),
+            'pending_bookings': bookings.filter(status='PENDING').count(),
+            'cancelled_bookings': bookings.filter(status='CANCELLED').count(),
+            'total_revenue_gbp': float(total_revenue),
+        })
+
+
+class EventBookingViewSet(viewsets.ModelViewSet):
+    """
+    Admin API for managing bookings made on Special Events.
+    """
+    serializer_class = EventBookingSerializer
+    permission_classes = [IsStaffUser]
+
+    def get_queryset(self):
+        qs = EventBooking.objects.select_related('event', 'customer').all()
+        event_id = self.request.query_params.get('event_id')
+        status_filter = self.request.query_params.get('status')
+        search = self.request.query_params.get('search')
+        if event_id:
+            qs = qs.filter(event_id=event_id)
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if search:
+            qs = qs.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(booking_reference__icontains=search))
+        return qs.order_by('-created_at')
+
+    @action(detail=True, methods=['post'], url_path='confirm')
+    def confirm(self, request, pk=None):
+        booking = self.get_object()
+        booking.status = 'CONFIRMED'
+        booking.payment_status = 'FULLY_PAID'
+        booking.amount_paid = booking.subtotal
+        booking.balance_due = 0
+        booking.save()
+        return Response({'success': True, 'status': booking.status})
+
+    @action(detail=True, methods=['post'], url_path='cancel')
+    def cancel(self, request, pk=None):
+        booking = self.get_object()
+        booking.status = 'CANCELLED'
+        booking.save()
+        return Response({'success': True, 'status': booking.status})
+
+    @action(detail=True, methods=['post'], url_path='mark-arrived')
+    def mark_arrived(self, request, pk=None):
+        booking = self.get_object()
+        booking.arrived = True
+        booking.arrived_at = timezone.now()
+        booking.save()
+        return Response({'success': True, 'arrived': True})
+
+
+# ─── Public API ───────────────────────────────────────────────────────────────
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def public_events_list(request):
+    """Public endpoint — returns all published, upcoming events."""
+    today = timezone.now().date()
+    events = SpecialEvent.objects.filter(
+        status='PUBLISHED',
+        is_public=True,
+        date__gte=today
+    ).order_by('date', 'start_time')
+
+    event_type = request.query_params.get('event_type')
+    if event_type:
+        events = events.filter(event_type=event_type)
+
+    serializer = SpecialEventSerializer(events, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def public_event_detail(request, slug):
+    """Public endpoint — returns a single published event by slug."""
+    try:
+        event = SpecialEvent.objects.get(slug=slug, status='PUBLISHED', is_public=True)
+    except SpecialEvent.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+    serializer = SpecialEventSerializer(event)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def create_event_booking(request):
+    """
+    Public endpoint — allows customers to book spots at a Special Event.
+    Validates capacity and creates the EventBooking.
+    """
+    data = request.data
+
+    try:
+        event = SpecialEvent.objects.get(id=data.get('event_id'), status='PUBLISHED')
+    except SpecialEvent.DoesNotExist:
+        return Response({'error': 'Event not found or not available'}, status=status.HTTP_404_NOT_FOUND)
+
+    num_children = int(data.get('num_children', 0))
+    num_adults = int(data.get('num_adults', 0))
+    total_attendees = num_children + num_adults
+
+    if total_attendees == 0:
+        return Response({'error': 'At least one attendee is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if total_attendees > event.available_spots:
+        return Response({
+            'error': f'Not enough spots available. Only {event.available_spots} spots left.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Calculate pricing
+    subtotal = (num_children * event.price_per_child) + (num_adults * event.price_per_adult)
+    deposit = event.deposit_amount if event.deposit_amount > 0 else subtotal
+
+    # Try to link to a customer account
+    customer = None
+    try:
+        customer = Customer.objects.get(email=data.get('email'))
+    except Customer.DoesNotExist:
+        pass
+
+    try:
+        booking = EventBooking.objects.create(
+            event=event,
+            customer=customer,
+            name=data.get('name', ''),
+            email=data.get('email', ''),
+            phone=data.get('phone', ''),
+            num_children=num_children,
+            num_adults=num_adults,
+            special_requirements=data.get('special_requirements', ''),
+            price_per_child=event.price_per_child,
+            price_per_adult=event.price_per_adult,
+            subtotal=subtotal,
+            deposit_amount=deposit,
+            amount_paid=0,
+            balance_due=subtotal,
+            status='PENDING',
+            payment_status='PENDING',
+            ip_address=request.META.get('REMOTE_ADDR'),
+        )
+        # ── Send confirmation email ───────────────────────────────────────
+        try:
+            from apps.emails.services import EmailService
+            email_svc = EmailService()
+            event_date_str = booking.event.date.strftime('%A, %-d %B %Y') if hasattr(booking.event.date, 'strftime') else str(booking.event.date)
+            email_svc.send_email(
+                email_type='event_booking_confirmation',
+                recipient_email=booking.email,
+                recipient_name=booking.name,
+                subject=f'Your booking for {event.title} is confirmed! {event.emoji}',
+                context={
+                    'customer_name': booking.name,
+                    'booking_reference': booking.booking_reference,
+                    'event_title': event.title,
+                    'event_date': event_date_str,
+                    'event_time': f"{event.start_time.strftime('%H:%M')} – {event.end_time.strftime('%H:%M')}",
+                    'num_children': booking.num_children,
+                    'num_adults': booking.num_adults,
+                    'subtotal': float(subtotal),
+                    'deposit_amount': float(deposit) if deposit < subtotal else None,
+                    'is_free': event.is_free,
+                    'accent_color': event.accent_color or '#8B5CF6',
+                    'emoji': event.emoji or '🎉',
+                    'special_instructions': event.special_instructions,
+                    'site_url': 'https://gokidsplay.co.uk',
+                },
+                template_name='emails/booking/event_confirmation.html',
+            )
+        except Exception as email_err:
+            logger.warning(f"Event booking confirmation email failed: {email_err}")
+
+        return Response({
+            'success': True,
+            'booking_reference': booking.booking_reference,
+            'booking_uuid': str(booking.uuid),
+            'subtotal': float(subtotal),
+            'deposit_due': float(deposit),
+            'balance_due': float(subtotal),
+            'message': f'Your spot at {event.title} is reserved! Booking ref: {booking.booking_reference}'
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        logger.error(f"Event booking creation failed: {e}", exc_info=True)
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def event_booking_confirmation(request, booking_uuid):
+    """Public endpoint — returns booking details by UUID for confirmation page."""
+    try:
+        booking = EventBooking.objects.select_related('event').get(uuid=booking_uuid)
+    except EventBooking.DoesNotExist:
+        return Response({'error': 'Booking not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        'booking_reference': booking.booking_reference,
+        'name': booking.name,
+        'email': booking.email,
+        'event': {
+            'title': booking.event.title,
+            'date': booking.event.date,
+            'start_time': booking.event.start_time,
+            'end_time': booking.event.end_time,
+            'emoji': booking.event.emoji,
+        },
+        'num_children': booking.num_children,
+        'num_adults': booking.num_adults,
+        'subtotal': float(booking.subtotal),
+        'deposit_amount': float(booking.deposit_amount),
+        'amount_paid': float(booking.amount_paid),
+        'balance_due': float(booking.balance_due),
+        'status': booking.status,
+        'payment_status': booking.payment_status,
+        'special_instructions': booking.event.special_instructions,
+    })

@@ -1,0 +1,2 @@
+# Azure Communication Services Email SDK
+azure-communication-email==1.0.0

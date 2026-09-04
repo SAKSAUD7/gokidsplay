@@ -1,0 +1,97 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Next.js
+.next/
+out/
+build/
+dist/
+frontend/deploy-final/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+
+# Turbo cache
+.turbo/
+
+# Local env files (never commit secrets)
+.env
+.env*.local
+/backend/.env
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+.env/
+.venv/
+
+# Django
+# DB is excluded — use spinpin_db_fixture.json for seeding instead
+db.sqlite3
+db.sqlite3-journal
+
+# Static files (generated on deploy)
+/backend/staticfiles/
+
+# Media IS tracked in git (all uploaded images/assets go to GitHub)
+# To exclude large user-uploaded content later, add rules here
+
+# Azure deploy artifacts (generated locally, not for git)
+frontend/deploy.zip
+frontend/deploy-extracted/
+
+# Azure migration scripts (not needed for VPS)
+/backend/create_azure_db.py
+/backend/migrate_media.py
+/backend/run_migration_azure.py
+/backend/api_test.py
+/backend/export_cms_data.py
+/backend/export_complete_cms.py
+/backend/export_complete_database.py
+/backend/import_cms_data.py
+/backend/import_complete_cms.py
+/backend/import_complete_database.py
+/backend/import_sample_bookings.py
+/backend/simple_export.py
+/backend/run_log.txt
+/backend/auth_debug.log
+
+# Test/temp scripts
+/test_*.js
+/test_*.py
+/check_*.py
+/backend/add_*.py
+/backend/test_*.py
+/frontend/test_*.js
+
+# Node
+node_modules
+
+AZURE_SECRETS.md
+

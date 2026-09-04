@@ -1,0 +1,6030 @@
+[
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rtelCVTjGUak1Irb14RWl3$RCtIQLyQbBWmHxdRSP2dbgN3K854bfSPP2BY1n03EjI=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin2",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-10T00:25:46.900Z",
+    "name": "Admin Two",
+    "email": "admin2@ninjapark.com",
+    "profile_pic": "",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rtelCVTjGUak1Irb14RWl3$RCtIQLyQbBWmHxdRSP2dbgN3K854bfSPP2BY1n03EjI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "manager",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-10T00:25:46.910Z",
+    "name": "Park Manager",
+    "email": "manager@ninjapark.com",
+    "profile_pic": "",
+    "role": "MANAGER",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rtelCVTjGUak1Irb14RWl3$RCtIQLyQbBWmHxdRSP2dbgN3K854bfSPP2BY1n03EjI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "content",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-10T00:25:46.911Z",
+    "name": "Content Manager",
+    "email": "content@ninjapark.com",
+    "profile_pic": "",
+    "role": "CONTENT_MANAGER",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rtelCVTjGUak1Irb14RWl3$RCtIQLyQbBWmHxdRSP2dbgN3K854bfSPP2BY1n03EjI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "staff",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-10T00:25:46.914Z",
+    "name": "Front Desk Staff",
+    "email": "staff@ninjapark.com",
+    "profile_pic": "",
+    "role": "STAFF",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$rtelCVTjGUak1Irb14RWl3$RCtIQLyQbBWmHxdRSP2dbgN3K854bfSPP2BY1n03EjI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "employee",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-10T00:25:46.915Z",
+    "name": "General Employee",
+    "email": "employee@spinpin.com",
+    "profile_pic": "",
+    "role": "EMPLOYEE",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.user",
+  "fields": {
+    "password": "pbkdf2_sha256$870000$U2tIp7UiXmSmOYinatc4xz$TknA50StyLchSvaLkXQw7vX7UKSMRGrwFYBTykNRBrc=",
+    "last_login": "2026-06-12T10:05:46.986Z",
+    "is_superuser": true,
+    "username": "spinpin_admin",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-11T07:15:41.079Z",
+    "name": "SpinPin Admin",
+    "email": "admin@spinpin.co.uk",
+    "profile_pic": "",
+    "role": "ADMIN",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "core.globalsettings",
+  "pk": 1,
+  "fields": {
+    "park_name": "Ninja Inflatable Park",
+    "contact_phone": "+91 98454 71611",
+    "contact_email": "admin@ninjapark.com",
+    "address": null,
+    "map_url": null,
+    "opening_hours": {},
+    "marquee_text": [],
+    "about_text": null,
+    "hero_title": "Experience the Ultimate Bounce!",
+    "hero_subtitle": "The biggest inflatable park in the city",
+    "gst_number": null,
+    "session_duration": 60,
+    "adult_price": "899.00",
+    "child_price": "500.00",
+    "online_booking_enabled": true,
+    "party_bookings_enabled": true,
+    "maintenance_mode": false,
+    "waiver_required": true,
+    "party_availability": "Thursday - Sunday",
+    "updated_at": "2026-05-10T00:54:15.947Z"
+  }
+},
+{
+  "model": "core.logo",
+  "pk": 1,
+  "fields": {
+    "name": "SpinPin Logo",
+    "image": "logos/spinpin-logo.png",
+    "is_active": true,
+    "created_at": "2026-05-18T10:49:45.072Z",
+    "updated_at": "2026-05-18T10:49:45.072Z"
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 1,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-05-22",
+    "link": "/admin/bookings/1",
+    "is_read": false,
+    "created_at": "2026-05-18T01:15:52.640Z",
+    "booking_id": 1,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 2,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-05-30",
+    "link": "/admin/bookings/2",
+    "is_read": false,
+    "created_at": "2026-05-18T10:44:05.293Z",
+    "booking_id": 2,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 3,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Sauopn for 2026-06-17",
+    "link": "/admin/bookings/3",
+    "is_read": false,
+    "created_at": "2026-06-01T11:25:10.100Z",
+    "booking_id": 3,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 4,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from karem for 2026-06-19",
+    "link": "/admin/bookings/4",
+    "is_read": false,
+    "created_at": "2026-06-01T11:29:39.370Z",
+    "booking_id": 4,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 5,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from Saud Ali khan for 2026-06-04",
+    "link": "/admin/party-bookings/1",
+    "is_read": false,
+    "created_at": "2026-06-02T07:56:43.063Z",
+    "booking_id": null,
+    "party_booking_id": 1,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 6,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from lion for 2026-06-04",
+    "link": "/admin/party-bookings/2",
+    "is_read": false,
+    "created_at": "2026-06-02T17:23:31.428Z",
+    "booking_id": null,
+    "party_booking_id": 2,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 7,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from saksa for 2026-06-03",
+    "link": "/admin/bookings/5",
+    "is_read": false,
+    "created_at": "2026-06-02T17:56:23.969Z",
+    "booking_id": 5,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 8,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Suresh for 2026-06-26",
+    "link": "/admin/bookings/6",
+    "is_read": false,
+    "created_at": "2026-06-03T10:34:26.237Z",
+    "booking_id": 6,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 9,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-06-13",
+    "link": "/admin/bookings/7",
+    "is_read": false,
+    "created_at": "2026-06-03T10:35:25.555Z",
+    "booking_id": 7,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 10,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-06-18",
+    "link": "/admin/bookings/8",
+    "is_read": false,
+    "created_at": "2026-06-03T10:51:27.662Z",
+    "booking_id": 8,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 11,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-06-27",
+    "link": "/admin/bookings/9",
+    "is_read": false,
+    "created_at": "2026-06-05T11:08:57.697Z",
+    "booking_id": 9,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 12,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2026-06-26",
+    "link": "/admin/bookings/10",
+    "is_read": false,
+    "created_at": "2026-06-12T10:07:04.724Z",
+    "booking_id": 10,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 13,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Suresh for 2026-06-13",
+    "link": "/admin/bookings/11",
+    "is_read": false,
+    "created_at": "2026-06-12T10:13:02.202Z",
+    "booking_id": 11,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 14,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Suresh for 2026-06-16",
+    "link": "/admin/bookings/12",
+    "is_read": false,
+    "created_at": "2026-06-15T10:18:50.716Z",
+    "booking_id": 12,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 15,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-19",
+    "link": "/admin/bookings/13",
+    "is_read": false,
+    "created_at": "2026-06-15T10:30:54.726Z",
+    "booking_id": 13,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 16,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-25",
+    "link": "/admin/bookings/14",
+    "is_read": false,
+    "created_at": "2026-06-15T10:35:05.161Z",
+    "booking_id": 14,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 17,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-26",
+    "link": "/admin/bookings/15",
+    "is_read": false,
+    "created_at": "2026-06-15T10:48:56.422Z",
+    "booking_id": 15,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 18,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-20",
+    "link": "/admin/bookings/16",
+    "is_read": false,
+    "created_at": "2026-06-15T10:50:05.167Z",
+    "booking_id": 16,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 19,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-18",
+    "link": "/admin/bookings/17",
+    "is_read": false,
+    "created_at": "2026-06-15T11:31:52.338Z",
+    "booking_id": 17,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 20,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-25",
+    "link": "/admin/bookings/18",
+    "is_read": false,
+    "created_at": "2026-06-15T11:46:22.495Z",
+    "booking_id": 18,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 21,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-25",
+    "link": "/admin/bookings/19",
+    "is_read": false,
+    "created_at": "2026-06-15T11:46:50.654Z",
+    "booking_id": 19,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 22,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-27",
+    "link": "/admin/bookings/20",
+    "is_read": false,
+    "created_at": "2026-06-15T12:08:28.102Z",
+    "booking_id": 20,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 23,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-20",
+    "link": "/admin/bookings/21",
+    "is_read": false,
+    "created_at": "2026-06-17T09:08:20.379Z",
+    "booking_id": 21,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 24,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-19",
+    "link": "/admin/bookings/22",
+    "is_read": false,
+    "created_at": "2026-06-17T10:22:38.603Z",
+    "booking_id": 22,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 25,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-20",
+    "link": "/admin/bookings/23",
+    "is_read": false,
+    "created_at": "2026-06-17T11:18:05.273Z",
+    "booking_id": 23,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 26,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Saud Ali khan (1hk18is080@hkbk.edu.in): uyupiopp[hgf",
+    "link": "/admin/cms/contact-messages/1",
+    "is_read": false,
+    "created_at": "2026-06-17T11:29:32.595Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 1
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 27,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Saud Ali khan (1hk18is080@hkbk.edu.in): jhkhlkjkhggjj",
+    "link": "/admin/cms/contact-messages/2",
+    "is_read": false,
+    "created_at": "2026-06-17T11:30:25.192Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 2
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 28,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohammed for 2026-06-21",
+    "link": "/admin/bookings/24",
+    "is_read": false,
+    "created_at": "2026-06-17T11:43:11.997Z",
+    "booking_id": 24,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 29,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-21",
+    "link": "/admin/party-bookings/3",
+    "is_read": false,
+    "created_at": "2026-06-17T11:45:58.864Z",
+    "booking_id": null,
+    "party_booking_id": 3,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 30,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-21",
+    "link": "/admin/party-bookings/4",
+    "is_read": false,
+    "created_at": "2026-06-17T11:51:29.059Z",
+    "booking_id": null,
+    "party_booking_id": 4,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 31,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-21",
+    "link": "/admin/party-bookings/5",
+    "is_read": false,
+    "created_at": "2026-06-17T11:52:18.858Z",
+    "booking_id": null,
+    "party_booking_id": 5,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 32,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Saud Ali khan (1hk18is080@hkbk.edu.in): gchgdhg",
+    "link": "/admin/cms/contact-messages/3",
+    "is_read": false,
+    "created_at": "2026-06-17T12:04:08.579Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 3
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 33,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Suresh (saksaudalikhan7@gmail.com): dgsjhdjsgd",
+    "link": "/admin/cms/contact-messages/4",
+    "is_read": false,
+    "created_at": "2026-06-17T12:04:33.700Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 4
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 34,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-26",
+    "link": "/admin/party-bookings/6",
+    "is_read": false,
+    "created_at": "2026-06-17T12:06:21.406Z",
+    "booking_id": null,
+    "party_booking_id": 6,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 35,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-25",
+    "link": "/admin/party-bookings/7",
+    "is_read": false,
+    "created_at": "2026-06-17T13:04:42.886Z",
+    "booking_id": null,
+    "party_booking_id": 7,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 36,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-26",
+    "link": "/admin/party-bookings/8",
+    "is_read": false,
+    "created_at": "2026-06-17T13:44:43.503Z",
+    "booking_id": null,
+    "party_booking_id": 8,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 37,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from mohammed for 2026-06-19",
+    "link": "/admin/party-bookings/9",
+    "is_read": false,
+    "created_at": "2026-06-17T13:51:21.967Z",
+    "booking_id": null,
+    "party_booking_id": 9,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 1,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "notes": null,
+    "created_at": "2026-05-18T01:15:52.338Z",
+    "updated_at": "2026-06-12T10:07:04.703Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 2,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "manager@ninjapark.com",
+    "phone": "",
+    "notes": null,
+    "created_at": "2026-05-18T10:41:47.600Z",
+    "updated_at": "2026-05-18T10:41:47.600Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 3,
+  "fields": {
+    "name": "Sauopn",
+    "email": "saksaud@gmail.com",
+    "phone": "7411091256",
+    "notes": null,
+    "created_at": "2026-06-01T11:25:10.030Z",
+    "updated_at": "2026-06-01T11:25:10.030Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 4,
+  "fields": {
+    "name": "karem",
+    "email": "sak12saud@gmail.com",
+    "phone": "9874562541",
+    "notes": null,
+    "created_at": "2026-06-01T11:29:39.289Z",
+    "updated_at": "2026-06-01T11:29:39.289Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 5,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "notes": null,
+    "created_at": "2026-06-02T07:03:58.974Z",
+    "updated_at": "2026-06-15T10:50:05.155Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 6,
+  "fields": {
+    "name": "lion",
+    "email": "lion@gmail.com",
+    "phone": "7894561235",
+    "notes": null,
+    "created_at": "2026-06-02T17:23:31.371Z",
+    "updated_at": "2026-06-02T17:23:31.371Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 7,
+  "fields": {
+    "name": "saksa",
+    "email": "saksae@gmail.com",
+    "phone": "7411894562",
+    "notes": null,
+    "created_at": "2026-06-02T17:56:23.933Z",
+    "updated_at": "2026-06-02T17:56:23.933Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 8,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "notes": null,
+    "created_at": "2026-06-03T10:34:26.203Z",
+    "updated_at": "2026-06-15T10:16:23.917Z"
+  }
+},
+{
+  "model": "bookings.customertoken",
+  "pk": 1,
+  "fields": {
+    "customer": 2,
+    "password_hash": "pbkdf2_sha256$870000$59iBL89LpGIeHD00uRfcXZ$cNEcRmEQGu3NgoE/q1Zhr2R2Z5vUuO1OH86g73wFPWE=",
+    "token": "tqmmxtPM6ZgBAbStEs2_O2uF9DuByUAvRvM1Tq0U8GtrGQJJquiY4w",
+    "expires_at": "2026-06-17T10:41:48.026Z",
+    "created_at": "2026-05-18T10:41:48.028Z",
+    "updated_at": "2026-05-18T10:41:48.028Z"
+  }
+},
+{
+  "model": "bookings.customertoken",
+  "pk": 2,
+  "fields": {
+    "customer": 5,
+    "password_hash": "pbkdf2_sha256$870000$YaRRuG9zbyorFsir3x7YFA$yafTFw5Esoiw9/kwr0sh0merRZt1ICCVOreiEqc/zkA=",
+    "token": "_O9jFAcmbbB6Qiou9Az7zV8pZAzbD8UmIvqMMvVLCOgnqnsIHnlKgQ",
+    "expires_at": "2026-07-15T12:27:08.321Z",
+    "created_at": "2026-06-02T07:03:59.726Z",
+    "updated_at": "2026-06-15T12:27:08.322Z"
+  }
+},
+{
+  "model": "bookings.customertoken",
+  "pk": 3,
+  "fields": {
+    "customer": 8,
+    "password_hash": "pbkdf2_sha256$870000$NmrU9rKxXBDkueGVw0fSNZ$TADgQtnduiF/dRsTSBRnMUi7zaNZnXPVKTidbd7wlK0=",
+    "token": "omjiG92vgcUtx6oUhUrYr61KqDeM4TCdeCbIwiiiCAuy0Pwqg-V7aQ",
+    "expires_at": "2026-07-15T10:16:24.329Z",
+    "created_at": "2026-06-15T10:16:24.331Z",
+    "updated_at": "2026-06-15T10:16:24.331Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 1,
+  "fields": {
+    "uuid": "a35dd605-f5bc-4cc1-8d56-abb923a800f9",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2026-05-22",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "14.90",
+    "discount_amount": "0.00",
+    "amount": "14.90",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      }
+    ],
+    "parking_plates": null,
+    "qr_code": null,
+    "booking_number": "SP-20260518-0001",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-05-18T01:15:52.454Z",
+    "updated_at": "2026-05-18T01:15:52.454Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 2,
+  "fields": {
+    "uuid": "9f05eb89-f3d3-4095-b679-7b16ec81140d",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2026-05-30",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 1,
+    "spectators": 1,
+    "subtotal": "39.30",
+    "discount_amount": "0.00",
+    "amount": "39.30",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": [
+      {
+        "id": "bowling-shoes",
+        "label": "Shoe Hire",
+        "emoji": "👞",
+        "qty": 1,
+        "price_each": 1.5,
+        "subtotal": 1.5
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      }
+    ],
+    "parking_plates": null,
+    "qr_code": null,
+    "booking_number": "SP-20260518-0002",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-05-18T10:44:05.265Z",
+    "updated_at": "2026-05-18T10:44:05.265Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 3,
+  "fields": {
+    "uuid": "5a20caa3-7bf7-4d53-9dcd-fcb99a30c6ed",
+    "name": "Sauopn",
+    "email": "saksaud@gmail.com",
+    "phone": "7411091256",
+    "date": "2026-06-17",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "27.85",
+    "discount_amount": "0.00",
+    "amount": "27.85",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "OPQ15K"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260601-0003",
+    "customer": 3,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-01T11:25:10.073Z",
+    "updated_at": "2026-06-01T11:25:10.073Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 4,
+  "fields": {
+    "uuid": "85127ea1-7bb6-4dd6-811b-de3739546e33",
+    "name": "karem",
+    "email": "sak12saud@gmail.com",
+    "phone": "9874562541",
+    "date": "2026-06-19",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "17.90",
+    "discount_amount": "0.00",
+    "amount": "17.90",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "OPA45K"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260601-0004",
+    "customer": 4,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-01T11:29:39.340Z",
+    "updated_at": "2026-06-01T11:29:39.340Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 5,
+  "fields": {
+    "uuid": "357d94fb-4675-4d7e-b204-eb1b7f1a8b51",
+    "name": "saksa",
+    "email": "saksae@gmail.com",
+    "phone": "7411894562",
+    "date": "2026-06-03",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "27.85",
+    "discount_amount": "0.00",
+    "amount": "27.85",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "PIH78K"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260602-0005",
+    "customer": 7,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-02T17:56:23.956Z",
+    "updated_at": "2026-06-02T17:56:23.956Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 6,
+  "fields": {
+    "uuid": "b59eb059-c239-4153-870f-1d849cb19783",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "9874568445",
+    "date": "2026-06-26",
+    "time": "19:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260603-0006",
+    "customer": 8,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-03T10:34:26.228Z",
+    "updated_at": "2026-06-03T10:34:26.228Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 7,
+  "fields": {
+    "uuid": "f4332006-2e78-488c-955d-562ff49f2f36",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2026-06-13",
+    "time": "15:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260603-0007",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-03T10:35:25.481Z",
+    "updated_at": "2026-06-03T10:35:25.481Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 8,
+  "fields": {
+    "uuid": "9faf7bd8-b6c9-4b1d-b6a6-58f205a999dc",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2026-06-18",
+    "time": "19:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260603-0008",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-03T10:51:27.648Z",
+    "updated_at": "2026-06-03T10:51:27.648Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 9,
+  "fields": {
+    "uuid": "28d713a9-8da4-4a0a-aac9-fe82083818da",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2026-06-27",
+    "time": "16:30:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260605-0009",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-05T11:08:57.689Z",
+    "updated_at": "2026-06-05T11:08:57.689Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 10,
+  "fields": {
+    "uuid": "1d6e071b-b679-42f5-9f0d-ae879a152d43",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2026-06-26",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260612-0010",
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-12T10:07:04.713Z",
+    "updated_at": "2026-06-12T10:07:04.713Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 11,
+  "fields": {
+    "uuid": "aced6278-4f0c-4002-8b19-29ea2206dfa7",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2026-06-13",
+    "time": "16:30:00",
+    "duration": 90,
+    "adults": 3,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "29.85",
+    "discount_amount": "0.00",
+    "amount": "29.85",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260612-0011",
+    "customer": 8,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-12T10:13:02.200Z",
+    "updated_at": "2026-06-12T10:13:02.200Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 12,
+  "fields": {
+    "uuid": "0de37c0a-d5ba-4cf2-aba1-52a1bfca2cae",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2026-06-16",
+    "time": "15:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "19.90",
+    "discount_amount": "0.00",
+    "amount": "19.90",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0012",
+    "customer": 8,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T10:18:50.700Z",
+    "updated_at": "2026-06-15T10:18:50.700Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 13,
+  "fields": {
+    "uuid": "5b098338-6726-4af8-8c2b-353e6c52a0ef",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "date": "2026-06-19",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "11.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0013",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T10:30:54.716Z",
+    "updated_at": "2026-06-15T10:30:54.716Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 14,
+  "fields": {
+    "uuid": "aa9a5097-2551-4bc6-aaae-aad23feb8351",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "date": "2026-06-25",
+    "time": "15:00:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0014",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T10:35:05.150Z",
+    "updated_at": "2026-06-15T10:35:05.150Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 15,
+  "fields": {
+    "uuid": "b1617e6f-3e82-4de6-9738-5469e707b915",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "date": "2026-06-26",
+    "time": "21:00:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0015",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T10:48:56.415Z",
+    "updated_at": "2026-06-15T10:48:56.415Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 16,
+  "fields": {
+    "uuid": "8a6d8db3-9f6b-4b58-962e-a66f7aa9a32b",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-20",
+    "time": "15:00:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "9.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0016",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T10:50:05.165Z",
+    "updated_at": "2026-06-15T10:50:05.165Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 17,
+  "fields": {
+    "uuid": "13c611ba-e751-40d7-bdcd-ec5abcbac5d0",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-18",
+    "time": "15:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "11.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0017",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T11:31:52.330Z",
+    "updated_at": "2026-06-15T11:31:52.330Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 18,
+  "fields": {
+    "uuid": "9642e4ca-bfbf-442e-aeb0-1101273aef5a",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-25",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "11.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0018",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T11:46:22.487Z",
+    "updated_at": "2026-06-15T11:46:22.487Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 19,
+  "fields": {
+    "uuid": "a2a8d881-4984-4452-819d-a6d5875f122b",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-25",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "17.90",
+    "discount_amount": "0.00",
+    "amount": "19.90",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "KIL75L"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0019",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T11:46:50.647Z",
+    "updated_at": "2026-06-15T11:46:50.647Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 20,
+  "fields": {
+    "uuid": "3b816ba3-1326-4c7b-827c-7ca39cbfb590",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-27",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "27.85",
+    "discount_amount": "0.00",
+    "amount": "29.85",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "LE21G"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260615-0020",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-15T12:08:28.086Z",
+    "updated_at": "2026-06-15T12:08:28.086Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 21,
+  "fields": {
+    "uuid": "3007797c-3bb8-4a78-ada6-3a38b2dab521",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-20",
+    "time": "15:00:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "16.45",
+    "discount_amount": "0.00",
+    "amount": "18.45",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": [
+      {
+        "id": "bowling-shoes",
+        "label": "Shoe Hire",
+        "emoji": "👞",
+        "qty": 1,
+        "price_each": 1.5,
+        "subtotal": 1.5
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "LE21B"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260617-0021",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T09:08:20.363Z",
+    "updated_at": "2026-06-17T09:08:20.363Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 22,
+  "fields": {
+    "uuid": "9b6a9429-78b4-4140-815b-3c256a8eff05",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-19",
+    "time": "19:30:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "16.45",
+    "discount_amount": "0.00",
+    "amount": "18.45",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": [
+      {
+        "id": "bowling-shoes",
+        "label": "Shoe Hire",
+        "emoji": "👞",
+        "qty": 1,
+        "price_each": 1.5,
+        "subtotal": 1.5
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "L4DTR"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260617-0022",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T10:22:38.591Z",
+    "updated_at": "2026-06-17T10:22:38.591Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 23,
+  "fields": {
+    "uuid": "0a0de2d5-af4e-4d1f-96a2-c99a01251c7d",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-20",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 3,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "37.80",
+    "discount_amount": "7.56",
+    "amount": "32.24",
+    "paid_amount": "0.00",
+    "voucher_code": "spinpin20",
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "roller-skating",
+    "add_ons": [
+      {
+        "id": "skate-hire",
+        "label": "Skate Hire",
+        "emoji": "🛼",
+        "qty": 1,
+        "price_each": 2.95,
+        "subtotal": 2.95
+      },
+      {
+        "id": "locker",
+        "label": "Locker Hire",
+        "emoji": "🔒",
+        "qty": 1,
+        "price_each": 2,
+        "subtotal": 2
+      },
+      {
+        "id": "parking",
+        "label": "Parking",
+        "emoji": "🚗",
+        "qty": 1,
+        "price_each": 3,
+        "subtotal": 3
+      }
+    ],
+    "parking_plates": [
+      "LE12D"
+    ],
+    "qr_code": null,
+    "booking_number": "SP-20260617-0023",
+    "customer": 5,
+    "voucher": 1,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T11:18:05.256Z",
+    "updated_at": "2026-06-17T11:18:05.256Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 24,
+  "fields": {
+    "uuid": "008ba144-10fd-4b45-a6b8-73c325d10b06",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-21",
+    "time": "13:30:00",
+    "duration": 90,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "9.95",
+    "discount_amount": "0.00",
+    "amount": "11.95",
+    "paid_amount": "0.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "activity": "ten-pin-bowling",
+    "add_ons": null,
+    "parking_plates": [],
+    "qr_code": null,
+    "booking_number": "SP-20260617-0024",
+    "customer": 5,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T11:43:11.977Z",
+    "updated_at": "2026-06-17T11:43:11.977Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 1,
+  "fields": {
+    "uuid": "53649af6-b051-40fd-96e5-f740cd9252da",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2026-06-04",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 3,
+    "spectators": 0,
+    "amount": "152.95",
+    "paid_amount": "0.00",
+    "birthday_child_name": "kims",
+    "birthday_child_age": 8,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "dob": "2004-02-04",
+          "isPrimary": true
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2026-06-02T07:57:26.303Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 1,
+    "booking_number": "SPPARTY-20260602-0001",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-02T07:56:43.009Z",
+    "updated_at": "2026-06-02T07:57:26.328Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 2,
+  "fields": {
+    "uuid": "db9cd1af-664a-423c-acae-5bcba6391b30",
+    "name": "lion",
+    "email": "lion@gmail.com",
+    "phone": "7894561235",
+    "date": "2026-06-04",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 1,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "ping",
+    "birthday_child_age": 8,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 6,
+    "booking_number": "SPPARTY-20260602-0002",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-02T17:23:31.403Z",
+    "updated_at": "2026-06-02T17:23:31.403Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 3,
+  "fields": {
+    "uuid": "6c0b3508-895a-45f0-9546-51da99240f55",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-21",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "Halima",
+    "birthday_child_age": 9,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "8792248396",
+          "dob": "2001-03-19",
+          "isPrimary": true
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2026-06-17T11:49:30.964Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0003",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T11:45:58.842Z",
+    "updated_at": "2026-06-17T11:49:30.966Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 4,
+  "fields": {
+    "uuid": "0bb8fe44-ad11-4261-b842-507c619437cf",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-21",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "Halima",
+    "birthday_child_age": 9,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0004",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T11:51:29.043Z",
+    "updated_at": "2026-06-17T11:51:29.043Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 5,
+  "fields": {
+    "uuid": "f7bb2695-9323-43fc-8f49-edc0dd83eec8",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-21",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "Halima",
+    "birthday_child_age": 9,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0005",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T11:52:18.841Z",
+    "updated_at": "2026-06-17T11:52:18.841Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 6,
+  "fields": {
+    "uuid": "777c0b43-5f96-4c8b-b494-e0c70a162c08",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-26",
+    "time": "15:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "jio",
+    "birthday_child_age": 7,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0006",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T12:06:21.359Z",
+    "updated_at": "2026-06-17T12:06:21.359Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 7,
+  "fields": {
+    "uuid": "6b80e037-8052-4ee4-9bc2-f09a047570a4",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-25",
+    "time": "15:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "pop",
+    "birthday_child_age": 6,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "98745895485",
+          "dob": "2008-06-03",
+          "isPrimary": true,
+          "waiverSigned": false
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2026-06-17T13:05:11.399Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0007",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T13:04:42.837Z",
+    "updated_at": "2026-06-17T13:05:11.406Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 8,
+  "fields": {
+    "uuid": "10ff0740-91ee-4a97-ae8c-fcc5cc7db88b",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-26",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "kiop",
+    "birthday_child_age": 8,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "7485965478",
+          "dob": "2008-06-16",
+          "isPrimary": true,
+          "waiverSigned": false
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2026-06-17T13:45:01.088Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0008",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T13:44:43.472Z",
+    "updated_at": "2026-06-17T13:45:01.091Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 9,
+  "fields": {
+    "uuid": "2acf51d7-cc84-43b2-bff3-171b09e09ee3",
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "date": "2026-06-19",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "spectators": 0,
+    "amount": "150.00",
+    "paid_amount": "0.00",
+    "birthday_child_name": "uioo",
+    "birthday_child_age": 7,
+    "special_requests": null,
+    "dietary_restrictions": null,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "78451256956",
+          "dob": "2008-06-03",
+          "isPrimary": true,
+          "waiverSigned": false
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2026-06-17T13:51:39.613Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "payment_status": "PENDING",
+    "customer": 5,
+    "booking_number": "SPPARTY-20260617-0009",
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2026-06-17T13:51:21.939Z",
+    "updated_at": "2026-06-17T13:51:39.614Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 1,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2005-02-08",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-05-18T01:15:53.247Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 1,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-05-18T01:15:53.248Z",
+    "updated_at": "2026-05-18T01:15:53.248Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 2,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2008-05-07",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-05-18T10:44:05.337Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "name": "Suresh",
+        "dob": "2022-05-31"
+      }
+    ],
+    "adults": [
+      {
+        "name": "ghg",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "9411091256",
+        "dob": "2008-05-11"
+      }
+    ],
+    "booking": 2,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-05-18T10:44:05.338Z",
+    "updated_at": "2026-05-18T10:44:05.338Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 3,
+  "fields": {
+    "name": "Sauopn",
+    "email": "saksaud@gmail.com",
+    "phone": "7411091256",
+    "dob": "2001-05-08",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-01T11:25:10.218Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "name": "Saud Ali khan",
+        "dob": "2009-02-01"
+      }
+    ],
+    "adults": [],
+    "booking": 3,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-01T11:25:10.220Z",
+    "updated_at": "2026-06-01T11:25:10.220Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 4,
+  "fields": {
+    "name": "karem",
+    "email": "sak12saud@gmail.com",
+    "phone": "9874562541",
+    "dob": "2000-06-13",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-01T11:29:39.533Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 4,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-01T11:29:39.533Z",
+    "updated_at": "2026-06-01T11:29:39.533Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 7,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2004-02-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-02T07:57:26.528Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 1,
+    "customer": 1,
+    "created_at": "2026-06-02T07:57:26.528Z",
+    "updated_at": "2026-06-02T18:14:24.030Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 8,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2004-02-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-02T07:57:26.939Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 1,
+    "customer": 1,
+    "created_at": "2026-06-02T07:57:26.939Z",
+    "updated_at": "2026-06-02T18:14:26.367Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 9,
+  "fields": {
+    "name": "saksa",
+    "email": "saksae@gmail.com",
+    "phone": "7411894562",
+    "dob": "2006-02-14",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-02T17:56:24.047Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "name": "king",
+        "dob": "2023-02-25"
+      }
+    ],
+    "adults": [],
+    "booking": 5,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-02T17:56:24.047Z",
+    "updated_at": "2026-06-02T18:14:29.388Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 10,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "9874568445",
+    "dob": "2006-03-01",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-03T10:34:26.292Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 6,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-03T10:34:26.292Z",
+    "updated_at": "2026-06-03T10:34:26.292Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 11,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2006-02-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-03T10:35:25.607Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 7,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-03T10:35:25.607Z",
+    "updated_at": "2026-06-03T10:35:25.607Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 12,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2000-02-16",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-03T10:51:27.701Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 8,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-03T10:51:27.701Z",
+    "updated_at": "2026-06-03T10:51:27.701Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 13,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2008-06-05",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-05T11:08:57.737Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 9,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-05T11:08:57.737Z",
+    "updated_at": "2026-06-05T11:08:57.737Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 14,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2008-06-11",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-12T10:07:04.765Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 10,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-12T10:07:04.765Z",
+    "updated_at": "2026-06-12T10:07:04.765Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 15,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "dob": "2008-06-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-12T10:13:02.232Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [
+      {
+        "name": "koo",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "9874584745",
+        "dob": "2008-06-08"
+      },
+      {
+        "name": "hhh",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "7811091256",
+        "dob": "2008-06-02"
+      }
+    ],
+    "booking": 11,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-12T10:13:02.232Z",
+    "updated_at": "2026-06-12T10:13:02.232Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 16,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "dob": "1990-06-15",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T10:18:50.764Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [
+      {
+        "name": "Second Guest",
+        "email": "second@example.com",
+        "phone": "0987654321",
+        "dob": "1995-01-01"
+      }
+    ],
+    "booking": 12,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T10:18:50.764Z",
+    "updated_at": "2026-06-15T10:18:50.764Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 17,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "dob": "2008-06-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T10:30:54.765Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 13,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T10:30:54.765Z",
+    "updated_at": "2026-06-15T10:30:54.766Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 18,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "dob": "2008-06-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T10:35:05.197Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 14,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T10:35:05.197Z",
+    "updated_at": "2026-06-15T10:35:05.197Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 19,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "+917411095869",
+    "dob": "2008-06-05",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T10:48:56.456Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 15,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T10:48:56.456Z",
+    "updated_at": "2026-06-15T10:48:56.456Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 20,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "1998-06-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T10:50:05.214Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 16,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T10:50:05.215Z",
+    "updated_at": "2026-06-15T10:50:05.215Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 21,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2008-06-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T11:31:52.372Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 17,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T11:31:52.372Z",
+    "updated_at": "2026-06-15T11:31:52.372Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 22,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2008-05-27",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T11:46:22.538Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 18,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T11:46:22.539Z",
+    "updated_at": "2026-06-15T11:46:22.539Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 23,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2008-05-27",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T11:46:50.683Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 19,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T11:46:50.684Z",
+    "updated_at": "2026-06-15T11:46:50.684Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 24,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "1994-02-11",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-15T12:08:28.200Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "name": "kep",
+        "dob": "2019-02-10"
+      }
+    ],
+    "adults": [],
+    "booking": 20,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-15T12:08:28.200Z",
+    "updated_at": "2026-06-15T12:08:28.200Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 25,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2004-05-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T09:08:20.408Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 21,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-17T09:08:20.408Z",
+    "updated_at": "2026-06-17T09:08:20.408Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 26,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2008-06-10",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T10:22:38.646Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 22,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-17T10:22:38.646Z",
+    "updated_at": "2026-06-17T10:22:38.646Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 27,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2008-06-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T11:18:05.366Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [
+      {
+        "name": "lop ds",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "98711091256",
+        "dob": "2008-06-02"
+      },
+      {
+        "name": "sdsda",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "99781091256",
+        "dob": "2006-01-16"
+      }
+    ],
+    "booking": 23,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-17T11:18:05.367Z",
+    "updated_at": "2026-06-17T11:18:05.367Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 28,
+  "fields": {
+    "name": "mohammed",
+    "email": "ninja@ninja.com",
+    "phone": "7411095869",
+    "dob": "2001-03-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T11:43:12.056Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 24,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2026-06-17T11:43:12.057Z",
+    "updated_at": "2026-06-17T11:43:12.057Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 48,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "8792248396",
+    "dob": "2001-03-19",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T11:49:31.005Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 3,
+    "customer": 5,
+    "created_at": "2026-06-17T11:49:31.005Z",
+    "updated_at": "2026-06-17T11:49:31.005Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 49,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "98745895485",
+    "dob": "2008-06-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T13:05:11.448Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 7,
+    "customer": 5,
+    "created_at": "2026-06-17T13:05:11.448Z",
+    "updated_at": "2026-06-17T13:05:11.448Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 50,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7485965478",
+    "dob": "2008-06-16",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T13:45:01.111Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 8,
+    "customer": 5,
+    "created_at": "2026-06-17T13:45:01.111Z",
+    "updated_at": "2026-06-17T13:45:01.111Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 51,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "78451256956",
+    "dob": "2008-06-03",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2026-06-17T13:51:39.631Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": null,
+    "party_booking": 9,
+    "customer": 5,
+    "created_at": "2026-06-17T13:51:39.631Z",
+    "updated_at": "2026-06-17T13:51:39.631Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 1,
+  "fields": {
+    "slug": "home",
+    "title": "Spin Pin – Leicester's Premier Entertainment Venue",
+    "description": "Roller Skating, Ten Pin Bowling, Arcade Games and more at Spin Pin Leicester. Book your session today!",
+    "keywords": "bowling leicester, roller skating leicester, arcade leicester, spin pin, entertainment venue leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.930Z",
+    "updated_at": "2026-05-10T00:54:09.930Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 2,
+  "fields": {
+    "slug": "about",
+    "title": "About Spin Pin – Leicester City Centre Entertainment",
+    "description": "Learn about Spin Pin, Leicester's premier entertainment venue on Navigation Street.",
+    "keywords": "about spin pin, bowling venue leicester, roller skating venue",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.932Z",
+    "updated_at": "2026-05-10T00:54:09.932Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 3,
+  "fields": {
+    "slug": "attractions",
+    "title": "Attractions – Spin Pin Leicester",
+    "description": "Explore our activities: Roller Skating, Ten Pin Bowling, Arcade Games, VR and more.",
+    "keywords": "roller skating leicester, bowling leicester, arcade leicester, VR leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.933Z",
+    "updated_at": "2026-05-10T00:54:09.933Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 4,
+  "fields": {
+    "slug": "pricing",
+    "title": "Pricing – Spin Pin Leicester",
+    "description": "Affordable fun for all ages. View our session prices, add-ons, and group rates.",
+    "keywords": "spin pin prices, bowling prices leicester, roller skating prices leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.933Z",
+    "updated_at": "2026-05-10T00:54:09.933Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 5,
+  "fields": {
+    "slug": "parties",
+    "title": "Party Packages – Spin Pin Leicester",
+    "description": "Celebrate your birthday or event at Spin Pin Leicester. Book a party package today.",
+    "keywords": "birthday party leicester, party venue leicester, functions spin pin",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.934Z",
+    "updated_at": "2026-05-10T00:54:09.934Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 6,
+  "fields": {
+    "slug": "groups",
+    "title": "Group Bookings – Spin Pin Leicester",
+    "description": "Group and school bookings available at Spin Pin Leicester. Discounted rates for 10+ people.",
+    "keywords": "group booking leicester, school trip leicester, corporate event leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.935Z",
+    "updated_at": "2026-05-10T00:54:09.935Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 7,
+  "fields": {
+    "slug": "contact",
+    "title": "Contact Spin Pin – Leicester",
+    "description": "Get in touch with Spin Pin Leicester. Find our address, phone, and opening hours.",
+    "keywords": "spin pin contact, spin pin phone number, spin pin address, navigation street leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.936Z",
+    "updated_at": "2026-05-10T00:54:09.936Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 8,
+  "fields": {
+    "slug": "guidelines",
+    "title": "Safety Guidelines – Spin Pin Leicester",
+    "description": "Read our safety guidelines before your visit to Spin Pin Leicester.",
+    "keywords": "spin pin safety, bowling rules, roller skating rules leicester",
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.936Z",
+    "updated_at": "2026-05-10T00:54:09.936Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 4,
+  "fields": {
+    "name": "Roller Skating",
+    "slug": "roller-skating",
+    "short_description": "Experience Leicester's First Roller Skating Rink. Fun for all ages!",
+    "description": "Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family. Whether you are a first-timer or a seasoned skater, our spacious rink caters to all abilities.",
+    "image_url": "",
+    "gallery": [],
+    "why_choose_us": null,
+    "what_to_expect": null,
+    "location_info": null,
+    "activity_faqs": [],
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.221Z",
+    "updated_at": "2026-05-18T01:24:37.221Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 5,
+  "fields": {
+    "name": "Ten Pin Bowling",
+    "slug": "ten-pin-bowling",
+    "short_description": "Strike it big in our ten pin bowling lanes. Fun for everyone!",
+    "description": "Bowling at Spin Pin is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre. With bumpers available for younger players and an automatic scoring system, it is perfect for competitive fun with friends and family.",
+    "image_url": "",
+    "gallery": [],
+    "why_choose_us": null,
+    "what_to_expect": null,
+    "location_info": null,
+    "activity_faqs": [],
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.221Z",
+    "updated_at": "2026-05-18T01:24:37.221Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 6,
+  "fields": {
+    "name": "Arcade Games",
+    "slug": "arcade-games",
+    "short_description": "Level Up at Spin Pin! Classic hits, modern gaming, and VR.",
+    "description": "Step into Spin Pin Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between. From redemption machines to racing simulators, air hockey, basketball, and VR experiences - there is something for everyone. Purchase token packs and win prizes at the redemption counter.",
+    "image_url": "",
+    "gallery": [],
+    "why_choose_us": null,
+    "what_to_expect": null,
+    "location_info": null,
+    "activity_faqs": [],
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.221Z",
+    "updated_at": "2026-05-18T01:24:37.221Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 1,
+  "fields": {
+    "question": "Where is Spin Pin located?",
+    "answer": "We're at Navigation Street, Leicester City Centre, LE1 6JS. Very easy to reach by public transport or car.",
+    "category": "General",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.951Z",
+    "updated_at": "2026-05-10T00:54:09.951Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 2,
+  "fields": {
+    "question": "What are your opening hours?",
+    "answer": "We are open Tuesday to Sunday from 12 pm to 10 pm. We are closed on Mondays except during peak times (school holidays and bank holidays).",
+    "category": "General",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.951Z",
+    "updated_at": "2026-05-10T00:54:18.283Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 3,
+  "fields": {
+    "question": "Do I need to book in advance?",
+    "answer": "We highly recommend booking online to guarantee your spot, especially during weekends and peak times. Walk-ins are welcome subject to availability.",
+    "category": "Booking",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:18.289Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 4,
+  "fields": {
+    "question": "Is there parking available?",
+    "answer": "Nearby car parks are available close to Navigation Street. We also offer parking registration at reception for £3.00 per car.",
+    "category": "General",
+    "order": 4,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 5,
+  "fields": {
+    "question": "Is Spin Pin suitable for all ages?",
+    "answer": "Absolutely! We cater for all ages from toddlers to adults. We have specific sessions and equipment to suit different age groups.",
+    "category": "General",
+    "order": 5,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 6,
+  "fields": {
+    "question": "How much does it cost?",
+    "answer": "Roller Skating, Bowling & VR: £9.95 per person/game. Roller Skate Hire: £2.95/pair. Spectators (Age 4+): £2.95. Spectators under 4: FREE. Parking: £3.00/car. Lockers: £2.00.",
+    "category": "Pricing",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 7,
+  "fields": {
+    "question": "Are there any discounts for groups?",
+    "answer": "Yes! Groups of 10+ people qualify for discounted rates. Please get in touch via our contact page or call us for a custom quote.",
+    "category": "Pricing",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 8,
+  "fields": {
+    "question": "Do you accept card payments?",
+    "answer": "Yes, we accept all major credit and debit cards. We also welcome cash payments. Contactless payments are available at all tills.",
+    "category": "Pricing",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 9,
+  "fields": {
+    "question": "Do I need to bring my own skates?",
+    "answer": "No! We have quad skates available to hire (£2.95/pair) in all sizes from children to adults. You're also welcome to bring your own!",
+    "category": "Roller Skating",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 10,
+  "fields": {
+    "question": "Can complete beginners skate?",
+    "answer": "Absolutely! Our staff are friendly and always ready to help beginners get their skating legs. We also have skating aids available.",
+    "category": "Roller Skating",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 11,
+  "fields": {
+    "question": "What safety equipment is available?",
+    "answer": "Helmets, knee pads and wrist guards are available for hire or use at the venue. We strongly recommend protective equipment for younger skaters.",
+    "category": "Roller Skating",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.952Z",
+    "updated_at": "2026-05-10T00:54:09.952Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 12,
+  "fields": {
+    "question": "How long is a bowling session?",
+    "answer": "A standard session is one game (approximately 30-45 minutes for up to 6 players). You can book multiple games back to back.",
+    "category": "Bowling",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.953Z",
+    "updated_at": "2026-05-10T00:54:09.953Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 13,
+  "fields": {
+    "question": "Is shoe hire included?",
+    "answer": "Bowling shoes are available to hire for £1.50. If you have your own bowling shoes, you're welcome to bring them.",
+    "category": "Bowling",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.953Z",
+    "updated_at": "2026-05-10T00:54:09.953Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 14,
+  "fields": {
+    "question": "Do you have bumpers for children?",
+    "answer": "Yes! Bumpers and ball ramps are available for younger players to make bowling more enjoyable.",
+    "category": "Bowling",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.953Z",
+    "updated_at": "2026-05-10T00:54:09.953Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 15,
+  "fields": {
+    "question": "Can I book a birthday party at Spin Pin?",
+    "answer": "Yes! We love hosting birthday parties and special celebrations. Visit our Parties page or call us to discuss packages. We offer tailored party experiences including all activities, food options, and a private party area.",
+    "category": "Parties",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.953Z",
+    "updated_at": "2026-05-10T00:54:09.953Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 16,
+  "fields": {
+    "question": "What's included in a party package?",
+    "answer": "Party packages typically include session time for your chosen activities, a private party room, food from our menu, and a dedicated party host. Contact us for the latest inclusions and pricing.",
+    "category": "Parties",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.953Z",
+    "updated_at": "2026-05-10T00:54:09.953Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 17,
+  "fields": {
+    "question": "How far in advance should I book a party?",
+    "answer": "We recommend booking at least 2-4 weeks in advance, especially for weekends. For larger parties, 6+ weeks is ideal to secure your preferred date and time.",
+    "category": "Parties",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.954Z",
+    "updated_at": "2026-05-10T00:54:09.954Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 18,
+  "fields": {
+    "question": "Is Spin Pin wheelchair accessible?",
+    "answer": "Yes, our venue has ramp access and accessible facilities. Please call us in advance so we can make appropriate arrangements for your visit.",
+    "category": "Accessibility",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.954Z",
+    "updated_at": "2026-05-10T00:54:09.954Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 19,
+  "fields": {
+    "question": "Are lockers available?",
+    "answer": "Yes! Lockers are available at the venue for £2.00. Register at reception and we'll assign you one. Great for keeping your belongings safe while you play.",
+    "category": "Accessibility",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.954Z",
+    "updated_at": "2026-05-10T00:54:09.954Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 20,
+  "fields": {
+    "question": "Is parking available?",
+    "answer": "Yes! We have free parking on site. Please note parking is restricted to 2 hours. For extended parking, please register your vehicle at reception (maximum 3 hours).",
+    "category": "General",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.294Z",
+    "updated_at": "2026-05-10T00:54:18.294Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 21,
+  "fields": {
+    "question": "What payment methods do you accept?",
+    "answer": "We are CASH ONLY at the venue. A free cash machine is available on site. However, you can pay by card when booking online.",
+    "category": "Payment",
+    "order": 4,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.300Z",
+    "updated_at": "2026-05-10T00:54:18.300Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 22,
+  "fields": {
+    "question": "Do you cater for dietary requirements?",
+    "answer": "Yes! We offer vegetarian and halal food options. Please inform us of any allergies or dietary requirements at least 2 days before your visit.",
+    "category": "Food",
+    "order": 5,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.304Z",
+    "updated_at": "2026-05-10T00:54:18.305Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 23,
+  "fields": {
+    "question": "What is your age policy?",
+    "answer": "Most activities are suitable for ages 5+. Children under 16 must be accompanied by an adult (18+). We have specific sessions for different age groups.",
+    "category": "General",
+    "order": 6,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.310Z",
+    "updated_at": "2026-05-10T00:54:18.310Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 24,
+  "fields": {
+    "question": "Do I need to sign a waiver?",
+    "answer": "Yes, all participants must sign a waiver before participating in any activities. You can complete this online before your visit or at the venue.",
+    "category": "Safety",
+    "order": 7,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.314Z",
+    "updated_at": "2026-05-10T00:54:18.314Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 25,
+  "fields": {
+    "question": "Can I bring my own food?",
+    "answer": "Outside food and drinks are not permitted. We have a café on site offering a variety of food and drinks.",
+    "category": "Food",
+    "order": 8,
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.319Z",
+    "updated_at": "2026-05-10T00:54:18.319Z"
+  }
+},
+{
+  "model": "cms.sociallink",
+  "pk": 1,
+  "fields": {
+    "platform": "Instagram",
+    "url": "https://www.instagram.com/spinpinleicester",
+    "icon": "Instagram",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.954Z",
+    "updated_at": "2026-05-10T00:54:09.954Z"
+  }
+},
+{
+  "model": "cms.sociallink",
+  "pk": 2,
+  "fields": {
+    "platform": "Facebook",
+    "url": "https://www.facebook.com/spinpinleicester",
+    "icon": "Facebook",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.955Z",
+    "updated_at": "2026-05-10T00:54:09.955Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 1,
+  "fields": {
+    "title": "Gemini_Generated_Image_vj6fkfvj6fkfvj6f",
+    "image_url": "http://localhost:9000/media/uploads/20260518_141009_6346e262_Gemini_Generated_Image_vj6fkfvj6fkfvj6f.png",
+    "category": "General",
+    "order": 0,
+    "active": true,
+    "created_at": "2026-05-18T08:40:09.846Z",
+    "updated_at": "2026-05-18T08:40:09.846Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 2,
+  "fields": {
+    "title": "spinpin1",
+    "image_url": "http://localhost:9000/media/uploads/20260603_164327_6f44957e_spinpin1.webp",
+    "category": "parties_carousel",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-06-03T11:13:27.517Z",
+    "updated_at": "2026-06-03T11:13:27.517Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 3,
+  "fields": {
+    "title": "spinpin2",
+    "image_url": "http://localhost:9000/media/uploads/20260603_164345_68797757_spinpin2.webp",
+    "category": "parties_carousel",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-06-03T11:13:45.403Z",
+    "updated_at": "2026-06-03T11:13:45.403Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 4,
+  "fields": {
+    "title": "spinpin",
+    "image_url": "http://localhost:9000/media/uploads/20260603_164350_a74c2c31_spinpin.webp",
+    "category": "parties_carousel",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-06-03T11:13:50.429Z",
+    "updated_at": "2026-06-03T11:13:50.430Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 5,
+  "fields": {
+    "title": "spinpin2",
+    "image_url": "http://localhost:9000/media/uploads/20260605_150038_a70c1f0a_spinpin2.webp",
+    "category": "General",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-06-05T09:30:39.123Z",
+    "updated_at": "2026-06-05T09:30:39.123Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 6,
+  "fields": {
+    "title": "spinpin1",
+    "image_url": "http://localhost:9000/media/uploads/20260605_150039_8fce006e_spinpin1.webp",
+    "category": "General",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-06-05T09:30:39.373Z",
+    "updated_at": "2026-06-05T09:30:39.373Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 7,
+  "fields": {
+    "title": "spinpin",
+    "image_url": "http://localhost:9000/media/uploads/20260605_150039_e8dcecfd_spinpin.webp",
+    "category": "General",
+    "order": 3,
+    "active": true,
+    "created_at": "2026-06-05T09:30:39.639Z",
+    "updated_at": "2026-06-05T09:30:39.639Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 5,
+  "fields": {
+    "label": "Activities",
+    "value": "3",
+    "unit": "World-Class Activities",
+    "icon": "Zap",
+    "color": "primary",
+    "page": "about",
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-10T00:54:09.950Z",
+    "updated_at": "2026-05-20T07:30:53.875Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 10,
+  "fields": {
+    "label": "Happy Visitors",
+    "value": "5,000+",
+    "unit": "",
+    "icon": "Users",
+    "color": "primary",
+    "page": "home",
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-18T01:24:37.269Z",
+    "updated_at": "2026-05-18T01:24:37.269Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 11,
+  "fields": {
+    "label": "Safe & Fun",
+    "value": "100%",
+    "unit": "",
+    "icon": "Shield",
+    "color": "primary",
+    "page": "home",
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-18T01:24:37.269Z",
+    "updated_at": "2026-05-18T01:24:37.269Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 12,
+  "fields": {
+    "label": "City Centre",
+    "value": "Leicester",
+    "unit": "",
+    "icon": "Trophy",
+    "color": "primary",
+    "page": "home",
+    "active": true,
+    "order": 4,
+    "created_at": "2026-05-18T01:24:37.269Z",
+    "updated_at": "2026-05-18T01:24:37.269Z"
+  }
+},
+{
+  "model": "cms.menusection",
+  "pk": 4,
+  "fields": {
+    "category": "Hot Food",
+    "description": "Freshly prepared hot dishes available during your visit",
+    "items": [
+      "Chips – £2.50",
+      "Chicken Nuggets & Chips – £4.50",
+      "Hot Dog – £3.50",
+      "Nachos with Salsa – £4.00",
+      "Pizza Slice – £3.00"
+    ],
+    "icon": "Flame",
+    "color": "primary",
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-10T00:54:09.964Z",
+    "updated_at": "2026-05-10T00:54:09.964Z"
+  }
+},
+{
+  "model": "cms.menusection",
+  "pk": 5,
+  "fields": {
+    "category": "Cold Drinks & Snacks",
+    "description": "Refreshing drinks and light bites",
+    "items": [
+      "Soft Drinks – from £1.50",
+      "Water Bottle – £1.00",
+      "Crisps – £1.00",
+      "Chocolate Bar – £1.00",
+      "Ice Cream – £2.00"
+    ],
+    "icon": "Coffee",
+    "color": "secondary",
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-10T00:54:09.964Z",
+    "updated_at": "2026-05-10T00:54:09.964Z"
+  }
+},
+{
+  "model": "cms.menusection",
+  "pk": 6,
+  "fields": {
+    "category": "Party Food Add-on",
+    "description": "Available as part of party packages (price per person)",
+    "items": [
+      "Basic Package (£4.99pp): Sandwiches, chips, squash",
+      "Standard Package (£7.99pp): Hot food selection, soft drink, dessert",
+      "Premium Package (£12.99pp): Full buffet, dessert table, unlimited soft drinks"
+    ],
+    "icon": "PartyPopper",
+    "color": "accent",
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-10T00:54:09.964Z",
+    "updated_at": "2026-05-10T00:54:09.964Z"
+  }
+},
+{
+  "model": "cms.grouppackage",
+  "pk": 1,
+  "fields": {
+    "name": "School Trip Package",
+    "subtitle": "Perfect for educational visits and end-of-term treats",
+    "min_size": "15+ Students",
+    "icon": "Users",
+    "price": "8.99",
+    "price_note": "per student",
+    "features": [
+      "Roller skating OR bowling session",
+      "Dedicated group supervisor",
+      "Safety briefing included",
+      "Pre-booking required",
+      "1:10 teacher ratio recommended",
+      "Risk assessment available on request"
+    ],
+    "color": "primary",
+    "popular": false,
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.grouppackage",
+  "pk": 2,
+  "fields": {
+    "name": "Corporate & Team Events",
+    "subtitle": "Boost morale and team spirit with our fun corporate packages",
+    "min_size": "10+ People",
+    "icon": "Briefcase",
+    "price": "12.99",
+    "price_note": "per person",
+    "features": [
+      "Choice of all 3 activities",
+      "Dedicated event coordinator",
+      "Flexible timing",
+      "Food & drink packages available",
+      "Invoice billing available",
+      "Bespoke packages for large groups"
+    ],
+    "color": "secondary",
+    "popular": true,
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.grouppackage",
+  "pk": 3,
+  "fields": {
+    "name": "College & University Package",
+    "subtitle": "Great for students looking for affordable group fun",
+    "min_size": "10+ Students",
+    "icon": "GraduationCap",
+    "price": "9.99",
+    "price_note": "per person",
+    "features": [
+      "Access to all activities",
+      "Group discount applied",
+      "Flexible booking slots",
+      "Student ID required",
+      "Walk-in groups on selected days"
+    ],
+    "color": "accent",
+    "popular": false,
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 1,
+  "fields": {
+    "title": "General Safety Rules",
+    "icon": "Shield",
+    "items": [
+      "All visitors must read and agree to our safety rules before participating",
+      "Children under 7 must be accompanied by an adult at all times",
+      "Spin Pin staff instructions must be followed at all times",
+      "Spin Pin reserves the right to remove any participant who disregards safety rules",
+      "Spin Pin is not liable for personal injury sustained through failure to follow guidelines"
+    ],
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 2,
+  "fields": {
+    "title": "Roller Skating Guidelines",
+    "icon": "Zap",
+    "items": [
+      "Skate in the same direction as the flow of the rink",
+      "No running on the skating rink",
+      "Holding hands is limited to pairs – no chain skating",
+      "No overtaking or racing permitted",
+      "Beginners should use the outer edge of the rink",
+      "Wear safety equipment – helmets, knee & wrist pads recommended",
+      "No food or drink on the skating rink",
+      "Remove skates before leaving the rink area"
+    ],
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 3,
+  "fields": {
+    "title": "Bowling Guidelines",
+    "icon": "Target",
+    "items": [
+      "Bowling shoes must be worn on the lanes at all times",
+      "Only bowlers with paid sessions may enter the lane area",
+      "Do not cross the foul line onto the bowling lane",
+      "Wait for the pin setter to finish before bowling",
+      "Children under 7 require adult supervision at the lanes",
+      "No food or drink beyond the lane counter area",
+      "Bumpers and ramps are available for younger bowlers – ask at reception"
+    ],
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-10T00:54:09.962Z",
+    "updated_at": "2026-05-10T00:54:09.962Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 4,
+  "fields": {
+    "title": "Arcade Guidelines",
+    "icon": "Star",
+    "items": [
+      "Tokens must be purchased at reception",
+      "Tokens are non-refundable and non-transferable",
+      "Prize ticket values are displayed at the prize counter",
+      "One person per machine at a time",
+      "Spin Pin is not liable for personal injury sustained while using arcade machines",
+      "Broken or malfunctioning machines should be reported to staff immediately"
+    ],
+    "active": true,
+    "order": 4,
+    "created_at": "2026-05-10T00:54:09.963Z",
+    "updated_at": "2026-05-10T00:54:09.963Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 5,
+  "fields": {
+    "title": "Dress Code & Attire",
+    "icon": "Shirt",
+    "items": [
+      "Comfortable clothing appropriate for physical activity is recommended",
+      "Loose or overly baggy clothing is not recommended for roller skating",
+      "Jewellery and watches should be removed before roller skating for safety",
+      "Flat-soled grip socks are recommended under skates",
+      "Backpacks and bags should be stored in lockers before participating"
+    ],
+    "active": true,
+    "order": 5,
+    "created_at": "2026-05-10T00:54:09.963Z",
+    "updated_at": "2026-05-10T00:54:09.963Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 6,
+  "fields": {
+    "title": "Health & Safety",
+    "icon": "Heart",
+    "items": [
+      "Participants with medical conditions must inform staff before participating",
+      "Pregnant visitors are advised against roller skating and VR experiences",
+      "Spin Pin has a qualified first aider on site at all times",
+      "First aid kits are available throughout the venue",
+      "Emergency exits are clearly marked – please familiarise yourself on arrival",
+      "Report any accidents or near-misses to staff immediately"
+    ],
+    "active": true,
+    "order": 6,
+    "created_at": "2026-05-10T00:54:09.963Z",
+    "updated_at": "2026-05-10T00:54:09.963Z"
+  }
+},
+{
+  "model": "cms.bookinginformation",
+  "pk": 1,
+  "fields": {
+    "booking_type": "SESSION",
+    "title": "Spin Pin Session Booking",
+    "subtitle": "Booking Available from Thursday's to Sunday's",
+    "content": "Half Term - Peak School & Bank holidays.\n\nMonday - Closed\nTuesday to Sunday 12 pm to 10:00 pm",
+    "rules_content": "SPIN PIN ROLLER SKATING VENUE – RULES & GUIDELINES\n\nWelcome to Spin Pin! To ensure that all our guests have a safe and enjoyable experience, we ask that you read and follow the following rules and guidelines.\n\n1. GENERAL RULES\n• Skating Area: Only roller skates, inline skates, or skateboards are permitted on the rink\n• Use of Skates: participants must not skate outside the rink or wear the skates to the toilets, café or to access any other areas\n• Adherence to Instructions: All skaters must follow the instructions provided by Spin Pin staff\n• Respect for Others: Always be considerate and respectful towards fellow skaters\n• Alcohol and Drugs: Strictly prohibited\n• Smoking: Not allowed inside the venue\n\n2. SAFETY GUIDELINES\n• Participation: you must not participate without signing the required waiver\n• Skating at Your Own Risk: Roller skating involves inherent risks of injury\n• Safety Gear: Encouraged for all skaters, especially beginners\n• Skate Within Your Ability: Skate at speeds appropriate for your skill level\n\n3. AGE RESTRICTIONS\n• Minimum Age: Skating is permitted for individuals aged 5 and up\n• Children under 16 must be accompanied by an adult (18 years or older)",
+    "sessions_info": [
+      {
+        "name": "Rolly Polly",
+        "description": "A general skate session Open to all ages and ability",
+        "schedule": [
+          "Thursday 3 pm to 8 pm",
+          "Friday 3 pm to 8 pm",
+          "Saturday and Sunday 12 pm to 8 pm"
+        ]
+      },
+      {
+        "name": "Teen Tribe",
+        "description": "Skating session for teens aged 13 to 17 years old only of all skating abilities",
+        "schedule": [
+          "Thursday 8 pm to 9:30 pm"
+        ]
+      },
+      {
+        "name": "Grown-up Glide",
+        "description": "Adult only skating session 18+ of all skating abilities",
+        "schedule": [
+          "Friday 8 pm to 9:30 pm"
+        ]
+      },
+      {
+        "name": "Grand Disco",
+        "description": "For all ages and abilities",
+        "schedule": [
+          "Saturday 8 pm to 9:30 pm"
+        ]
+      }
+    ],
+    "active": true,
+    "created_at": "2026-05-10T00:54:18.278Z",
+    "updated_at": "2026-05-10T00:54:18.278Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 1,
+  "fields": {
+    "page": "home",
+    "section_key": "hero",
+    "title": "Welcome to Spin Pin",
+    "subtitle": "Bowling, Roller Skating & Arcade in Leicester",
+    "content": "Leicester's ultimate entertainment venue. Roller skating, ten pin bowling, and arcade games all under one roof.",
+    "image_url": "http://localhost:9000/media/uploads/20260511_131100_fc87e12c_Gemini_Generated_Image_vj6fkfvj6fkfvj6f.png",
+    "video_url": null,
+    "cta_text": "Book your session today",
+    "cta_link": "/book",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.937Z",
+    "updated_at": "2026-05-18T01:24:37.250Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 2,
+  "fields": {
+    "page": "home",
+    "section_key": "about",
+    "title": "Leicester's Premier Entertainment Venue",
+    "subtitle": "Three amazing activities under one roof",
+    "content": "Spin Pin is Leicester's go-to destination for roller skating, ten pin bowling, and arcade games. Conveniently located on Navigation Street in Leicester City Centre, we offer fun for the whole family. With 8+ bowling lanes, a full roller skating rink, and over 100 arcade machines, there's always something exciting waiting for you. Walk-ins are welcome – just show up and start playing! \nWelcome to Spin Pin – The ultimate destination in Leicester for fun and excitement! Whether you're looking to glide across the roller rink, strike big in our ten pin bowling lanes, or challenge your friends to thrilling arcade games, we've got something for everyone.\n\nEnjoy a variety of attractions:\n• Arcade Games for all ages\n• Roller Skating parties and open roller rink sessions\n• Ten Pin Bowling\n• VR Arcade\n\nPerfect for roller skating parties, group outings, or a spontaneous day of adventure, Spin Pin offers an unforgettable experience filled with energy, music, and non-stop entertainment.",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": "View Activities",
+    "cta_link": "/attractions",
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.937Z",
+    "updated_at": "2026-05-18T01:19:19.609Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 3,
+  "fields": {
+    "page": "home",
+    "section_key": "contact",
+    "title": "Find Us",
+    "subtitle": "Navigation Street, Leicester City Centre",
+    "content": "We're easy to find – right in Leicester City Centre on Navigation Street. Excellent transport links and parking nearby.",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": "Get Directions",
+    "cta_link": "https://maps.google.com/?q=Spin+Pin+Bowling+Roller+Skating+Arcade+Navigation+Street+Leicester",
+    "order": 10,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.939Z",
+    "updated_at": "2026-05-10T00:54:09.939Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 4,
+  "fields": {
+    "page": "about",
+    "section_key": "hero",
+    "title": "About Spin Pin Leicester",
+    "subtitle": "We're on a mission to bring fun, family, and friends together in Leicester's greatest entertainment venue.",
+    "content": "Discover the story behind Leicester's premier entertainment venue.",
+    "image_url": "/images/uploads/img-7.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.940Z",
+    "updated_at": "2026-05-18T01:39:27.357Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 5,
+  "fields": {
+    "page": "about",
+    "section_key": "story",
+    "title": "Our Story",
+    "subtitle": null,
+    "content": "<p>Spin Pin Leicester was born from a simple idea: create a space where people of all ages can enjoy roller skating, bowling, and arcade games together – all under one roof, right in the heart of Leicester City Centre.</p><p>We opened our doors on Navigation Street and quickly became the city's favourite venue for family outings, birthday parties, date nights, school trips, and corporate events. We combine the nostalgia of roller skating with the thrill of ten pin bowling and the excitement of over 100 arcade machines.</p><p>Whether you're a seasoned bowler, an experienced skater, or a complete beginner, Spin Pin welcomes you. Our friendly staff are always on hand to help, and our facilities are designed with safety, comfort, and fun in mind.</p>",
+    "image_url": "/images/uploads/img-3.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.940Z",
+    "updated_at": "2026-05-10T00:54:09.940Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 6,
+  "fields": {
+    "page": "parties",
+    "section_key": "hero",
+    "title": "Book Your Party at Spin Pin",
+    "subtitle": "Birthdays, celebrations, school trips and corporate events – we make every occasion unforgettable.",
+    "content": "Celebrate in style at Spin Pin Leicester! Birthday parties, group events and corporate gatherings. Roller skating, bowling and arcade fun all under one roof.",
+    "image_url": "/images/uploads/img-5.jpg",
+    "video_url": null,
+    "cta_text": "Book a Party",
+    "cta_link": "/party-booking",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.941Z",
+    "updated_at": "2026-05-18T01:33:24.199Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 7,
+  "fields": {
+    "page": "parties",
+    "section_key": "form",
+    "title": "Book Your Party",
+    "subtitle": "Fill in the form and we'll get in touch to confirm your booking within 24 hours.",
+    "content": null,
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 3,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.942Z",
+    "updated_at": "2026-05-10T00:54:09.942Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 8,
+  "fields": {
+    "page": "attractions",
+    "section_key": "hero",
+    "title": "Our Attractions",
+    "subtitle": "Roller Skating, Ten Pin Bowling & Arcade Games – Something for everyone at Spin Pin Leicester City Centre.",
+    "content": "From roller skating to bowling to arcade games — there's something for everyone at Spin Pin Leicester.",
+    "image_url": "/images/uploads/img-2.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.942Z",
+    "updated_at": "2026-05-18T01:39:27.487Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 9,
+  "fields": {
+    "page": "pricing",
+    "section_key": "hero",
+    "title": "Pricing & Tickets",
+    "subtitle": "Affordable fun for everyone. No hidden fees. Walk-ins always welcome!",
+    "content": "Affordable fun for everyone. Check out our session prices for roller skating, bowling, and more.",
+    "image_url": "http://localhost:9000/media/uploads/20260603_164509_425d38db_spinpin.webp",
+    "video_url": null,
+    "cta_text": "",
+    "cta_link": "",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.943Z",
+    "updated_at": "2026-06-03T11:15:11.310Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 10,
+  "fields": {
+    "page": "groups",
+    "section_key": "hero",
+    "title": "Group Bookings",
+    "subtitle": "Schools, colleges, corporates – we love hosting groups! Discounted rates for 10+ people.",
+    "content": "Planning a group visit? We offer special rates and packages for schools, corporate events, and large groups.",
+    "image_url": "/images/uploads/img-8.jpg",
+    "video_url": null,
+    "cta_text": "Enquire Now",
+    "cta_link": "/contact",
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.944Z",
+    "updated_at": "2026-05-18T01:39:27.403Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 11,
+  "fields": {
+    "page": "contact",
+    "section_key": "hero",
+    "title": "Get In Touch",
+    "subtitle": "We'd love to hear from you. Reach us by phone, email or come visit us at Navigation Street.",
+    "content": "We'd love to hear from you! Contact Spin Pin Leicester for bookings, enquiries, and more.",
+    "image_url": "/images/uploads/img-4.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.945Z",
+    "updated_at": "2026-05-18T01:39:27.383Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 12,
+  "fields": {
+    "page": "contact",
+    "section_key": "form",
+    "title": "Send us a Message",
+    "subtitle": "Fill in the form below and we'll respond within 24 hours.",
+    "content": null,
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 2,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.945Z",
+    "updated_at": "2026-05-10T00:54:09.945Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 13,
+  "fields": {
+    "page": "guidelines",
+    "section_key": "hero",
+    "title": "Safety Guidelines",
+    "subtitle": "Your safety is our top priority. Please read these guidelines before your visit to Spin Pin Leicester.",
+    "content": "Your safety is our priority. Please read our guidelines before your visit to Spin Pin Leicester.",
+    "image_url": "/images/uploads/img-7.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.945Z",
+    "updated_at": "2026-05-18T01:39:27.455Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 14,
+  "fields": {
+    "page": "faq",
+    "section_key": "hero",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Got questions? We've got answers! Find everything you need to know about visiting Spin Pin Leicester.",
+    "content": "Got questions? We have answers! Find everything you need to know about visiting Spin Pin Leicester.",
+    "image_url": "/images/uploads/img-7.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2026-05-10T00:54:09.946Z",
+    "updated_at": "2026-05-18T01:39:27.329Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 15,
+  "fields": {
+    "page": "party-booking",
+    "section_key": "hero",
+    "title": "Book Your Party at Spin Pin",
+    "subtitle": null,
+    "content": "Celebrate in style at Spin Pin Leicester! Birthday parties, group events and corporate gatherings. Roller skating, bowling and arcade fun all under one roof.",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2026-05-18T01:33:24.172Z",
+    "updated_at": "2026-05-18T01:33:24.172Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 1,
+  "fields": {
+    "name": "Standard Entry",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "9.95",
+    "duration": 60,
+    "period_text": "/ Person",
+    "description": "Skating, Bowling, or VR Session",
+    "features": [
+      "60 Minutes Session",
+      "Access to chosen activity"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 2,
+  "fields": {
+    "name": "Skate Hire",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "2.95",
+    "duration": 60,
+    "period_text": "Each",
+    "description": "Roller Skate Hire",
+    "features": [
+      "Quality Quad Skates"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 3,
+  "fields": {
+    "name": "Spectator (4+)",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "2.95",
+    "duration": 60,
+    "period_text": "Each",
+    "description": "Non-participating guests",
+    "features": [
+      "Relax in our lounge area"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 4,
+  "fields": {
+    "name": "Bowling Shoe Hire",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "1.50",
+    "duration": 60,
+    "period_text": "Each",
+    "description": "Bowling shoe rental",
+    "features": [
+      "Quality bowling shoes"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 5,
+  "fields": {
+    "name": "Locker Hire",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "2.00",
+    "duration": 0,
+    "period_text": "Per Locker",
+    "description": "Secure storage",
+    "features": [
+      "Secure your belongings"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 6,
+  "fields": {
+    "name": "Parking",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "3.00",
+    "duration": 0,
+    "period_text": "Per Car",
+    "description": "On-site parking",
+    "features": [
+      "Secure parking space"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 7,
+  "fields": {
+    "name": "Token Pack (20)",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "5.00",
+    "duration": 0,
+    "period_text": "Per Pack",
+    "description": "20 arcade tokens",
+    "features": [
+      "20 arcade game tokens"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.pricingplan",
+  "pk": 8,
+  "fields": {
+    "name": "Token Pack (50)",
+    "type": "SESSION",
+    "age_group": null,
+    "price": "10.00",
+    "duration": 0,
+    "period_text": "Per Pack",
+    "description": "50 arcade tokens - best value!",
+    "features": [
+      "50 arcade game tokens",
+      "Best value pack"
+    ],
+    "popular": false,
+    "variant": "primary",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.239Z",
+    "updated_at": "2026-05-18T01:24:37.239Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 5,
+  "fields": {
+    "key": "phone",
+    "label": "Call Us",
+    "value": "07349 110 865",
+    "category": "PHONE",
+    "icon": null,
+    "link": "tel:07349110865",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 6,
+  "fields": {
+    "key": "email",
+    "label": "Email Us",
+    "value": "info@spinpin.co.uk",
+    "category": "EMAIL",
+    "icon": null,
+    "link": "mailto:info@spinpin.co.uk",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 7,
+  "fields": {
+    "key": "address",
+    "label": "Address",
+    "value": "Ramdoot House, First Floor - 2/3 Navigation Street, Leicester, LE1 3UR",
+    "category": "ADDRESS",
+    "icon": null,
+    "link": "https://maps.google.com/maps?q=Navigation+Street+Leicester",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 8,
+  "fields": {
+    "key": "hours_mon",
+    "label": "Monday",
+    "value": "CLOSED",
+    "category": "HOURS",
+    "icon": null,
+    "link": null,
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 9,
+  "fields": {
+    "key": "hours_tue_thu",
+    "label": "Tue - Thu",
+    "value": "14:00 - 22:00",
+    "category": "HOURS",
+    "icon": null,
+    "link": null,
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 10,
+  "fields": {
+    "key": "hours_fri",
+    "label": "Friday",
+    "value": "12:00 - 22:00",
+    "category": "HOURS",
+    "icon": null,
+    "link": null,
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 11,
+  "fields": {
+    "key": "hours_sat",
+    "label": "Saturday",
+    "value": "12:00 - 23:00",
+    "category": "HOURS",
+    "icon": null,
+    "link": null,
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 12,
+  "fields": {
+    "key": "hours_sun",
+    "label": "Sunday",
+    "value": "12:00 - 22:00",
+    "category": "HOURS",
+    "icon": null,
+    "link": null,
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 13,
+  "fields": {
+    "key": "social_fb",
+    "label": "Facebook",
+    "value": "Spin Pin Leicester",
+    "category": "SOCIAL",
+    "icon": null,
+    "link": "https://www.facebook.com/profile.php?id=61572375597421",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 14,
+  "fields": {
+    "key": "social_ig",
+    "label": "Instagram",
+    "value": "@spinpinleicester",
+    "category": "SOCIAL",
+    "icon": null,
+    "link": "https://www.instagram.com/spinpinleicester",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.contactinfo",
+  "pk": 15,
+  "fields": {
+    "key": "social_tt",
+    "label": "TikTok",
+    "value": "@spinpinleicester",
+    "category": "SOCIAL",
+    "icon": null,
+    "link": "https://www.tiktok.com/@spinpinleicester",
+    "active": true,
+    "order": 0,
+    "created_at": "2026-05-18T01:24:37.202Z",
+    "updated_at": "2026-05-18T01:24:37.202Z"
+  }
+},
+{
+  "model": "cms.partypackage",
+  "pk": 4,
+  "fields": {
+    "name": "Roller Skating Party",
+    "description": "The perfect birthday party! Skate with your friends on our indoor rink followed by a private party room.",
+    "price": "15.00",
+    "min_participants": 10,
+    "max_participants": 50,
+    "duration": 120,
+    "includes": [
+      "60-min roller skating session",
+      "Dedicated party room for 1 hour",
+      "Skate hire for all guests",
+      "Party host included",
+      "Decorations and balloons",
+      "2 accompanying adults free"
+    ],
+    "addons": [],
+    "image_url": null,
+    "popular": false,
+    "variant": "SKATING",
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-18T01:33:24.139Z",
+    "updated_at": "2026-05-18T01:33:24.140Z"
+  }
+},
+{
+  "model": "cms.partypackage",
+  "pk": 5,
+  "fields": {
+    "name": "Bowling Party",
+    "description": "Strike up the fun! Bowl your way through a fantastic birthday party with your crew.",
+    "price": "15.00",
+    "min_participants": 10,
+    "max_participants": 40,
+    "duration": 120,
+    "includes": [
+      "60-min ten pin bowling session",
+      "Dedicated party room for 1 hour",
+      "Bowling shoe hire included",
+      "Party host included",
+      "Decorations and balloons",
+      "2 accompanying adults free"
+    ],
+    "addons": [],
+    "image_url": null,
+    "popular": false,
+    "variant": "BOWLING",
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-18T01:33:24.140Z",
+    "updated_at": "2026-05-18T01:33:24.140Z"
+  }
+},
+{
+  "model": "cms.partypackage",
+  "pk": 6,
+  "fields": {
+    "name": "Ultimate Party",
+    "description": "The full Spin Pin experience! Skating AND bowling PLUS arcade tokens for an unforgettable party.",
+    "price": "20.00",
+    "min_participants": 10,
+    "max_participants": 60,
+    "duration": 180,
+    "includes": [
+      "Skating OR Bowling (60 min)",
+      "Arcade token pack per child",
+      "Dedicated party room for 1 hour",
+      "Party host included",
+      "Premium decorations",
+      "4 accompanying adults free",
+      "Priority booking slots"
+    ],
+    "addons": [],
+    "image_url": null,
+    "popular": true,
+    "variant": "ULTIMATE",
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-18T01:33:24.140Z",
+    "updated_at": "2026-05-18T01:33:24.141Z"
+  }
+},
+{
+  "model": "cms.contactmessage",
+  "pk": 1,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "message": "uyupiopp[hgf",
+    "is_read": false,
+    "created_at": "2026-06-17T11:29:32.582Z"
+  }
+},
+{
+  "model": "cms.contactmessage",
+  "pk": 2,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "message": "jhkhlkjkhggjj",
+    "is_read": false,
+    "created_at": "2026-06-17T11:30:25.179Z"
+  }
+},
+{
+  "model": "cms.contactmessage",
+  "pk": 3,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "message": "gchgdhg",
+    "is_read": false,
+    "created_at": "2026-06-17T12:04:08.568Z"
+  }
+},
+{
+  "model": "cms.contactmessage",
+  "pk": 4,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "message": "dgsjhdjsgd",
+    "is_read": false,
+    "created_at": "2026-06-17T12:04:33.668Z"
+  }
+},
+{
+  "model": "cms.freeentry",
+  "pk": 1,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "reason": "youuyiyiopop[",
+    "status": "PENDING",
+    "notes": null,
+    "created_at": "2026-06-17T11:56:11.275Z",
+    "updated_at": "2026-06-17T11:56:11.275Z"
+  }
+},
+{
+  "model": "cms.sessionbookingconfig",
+  "pk": 1,
+  "fields": {
+    "adult_price": "9.95",
+    "adult_label": "Adult",
+    "adult_description": "Aged 16+ - per session",
+    "kid_price": "9.95",
+    "kid_label": "Child",
+    "kid_description": "Aged 3-15 - per session",
+    "spectator_price": "2.95",
+    "spectator_label": "Spectator (4+)",
+    "spectator_description": "Non-participating guests",
+    "gst_rate": "0.00",
+    "duration_minutes": 60,
+    "duration_label": "60-min Session",
+    "duration_description": "Standard Session",
+    "skate_hire_price": "2.95",
+    "shoe_hire_price": "1.50",
+    "locker_hire_price": "2.00",
+    "token_pack_20_price": "5.00",
+    "token_pack_50_price": "10.00",
+    "parking_price": "3.00",
+    "active": true,
+    "updated_at": "2026-05-18T01:39:27.302Z",
+    "created_at": "2026-05-18T01:10:01.385Z"
+  }
+},
+{
+  "model": "cms.partybookingconfig",
+  "pk": 1,
+  "fields": {
+    "participant_price": "15.00",
+    "participant_label": "Party Guest",
+    "participant_description": "Includes session + party room",
+    "spectator_price": "2.95",
+    "free_spectators": 2,
+    "spectator_label": "Accompanying Adult",
+    "spectator_description": "First 2 adults free",
+    "min_participants": 10,
+    "gst_rate": "0.00",
+    "deposit_percentage": "20.00",
+    "package_inclusions": [
+      "60-minute skating or bowling session",
+      "Dedicated party room for 1 hour",
+      "Party host included",
+      "Decorations and balloons",
+      "2 accompanying adults free"
+    ],
+    "available_time_slots": [
+      "12:00",
+      "13:00",
+      "14:00",
+      "15:00",
+      "16:00",
+      "17:00",
+      "18:00",
+      "19:00"
+    ],
+    "duration_label": "60-min session + 60-min party room",
+    "active": true,
+    "created_at": "2026-05-18T01:10:03.829Z",
+    "updated_at": "2026-05-18T01:33:24.224Z"
+  }
+},
+{
+  "model": "cms.attractionvideosection",
+  "pk": 1,
+  "fields": {
+    "title": "",
+    "video": "https://youtu.be/vICFXhJShwA",
+    "thumbnail": "",
+    "is_active": true,
+    "created_at": "2026-06-02T17:34:52.626Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 6,
+  "fields": {
+    "day_label": "Mon – Tue",
+    "open_time": "CLOSED",
+    "close_time": "",
+    "note": null,
+    "icon": "Moon",
+    "color": "secondary",
+    "active": true,
+    "order": 1,
+    "created_at": "2026-05-18T01:39:27.254Z",
+    "updated_at": "2026-05-18T01:39:27.254Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 7,
+  "fields": {
+    "day_label": "Wednesday",
+    "open_time": "12:00",
+    "close_time": "21:00",
+    "note": null,
+    "icon": "Clock",
+    "color": "primary",
+    "active": true,
+    "order": 2,
+    "created_at": "2026-05-18T01:39:27.254Z",
+    "updated_at": "2026-05-18T01:39:27.255Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 8,
+  "fields": {
+    "day_label": "Thursday",
+    "open_time": "12:00",
+    "close_time": "21:00",
+    "note": null,
+    "icon": "Clock",
+    "color": "primary",
+    "active": true,
+    "order": 3,
+    "created_at": "2026-05-18T01:39:27.255Z",
+    "updated_at": "2026-05-18T01:39:27.255Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 9,
+  "fields": {
+    "day_label": "Friday",
+    "open_time": "12:00",
+    "close_time": "22:00",
+    "note": null,
+    "icon": "Clock",
+    "color": "accent",
+    "active": true,
+    "order": 4,
+    "created_at": "2026-05-18T01:39:27.255Z",
+    "updated_at": "2026-05-18T01:39:27.255Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 10,
+  "fields": {
+    "day_label": "Saturday",
+    "open_time": "10:00",
+    "close_time": "22:00",
+    "note": null,
+    "icon": "Sun",
+    "color": "accent",
+    "active": true,
+    "order": 5,
+    "created_at": "2026-05-18T01:39:27.255Z",
+    "updated_at": "2026-05-18T01:39:27.255Z"
+  }
+},
+{
+  "model": "cms.timingcard",
+  "pk": 11,
+  "fields": {
+    "day_label": "Sunday",
+    "open_time": "10:00",
+    "close_time": "21:00",
+    "note": null,
+    "icon": "Sun",
+    "color": "secondary",
+    "active": true,
+    "order": 6,
+    "created_at": "2026-05-18T01:39:27.255Z",
+    "updated_at": "2026-05-18T01:39:27.255Z"
+  }
+},
+{
+  "model": "shop.voucher",
+  "pk": 1,
+  "fields": {
+    "code": "spinpin20",
+    "discount_type": "PERCENTAGE",
+    "discount_value": "20.00",
+    "min_order_amount": null,
+    "expiry_date": null,
+    "usage_limit": 1,
+    "used_count": 0,
+    "is_active": true,
+    "description": null,
+    "min_hours_before_slot": 0,
+    "created_at": "2026-06-17T11:09:58.995Z",
+    "updated_at": "2026-06-17T11:09:58.995Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 1,
+  "fields": {
+    "booking": 1,
+    "party_booking": null,
+    "provider": "SUMUP",
+    "order_id": "252c927b-8c06-4f58-9684-bde6b6ebe0a2",
+    "payment_id": null,
+    "amount": "11.95",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 11.95,
+      "checkout_reference": "SP-1-4843CDD7",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-12T10:11:46.153+00:00",
+      "description": "Roller Skating Booking #1 — SpinPin Leicester",
+      "id": "252c927b-8c06-4f58-9684-bde6b6ebe0a2",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "return_url": "http://localhost:5000/book/success?booking_id=1&booking_type=session&reference=SP-1-4843CDD7",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": "roller-skating"
+    },
+    "notes": null,
+    "created_at": "2026-06-12T10:11:47.351Z",
+    "updated_at": "2026-06-12T10:11:47.351Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 2,
+  "fields": {
+    "booking": 1,
+    "party_booking": null,
+    "provider": "SUMUP",
+    "order_id": "008e1b3a-d964-48c3-b37f-ee2213da4878",
+    "payment_id": null,
+    "amount": "10.00",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 10,
+      "checkout_reference": "SP-1-961C19DD",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-12T10:16:51.461+00:00",
+      "description": "Roller Skating Booking #1 — SpinPin Leicester",
+      "hosted_checkout": {
+        "enabled": true,
+        "redirect_url": "http://localhost:5000/book/success?booking_id=1&booking_type=session&reference=SP-1-961C19DD"
+      },
+      "hosted_checkout_url": "https://checkout.sumup.com/pay/c-008e1b3a-d964-48c3-b37f-ee2213da4878",
+      "id": "008e1b3a-d964-48c3-b37f-ee2213da4878",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": "roller-skating"
+    },
+    "notes": null,
+    "created_at": "2026-06-12T10:16:52.662Z",
+    "updated_at": "2026-06-12T10:16:52.662Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 3,
+  "fields": {
+    "booking": 5,
+    "party_booking": null,
+    "provider": "SUMUP",
+    "order_id": "48f132ee-7cba-4bf7-b6e0-a7de07529afc",
+    "payment_id": null,
+    "amount": "11.95",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 11.95,
+      "checkout_reference": "SP-5-CE4FBE70",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-15T10:30:59.770+00:00",
+      "description": "Roller Skating Booking #5 — SpinPin Leicester",
+      "hosted_checkout": {
+        "enabled": true,
+        "redirect_url": "http://localhost:5000/book/success?booking_id=5&booking_type=session&reference=SP-5-CE4FBE70"
+      },
+      "hosted_checkout_url": "https://checkout.sumup.com/pay/c-48f132ee-7cba-4bf7-b6e0-a7de07529afc",
+      "id": "48f132ee-7cba-4bf7-b6e0-a7de07529afc",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": "roller-skating"
+    },
+    "notes": null,
+    "created_at": "2026-06-15T10:30:59.890Z",
+    "updated_at": "2026-06-15T10:30:59.890Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 4,
+  "fields": {
+    "booking": 13,
+    "party_booking": null,
+    "provider": "SUMUP",
+    "order_id": "93b41a19-2f89-4be1-83db-2fb953b536fb",
+    "payment_id": null,
+    "amount": "11.95",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 11.95,
+      "checkout_reference": "SP-13-6A9DB8FF",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-15T11:45:39.333+00:00",
+      "description": "Roller Skating Booking #13 — SpinPin Leicester",
+      "hosted_checkout": {
+        "enabled": true,
+        "redirect_url": "http://localhost:5000/book/success?booking_id=13&booking_type=session&reference=SP-13-6A9DB8FF"
+      },
+      "hosted_checkout_url": "https://checkout.sumup.com/pay/c-93b41a19-2f89-4be1-83db-2fb953b536fb",
+      "id": "93b41a19-2f89-4be1-83db-2fb953b536fb",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": "roller-skating"
+    },
+    "notes": null,
+    "created_at": "2026-06-15T11:45:39.485Z",
+    "updated_at": "2026-06-15T11:45:39.485Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 5,
+  "fields": {
+    "booking": 20,
+    "party_booking": null,
+    "provider": "SUMUP",
+    "order_id": "88fc422a-90db-4dd7-ab8a-0642da53886e",
+    "payment_id": null,
+    "amount": "29.85",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 29.85,
+      "checkout_reference": "SP-20-4DE9E46C",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-15T12:08:34.704+00:00",
+      "description": "Roller Skating Booking #20 — SpinPin Leicester",
+      "hosted_checkout": {
+        "enabled": true,
+        "redirect_url": "http://localhost:5000/book/success?booking_id=20&booking_type=session&reference=SP-20-4DE9E46C"
+      },
+      "hosted_checkout_url": "https://checkout.sumup.com/pay/c-88fc422a-90db-4dd7-ab8a-0642da53886e",
+      "id": "88fc422a-90db-4dd7-ab8a-0642da53886e",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": "roller-skating"
+    },
+    "notes": null,
+    "created_at": "2026-06-15T12:08:34.865Z",
+    "updated_at": "2026-06-15T12:08:34.865Z"
+  }
+},
+{
+  "model": "payments.payment",
+  "pk": 6,
+  "fields": {
+    "booking": null,
+    "party_booking": 9,
+    "provider": "SUMUP",
+    "order_id": "4916ab74-1b35-4b59-928f-a19257f1704f",
+    "payment_id": null,
+    "amount": "150.00",
+    "currency": "GBP",
+    "status": "CREATED",
+    "provider_response": {
+      "amount": 150,
+      "checkout_reference": "SP-9-147EA1E7",
+      "checkout_type": "checkout",
+      "currency": "GBP",
+      "date": "2026-06-17T13:51:53.264+00:00",
+      "description": "Party Booking #9 — SpinPin Leicester",
+      "hosted_checkout": {
+        "enabled": true,
+        "redirect_url": "http://localhost:5000/book/success?booking_id=9&booking_type=party&reference=SP-9-147EA1E7"
+      },
+      "hosted_checkout_url": "https://checkout.sumup.com/pay/c-4916ab74-1b35-4b59-928f-a19257f1704f",
+      "id": "4916ab74-1b35-4b59-928f-a19257f1704f",
+      "merchant_code": "MC933QM6",
+      "merchant_country": "GB",
+      "merchant_name": "SPIN PIN LTD",
+      "pay_to_email": "spinpinltd@gmail.com",
+      "purpose": "CHECKOUT",
+      "status": "PENDING",
+      "transactions": [],
+      "user_id": "c0ab03f4-9b8f-4507-8687-34502f5ae36f",
+      "_merchant_account": "SpinPin Ltd",
+      "_activity": ""
+    },
+    "notes": null,
+    "created_at": "2026-06-17T13:51:53.491Z",
+    "updated_at": "2026-06-17T13:51:53.491Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 1,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-05-18T01:15:53.247497+00:00",
+      "waiver_id": 1,
+      "booking_reference": "Session #1"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-05-18T01:16:53.554Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-05-18T01:15:53.466Z",
+    "sent_at": null,
+    "updated_at": "2026-05-18T01:15:53.555Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 2,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-05-18T10:44:05.337719+00:00",
+      "waiver_id": 2,
+      "booking_reference": "Session #2"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-05-18T10:45:05.374Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-05-18T10:44:05.359Z",
+    "sent_at": null,
+    "updated_at": "2026-05-18T10:44:05.374Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 3,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "saksaud@gmail.com",
+    "recipient_name": "Sauopn",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Sauopn",
+      "signed_at": "2026-06-01T11:25:10.218577+00:00",
+      "waiver_id": 3,
+      "booking_reference": "Session #3"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-01T11:26:10.357Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-01T11:25:10.304Z",
+    "sent_at": null,
+    "updated_at": "2026-06-01T11:25:10.358Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 4,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "sak12saud@gmail.com",
+    "recipient_name": "karem",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "karem",
+      "signed_at": "2026-06-01T11:29:39.533227+00:00",
+      "waiver_id": 4,
+      "booking_reference": "Session #4"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-01T11:30:39.664Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-01T11:29:39.614Z",
+    "sent_at": null,
+    "updated_at": "2026-06-01T11:29:39.665Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 5,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "saksae@gmail.com",
+    "recipient_name": "saksa",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "saksa",
+      "signed_at": "2026-06-02T17:56:24.047038+00:00",
+      "waiver_id": 9,
+      "booking_reference": "Session #5"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-02T17:57:24.092Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-02T17:56:24.072Z",
+    "sent_at": null,
+    "updated_at": "2026-06-02T17:56:24.092Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 6,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "saksaudalikhan7@gmail.com",
+    "recipient_name": "Suresh",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Suresh",
+      "signed_at": "2026-06-03T10:34:26.292978+00:00",
+      "waiver_id": 10,
+      "booking_reference": "Session #6"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-03T10:35:26.338Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-03T10:34:26.321Z",
+    "sent_at": null,
+    "updated_at": "2026-06-03T10:34:26.338Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 7,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-06-03T10:35:25.607647+00:00",
+      "waiver_id": 11,
+      "booking_reference": "Session #7"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-03T10:36:25.653Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-03T10:35:25.630Z",
+    "sent_at": null,
+    "updated_at": "2026-06-03T10:35:25.653Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 8,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-06-03T10:51:27.701842+00:00",
+      "waiver_id": 12,
+      "booking_reference": "Session #8"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-03T10:52:27.751Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-03T10:51:27.727Z",
+    "sent_at": null,
+    "updated_at": "2026-06-03T10:51:27.751Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 9,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-06-05T11:08:57.737167+00:00",
+      "waiver_id": 13,
+      "booking_reference": "Session #9"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-05T11:09:57.779Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-05T11:08:57.762Z",
+    "sent_at": null,
+    "updated_at": "2026-06-05T11:08:57.779Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 10,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "1hk18is080@hkbk.edu.in",
+    "recipient_name": "Saud Ali khan",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Saud Ali khan",
+      "signed_at": "2026-06-12T10:07:04.765405+00:00",
+      "waiver_id": 14,
+      "booking_reference": "Session #10"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-12T10:08:04.800Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-12T10:07:04.786Z",
+    "sent_at": null,
+    "updated_at": "2026-06-12T10:07:04.800Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 11,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "saksaudalikhan7@gmail.com",
+    "recipient_name": "Suresh",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Suresh",
+      "signed_at": "2026-06-12T10:13:02.232420+00:00",
+      "waiver_id": 15,
+      "booking_reference": "Session #11"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-12T10:14:02.261Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-12T10:13:02.249Z",
+    "sent_at": null,
+    "updated_at": "2026-06-12T10:13:02.261Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 12,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "saksaudalikhan7@gmail.com",
+    "recipient_name": "Suresh",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "Suresh",
+      "signed_at": "2026-06-15T10:18:50.764295+00:00",
+      "waiver_id": 16,
+      "booking_reference": "Session #12"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T10:19:50.795Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T10:18:50.784Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T10:18:50.797Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 13,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T10:30:54.765776+00:00",
+      "waiver_id": 17,
+      "booking_reference": "Session #13"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T10:31:54.799Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T10:30:54.784Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T10:30:54.800Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 14,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T10:35:05.197851+00:00",
+      "waiver_id": 18,
+      "booking_reference": "Session #14"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T10:36:05.238Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T10:35:05.223Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T10:35:05.238Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 15,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T10:48:56.456991+00:00",
+      "waiver_id": 19,
+      "booking_reference": "Session #15"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T10:49:56.485Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T10:48:56.474Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T10:48:56.485Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 16,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T10:50:05.214569+00:00",
+      "waiver_id": 20,
+      "booking_reference": "Session #16"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T10:51:05.256Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T10:50:05.236Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T10:50:05.256Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 17,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T11:31:52.372082+00:00",
+      "waiver_id": 21,
+      "booking_reference": "Session #17"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T11:32:52.404Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T11:31:52.391Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T11:31:52.405Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 18,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T11:46:22.538901+00:00",
+      "waiver_id": 22,
+      "booking_reference": "Session #18"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T11:47:22.574Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T11:46:22.563Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T11:46:22.574Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 19,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T11:46:50.683331+00:00",
+      "waiver_id": 23,
+      "booking_reference": "Session #19"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T11:47:50.714Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T11:46:50.704Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T11:46:50.715Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 20,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-15T12:08:28.200411+00:00",
+      "waiver_id": 24,
+      "booking_reference": "Session #20"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-15T12:09:28.282Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-15T12:08:28.246Z",
+    "sent_at": null,
+    "updated_at": "2026-06-15T12:08:28.283Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 21,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-17T09:08:20.408147+00:00",
+      "waiver_id": 25,
+      "booking_reference": "Session #21"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-17T09:09:20.443Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-17T09:08:20.428Z",
+    "sent_at": null,
+    "updated_at": "2026-06-17T09:08:20.443Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 22,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-17T10:22:38.646005+00:00",
+      "waiver_id": 26,
+      "booking_reference": "Session #22"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-17T10:23:38.702Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-17T10:22:38.678Z",
+    "sent_at": null,
+    "updated_at": "2026-06-17T10:22:38.704Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 23,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-17T11:18:05.366538+00:00",
+      "waiver_id": 27,
+      "booking_reference": "Session #23"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-17T11:19:05.446Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-17T11:18:05.406Z",
+    "sent_at": null,
+    "updated_at": "2026-06-17T11:18:05.446Z"
+  }
+},
+{
+  "model": "emails.emaillog",
+  "pk": 24,
+  "fields": {
+    "email_type": "WAIVER_CONFIRMATION",
+    "recipient_email": "ninja@ninja.com",
+    "recipient_name": "mohammed",
+    "subject": "Waiver Confirmation - Ninja Inflatable Park",
+    "template_name": "emails/waiver_confirmation.html",
+    "context_data": {
+      "name": "mohammed",
+      "signed_at": "2026-06-17T11:43:12.056775+00:00",
+      "waiver_id": 28,
+      "booking_reference": "Session #24"
+    },
+    "status": "FAILED",
+    "error_message": "Email sending disabled by EMAIL_ENABLED flag",
+    "message_id": null,
+    "retry_count": 1,
+    "max_retries": 3,
+    "next_retry_at": "2026-06-17T11:44:12.136Z",
+    "booking": null,
+    "party_booking": null,
+    "contact_message": null,
+    "created_at": "2026-06-17T11:43:12.112Z",
+    "sent_at": null,
+    "updated_at": "2026-06-17T11:43:12.137Z"
+  }
+}
+]

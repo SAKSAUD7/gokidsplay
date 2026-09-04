@@ -1,0 +1,144 @@
+// Modern Card-Based Revenue Overview Design
+// Replace lines 130-231 in admin/page.tsx with this code
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                {/* Revenue Overview - Modern Card Design */}
+                <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+                    {/* Header */}
+                    <div className="p-6 border-b border-slate-700/50">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h2 className="text-xl font-bold text-white flex items-center gap-2 mb-2">
+                                    <div className="p-2 bg-emerald-500/20 rounded-lg">
+                                        <TrendingUp size={20} className="text-emerald-400" />
+                                    </div>
+                                    Revenue Overview
+                                </h2>
+                                <p className="text-slate-400 text-sm">Last 7 days performance</p>
+                            </div>
+                            {stats.monthlyRevenue && stats.monthlyRevenue.length > 0 && (
+                                <div className="text-right bg-emerald-500/10 px-4 py-3 rounded-xl border border-emerald-500/20">
+                                    <p className="text-xs text-emerald-400 uppercase tracking-wider mb-1">Total Revenue</p>
+                                    <p className="text-3xl font-black text-white">
+                                        ₹{stats.monthlyRevenue.reduce((sum: number, item: any) => sum + item.total, 0).toLocaleString()}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="p-6">
+                        {stats.monthlyRevenue && stats.monthlyRevenue.length > 0 ? (
+                            <>
+                                {/* Stats Summary */}
+                                <div className="grid grid-cols-3 gap-4 mb-6">
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                                        <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Avg/Day</p>
+                                        <p className="text-xl font-bold text-white">
+                                            ₹{Math.round(stats.monthlyRevenue.reduce((sum: number, item: any) => sum + item.total, 0) / stats.monthlyRevenue.length).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                                        <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Highest</p>
+                                        <p className="text-xl font-bold text-emerald-400">
+                                            ₹{Math.max(...stats.monthlyRevenue.map((d: any) => d.total)).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                                        <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Days Active</p>
+                                        <p className="text-xl font-bold text-blue-400">
+                                            {stats.monthlyRevenue.filter((d: any) => d.total > 0).length}/7
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Day Cards Grid */}
+                                <div className="grid grid-cols-7 gap-2">
+                                    {stats.monthlyRevenue.map((item: any, i: number) => {
+                                        const maxRevenue = Math.max(...stats.monthlyRevenue.map((d: any) => d.total));
+                                        const percentage = maxRevenue > 0 ? (item.total / maxRevenue) * 100 : 0;
+                                        const isHighest = item.total === maxRevenue && item.total > 0;
+                                        const totalRevenue = stats.monthlyRevenue.reduce((sum: number, d: any) => sum + d.total, 0);
+                                        const sharePercentage = totalRevenue > 0 ? ((item.total / totalRevenue) * 100).toFixed(0) : 0;
+
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={`relative group cursor-pointer transition-all duration-300 ${
+                                                    isHighest 
+                                                        ? 'bg-gradient-to-br from-emerald-500 to-teal-500 scale-105' 
+                                                        : item.total > 0 
+                                                            ? 'bg-gradient-to-br from-blue-500/20 to-purple-500/20 hover:from-blue-500/30 hover:to-purple-500/30' 
+                                                            : 'bg-slate-800/30'
+                                                } rounded-xl p-3 border ${
+                                                    isHighest 
+                                                        ? 'border-emerald-400 shadow-lg shadow-emerald-500/50' 
+                                                        : item.total > 0 
+                                                            ? 'border-slate-600/50 hover:border-blue-500/50' 
+                                                            : 'border-slate-700/30'
+                                                }`}
+                                            >
+                                                {/* Day Name */}
+                                                <div className={`text-center mb-2 ${isHighest ? 'text-white' : 'text-slate-400'}`}>
+                                                    <p className="text-xs font-bold uppercase tracking-wider">{item.name}</p>
+                                                </div>
+
+                                                {/* Amount */}
+                                                <div className="text-center mb-2">
+                                                    <p className={`text-sm font-black ${isHighest ? 'text-white' : item.total > 0 ? 'text-white' : 'text-slate-600'}`}>
+                                                        {item.total > 0 ? `₹${(item.total / 1000).toFixed(1)}k` : '—'}
+                                                    </p>
+                                                </div>
+
+                                                {/* Progress Bar */}
+                                                {item.total > 0 && (
+                                                    <div className="w-full bg-slate-700/50 rounded-full h-1.5 mb-2">
+                                                        <div
+                                                            className={`h-full rounded-full ${isHighest ? 'bg-white' : 'bg-blue-400'}`}
+                                                            style={{ width: `${percentage}%` }}
+                                                        ></div>
+                                                    </div>
+                                                )}
+
+                                                {/* Share Percentage */}
+                                                {item.total > 0 && (
+                                                    <div className="text-center">
+                                                        <p className={`text-[10px] font-medium ${isHighest ? 'text-white/90' : 'text-slate-400'}`}>
+                                                            {sharePercentage}%
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Highest Badge */}
+                                                {isHighest && (
+                                                    <div className="absolute -top-2 -right-2 bg-yellow-400 text-slate-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold animate-bounce">
+                                                        ⭐
+                                                    </div>
+                                                )}
+
+                                                {/* Hover Tooltip */}
+                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                                    <div className="bg-slate-900 text-white text-xs py-2 px-3 rounded-lg shadow-xl whitespace-nowrap border border-slate-700">
+                                                        <div className="font-bold">₹{item.total.toLocaleString()}</div>
+                                                        {item.total > 0 && (
+                                                            <div className="text-slate-400 text-[10px] mt-0.5">{sharePercentage}% of total</div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+                                <div className="bg-slate-800/50 rounded-full p-6 mb-4 border border-slate-700">
+                                    <TrendingUp className="w-12 h-12 text-slate-600" />
+                                </div>
+                                <p className="text-lg font-medium text-slate-300 mb-1">No revenue data yet</p>
+                                <p className="text-sm text-slate-500">Create bookings to see your revenue analytics</p>
+                            </div>
+                        )}
+                    </div>
+                </div>

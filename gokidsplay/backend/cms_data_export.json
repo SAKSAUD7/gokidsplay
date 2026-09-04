@@ -1,0 +1,654 @@
+{
+  "Page": [
+    {
+      "id": 1,
+      "slug": "home",
+      "title": "Ninja Inflatable Park - Home",
+      "description": "Welcome to the ultimate inflatable park experience!",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.299000+00:00",
+      "updated_at": "2025-12-07 02:47:01.962000+00:00"
+    },
+    {
+      "id": 2,
+      "slug": "about",
+      "title": "About Us - Ninja Inflatable Park",
+      "description": "Learn about our story and mission.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.308000+00:00",
+      "updated_at": "2025-12-07 02:47:01.977000+00:00"
+    },
+    {
+      "id": 3,
+      "slug": "pricing",
+      "title": "Pricing - Ninja Inflatable Park",
+      "description": "Check our session and party prices.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.316000+00:00",
+      "updated_at": "2025-12-07 02:47:01.981000+00:00"
+    },
+    {
+      "id": 4,
+      "slug": "parties",
+      "title": "Parties - Ninja Inflatable Park",
+      "description": "Book the best birthday party ever!",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.323000+00:00",
+      "updated_at": "2025-12-07 02:47:01.985000+00:00"
+    },
+    {
+      "id": 5,
+      "slug": "attractions",
+      "title": "Attractions - Ninja Inflatable Park",
+      "description": "Explore our amazing inflatable attractions.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.331000+00:00",
+      "updated_at": "2025-12-07 02:47:01.989000+00:00"
+    },
+    {
+      "id": 6,
+      "slug": "contact",
+      "title": "Contact Us - Ninja Inflatable Park",
+      "description": "Get in touch with us.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.337000+00:00",
+      "updated_at": "2025-12-07 02:47:01.992000+00:00"
+    },
+    {
+      "id": 7,
+      "slug": "facilities",
+      "title": "Facilities - Ninja Inflatable Park",
+      "description": "Our park facilities and amenities.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.344000+00:00",
+      "updated_at": "2025-12-07 02:47:01.995000+00:00"
+    },
+    {
+      "id": 8,
+      "slug": "groups",
+      "title": "Group Bookings - Ninja Inflatable Park",
+      "description": "Special rates for schools and large groups.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.351000+00:00",
+      "updated_at": "2025-12-07 02:47:01.997000+00:00"
+    },
+    {
+      "id": 9,
+      "slug": "guidelines",
+      "title": "Safety Guidelines - Ninja Inflatable Park",
+      "description": "Important safety rules and guidelines.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.357000+00:00",
+      "updated_at": "2025-12-07 02:47:02.002000+00:00"
+    },
+    {
+      "id": 10,
+      "slug": "privacy",
+      "title": "Privacy Policy - Ninja Inflatable Park",
+      "description": "Our privacy policy.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.364000+00:00",
+      "updated_at": "2025-12-07 02:47:02.005000+00:00"
+    },
+    {
+      "id": 11,
+      "slug": "waiver-terms",
+      "title": "Waiver Terms - Ninja Inflatable Park",
+      "description": "Terms and conditions for waivers.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.371000+00:00",
+      "updated_at": "2025-12-07 02:47:02.009000+00:00"
+    }
+  ],
+  "Activity": [
+    {
+      "id": 36,
+      "name": "Ninja Warrior Course",
+      "slug": null,
+      "short_description": null,
+      "description": "this is a obstacle course",
+      "image_url": "uploads/20251206_212150_fe55de4f_attraction6.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 06:17:48.861000+00:00",
+      "updated_at": "2025-12-23 21:42:16.812000+00:00"
+    },
+    {
+      "id": 37,
+      "name": "Giant Slides",
+      "slug": null,
+      "short_description": null,
+      "description": "Experience the thrill of our massive inflatable slides. Perfect for speed demons and adrenaline junkies!",
+      "image_url": "uploads/20251206_212222_7e768e5b_attraction11.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 06:17:48.866000+00:00",
+      "updated_at": "2025-12-23 21:42:16.817000+00:00"
+    },
+    {
+      "id": 38,
+      "name": "Wipeout Zone",
+      "slug": null,
+      "short_description": null,
+      "description": "Navigate through spinning obstacles and bouncing challenges. Can you make it across without falling?",
+      "image_url": "uploads/20251224_025405_49e6ddaf_1763947163648.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 06:17:48.873000+00:00",
+      "updated_at": "2025-12-23 21:42:16.818000+00:00"
+    },
+    {
+      "id": 39,
+      "name": "Bounce Arena",
+      "slug": null,
+      "short_description": null,
+      "description": "Jump, flip, and bounce to your heart's content in our massive bounce arena. Fun for all ages!",
+      "image_url": "uploads/20251206_212311_7225e49f_attraction1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-05 06:17:48.878000+00:00",
+      "updated_at": "2025-12-23 21:42:16.819000+00:00"
+    },
+    {
+      "id": 40,
+      "name": "Obstacle Challenge",
+      "slug": null,
+      "short_description": null,
+      "description": "Race through tunnels, climb walls, and dodge obstacles in this action-packed challenge course!",
+      "image_url": "/images/uploads/img-5.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-05 06:17:48.885000+00:00",
+      "updated_at": "2025-12-05 06:17:48.885000+00:00"
+    },
+    {
+      "id": 41,
+      "name": "Mega Slides",
+      "slug": null,
+      "short_description": null,
+      "description": "Our tallest and fastest slides for the ultimate sliding experience. Hold on tight!",
+      "image_url": "/images/uploads/img-6.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-05 06:17:48.890000+00:00",
+      "updated_at": "2025-12-05 06:17:48.890000+00:00"
+    },
+    {
+      "id": 43,
+      "name": "Toddler Zone",
+      "slug": null,
+      "short_description": null,
+      "description": "Safe and fun area designed specifically for our youngest ninjas aged 1-7 years.",
+      "image_url": "/images/uploads/img-8.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 8,
+      "created_at": "2025-12-05 06:17:48.902000+00:00",
+      "updated_at": "2025-12-05 06:17:48.902000+00:00"
+    },
+    {
+      "id": 44,
+      "name": "Climbing Walls",
+      "slug": null,
+      "short_description": null,
+      "description": "Scale our inflatable climbing walls and reach new heights! Multiple difficulty levels available.",
+      "image_url": "uploads/20251207_091409_4db31295_attraction7wallclimbing.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 9,
+      "created_at": "2025-12-05 06:17:48.908000+00:00",
+      "updated_at": "2025-12-23 21:42:16.819000+00:00"
+    },
+    {
+      "id": 45,
+      "name": "Party Zones",
+      "slug": null,
+      "short_description": null,
+      "description": "Private party areas perfect for birthdays and celebrations. Make your special day unforgettable!",
+      "image_url": "/images/uploads/img-10.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 10,
+      "created_at": "2025-12-05 06:17:48.913000+00:00",
+      "updated_at": "2025-12-05 06:17:48.913000+00:00"
+    },
+    {
+      "id": 47,
+      "name": "Ninja Obstacle Course",
+      "slug": "ninja-obstacle-course",
+      "short_description": "Ultimate ninja warrior-style inflatable course",
+      "description": "Test your agility and strength on our ultimate ninja warrior-style inflatable course. Climb, jump, and conquer!",
+      "image_url": "uploads/20251205_141324_d9eda80b_attraction1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 10:43:17.442000+00:00",
+      "updated_at": "2025-12-23 21:42:16.820000+00:00"
+    },
+    {
+      "id": 48,
+      "name": "TEKKEN",
+      "slug": "",
+      "short_description": "Massive inflatable slides with multiple lanes",
+      "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+      "image_url": "uploads/20251206_212434_49af383f_game1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 10:43:17.453000+00:00",
+      "updated_at": "2025-12-23 21:42:16.821000+00:00"
+    },
+    {
+      "id": 52,
+      "name": "Dinosaur Guard",
+      "slug": "dinosaur-guard",
+      "short_description": "Prehistoric adventure zone",
+      "description": "Navigate past the inflatable dinosaurs in this prehistoric adventure zone!",
+      "image_url": "uploads/20251205_133605_61d5c552_enterdino.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-05 10:43:17.485000+00:00",
+      "updated_at": "2025-12-23 21:42:16.822000+00:00"
+    },
+    {
+      "id": 53,
+      "name": "Balance Beam Challenge",
+      "slug": "balance-beam",
+      "short_description": "Test your balance skills",
+      "description": "Test your balance skills on our inflatable beam. Don't fall off!",
+      "image_url": "uploads/20251205_140842_0eb9e4d6_attraction6.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 7,
+      "created_at": "2025-12-05 10:43:17.493000+00:00",
+      "updated_at": "2025-12-23 21:42:16.823000+00:00"
+    },
+    {
+      "id": 57,
+      "name": "Wave Bed",
+      "slug": "wave-bed",
+      "short_description": "Bouncy inflatable bed for groups",
+      "description": "Ride the waves on our bouncy inflatable bed. Perfect for group fun!",
+      "image_url": "uploads/20251207_155807_41e43632_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 11,
+      "created_at": "2025-12-05 10:43:17.525000+00:00",
+      "updated_at": "2025-12-23 21:42:16.824000+00:00"
+    },
+    {
+      "id": 58,
+      "name": "Giant Slides",
+      "slug": "giant-slides",
+      "short_description": "Massive inflatable slides with multiple lanes",
+      "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+      "image_url": "uploads/20251205_133456_2a794495_bigslide .jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-07 02:47:02.090000+00:00",
+      "updated_at": "2025-12-23 21:42:16.825000+00:00"
+    },
+    {
+      "id": 59,
+      "name": "Wipe-Out Challenge",
+      "slug": "wipe-out-challenge",
+      "short_description": "Balance through spinning obstacles",
+      "description": "Can you stay balanced? Navigate the spinning obstacles without falling into the soft landing zone!",
+      "image_url": "uploads/20251205_132226_c26b1787_attraction2.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-07 02:47:02.095000+00:00",
+      "updated_at": "2025-12-23 21:42:16.826000+00:00"
+    },
+    {
+      "id": 60,
+      "name": "Inflatable Maze",
+      "slug": "inflatable-maze",
+      "short_description": "Colorful maze with twists and turns",
+      "description": "Get lost in our colorful maze! Find your way through twists, turns, and surprise obstacles.",
+      "image_url": "uploads/20251206_220639_ff0d1565_attraction3.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-07 02:47:02.099000+00:00",
+      "updated_at": "2025-12-23 21:42:16.827000+00:00"
+    },
+    {
+      "id": 61,
+      "name": "Giant Jumping Balls",
+      "slug": "giant-jumping-balls",
+      "short_description": "Oversized jumping balls for all ages",
+      "description": "Bounce to new heights on our oversized jumping balls. Perfect for all ages!",
+      "image_url": "uploads/20251207_064945_56077e49_attraction4.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-07 02:47:02.103000+00:00",
+      "updated_at": "2025-12-23 21:42:16.827000+00:00"
+    },
+    {
+      "id": 63,
+      "name": "Adventure Park",
+      "slug": "adventure-park",
+      "short_description": "Complete adventure experience",
+      "description": "Explore our adventure-themed inflatable park with multiple zones and challenges to discover!",
+      "image_url": "uploads/20251219_015558_619aa921_bigestslide.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 10,
+      "created_at": "2025-12-07 02:47:02.122000+00:00",
+      "updated_at": "2025-12-23 21:42:16.828000+00:00"
+    }
+  ],
+  "Banner": [
+    {
+      "id": 2,
+      "title": "Book Your Adventure Today",
+      "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920&h=600&fit=crop",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-02 17:49:21.474000+00:00",
+      "updated_at": "2025-12-23 21:42:16.830000+00:00"
+    },
+    {
+      "id": 4,
+      "title": "Book Now",
+      "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-02 17:51:48.138000+00:00",
+      "updated_at": "2025-12-23 21:42:16.831000+00:00"
+    }
+  ],
+  "InstagramReel": [],
+  "Faq": [
+    {
+      "id": 11,
+      "question": "What age groups can enjoy Ninja Park?",
+      "answer": "We have zones for everyone! From a dedicated toddler area to challenging courses for teens and adults. It's truly All Ages, All Fun.",
+      "category": "General",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.953000+00:00",
+      "updated_at": "2025-12-07 02:47:02.194000+00:00"
+    },
+    {
+      "id": 12,
+      "question": "Do I need to book in advance?",
+      "answer": "We highly recommend booking online to secure your slot, especially on weekends. Walk-ins are subject to availability.",
+      "category": "Booking",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.960000+00:00",
+      "updated_at": "2025-12-07 02:47:02.198000+00:00"
+    },
+    {
+      "id": 13,
+      "question": "What should I wear?",
+      "answer": "Comfortable athletic wear is best. Socks are MANDATORY for hygiene and safety. We sell grip socks at the counter if you need them.",
+      "category": "General",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.964000+00:00",
+      "updated_at": "2025-12-07 02:47:02.200000+00:00"
+    },
+    {
+      "id": 14,
+      "question": "Is the park safe for children?",
+      "answer": "Absolutely! We have a 100% safety record. Our equipment is top-tier, and trained marshals supervise all zones.",
+      "category": "Safety",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.970000+00:00",
+      "updated_at": "2025-12-07 02:47:02.205000+00:00"
+    },
+    {
+      "id": 15,
+      "question": "Can I host a birthday party here?",
+      "answer": "Yes! We specialize in unforgettable birthday bashes. Check out our Parties page for packages.",
+      "category": "Events",
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.976000+00:00",
+      "updated_at": "2025-12-07 02:47:02.208000+00:00"
+    }
+  ],
+  "Testimonial": [],
+  "SocialLink": [
+    {
+      "id": 1,
+      "platform": "Facebook",
+      "url": "https://facebook.com/ninjainflatablepark",
+      "icon": "facebook",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.586000+00:00",
+      "updated_at": "2025-12-02 17:49:21.586000+00:00"
+    },
+    {
+      "id": 2,
+      "platform": "Instagram",
+      "url": "https://instagram.com/ninjainflatablepark",
+      "icon": "instagram",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.598000+00:00",
+      "updated_at": "2025-12-02 17:49:21.598000+00:00"
+    },
+    {
+      "id": 3,
+      "platform": "Twitter",
+      "url": "https://twitter.com/ninjainflatablepark",
+      "icon": "twitter",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.606000+00:00",
+      "updated_at": "2025-12-02 17:49:21.606000+00:00"
+    }
+  ],
+  "GalleryItem": [
+    {
+      "id": 21,
+      "title": "Promo Party",
+      "image_url": "/promo-party.jpg",
+      "category": "parties_carousel",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-10 10:05:20.848000+00:00",
+      "updated_at": "2025-12-10 10:05:20.848000+00:00"
+    },
+    {
+      "id": 22,
+      "title": "Birthday Party",
+      "image_url": "/park-birthday-party.jpg",
+      "category": "parties_carousel",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-10 10:05:20.859000+00:00",
+      "updated_at": "2025-12-10 10:05:20.859000+00:00"
+    },
+    {
+      "id": 25,
+      "title": "1763947163648",
+      "image_url": "uploads/20251210_160007_1b570d5a_1763947163648.jpg",
+      "category": "General",
+      "order": 6,
+      "active": true,
+      "created_at": "2025-12-10 10:30:07.887000+00:00",
+      "updated_at": "2025-12-23 21:42:16.834000+00:00"
+    },
+    {
+      "id": 27,
+      "title": "1763947047133",
+      "image_url": "uploads/20251210_160041_ac5e178c_1763947047133.jpg",
+      "category": "General",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-10 10:30:42.150000+00:00",
+      "updated_at": "2025-12-24 07:30:47.840000+00:00"
+    },
+    {
+      "id": 28,
+      "title": "bigestslide",
+      "image_url": "uploads/20251210_160156_9687db56_bigestslide.jpeg",
+      "category": "General",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-10 10:31:56.936000+00:00",
+      "updated_at": "2025-12-23 21:42:16.836000+00:00"
+    },
+    {
+      "id": 29,
+      "title": "wipeoutvid",
+      "image_url": "uploads/20251210_160157_633f30c9_wipeoutvid.jpeg",
+      "category": "General",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-10 10:31:57.472000+00:00",
+      "updated_at": "2025-12-23 21:42:16.837000+00:00"
+    },
+    {
+      "id": 30,
+      "title": "enterdino",
+      "image_url": "uploads/20251210_160157_ce4047ef_enterdino.jpeg",
+      "category": "General",
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-10 10:31:57.993000+00:00",
+      "updated_at": "2025-12-23 21:42:16.837000+00:00"
+    },
+    {
+      "id": 31,
+      "title": "overview",
+      "image_url": "uploads/20251210_160158_e59ac9eb_overview.jpeg",
+      "category": "General",
+      "order": 6,
+      "active": true,
+      "created_at": "2025-12-10 10:31:58.539000+00:00",
+      "updated_at": "2025-12-23 21:42:16.838000+00:00"
+    },
+    {
+      "id": 32,
+      "title": "ninja",
+      "image_url": "uploads/20251210_160158_93503054_ninja.jpeg",
+      "category": "General",
+      "order": 7,
+      "active": true,
+      "created_at": "2025-12-10 10:31:59.086000+00:00",
+      "updated_at": "2025-12-23 21:42:16.839000+00:00"
+    },
+    {
+      "id": 33,
+      "title": "WhatsApp Image 2025-11-26 at 3",
+      "image_url": "uploads/20251210_160159_82703492_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+      "category": "General",
+      "order": 8,
+      "active": true,
+      "created_at": "2025-12-10 10:31:59.661000+00:00",
+      "updated_at": "2025-12-23 21:42:16.840000+00:00"
+    },
+    {
+      "id": 34,
+      "title": "1763947002913",
+      "image_url": "uploads/20251210_160451_011360c9_1763947002913.jpg",
+      "category": "parties_carousel",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-10 10:34:52.176000+00:00",
+      "updated_at": "2025-12-23 21:42:16.841000+00:00"
+    }
+  ],
+  "StatCard": [
+    {
+      "id": 9,
+      "label": "Sq Ft of Fun",
+      "value": "20,000+",
+      "unit": "Sq Ft of Fun",
+      "icon": "Zap",
+      "color": "primary",
+      "page": "about",
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 06:17:48.987000+00:00",
+      "updated_at": "2025-12-07 02:47:02.071000+00:00"
+    },
+    {
+      "id": 10,
+      "label": "Happy Ninjas",
+      "value": "50,000+",
+      "unit": "Happy Ninjas",
+      "icon": "Users",
+      "color": "secondary",
+      "page": "about",
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 06:17:48.992000+00:00",
+      "updated_at": "2025-12-07 02:47:02.074000+00:00"
+    },
+    {
+      "id": 11,
+      "label": "Unique Zones",
+      "value": "11+",
+      "unit": "Unique Zones",
+      "icon": "Trophy",
+      "color": "accent",
+      "page": "about",
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 06:17:48.998000+00:00",
+      "updated_at": "2025-12-07 02:47:02.077000+00:00"
+    },
+    {
+      "id": 12,
+      "label": "Safety Record",
+      "value": "100%",
+      "unit": "Safety Record",
+      "icon": "Shield",
+      "color": "primary",
+      "page": "about",
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-05 06:17:49.003000+00:00",
+      "updated_at": "2025-12-07 02:47:02.080000+00:00"
+    }
+  ],
+  "MenuSection": [
+    {
+      "id": 1,
+      "category": "Veg",
+      "items": [
+        "sandwichs",
+        "manchuri",
+        "rolls"
+      ],
+      "icon": null,
+      "color": "secondary",
+      "active": true,
+      "order": 0,
+      "created_at": "2025-12-10 10:48:16.049000+00:00",
+      "updated_at": "2025-12-10 10:48:16.049000+00:00"
+    }
+  ]
+}

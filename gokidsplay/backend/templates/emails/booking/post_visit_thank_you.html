@@ -1,0 +1,45 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Thank You for Visiting Spin Pin!{% endblock %}
+
+{% block header_subtitle %}We hope you had a blast! 🎉{% endblock %}
+
+{% block content %}
+<p class="greeting">Hi {{ customer_name }}! 👋</p>
+
+<p class="message">
+    Thank you for choosing Spin Pin for your recent {{ activity_name|lower }} session! We hope you and your guests had an amazing time and created some wonderful memories.
+</p>
+
+<div style="background-color: #f3f4f6; padding: 20px; margin: 30px 0; border-radius: 8px; text-align: center;">
+    <h3 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">How did we do? ⭐</h3>
+    <p style="color: #4b5563; margin-bottom: 20px;">
+        We're always striving to make the Spin Pin experience better. We would love it if you could take a quick moment to leave us a review!
+    </p>
+    <!-- Placeholder link for Google Reviews or similar -->
+    <a href="https://g.page/r/spinpin-review" style="display: inline-block; background-color: #667eea; color: white; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600;">Leave a Review</a>
+</div>
+
+<p class="message">
+    We'd love to see you again soon. Be sure to check our website for upcoming events, new attractions, and special offers!
+</p>
+
+<div style="text-align: center; margin: 40px 0 20px 0;">
+    <p style="font-size: 16px; color: #4a5568; margin: 0 0 20px 0;">
+        Follow us on social media for the latest updates!
+    </p>
+    <p style="margin: 10px 0;">
+        <strong style="color: #667eea;">📸 Instagram:</strong> <a href="https://instagram.com/spinpin.uk" style="color: #1a202c; text-decoration: none;">@spinpin.uk</a>
+    </p>
+    <p style="margin: 10px 0;">
+        <strong style="color: #667eea;">👍 Facebook:</strong> <a href="https://facebook.com/spinpin.uk" style="color: #1a202c; text-decoration: none;">Spin Pin</a>
+    </p>
+</div>
+
+<div style="text-align: center; margin: 30px 0;">
+    <p style="font-size: 18px; font-weight: 600; color: #1a202c; margin: 0 0 20px 0;">
+        See you next time! 🎳🛼
+    </p>
+</div>
+
+{% endblock %}

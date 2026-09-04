@@ -1,0 +1,1918 @@
+{
+  "Page": [
+    {
+      "id": 1,
+      "slug": "home",
+      "title": "Ninja Inflatable Park - Home",
+      "description": "Welcome to the ultimate inflatable park experience!",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.299000+00:00",
+      "updated_at": "2025-12-07 02:47:01.962000+00:00"
+    },
+    {
+      "id": 2,
+      "slug": "about",
+      "title": "About Us - Ninja Inflatable Park",
+      "description": "Learn about our story and mission.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.308000+00:00",
+      "updated_at": "2025-12-07 02:47:01.977000+00:00"
+    },
+    {
+      "id": 3,
+      "slug": "pricing",
+      "title": "Pricing - Ninja Inflatable Park",
+      "description": "Check our session and party prices.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.316000+00:00",
+      "updated_at": "2025-12-07 02:47:01.981000+00:00"
+    },
+    {
+      "id": 4,
+      "slug": "parties",
+      "title": "Parties - Ninja Inflatable Park",
+      "description": "Book the best birthday party ever!",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.323000+00:00",
+      "updated_at": "2025-12-07 02:47:01.985000+00:00"
+    },
+    {
+      "id": 5,
+      "slug": "attractions",
+      "title": "Attractions - Ninja Inflatable Park",
+      "description": "Explore our amazing inflatable attractions.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.331000+00:00",
+      "updated_at": "2025-12-07 02:47:01.989000+00:00"
+    },
+    {
+      "id": 6,
+      "slug": "contact",
+      "title": "Contact Us - Ninja Inflatable Park",
+      "description": "Get in touch with us.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.337000+00:00",
+      "updated_at": "2025-12-07 02:47:01.992000+00:00"
+    },
+    {
+      "id": 7,
+      "slug": "facilities",
+      "title": "Facilities - Ninja Inflatable Park",
+      "description": "Our park facilities and amenities.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.344000+00:00",
+      "updated_at": "2025-12-07 02:47:01.995000+00:00"
+    },
+    {
+      "id": 8,
+      "slug": "groups",
+      "title": "Group Bookings - Ninja Inflatable Park",
+      "description": "Special rates for schools and large groups.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.351000+00:00",
+      "updated_at": "2025-12-07 02:47:01.997000+00:00"
+    },
+    {
+      "id": 9,
+      "slug": "guidelines",
+      "title": "Safety Guidelines - Ninja Inflatable Park",
+      "description": "Important safety rules and guidelines.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.357000+00:00",
+      "updated_at": "2025-12-07 02:47:02.002000+00:00"
+    },
+    {
+      "id": 10,
+      "slug": "privacy",
+      "title": "Privacy Policy - Ninja Inflatable Park",
+      "description": "Our privacy policy.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.364000+00:00",
+      "updated_at": "2025-12-07 02:47:02.005000+00:00"
+    },
+    {
+      "id": 11,
+      "slug": "waiver-terms",
+      "title": "Waiver Terms - Ninja Inflatable Park",
+      "description": "Terms and conditions for waivers.",
+      "keywords": null,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.371000+00:00",
+      "updated_at": "2025-12-07 02:47:02.009000+00:00"
+    }
+  ],
+  "PageSection": [
+    {
+      "id": 2,
+      "page": "about",
+      "section_key": "hero",
+      "title": "India's Biggest Inflatable Adventure Park!",
+      "subtitle": "Experience the thrill of jumping, sliding, and bouncing in a safe and fun environment.",
+      "content": "Experience the thrill of jumping, sliding, and bouncing in a safe and fun environment.",
+      "image_url": "uploads/20251205_132326_48cf3a03_entere.jpeg",
+      "video_url": null,
+      "cta_text": "",
+      "cta_link": "",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.430000+00:00",
+      "updated_at": "2025-12-23 21:42:16.848000+00:00"
+    },
+    {
+      "id": 4,
+      "page": "about",
+      "section_key": "story",
+      "title": "Our Story",
+      "subtitle": null,
+      "content": "<p>Ninja Inflatable Park was born from a simple idea: create a space where people of all ages can unleash their inner ninja, challenge themselves, and have an absolute blast doing it.</p>\n<p>Spanning over 20,000 square feet, we've created India's largest inflatable adventure park with 11+ unique zones designed to thrill, challenge, and entertain.</p>\n<p>Whether you're looking for a fun family outing, an adrenaline-pumping workout, or the perfect venue for your next celebration, Ninja Park is your destination for unforgettable memories.</p>",
+      "image_url": "/park-slides-action.jpg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.463000+00:00",
+      "updated_at": "2025-12-07 02:47:02.032000+00:00"
+    },
+    {
+      "id": 16,
+      "page": "about",
+      "section_key": "reviews",
+      "title": "People Reviews on Ninja",
+      "subtitle": null,
+      "content": "Check out these amazing reviews from our visitors!",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.845000+00:00",
+      "updated_at": "2025-12-07 02:47:02.035000+00:00"
+    },
+    {
+      "id": 17,
+      "page": "about",
+      "section_key": "cta",
+      "title": "Join the Adventure!",
+      "subtitle": null,
+      "content": "Experience the thrill of India's biggest inflatable park today!",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.849000+00:00",
+      "updated_at": "2025-12-07 02:47:02.040000+00:00"
+    },
+    {
+      "id": 5,
+      "page": "attractions",
+      "section_key": "hero",
+      "title": "Our Attractions!",
+      "subtitle": "Explore our world-class inflatable courses and ninja challenges!",
+      "content": "From ninja obstacle courses to giant slides, we've got something for everyone. Choose your adventure!",
+      "image_url": "uploads/20251207_195732_c66169a0_WhatsApp%20Image%202025-11-24%20at%206.31.02%20AM%20(2).jpeg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.348000+00:00",
+      "updated_at": "2025-12-23 21:42:16.850000+00:00"
+    },
+    {
+      "id": 20,
+      "page": "contact",
+      "section_key": "contact_form",
+      "title": "“Contact Us & Group Booking Enquiry”",
+      "subtitle": "",
+      "content": null,
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-09 20:00:05.481000+00:00",
+      "updated_at": "2025-12-09 20:00:05.481000+00:00"
+    },
+    {
+      "id": 10,
+      "page": "contact",
+      "section_key": "hero",
+      "title": "CONTACT US",
+      "subtitle": "We are here to help! Get in touch with our team.",
+      "content": "We are here to help! Get in touch with our team.",
+      "image_url": "/park-slides-action.jpg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.398000+00:00",
+      "updated_at": "2025-12-05 15:26:54.398000+00:00"
+    },
+    {
+      "id": 11,
+      "page": "groups",
+      "section_key": "hero",
+      "title": "GROUP BOOKINGS",
+      "subtitle": "Special rates for schools, corporates, and large groups.",
+      "content": "Special rates for schools, corporates, and large groups.",
+      "image_url": "/park-slides-action.jpg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.409000+00:00",
+      "updated_at": "2025-12-05 15:26:54.409000+00:00"
+    },
+    {
+      "id": 7,
+      "page": "guidelines",
+      "section_key": "hero",
+      "title": "Safety Guidelines",
+      "subtitle": "Your safety is our priority. Please review the rules before you jump.",
+      "content": "Please read our safety guidelines carefully before jumping.",
+      "image_url": "uploads/20251206_225933_e72aaa89_Gemini_Generated_Image_gvi0uogvi0uogvi0.png",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.369000+00:00",
+      "updated_at": "2025-12-23 21:42:16.851000+00:00"
+    },
+    {
+      "id": 1,
+      "page": "home",
+      "section_key": "hero",
+      "title": "ARE YOU A NINJA?",
+      "subtitle": "Get ready to jump, climb, bounce, and conquer the ultimate inflatable adventure!",
+      "content": "Get ready to jump, climb, bounce, and conquer the ultimate inflatable adventure!",
+      "image_url": "uploads/20251207_085248_e1751e6d_entere.jpeg",
+      "video_url": null,
+      "cta_text": "Book Now",
+      "cta_link": "/book",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-04 23:35:15.421000+00:00",
+      "updated_at": "2025-12-23 21:42:16.852000+00:00"
+    },
+    {
+      "id": 3,
+      "page": "home",
+      "section_key": "about",
+      "title": "India's Biggest Inflatable Park",
+      "subtitle": null,
+      "content": "Ninja Inflatable Park was born from a simple idea: create a space where people of all ages can unleash their inner ninja, challenge themselves, and have an absolute blast doing it.",
+      "image_url": "/park-slides-action.jpg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.132000+00:00",
+      "updated_at": "2025-12-10 10:28:07.354000+00:00"
+    },
+    {
+      "id": 13,
+      "page": "home",
+      "section_key": "about_extended",
+      "title": null,
+      "subtitle": null,
+      "content": "Spanning over 20,000 square feet, we've created India's largest inflatable adventure park with 11+ unique zones designed to thrill, challenge, and entertain.",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.824000+00:00",
+      "updated_at": "2025-12-07 02:47:02.019000+00:00"
+    },
+    {
+      "id": 14,
+      "page": "home",
+      "section_key": "gallery",
+      "title": "See The Action",
+      "subtitle": null,
+      "content": "Real moments, real fun! Check out what awaits you at Ninja Inflatable Park.",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.827000+00:00",
+      "updated_at": "2025-12-07 02:47:02.022000+00:00"
+    },
+    {
+      "id": 15,
+      "page": "home",
+      "section_key": "cta",
+      "title": "Ready to BOUNCE?",
+      "subtitle": null,
+      "content": "Book your tickets now and experience the ultimate inflatable adventure!",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.833000+00:00",
+      "updated_at": "2025-12-07 02:47:02.026000+00:00"
+    },
+    {
+      "id": 8,
+      "page": "parties",
+      "section_key": "hero",
+      "title": "PARTY PACKAGES",
+      "subtitle": "Celebrate your special day with us!",
+      "content": "Celebrate your special day with us!",
+      "image_url": "/park-slides-action.jpg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.378000+00:00",
+      "updated_at": "2025-12-05 15:26:54.378000+00:00"
+    },
+    {
+      "id": 9,
+      "page": "party-booking",
+      "section_key": "hero",
+      "title": "BOOK YOUR PARTY",
+      "subtitle": "Complete the form below to reserve your celebration.",
+      "content": "Complete the form below to reserve your celebration.",
+      "image_url": "uploads/20251207_180519_ad434a39_WhatsApp%20Image%202025-11-26%20at%203.24.06%20AM.jpeg",
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 0,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.389000+00:00",
+      "updated_at": "2025-12-23 21:42:16.852000+00:00"
+    },
+    {
+      "id": 12,
+      "page": "party-booking",
+      "section_key": "terms",
+      "title": "Parties Terms & Conditions",
+      "subtitle": null,
+      "content": "<ul class=\"list-disc pl-5 space-y-2\">\n        <li>Minimum of 10 participants required for all party packages.</li>\n        <li>A non-refundable deposit is required to secure your booking.</li>\n        <li>Party duration includes jump time and party room access.</li>\n        <li>Outside food and drinks are not permitted (except for birthday cakes).</li>\n        <li>Waivers must be signed for all participants.</li>\n        <li>Socks are required for all jumpers.</li>\n    </ul>",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 16:20:54.425000+00:00",
+      "updated_at": "2025-12-05 16:20:54.425000+00:00"
+    },
+    {
+      "id": 6,
+      "page": "pricing",
+      "section_key": "hero",
+      "title": "Pricing Plans",
+      "subtitle": "Choose the perfect pass for your adventure.",
+      "content": "Choose the perfect package for your ninja adventure.",
+      "image_url": "uploads/20251207_055052_473fb540_Gemini_Generated_Image_jjyfsljjyfsljjyf.png",
+      "video_url": null,
+      "cta_text": "",
+      "cta_link": "",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 15:26:54.359000+00:00",
+      "updated_at": "2025-12-23 21:42:16.853000+00:00"
+    },
+    {
+      "id": 18,
+      "page": "pricing",
+      "section_key": "group_booking",
+      "title": "GROUP BOOKING",
+      "subtitle": null,
+      "content": "Custom Pricing for Groups 10+",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.857000+00:00",
+      "updated_at": "2025-12-07 02:47:02.049000+00:00"
+    },
+    {
+      "id": 19,
+      "page": "pricing",
+      "section_key": "important_info",
+      "title": "Important Info",
+      "subtitle": null,
+      "content": "• Extra Hour: ₹500 per person\n• Socks: Mandatory for all jumpers\n• Waiver: Must be signed before entry\n• Arrive Early: 15 mins before session",
+      "image_url": null,
+      "video_url": null,
+      "cta_text": null,
+      "cta_link": null,
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-07 02:38:38.862000+00:00",
+      "updated_at": "2025-12-07 02:47:02.053000+00:00"
+    }
+  ],
+  "Activity": [
+    {
+      "id": 36,
+      "name": "Ninja Warrior Course",
+      "slug": null,
+      "short_description": null,
+      "description": "this is a obstacle course",
+      "image_url": "uploads/20251206_212150_fe55de4f_attraction6.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 06:17:48.861000+00:00",
+      "updated_at": "2025-12-23 21:42:16.812000+00:00"
+    },
+    {
+      "id": 37,
+      "name": "Giant Slides",
+      "slug": null,
+      "short_description": null,
+      "description": "Experience the thrill of our massive inflatable slides. Perfect for speed demons and adrenaline junkies!",
+      "image_url": "uploads/20251206_212222_7e768e5b_attraction11.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 06:17:48.866000+00:00",
+      "updated_at": "2025-12-23 21:42:16.817000+00:00"
+    },
+    {
+      "id": 38,
+      "name": "Wipeout Zone",
+      "slug": null,
+      "short_description": null,
+      "description": "Navigate through spinning obstacles and bouncing challenges. Can you make it across without falling?",
+      "image_url": "uploads/20251224_025405_49e6ddaf_1763947163648.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 06:17:48.873000+00:00",
+      "updated_at": "2025-12-23 21:42:16.818000+00:00"
+    },
+    {
+      "id": 39,
+      "name": "Bounce Arena",
+      "slug": null,
+      "short_description": null,
+      "description": "Jump, flip, and bounce to your heart's content in our massive bounce arena. Fun for all ages!",
+      "image_url": "uploads/20251206_212311_7225e49f_attraction1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-05 06:17:48.878000+00:00",
+      "updated_at": "2025-12-23 21:42:16.819000+00:00"
+    },
+    {
+      "id": 40,
+      "name": "Obstacle Challenge",
+      "slug": null,
+      "short_description": null,
+      "description": "Race through tunnels, climb walls, and dodge obstacles in this action-packed challenge course!",
+      "image_url": "/images/uploads/img-5.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-05 06:17:48.885000+00:00",
+      "updated_at": "2025-12-05 06:17:48.885000+00:00"
+    },
+    {
+      "id": 41,
+      "name": "Mega Slides",
+      "slug": null,
+      "short_description": null,
+      "description": "Our tallest and fastest slides for the ultimate sliding experience. Hold on tight!",
+      "image_url": "/images/uploads/img-6.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-05 06:17:48.890000+00:00",
+      "updated_at": "2025-12-05 06:17:48.890000+00:00"
+    },
+    {
+      "id": 43,
+      "name": "Toddler Zone",
+      "slug": null,
+      "short_description": null,
+      "description": "Safe and fun area designed specifically for our youngest ninjas aged 1-7 years.",
+      "image_url": "/images/uploads/img-8.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 8,
+      "created_at": "2025-12-05 06:17:48.902000+00:00",
+      "updated_at": "2025-12-05 06:17:48.902000+00:00"
+    },
+    {
+      "id": 44,
+      "name": "Climbing Walls",
+      "slug": null,
+      "short_description": null,
+      "description": "Scale our inflatable climbing walls and reach new heights! Multiple difficulty levels available.",
+      "image_url": "uploads/20251207_091409_4db31295_attraction7wallclimbing.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 9,
+      "created_at": "2025-12-05 06:17:48.908000+00:00",
+      "updated_at": "2025-12-23 21:42:16.819000+00:00"
+    },
+    {
+      "id": 45,
+      "name": "Party Zones",
+      "slug": null,
+      "short_description": null,
+      "description": "Private party areas perfect for birthdays and celebrations. Make your special day unforgettable!",
+      "image_url": "/images/uploads/img-10.jpg",
+      "gallery": [],
+      "active": true,
+      "order": 10,
+      "created_at": "2025-12-05 06:17:48.913000+00:00",
+      "updated_at": "2025-12-05 06:17:48.913000+00:00"
+    },
+    {
+      "id": 47,
+      "name": "Ninja Obstacle Course",
+      "slug": "ninja-obstacle-course",
+      "short_description": "Ultimate ninja warrior-style inflatable course",
+      "description": "Test your agility and strength on our ultimate ninja warrior-style inflatable course. Climb, jump, and conquer!",
+      "image_url": "uploads/20251205_141324_d9eda80b_attraction1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 10:43:17.442000+00:00",
+      "updated_at": "2025-12-23 21:42:16.820000+00:00"
+    },
+    {
+      "id": 48,
+      "name": "TEKKEN",
+      "slug": "",
+      "short_description": "Massive inflatable slides with multiple lanes",
+      "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+      "image_url": "uploads/20251206_212434_49af383f_game1.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 10:43:17.453000+00:00",
+      "updated_at": "2025-12-23 21:42:16.821000+00:00"
+    },
+    {
+      "id": 52,
+      "name": "Dinosaur Guard",
+      "slug": "dinosaur-guard",
+      "short_description": "Prehistoric adventure zone",
+      "description": "Navigate past the inflatable dinosaurs in this prehistoric adventure zone!",
+      "image_url": "uploads/20251205_133605_61d5c552_enterdino.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-05 10:43:17.485000+00:00",
+      "updated_at": "2025-12-23 21:42:16.822000+00:00"
+    },
+    {
+      "id": 53,
+      "name": "Balance Beam Challenge",
+      "slug": "balance-beam",
+      "short_description": "Test your balance skills",
+      "description": "Test your balance skills on our inflatable beam. Don't fall off!",
+      "image_url": "uploads/20251205_140842_0eb9e4d6_attraction6.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 7,
+      "created_at": "2025-12-05 10:43:17.493000+00:00",
+      "updated_at": "2025-12-23 21:42:16.823000+00:00"
+    },
+    {
+      "id": 57,
+      "name": "Wave Bed",
+      "slug": "wave-bed",
+      "short_description": "Bouncy inflatable bed for groups",
+      "description": "Ride the waves on our bouncy inflatable bed. Perfect for group fun!",
+      "image_url": "uploads/20251207_155807_41e43632_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 11,
+      "created_at": "2025-12-05 10:43:17.525000+00:00",
+      "updated_at": "2025-12-23 21:42:16.824000+00:00"
+    },
+    {
+      "id": 58,
+      "name": "Giant Slides",
+      "slug": "giant-slides",
+      "short_description": "Massive inflatable slides with multiple lanes",
+      "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+      "image_url": "uploads/20251205_133456_2a794495_bigslide .jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-07 02:47:02.090000+00:00",
+      "updated_at": "2025-12-23 21:42:16.825000+00:00"
+    },
+    {
+      "id": 59,
+      "name": "Wipe-Out Challenge",
+      "slug": "wipe-out-challenge",
+      "short_description": "Balance through spinning obstacles",
+      "description": "Can you stay balanced? Navigate the spinning obstacles without falling into the soft landing zone!",
+      "image_url": "uploads/20251205_132226_c26b1787_attraction2.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-07 02:47:02.095000+00:00",
+      "updated_at": "2025-12-23 21:42:16.826000+00:00"
+    },
+    {
+      "id": 60,
+      "name": "Inflatable Maze",
+      "slug": "inflatable-maze",
+      "short_description": "Colorful maze with twists and turns",
+      "description": "Get lost in our colorful maze! Find your way through twists, turns, and surprise obstacles.",
+      "image_url": "uploads/20251206_220639_ff0d1565_attraction3.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-07 02:47:02.099000+00:00",
+      "updated_at": "2025-12-23 21:42:16.827000+00:00"
+    },
+    {
+      "id": 61,
+      "name": "Giant Jumping Balls",
+      "slug": "giant-jumping-balls",
+      "short_description": "Oversized jumping balls for all ages",
+      "description": "Bounce to new heights on our oversized jumping balls. Perfect for all ages!",
+      "image_url": "uploads/20251207_064945_56077e49_attraction4.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-07 02:47:02.103000+00:00",
+      "updated_at": "2025-12-23 21:42:16.827000+00:00"
+    },
+    {
+      "id": 63,
+      "name": "Adventure Park",
+      "slug": "adventure-park",
+      "short_description": "Complete adventure experience",
+      "description": "Explore our adventure-themed inflatable park with multiple zones and challenges to discover!",
+      "image_url": "uploads/20251219_015558_619aa921_bigestslide.jpeg",
+      "gallery": [],
+      "active": true,
+      "order": 10,
+      "created_at": "2025-12-07 02:47:02.122000+00:00",
+      "updated_at": "2025-12-23 21:42:16.828000+00:00"
+    }
+  ],
+  "Banner": [
+    {
+      "id": 2,
+      "title": "Book Your Adventure Today",
+      "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920&h=600&fit=crop",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-02 17:49:21.474000+00:00",
+      "updated_at": "2025-12-23 21:42:16.830000+00:00"
+    },
+    {
+      "id": 4,
+      "title": "Book Now",
+      "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-02 17:51:48.138000+00:00",
+      "updated_at": "2025-12-23 21:42:16.831000+00:00"
+    }
+  ],
+  "ContactInfo": [
+    {
+      "id": 6,
+      "key": "address",
+      "label": "Visit Us",
+      "value": "Ninja Inflatable Park, Bangalore",
+      "category": "ADDRESS",
+      "icon": "MapPin",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 01:51:23.713000+00:00",
+      "updated_at": "2025-12-05 01:51:23.713000+00:00"
+    },
+    {
+      "id": 3,
+      "key": "main_address",
+      "label": "Visit Us",
+      "value": "Ground Floor, Gopalan Innovation Mall, Bannerghatta Main Rd, JP Nagar 3rd Phase, Bengaluru, Karnataka 560076",
+      "category": "ADDRESS",
+      "icon": "MapPin",
+      "link": null,
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-04 23:35:15.412000+00:00",
+      "updated_at": "2025-12-07 02:47:02.242000+00:00"
+    },
+    {
+      "id": 5,
+      "key": "email",
+      "label": "Email Us",
+      "value": "info@ninjapark.com",
+      "category": "EMAIL",
+      "icon": "Mail",
+      "link": null,
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 01:51:23.700000+00:00",
+      "updated_at": "2025-12-05 01:51:23.700000+00:00"
+    },
+    {
+      "id": 2,
+      "key": "main_email",
+      "label": "Email Us",
+      "value": "info@ninjapark.com",
+      "category": "EMAIL",
+      "icon": "Mail",
+      "link": null,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-04 23:35:15.402000+00:00",
+      "updated_at": "2025-12-07 02:47:02.237000+00:00"
+    },
+    {
+      "id": 9,
+      "key": "opening_hours",
+      "label": "Opening Hours",
+      "value": "12:00 PM - 10:00 PM",
+      "category": "HOURS",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-07 02:38:38.912000+00:00",
+      "updated_at": "2025-12-07 02:38:38.912000+00:00"
+    },
+    {
+      "id": 7,
+      "key": "hours_week",
+      "label": "Weekdays",
+      "value": "12:00 PM - 9:00 PM",
+      "category": "HOURS",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 01:51:23.725000+00:00",
+      "updated_at": "2025-12-05 01:51:23.725000+00:00"
+    },
+    {
+      "id": 14,
+      "key": "hours_weekdays",
+      "label": "Weekdays",
+      "value": "12:00 PM - 9:00 PM",
+      "category": "HOURS",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-07 02:47:02.245000+00:00",
+      "updated_at": "2025-12-07 02:47:02.245000+00:00"
+    },
+    {
+      "id": 8,
+      "key": "hours_mon",
+      "label": "Monday",
+      "value": "Closed",
+      "category": "HOURS",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-05 01:51:23.739000+00:00",
+      "updated_at": "2025-12-05 01:51:23.739000+00:00"
+    },
+    {
+      "id": 15,
+      "key": "hours_weekends",
+      "label": "Weekends",
+      "value": "10:00 AM - 11:00 PM",
+      "category": "HOURS",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-07 02:47:02.249000+00:00",
+      "updated_at": "2025-12-07 02:47:02.249000+00:00"
+    },
+    {
+      "id": 10,
+      "key": "extra_hour_price",
+      "label": "Extra Hour",
+      "value": "₹500 per person",
+      "category": "OTHER",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-07 02:38:38.915000+00:00",
+      "updated_at": "2025-12-07 02:47:02.252000+00:00"
+    },
+    {
+      "id": 11,
+      "key": "socks_requirement",
+      "label": "Socks",
+      "value": "Mandatory for all jumpers",
+      "category": "OTHER",
+      "icon": "AlertCircle",
+      "link": null,
+      "active": true,
+      "order": 7,
+      "created_at": "2025-12-07 02:38:38.920000+00:00",
+      "updated_at": "2025-12-07 02:47:02.256000+00:00"
+    },
+    {
+      "id": 12,
+      "key": "waiver_requirement",
+      "label": "Waiver",
+      "value": "Must be signed before entry",
+      "category": "OTHER",
+      "icon": "FileText",
+      "link": null,
+      "active": true,
+      "order": 8,
+      "created_at": "2025-12-07 02:38:38.922000+00:00",
+      "updated_at": "2025-12-07 02:47:02.260000+00:00"
+    },
+    {
+      "id": 13,
+      "key": "arrival_time",
+      "label": "Arrive Early",
+      "value": "15 mins before session",
+      "category": "OTHER",
+      "icon": "Clock",
+      "link": null,
+      "active": true,
+      "order": 9,
+      "created_at": "2025-12-07 02:38:38.927000+00:00",
+      "updated_at": "2025-12-07 02:47:02.264000+00:00"
+    },
+    {
+      "id": 4,
+      "key": "phone",
+      "label": "Call Us",
+      "value": "+91 98454 71611",
+      "category": "PHONE",
+      "icon": "Phone",
+      "link": null,
+      "active": true,
+      "order": 0,
+      "created_at": "2025-12-05 01:51:23.679000+00:00",
+      "updated_at": "2025-12-05 01:51:23.679000+00:00"
+    },
+    {
+      "id": 1,
+      "key": "main_phone",
+      "label": "Call Us",
+      "value": "+91 98454 71611",
+      "category": "PHONE",
+      "icon": "Phone",
+      "link": null,
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-04 23:35:15.394000+00:00",
+      "updated_at": "2025-12-07 02:47:02.234000+00:00"
+    }
+  ],
+  "SocialLink": [
+    {
+      "id": 1,
+      "platform": "Facebook",
+      "url": "https://facebook.com/ninjainflatablepark",
+      "icon": "facebook",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.586000+00:00",
+      "updated_at": "2025-12-02 17:49:21.586000+00:00"
+    },
+    {
+      "id": 2,
+      "platform": "Instagram",
+      "url": "https://instagram.com/ninjainflatablepark",
+      "icon": "instagram",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.598000+00:00",
+      "updated_at": "2025-12-02 17:49:21.598000+00:00"
+    },
+    {
+      "id": 3,
+      "platform": "Twitter",
+      "url": "https://twitter.com/ninjainflatablepark",
+      "icon": "twitter",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-02 17:49:21.606000+00:00",
+      "updated_at": "2025-12-02 17:49:21.606000+00:00"
+    }
+  ],
+  "GalleryItem": [
+    {
+      "id": 21,
+      "title": "Promo Party",
+      "image_url": "/promo-party.jpg",
+      "category": "parties_carousel",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-10 10:05:20.848000+00:00",
+      "updated_at": "2025-12-10 10:05:20.848000+00:00"
+    },
+    {
+      "id": 22,
+      "title": "Birthday Party",
+      "image_url": "/park-birthday-party.jpg",
+      "category": "parties_carousel",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-10 10:05:20.859000+00:00",
+      "updated_at": "2025-12-10 10:05:20.859000+00:00"
+    },
+    {
+      "id": 25,
+      "title": "1763947163648",
+      "image_url": "uploads/20251210_160007_1b570d5a_1763947163648.jpg",
+      "category": "General",
+      "order": 6,
+      "active": true,
+      "created_at": "2025-12-10 10:30:07.887000+00:00",
+      "updated_at": "2025-12-23 21:42:16.834000+00:00"
+    },
+    {
+      "id": 27,
+      "title": "1763947047133",
+      "image_url": "uploads/20251210_160041_ac5e178c_1763947047133.jpg",
+      "category": "General",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-10 10:30:42.150000+00:00",
+      "updated_at": "2025-12-24 07:30:47.840000+00:00"
+    },
+    {
+      "id": 28,
+      "title": "bigestslide",
+      "image_url": "uploads/20251210_160156_9687db56_bigestslide.jpeg",
+      "category": "General",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-10 10:31:56.936000+00:00",
+      "updated_at": "2025-12-23 21:42:16.836000+00:00"
+    },
+    {
+      "id": 29,
+      "title": "wipeoutvid",
+      "image_url": "uploads/20251210_160157_633f30c9_wipeoutvid.jpeg",
+      "category": "General",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-10 10:31:57.472000+00:00",
+      "updated_at": "2025-12-23 21:42:16.837000+00:00"
+    },
+    {
+      "id": 30,
+      "title": "enterdino",
+      "image_url": "uploads/20251210_160157_ce4047ef_enterdino.jpeg",
+      "category": "General",
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-10 10:31:57.993000+00:00",
+      "updated_at": "2025-12-23 21:42:16.837000+00:00"
+    },
+    {
+      "id": 31,
+      "title": "overview",
+      "image_url": "uploads/20251210_160158_e59ac9eb_overview.jpeg",
+      "category": "General",
+      "order": 6,
+      "active": true,
+      "created_at": "2025-12-10 10:31:58.539000+00:00",
+      "updated_at": "2025-12-23 21:42:16.838000+00:00"
+    },
+    {
+      "id": 32,
+      "title": "ninja",
+      "image_url": "uploads/20251210_160158_93503054_ninja.jpeg",
+      "category": "General",
+      "order": 7,
+      "active": true,
+      "created_at": "2025-12-10 10:31:59.086000+00:00",
+      "updated_at": "2025-12-23 21:42:16.839000+00:00"
+    },
+    {
+      "id": 33,
+      "title": "WhatsApp Image 2025-11-26 at 3",
+      "image_url": "uploads/20251210_160159_82703492_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+      "category": "General",
+      "order": 8,
+      "active": true,
+      "created_at": "2025-12-10 10:31:59.661000+00:00",
+      "updated_at": "2025-12-23 21:42:16.840000+00:00"
+    },
+    {
+      "id": 34,
+      "title": "1763947002913",
+      "image_url": "uploads/20251210_160451_011360c9_1763947002913.jpg",
+      "category": "parties_carousel",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-10 10:34:52.176000+00:00",
+      "updated_at": "2025-12-23 21:42:16.841000+00:00"
+    }
+  ],
+  "PricingPlan": [
+    {
+      "id": 4,
+      "name": "Little Ninjas",
+      "type": "SESSION",
+      "age_group": "Ages 1 - 7 Years",
+      "price": "500.00",
+      "duration": 60,
+      "period_text": "/ 60 Mins",
+      "description": null,
+      "features": [
+        "Full Access to Kids Zones",
+        "Safe & Supervised Area",
+        "Parental Supervision Required",
+        "+ GST Applicable"
+      ],
+      "popular": false,
+      "variant": "secondary",
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 06:17:48.930000+00:00",
+      "updated_at": "2025-12-05 06:17:48.930000+00:00"
+    },
+    {
+      "id": 5,
+      "name": "Ninja Warriors",
+      "type": "SESSION",
+      "age_group": "Ages 7+ Years",
+      "price": "899.00",
+      "duration": 60,
+      "period_text": "/ 60 Mins",
+      "description": null,
+      "features": [
+        "Access to All Attractions",
+        "Ninja Obstacle Course",
+        "Giant Slides & Wipeout",
+        "+ GST Applicable"
+      ],
+      "popular": true,
+      "variant": "primary",
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 06:17:48.936000+00:00",
+      "updated_at": "2025-12-05 06:17:48.937000+00:00"
+    },
+    {
+      "id": 6,
+      "name": "Spectator",
+      "type": "SESSION",
+      "age_group": "Guardians / Parents",
+      "price": "150.00",
+      "duration": 0,
+      "period_text": "/ Session",
+      "description": null,
+      "features": [
+        "Entry to Park Premises",
+        "Café Access",
+        "Designated Seating Areas",
+        "+ GST Applicable"
+      ],
+      "popular": false,
+      "variant": "accent",
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 06:17:48.942000+00:00",
+      "updated_at": "2025-12-05 06:17:48.943000+00:00"
+    }
+  ],
+  "PartyPackage": [
+    {
+      "id": 2,
+      "name": "Party Package",
+      "description": "The ultimate ninja party experience! Perfect for birthdays, celebrations, and group events.",
+      "price": "1500.00",
+      "min_participants": 10,
+      "max_participants": 30,
+      "duration": 120,
+      "includes": [
+        "90 Mins Ninja Park Access",
+        "30 Mins Private Party Room",
+        "Dedicated Party Host",
+        "Ninja Grip Socks for All",
+        "E-Invitations",
+        "Setup & Cleanup Included",
+        "Gift for Birthday Child"
+      ],
+      "addons": [
+        "Pizza Package",
+        "Unlimited Drinks",
+        "Cake Service"
+      ],
+      "image_url": null,
+      "popular": true,
+      "variant": "primary",
+      "active": true,
+      "order": 0,
+      "created_at": "2025-12-06 16:45:03.346000+00:00",
+      "updated_at": "2025-12-07 03:11:48.669000+00:00"
+    }
+  ],
+  "GroupPackage": [
+    {
+      "id": 1,
+      "name": "School Groups",
+      "subtitle": "Perfect for field trips & educational outings",
+      "min_size": "15+ Students",
+      "icon": "Building2",
+      "price": "699.00",
+      "price_note": "per student",
+      "features": [
+        "Discounted group rates",
+        "Teacher/Chaperone free entry",
+        "Dedicated supervision area",
+        "Flexible timing slots",
+        "Educational team building activities",
+        "Safe & secure environment"
+      ],
+      "color": "primary",
+      "popular": false,
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 15:05:01.867000+00:00",
+      "updated_at": "2025-12-05 15:05:01.867000+00:00"
+    },
+    {
+      "id": 2,
+      "name": "Corporate Teams",
+      "subtitle": "Team building & employee engagement",
+      "min_size": "10+ Employees",
+      "icon": "Trophy",
+      "price": "799.00",
+      "price_note": "per person",
+      "features": [
+        "Customized team challenges",
+        "Private session options",
+        "Corporate invoicing available",
+        "Refreshments can be arranged",
+        "Team building activities",
+        "Photography services available"
+      ],
+      "color": "secondary",
+      "popular": true,
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 15:05:01.879000+00:00",
+      "updated_at": "2025-12-06 19:05:02.750000+00:00"
+    }
+  ],
+  "FacilityItem": [
+    {
+      "id": 1,
+      "title": "Play Zones",
+      "description": "Separate age-appropriate play areas including ninja obstacle courses, climbing walls, and giant slides.",
+      "icon": "Users",
+      "image_url": "uploads/20251219_020124_577c79bf_attraction9.jpeg",
+      "items": [
+        "Ninja Course",
+        "Toddler Zone",
+        "Giant Slides",
+        "Wipeout Challenge"
+      ],
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.360000+00:00",
+      "updated_at": "2025-12-23 21:42:16.860000+00:00"
+    },
+    {
+      "id": 2,
+      "title": "Ninja Café",
+      "description": "Refuel after your adventure with our selection of hot & cold drinks, meals, and snacks.",
+      "icon": "Coffee",
+      "image_url": "uploads/20251207_160214_dec6a332_enter.jpeg",
+      "items": [
+        "Hot & Cold Drinks",
+        "Fresh Snacks",
+        "Meals",
+        "Seating Area"
+      ],
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.375000+00:00",
+      "updated_at": "2025-12-23 21:42:16.861000+00:00"
+    },
+    {
+      "id": 3,
+      "title": "Party Rooms",
+      "description": "Private party rooms available for birthdays and special events with customizable packages.",
+      "icon": "Utensils",
+      "image_url": "/images/uploads/img-3.jpg",
+      "items": [
+        "Private Space",
+        "Decorations",
+        "Hosting Staff",
+        "Catering"
+      ],
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.389000+00:00",
+      "updated_at": "2025-12-07 02:47:02.220000+00:00"
+    },
+    {
+      "id": 4,
+      "title": "Parking & Access",
+      "description": "Convenient access for all visitors with ample parking space.",
+      "icon": "Car",
+      "image_url": "/images/uploads/img-4.jpg",
+      "items": [
+        "Free Parking (2 Hrs)",
+        "Accessible Entry",
+        "Drop-off Zone"
+      ],
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.409000+00:00",
+      "updated_at": "2025-12-07 02:47:02.224000+00:00"
+    },
+    {
+      "id": 5,
+      "title": "Health & Safety",
+      "description": "Your safety is our priority with trained staff and first-aid facilities.",
+      "icon": "Shield",
+      "image_url": "/images/uploads/img-5.jpg",
+      "items": [
+        "First Aid Staff",
+        "CCTV Surveillance",
+        "Hygiene Stations",
+        "Daily Cleaning"
+      ],
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.422000+00:00",
+      "updated_at": "2025-12-07 02:47:02.227000+00:00"
+    },
+    {
+      "id": 6,
+      "title": "Amenities",
+      "description": "Everything you need for a comfortable visit.",
+      "icon": "Wifi",
+      "image_url": "/images/uploads/img-6.jpg",
+      "items": [
+        "Free Wi-Fi",
+        "Lockers",
+        "Baby Care Room",
+        "Merchandise Store"
+      ],
+      "order": 6,
+      "active": true,
+      "created_at": "2025-12-05 01:51:23.436000+00:00",
+      "updated_at": "2025-12-07 02:47:02.231000+00:00"
+    }
+  ],
+  "ValueItem": [
+    {
+      "id": 9,
+      "title": "Fun First",
+      "description": "Every decision we make is centered around creating maximum fun and joy for our guests.",
+      "icon": "Users",
+      "color": "secondary",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.015000+00:00",
+      "updated_at": "2025-12-07 02:47:02.178000+00:00"
+    },
+    {
+      "id": 10,
+      "title": "Safety Always",
+      "description": "Your safety is our top priority. Trained staff, quality equipment, and strict protocols.",
+      "icon": "Shield",
+      "color": "primary",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.020000+00:00",
+      "updated_at": "2025-12-07 02:47:02.182000+00:00"
+    },
+    {
+      "id": 11,
+      "title": "Inclusive",
+      "description": "Activities for all ages and abilities. Everyone deserves to feel like a ninja!",
+      "icon": "Heart",
+      "color": "accent",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.027000+00:00",
+      "updated_at": "2025-12-07 02:47:02.186000+00:00"
+    },
+    {
+      "id": 12,
+      "title": "Excellence",
+      "description": "We strive for excellence in every aspect, from cleanliness to customer service.",
+      "icon": "Award",
+      "color": "secondary",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.031000+00:00",
+      "updated_at": "2025-12-07 02:47:02.190000+00:00"
+    }
+  ],
+  "TimelineItem": [
+    {
+      "id": 11,
+      "year": "2020",
+      "title": "The Dream Begins",
+      "description": "Conceptualized India's biggest inflatable adventure park",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.044000+00:00",
+      "updated_at": "2025-12-07 02:47:02.159000+00:00"
+    },
+    {
+      "id": 12,
+      "year": "2021",
+      "title": "Construction Starts",
+      "description": "Began building our 20,000 sq ft facility with state-of-the-art equipment",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.049000+00:00",
+      "updated_at": "2025-12-07 02:47:02.162000+00:00"
+    },
+    {
+      "id": 13,
+      "year": "2022",
+      "title": "Grand Opening",
+      "description": "Opened doors to thousands of excited ninjas!",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.056000+00:00",
+      "updated_at": "2025-12-07 02:47:02.167000+00:00"
+    },
+    {
+      "id": 14,
+      "year": "2023",
+      "title": "50K+ Happy Visitors",
+      "description": "Celebrated serving over 50,000 happy customers",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.061000+00:00",
+      "updated_at": "2025-12-07 02:47:02.170000+00:00"
+    },
+    {
+      "id": 15,
+      "year": "2024",
+      "title": "Expansion & Growth",
+      "description": "Added new zones and became India's #1 inflatable park",
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-05 06:17:49.066000+00:00",
+      "updated_at": "2025-12-07 02:47:02.175000+00:00"
+    }
+  ],
+  "Faq": [
+    {
+      "id": 11,
+      "question": "What age groups can enjoy Ninja Park?",
+      "answer": "We have zones for everyone! From a dedicated toddler area to challenging courses for teens and adults. It's truly All Ages, All Fun.",
+      "category": "General",
+      "order": 1,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.953000+00:00",
+      "updated_at": "2025-12-07 02:47:02.194000+00:00"
+    },
+    {
+      "id": 12,
+      "question": "Do I need to book in advance?",
+      "answer": "We highly recommend booking online to secure your slot, especially on weekends. Walk-ins are subject to availability.",
+      "category": "Booking",
+      "order": 2,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.960000+00:00",
+      "updated_at": "2025-12-07 02:47:02.198000+00:00"
+    },
+    {
+      "id": 13,
+      "question": "What should I wear?",
+      "answer": "Comfortable athletic wear is best. Socks are MANDATORY for hygiene and safety. We sell grip socks at the counter if you need them.",
+      "category": "General",
+      "order": 3,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.964000+00:00",
+      "updated_at": "2025-12-07 02:47:02.200000+00:00"
+    },
+    {
+      "id": 14,
+      "question": "Is the park safe for children?",
+      "answer": "Absolutely! We have a 100% safety record. Our equipment is top-tier, and trained marshals supervise all zones.",
+      "category": "Safety",
+      "order": 4,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.970000+00:00",
+      "updated_at": "2025-12-07 02:47:02.205000+00:00"
+    },
+    {
+      "id": 15,
+      "question": "Can I host a birthday party here?",
+      "answer": "Yes! We specialize in unforgettable birthday bashes. Check out our Parties page for packages.",
+      "category": "Events",
+      "order": 5,
+      "active": true,
+      "created_at": "2025-12-05 06:17:48.976000+00:00",
+      "updated_at": "2025-12-07 02:47:02.208000+00:00"
+    }
+  ],
+  "StatCard": [
+    {
+      "id": 9,
+      "label": "Sq Ft of Fun",
+      "value": "20,000+",
+      "unit": "Sq Ft of Fun",
+      "icon": "Zap",
+      "color": "primary",
+      "page": "about",
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-05 06:17:48.987000+00:00",
+      "updated_at": "2025-12-07 02:47:02.071000+00:00"
+    },
+    {
+      "id": 10,
+      "label": "Happy Ninjas",
+      "value": "50,000+",
+      "unit": "Happy Ninjas",
+      "icon": "Users",
+      "color": "secondary",
+      "page": "about",
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-05 06:17:48.992000+00:00",
+      "updated_at": "2025-12-07 02:47:02.074000+00:00"
+    },
+    {
+      "id": 11,
+      "label": "Unique Zones",
+      "value": "11+",
+      "unit": "Unique Zones",
+      "icon": "Trophy",
+      "color": "accent",
+      "page": "about",
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-05 06:17:48.998000+00:00",
+      "updated_at": "2025-12-07 02:47:02.077000+00:00"
+    },
+    {
+      "id": 12,
+      "label": "Safety Record",
+      "value": "100%",
+      "unit": "Safety Record",
+      "icon": "Shield",
+      "color": "primary",
+      "page": "about",
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-05 06:17:49.003000+00:00",
+      "updated_at": "2025-12-07 02:47:02.080000+00:00"
+    }
+  ],
+  "MenuSection": [
+    {
+      "id": 1,
+      "category": "Veg",
+      "items": [
+        "sandwichs",
+        "manchuri",
+        "rolls"
+      ],
+      "icon": null,
+      "color": "secondary",
+      "active": true,
+      "order": 0,
+      "created_at": "2025-12-10 10:48:16.049000+00:00",
+      "updated_at": "2025-12-10 10:48:16.049000+00:00"
+    }
+  ],
+  "LegalDocument": [
+    {
+      "id": 8,
+      "document_type": "TERMS",
+      "title": "Terms & Conditions",
+      "intro": "Please read these terms and conditions carefully before using Ninja Inflatable Park.",
+      "sections": [
+        {
+          "title": "Acceptance of Terms",
+          "content": "By entering Ninja Inflatable Park, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our facilities."
+        },
+        {
+          "title": "Age Requirements",
+          "content": "Participants must be at least 1 year old. Children under 12 must be accompanied by an adult (18+) who remains on the premises. Separate zones are designated for different age groups to ensure safety."
+        },
+        {
+          "title": "Health & Safety",
+          "content": "Participants must be in good health and free from any medical conditions that could be aggravated by physical activity. Pregnant women, individuals with heart conditions, back problems, or recent injuries should not participate. If you have any medical concerns, please consult your doctor before visiting."
+        },
+        {
+          "title": "Rules & Regulations",
+          "content": "All participants must follow park rules and staff instructions at all times. Failure to comply may result in immediate removal from the park without refund. Grip socks are mandatory for all participants and can be purchased at the facility."
+        },
+        {
+          "title": "Liability",
+          "content": "Ninja Inflatable Park takes every precaution to ensure safety, but participation in activities is at your own risk. By entering the park, you acknowledge that inflatable activities carry inherent risks and agree to waive any claims against the park for injuries sustained during normal use."
+        },
+        {
+          "title": "Booking & Payments",
+          "content": "All bookings must be paid in advance. Cancellations made 24 hours before the session are eligible for a full refund. Late cancellations or no-shows are non-refundable. We reserve the right to cancel sessions due to maintenance or safety concerns with full refunds provided."
+        },
+        {
+          "title": "Photography & Media",
+          "content": "By entering the park, you consent to being photographed or recorded for promotional purposes. If you do not wish to be included in promotional materials, please inform staff upon entry."
+        },
+        {
+          "title": "Personal Belongings",
+          "content": "Ninja Inflatable Park is not responsible for lost, stolen, or damaged personal belongings. Lockers are available for rent. We recommend leaving valuables at home."
+        },
+        {
+          "title": "Right to Refuse Entry",
+          "content": "We reserve the right to refuse entry or remove any person from the premises who appears intoxicated, under the influence of drugs, or behaves in a manner deemed unsafe or inappropriate."
+        },
+        {
+          "title": "Changes to Terms",
+          "content": "These terms and conditions may be updated from time to time. Continued use of our facilities constitutes acceptance of any changes."
+        }
+      ],
+      "active": true,
+      "created_at": "2025-12-06 17:18:23.211000+00:00",
+      "updated_at": "2025-12-08 01:33:20.701000+00:00"
+    },
+    {
+      "id": 9,
+      "document_type": "WAIVER",
+      "title": "Participant Waiver & Release of Liability",
+      "intro": "This waiver must be signed by all participants (or their legal guardian if under 18) before entry.",
+      "sections": [
+        {
+          "title": "Assumption of Risk",
+          "content": "I acknowledge that participation in inflatable park activities involves inherent risks including but not limited to: falls, collisions, sprains, fractures, and other injuries. I voluntarily assume all risks associated with participation."
+        },
+        {
+          "title": "Health Declaration",
+          "content": "I certify that I (or the minor participant) am in good physical condition and have no medical conditions that would prevent safe participation. I agree to immediately inform staff of any health issues that arise during my visit."
+        },
+        {
+          "title": "Release of Liability",
+          "content": "I hereby release, waive, discharge, and covenant not to sue Ninja Inflatable Park, its owners, employees, and agents from any and all liability, claims, demands, or causes of action arising from participation in park activities, including those caused by negligence."
+        },
+        {
+          "title": "Medical Treatment Authorization",
+          "content": "In the event of injury, I authorize Ninja Inflatable Park staff to provide first aid and, if necessary, arrange for emergency medical treatment. I agree to be responsible for any medical expenses incurred."
+        },
+        {
+          "title": "Rules Compliance",
+          "content": "I agree to follow all posted rules, safety guidelines, and instructions from park staff. I understand that failure to comply may result in immediate removal from the facility without refund."
+        },
+        {
+          "title": "Parental Consent (For Minors)",
+          "content": "As the parent or legal guardian, I consent to the minor's participation and agree to all terms on their behalf. I understand that I am responsible for supervising the minor and ensuring their compliance with all rules."
+        },
+        {
+          "title": "Photo/Video Consent",
+          "content": "I grant permission for Ninja Inflatable Park to use photographs or videos taken during my visit for promotional purposes without compensation."
+        },
+        {
+          "title": "Acknowledgment",
+          "content": "I have read this waiver carefully, understand its contents, and sign it voluntarily. I acknowledge that this is a legal document that affects my legal rights."
+        }
+      ],
+      "active": true,
+      "created_at": "2025-12-06 17:18:23.231000+00:00",
+      "updated_at": "2025-12-07 03:23:35.878000+00:00"
+    },
+    {
+      "id": 10,
+      "document_type": "PRIVACY",
+      "title": "Privacy Policy",
+      "intro": "Ninja Inflatable Park is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.",
+      "sections": [
+        {
+          "title": "Information We Collect",
+          "content": "We collect personal information including name, email, phone number, date of birth, and emergency contact details when you book sessions or sign waivers. We also collect payment information for transactions and may use cookies on our website to improve user experience."
+        },
+        {
+          "title": "How We Use Your Information",
+          "content": "Your information is used to: process bookings and payments, communicate about your reservations, send promotional offers (with your consent), maintain safety records and waivers, improve our services, and comply with legal obligations."
+        },
+        {
+          "title": "Data Security",
+          "content": "We implement industry-standard security measures to protect your personal information. Payment data is processed through secure, PCI-compliant payment gateways. However, no method of transmission over the internet is 100% secure."
+        },
+        {
+          "title": "Information Sharing",
+          "content": "We do not sell or rent your personal information to third parties. We may share information with: payment processors for transactions, emergency services if required for safety, legal authorities when required by law, and service providers who assist in our operations (under strict confidentiality agreements)."
+        },
+        {
+          "title": "Data Retention",
+          "content": "We retain your personal information for as long as necessary to fulfill the purposes outlined in this policy, comply with legal obligations, and resolve disputes. Waiver forms are kept for 7 years as required by law."
+        },
+        {
+          "title": "Your Rights",
+          "content": "You have the right to: access your personal data, request corrections to inaccurate information, request deletion of your data (subject to legal requirements), opt-out of marketing communications, and withdraw consent for data processing."
+        },
+        {
+          "title": "Cookies & Tracking",
+          "content": "Our website uses cookies to enhance user experience, analyze site traffic, and personalize content. You can control cookie preferences through your browser settings."
+        },
+        {
+          "title": "Children's Privacy",
+          "content": "We collect minimal information from children under 13, only as necessary for safety and booking purposes, always with parental consent. Parents have the right to review and request deletion of their child's information."
+        },
+        {
+          "title": "Changes to Privacy Policy",
+          "content": "We may update this privacy policy periodically. Significant changes will be communicated via email or website notice. Continued use of our services constitutes acceptance of the updated policy."
+        },
+        {
+          "title": "Contact Us",
+          "content": "For privacy-related questions or to exercise your rights, contact us at: Email: privacy@ninjapark.com, Phone: +91 98454 71611, Address: Gopalan Innovation Mall, Bangalore."
+        }
+      ],
+      "active": true,
+      "created_at": "2025-12-06 17:18:23.246000+00:00",
+      "updated_at": "2025-12-07 04:01:05.695000+00:00"
+    },
+    {
+      "id": 11,
+      "document_type": "WAIVER_TERMS",
+      "title": "Waiver Terms & Conditions",
+      "intro": "Additional terms specific to the waiver agreement.",
+      "sections": [
+        {
+          "title": "Waiver Validity",
+          "content": "This waiver is valid for one calendar year from the date of signing. Participants must sign a new waiver annually or if there are significant changes to health status."
+        },
+        {
+          "title": "Electronic Signatures",
+          "content": "Electronic signatures are legally binding and have the same effect as handwritten signatures. By signing electronically, you confirm your identity and intent to be bound by this agreement."
+        },
+        {
+          "title": "Waiver Requirements",
+          "content": "All participants must have a signed waiver on file before entry. No exceptions will be made. Waivers can be completed online in advance or at the facility before your session."
+        },
+        {
+          "title": "Guardian Responsibility",
+          "content": "Parents or legal guardians must sign waivers for all participants under 18 years of age. The guardian signing the waiver must be present during the minor's visit."
+        },
+        {
+          "title": "Waiver Storage",
+          "content": "Signed waivers are stored securely in our system for 7 years as required by law. You may request a copy of your signed waiver at any time."
+        }
+      ],
+      "active": true,
+      "created_at": "2025-12-07 03:23:35.895000+00:00",
+      "updated_at": "2025-12-07 03:23:35.895000+00:00"
+    },
+    {
+      "id": 12,
+      "document_type": "DETAILED_RULES",
+      "title": "Detailed Park Rules",
+      "intro": "Comprehensive rules and regulations for all participants.",
+      "sections": [
+        {
+          "title": "Entry Requirements",
+          "content": "Valid booking confirmation required. Grip socks mandatory (available for purchase). Waiver must be signed before entry. Arrive 15 minutes before session start time. Late arrivals may result in reduced session time."
+        },
+        {
+          "title": "Dress Code",
+          "content": "Wear comfortable athletic clothing. Remove all jewelry, watches, glasses, and sharp objects. Tie long hair back. No shoes allowed in play areas (grip socks only). No loose clothing that could catch on equipment."
+        },
+        {
+          "title": "Prohibited Items",
+          "content": "Food and drinks (except water in sealed bottles). Chewing gum. Electronic devices in play areas. Sharp objects of any kind. Bags or backpacks (use lockers). Outside equipment or toys."
+        },
+        {
+          "title": "Behavior Rules",
+          "content": "Follow all staff instructions immediately. No pushing, shoving, or rough play. One person on slides at a time. No running in non-play areas. No climbing on safety barriers. Respect other participants. No inappropriate language or behavior."
+        },
+        {
+          "title": "Safety Zones",
+          "content": "Toddler Zone (1-7 years): Dedicated area for young children. Main Zones (8+ years): Age-appropriate challenges. Respect zone boundaries. Do not enter zones not suitable for your age/size."
+        },
+        {
+          "title": "Supervision Requirements",
+          "content": "Children under 12 must have adult supervision. Supervising adults must remain on premises. One adult can supervise maximum 4 children. Adults must be able to respond quickly in emergencies."
+        },
+        {
+          "title": "Health & Hygiene",
+          "content": "Wash hands before entering play areas. Use hand sanitizer stations provided. Cover coughs and sneezes. Do not participate if feeling unwell. Inform staff immediately of any accidents or spills."
+        },
+        {
+          "title": "Emergency Procedures",
+          "content": "In case of emergency, follow staff instructions. Know the location of emergency exits. First aid available on-site. Emergency contact numbers posted throughout facility. Do not leave premises without informing staff in emergencies."
+        },
+        {
+          "title": "Capacity Limits",
+          "content": "Maximum capacity enforced for safety. Wait your turn if an area is full. Time limits may be imposed during busy periods. Staff have final say on capacity decisions."
+        },
+        {
+          "title": "Consequences of Rule Violations",
+          "content": "First violation: Verbal warning. Second violation: Temporary removal from activity. Third violation: Removal from park without refund. Serious violations: Immediate removal and potential ban. No refunds for rule violations."
+        }
+      ],
+      "active": true,
+      "created_at": "2025-12-07 03:23:35.901000+00:00",
+      "updated_at": "2025-12-07 03:30:27.456000+00:00"
+    }
+  ],
+  "GuidelineCategory": [
+    {
+      "id": 16,
+      "title": "Before You Jump",
+      "icon": "AlertCircle",
+      "items": [
+        "Remove all sharp objects (jewelry, watches, keys, etc.)",
+        "Wear comfortable athletic clothing",
+        "Grip socks are MANDATORY - available for purchase",
+        "Complete waiver form before entry",
+        "Listen carefully to safety briefing"
+      ],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-07 02:56:58.412000+00:00",
+      "updated_at": "2025-12-07 02:56:58.412000+00:00"
+    },
+    {
+      "id": 10,
+      "title": "General Safety",
+      "icon": "Shield",
+      "items": [
+        "Follow all instructions from Court Marshals",
+        "One person per trampoline at a time",
+        "No double bouncing or rough play",
+        "Always land on two feet or your back",
+        "No running on the pads",
+        "Empty pockets before jumping"
+      ],
+      "active": true,
+      "order": 1,
+      "created_at": "2025-12-06 17:18:23.105000+00:00",
+      "updated_at": "2025-12-06 17:18:23.105000+00:00"
+    },
+    {
+      "id": 17,
+      "title": "While Playing",
+      "icon": "Activity",
+      "items": [
+        "Follow all marshal instructions",
+        "One person on slides at a time",
+        "No pushing, shoving, or rough play",
+        "Stay in age-appropriate zones",
+        "Take breaks when tired",
+        "Stay hydrated"
+      ],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-07 02:56:58.419000+00:00",
+      "updated_at": "2025-12-07 02:56:58.419000+00:00"
+    },
+    {
+      "id": 11,
+      "title": "Dress Code",
+      "icon": "Users",
+      "items": [
+        "Ninja Grip Socks are MANDATORY",
+        "Remove all jewelry and loose objects",
+        "Empty pockets completely",
+        "No belt buckles or clothing studs",
+        "Long hair must be tied back",
+        "Remove glasses if possible"
+      ],
+      "active": true,
+      "order": 2,
+      "created_at": "2025-12-06 17:18:23.120000+00:00",
+      "updated_at": "2025-12-06 17:18:23.120000+00:00"
+    },
+    {
+      "id": 12,
+      "title": "Health Restrictions",
+      "icon": "AlertTriangle",
+      "items": [
+        "Do not jump if pregnant",
+        "Do not jump with health limitations",
+        "Do not jump under influence of alcohol/drugs",
+        "Weight limit: 120kg",
+        "Waiver must be signed by all jumpers",
+        "Report any accidents immediately"
+      ],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-06 17:18:23.131000+00:00",
+      "updated_at": "2025-12-06 17:18:23.131000+00:00"
+    },
+    {
+      "id": 18,
+      "title": "Health & Safety",
+      "icon": "Heart",
+      "items": [
+        "Not recommended if pregnant",
+        "Inform staff of any medical conditions",
+        "No food or drinks in play areas",
+        "First aid available on-site",
+        "Emergency exits clearly marked"
+      ],
+      "active": true,
+      "order": 3,
+      "created_at": "2025-12-07 02:56:58.424000+00:00",
+      "updated_at": "2025-12-07 02:56:58.424000+00:00"
+    },
+    {
+      "id": 19,
+      "title": "Age Restrictions",
+      "icon": "Users",
+      "items": [
+        "Toddler zone: Ages 1-7 only",
+        "Main zones: Ages 8 and above",
+        "Adult supervision required for children under 12",
+        "Height/weight restrictions apply to certain attractions",
+        "Separate sessions for different age groups"
+      ],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-07 02:56:58.428000+00:00",
+      "updated_at": "2025-12-07 02:56:58.428000+00:00"
+    },
+    {
+      "id": 13,
+      "title": "Kids Zone Rules",
+      "icon": "Users",
+      "items": [
+        "Strictly for ages 7 and under",
+        "Adult supervision required at all times",
+        "No big kids allowed in this zone",
+        "Gentle play only",
+        "One child per slide lane",
+        "No climbing up the slides"
+      ],
+      "active": true,
+      "order": 4,
+      "created_at": "2025-12-06 17:18:23.147000+00:00",
+      "updated_at": "2025-12-06 17:18:23.147000+00:00"
+    },
+    {
+      "id": 14,
+      "title": "Spectator Policy",
+      "icon": "Shield",
+      "items": [
+        "Spectators must stay in designated areas",
+        "Do not enter the inflatable arenas",
+        "No food or drink on the course",
+        "Keep clear of landing zones",
+        "Follow marshal instructions",
+        "Respect all participants"
+      ],
+      "active": true,
+      "order": 5,
+      "created_at": "2025-12-06 17:18:23.164000+00:00",
+      "updated_at": "2025-12-06 17:18:23.164000+00:00"
+    },
+    {
+      "id": 15,
+      "title": "Equipment Safety",
+      "icon": "Shield",
+      "items": [
+        "Empty pockets before jumping",
+        "No keys, phones, or sharp objects",
+        "Remove heavy jewelry/watches",
+        "Do not chew gum or eat while jumping",
+        "Secure glasses/goggles",
+        "Grip socks intact and clean"
+      ],
+      "active": true,
+      "order": 6,
+      "created_at": "2025-12-06 17:18:23.182000+00:00",
+      "updated_at": "2025-12-06 17:18:23.182000+00:00"
+    }
+  ]
+}

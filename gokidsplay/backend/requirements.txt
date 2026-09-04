@@ -1,0 +1,48 @@
+# Core Django
+Django==5.1.4
+
+# Django REST Framework
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.4.0
+drf-spectacular==0.28.0
+django-filter==24.3
+
+# Django Extensions
+django-cors-headers==4.6.0
+
+# Database
+# SQLite is built into Python (dev)
+# PostgreSQL and Azure dependencies for production:
+psycopg2-binary==2.9.10
+dj-database-url==2.1.0
+django-storages[azure]==1.14.2
+
+# Static Files (VPS: Nginx serves static, whitenoise used in dev)
+whitenoise==6.5.0
+
+# Server (Gunicorn for VPS production)
+gunicorn==23.0.0
+
+# PDF Generation (waiver PDFs)
+reportlab==4.2.5
+
+# Image Processing (media upload resizing)
+Pillow==11.0.0
+
+# Environment & Configuration
+python-dotenv==1.0.1
+python-decouple==3.8
+
+# Authentication
+PyJWT==2.10.1
+
+# Utilities
+pytz==2024.2
+python-dateutil==2.9.0
+requests==2.32.3
+
+# QR Code generation (booking QR codes)
+qrcode==8.0
+
+# Azure Communication Services (Email)
+azure-communication-email==1.0.0

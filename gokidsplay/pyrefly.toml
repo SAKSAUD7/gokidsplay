@@ -1,0 +1,7 @@
+[python]
+python_path = ["backend"]
+
+[project]
+name = "spinpin-backend"
+include = ["backend/**/*.py"]
+exclude = ["**/migrations/**", "**/__pycache__/**"]

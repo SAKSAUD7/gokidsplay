@@ -1,0 +1,3 @@
+# Deployment trigger
+# Updated: 2025-12-30 19:14 IST
+# Purpose: Force Azure backend redeploy after infrastructure error

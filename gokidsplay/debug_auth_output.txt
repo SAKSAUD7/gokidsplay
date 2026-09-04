@@ -1,0 +1,10 @@
+--- Debugging Auth for employee@ninjapark.com ---
+AUTH_USER_MODEL: core.User
+AUTHENTICATION_BACKENDS: ['django.contrib.auth.backends.ModelBackend']
+
+User not found... Creating it now locally.
+User Created: employee@ninjapark.com
+
+--- Testing authenticate() ---
+1. authenticate(username='employee@ninjapark.com'): SUCCESS
+2. authenticate(email='employee@ninjapark.com'): SUCCESS

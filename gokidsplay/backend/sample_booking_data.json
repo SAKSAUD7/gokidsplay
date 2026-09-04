@@ -1,0 +1,312 @@
+{
+  "bookings.Customer": [
+    {
+      "id": 1,
+      "name": "Mohammed Nooruddin Asrar",
+      "email": "asrar@azuria.in",
+      "phone": "9481155714",
+      "notes": null,
+      "created_at": "2025-12-04 00:57:52.165000+00:00",
+      "updated_at": "2025-12-04 00:57:52.165000+00:00"
+    },
+    {
+      "id": 2,
+      "name": "Sakiya Sultana",
+      "email": "sakiya@azuria.in",
+      "phone": "9481155714",
+      "notes": null,
+      "created_at": "2025-12-04 00:57:52.181000+00:00",
+      "updated_at": "2025-12-04 00:57:52.181000+00:00"
+    }
+  ],
+  "bookings.BookingBlock": [
+    {
+      "id": 4,
+      "start_date": "2025-12-11 04:30:00+00:00",
+      "end_date": "2025-12-12 05:30:00+00:00",
+      "reason": "matainace",
+      "type": "MAINTENANCE",
+      "recurring": false,
+      "created_at": "2025-12-07 01:06:50.657000+00:00",
+      "updated_at": "2025-12-07 01:06:50.657000+00:00"
+    }
+  ],
+  "bookings.PartyBooking": [
+    {
+      "id": 40,
+      "uuid": "05075c95-9366-4b99-a0ce-3ae147f42ef9",
+      "name": "  prateek",
+      "email": "1hk18is080@hkbk.edu.in",
+      "phone": "07411091256",
+      "date": "2025-12-20",
+      "time": "16:00:00",
+      "package_name": "Standard Party",
+      "kids": 12,
+      "adults": 0,
+      "amount": "21240.00",
+      "birthday_child_name": "mathew",
+      "birthday_child_age": 10,
+      "participants": {
+        "adults": [
+          {
+            "id": "1",
+            "dob": "2000-12-12",
+            "name": "mam",
+            "email": "saksaudalikhan7@gmail.com",
+            "phone": "7894561231",
+            "isPrimary": true
+          },
+          {
+            "id": "1766061384899",
+            "dob": "2000-02-21",
+            "name": "prop",
+            "email": "1hk18is080@hkbk.edu.in",
+            "phone": "07411091256",
+            "isPrimary": false
+          },
+          {
+            "id": "1766061385851",
+            "dob": "2009-12-12",
+            "name": "dude",
+            "email": "saksaudalikhan7@gmail.com",
+            "phone": "7878787784",
+            "isPrimary": false
+          }
+        ],
+        "minors": [
+          {
+            "id": "1766061296512",
+            "dob": "2019-02-12",
+            "name": "abcde",
+            "guardian": "sasas"
+          },
+          {
+            "id": "1766061297105",
+            "dob": "2019-02-11",
+            "name": "ffgfg",
+            "guardian": "dfdfd"
+          },
+          {
+            "id": "1766061297278",
+            "dob": "2020-02-22",
+            "name": "dfdfdf",
+            "guardian": "dfdfdfd"
+          },
+          {
+            "id": "1766061297466",
+            "dob": "2019-02-11",
+            "name": "adsasa",
+            "guardian": "dssds"
+          },
+          {
+            "id": "1766061297690",
+            "dob": "2019-03-22",
+            "name": "sdsdsd",
+            "guardian": "dfdfdf"
+          }
+        ]
+      },
+      "waiver_signed": true,
+      "waiver_signed_at": "2025-12-18 12:37:27.083000+00:00",
+      "waiver_ip_address": "127.0.0.1",
+      "status": "PENDING",
+      "customer_id": 3,
+      "arrived": false,
+      "arrived_at": null,
+      "created_at": "2025-12-18 12:34:31.586000+00:00",
+      "updated_at": "2025-12-18 12:37:27.084000+00:00"
+    }
+  ],
+  "bookings.Waiver": [
+    {
+      "id": 114,
+      "name": "md yusuf",
+      "email": "mdyusuf76@gmail.com",
+      "phone": "9685743214",
+      "dob": "2000-11-10",
+      "participant_type": "ADULT",
+      "is_primary_signer": false,
+      "signed_at": "2025-12-24 20:18:33.284000+00:00",
+      "version": "1.0",
+      "emergency_contact": null,
+      "ip_address": "127.0.0.1",
+      "is_verified": false,
+      "minors": [
+        {
+          "dob": "2015-12-12",
+          "name": "muzu"
+        },
+        {
+          "dob": "2016-08-07",
+          "name": "kiop"
+        }
+      ],
+      "adults": [
+        {
+          "dob": "2000-05-12",
+          "name": "rahim",
+          "email": "sakioi@gmail.com",
+          "phone": "7894561235"
+        }
+      ],
+      "booking_id": 22,
+      "party_booking_id": null,
+      "customer_id": null,
+      "created_at": "2025-12-24 20:18:33.284000+00:00",
+      "updated_at": "2025-12-24 20:18:33.284000+00:00"
+    },
+    {
+      "id": 113,
+      "name": "alaadin",
+      "email": "winglyy3@gamil.com",
+      "phone": "8787459845",
+      "dob": "2004-05-21",
+      "participant_type": "ADULT",
+      "is_primary_signer": false,
+      "signed_at": "2025-12-18 22:45:01.242000+00:00",
+      "version": "1.0",
+      "emergency_contact": null,
+      "ip_address": "127.0.0.1",
+      "is_verified": true,
+      "minors": [
+        {
+          "dob": "2010-06-05",
+          "name": "dive"
+        }
+      ],
+      "adults": [
+        {
+          "dob": "2000-11-11",
+          "name": "tingly",
+          "email": "sirrionrio@gmail.com",
+          "phone": "8745895684"
+        },
+        {
+          "dob": "2010-08-09",
+          "name": "kihnggbh",
+          "email": "tuihfgh43@gmail.com",
+          "phone": "96587412301"
+        }
+      ],
+      "booking_id": 21,
+      "party_booking_id": null,
+      "customer_id": null,
+      "created_at": "2025-12-18 22:45:01.244000+00:00",
+      "updated_at": "2025-12-19 11:27:23.566000+00:00"
+    }
+  ],
+  "invitations.InvitationTemplate": [
+    {
+      "id": 1,
+      "name": "Ninja Adventure Party!",
+      "background_image": "invitation_templates/Gemini_Generated_Image_1rrwjp1rrwjp1rrw_1.jpg",
+      "default_title": "You're Invited!",
+      "default_message": "Come join us for a party at Ninja Inflatable Park!",
+      "is_active": true,
+      "created_at": "2025-12-08 17:31:17.304000+00:00",
+      "updated_at": "2025-12-08 17:31:17.304000+00:00"
+    },
+    {
+      "id": 3,
+      "name": "Ninja Adventure Party!",
+      "background_image": "invitation_templates/1763947163648.jpg",
+      "default_title": "You're Invited! Come join us for a party at Ninja Inflatable Park!",
+      "default_message": "Phone: 098454 71611\r\nAddress: 35/11, Hennur Bagalur Main Road, next to Reya Scholl, Jala Hobli, Dasanayakanahalli, Chagalahatti, Bengaluru, Karnataka 562149",
+      "is_active": true,
+      "created_at": "2025-12-15 00:41:27.352000+00:00",
+      "updated_at": "2025-12-15 00:41:27.353000+00:00"
+    }
+  ],
+  "invitations.BookingInvitation": [
+    {
+      "id": 1,
+      "uuid": "86d5e5bd-4d17-4218-9aa3-1af2cd8de84d",
+      "booking_id": 31,
+      "template_id": 1,
+      "child_name": "prrem",
+      "party_date": "2025-12-12",
+      "party_time": "12:00:00",
+      "venue": "Ninja Inflatable Park",
+      "custom_message": "Come join us for a party at Ninja Inflatable Park!",
+      "created_at": "2025-12-09 14:44:31.884000+00:00",
+      "updated_at": "2025-12-09 14:44:31.911000+00:00"
+    },
+    {
+      "id": 4,
+      "uuid": "48e7479d-35d7-4fab-b2a3-b0efbaae0863",
+      "booking_id": 37,
+      "template_id": 3,
+      "child_name": "naman mathur",
+      "party_date": "2025-12-27",
+      "party_time": "16:00:00",
+      "venue": "Ninja Inflatable Park",
+      "custom_message": "Phone: 098454 71611\r\nAddress: 35/11, Hennur Bagalur Main Road, next to Reya Scholl, Jala Hobli, Dasanayakanahalli, Chagalahatti, Bengaluru, Karnataka 562149",
+      "created_at": "2025-12-15 00:54:57.892000+00:00",
+      "updated_at": "2025-12-15 00:54:57.965000+00:00"
+    },
+    {
+      "id": 5,
+      "uuid": "70e5d409-08af-418b-876e-4ffa3ce91c01",
+      "booking_id": 38,
+      "template_id": 3,
+      "child_name": "sherya",
+      "party_date": "2025-12-17",
+      "party_time": "14:00:00",
+      "venue": "Ninja Inflatable Park",
+      "custom_message": "Phone: 098454 71611\r\nAddress: 35/11, Hennur Bagalur Main Road, next to Reya Scholl, Jala Hobli, Dasanayakanahalli, Chagalahatti, Bengaluru, Karnataka 562149",
+      "created_at": "2025-12-16 10:33:49.694000+00:00",
+      "updated_at": "2025-12-16 10:33:49.709000+00:00"
+    },
+    {
+      "id": 6,
+      "uuid": "752d7a46-4f67-4061-aa07-7166a089f4ed",
+      "booking_id": 39,
+      "template_id": 1,
+      "child_name": "sameer",
+      "party_date": "2000-02-12",
+      "party_time": "12:00:00",
+      "venue": "Ninja Inflatable Park",
+      "custom_message": "Come join us for a party at Ninja Inflatable Park!",
+      "created_at": "2025-12-18 11:03:49.261000+00:00",
+      "updated_at": "2025-12-18 11:03:49.289000+00:00"
+    },
+    {
+      "id": 7,
+      "uuid": "b6b4851a-6bd6-4c45-9088-c91b569b7bce",
+      "booking_id": 40,
+      "template_id": 1,
+      "child_name": "mathew",
+      "party_date": "2025-12-20",
+      "party_time": "16:00:00",
+      "venue": "Ninja Inflatable Park",
+      "custom_message": "Come join us for a party at Ninja Inflatable Park!",
+      "created_at": "2025-12-18 12:37:29.843000+00:00",
+      "updated_at": "2025-12-18 12:37:29.871000+00:00"
+    }
+  ],
+  "core.GlobalSettings": [
+    {
+      "id": 1,
+      "park_name": "Ninja Inflatable Park",
+      "contact_phone": "+91 98454 71611",
+      "contact_email": "info@ninjapark.com",
+      "address": null,
+      "map_url": null,
+      "opening_hours": {},
+      "marquee_text": [],
+      "about_text": null,
+      "hero_title": null,
+      "hero_subtitle": null,
+      "gst_number": null,
+      "session_duration": 60,
+      "adult_price": "899.00",
+      "child_price": "500.00",
+      "online_booking_enabled": true,
+      "party_bookings_enabled": true,
+      "maintenance_mode": false,
+      "waiver_required": true,
+      "party_availability": "Thursday - Sunday",
+      "updated_at": "2025-12-09 20:00:55.167000+00:00"
+    }
+  ]
+}

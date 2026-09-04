@@ -1,0 +1,1 @@
+# SpinPin Email Services Package

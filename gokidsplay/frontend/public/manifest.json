@@ -1,0 +1,63 @@
+{
+    "name": "Go Kids Play Leicester",
+    "short_name": "Go Kids Play",
+    "description": "Book roller skating, bowling and more at Go Kids Play Leicester — Navigation Street",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0118",
+    "theme_color": "#0a0118",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/images/gokidsplay-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/images/gokidsplay-logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": [
+        "entertainment",
+        "sports",
+        "leisure"
+    ],
+    "shortcuts": [
+        {
+            "name": "Book Now",
+            "short_name": "Book",
+            "description": "Book a skating or bowling session",
+            "url": "/book",
+            "icons": [
+                {
+                    "src": "/images/gokidsplay-logo.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Sign Waiver",
+            "short_name": "Waiver",
+            "description": "Sign your digital waiver",
+            "url": "/kiosk/waiver",
+            "icons": [
+                {
+                    "src": "/images/gokidsplay-logo.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/images/gokidsplay/unnamed (1).webp",
+            "sizes": "640x480",
+            "type": "image/webp",
+            "label": "Go Kids Play Roller Skating"
+        }
+    ]
+}

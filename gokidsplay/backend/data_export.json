@@ -1,0 +1,5298 @@
+﻿[
+{
+  "model": "core.globalsettings",
+  "pk": 1,
+  "fields": {
+    "park_name": "Ninja Inflatable Park",
+    "contact_phone": "+91 98454 71611",
+    "contact_email": "info@ninjapark.com",
+    "address": null,
+    "map_url": null,
+    "opening_hours": {},
+    "marquee_text": [],
+    "about_text": null,
+    "hero_title": null,
+    "hero_subtitle": null,
+    "gst_number": null,
+    "session_duration": 60,
+    "adult_price": "899.00",
+    "child_price": "500.00",
+    "online_booking_enabled": true,
+    "party_bookings_enabled": true,
+    "maintenance_mode": false,
+    "waiver_required": true,
+    "party_availability": "Thursday - Sunday",
+    "updated_at": "2025-12-09T20:00:55.167Z"
+  }
+},
+{
+  "model": "core.logo",
+  "pk": 1,
+  "fields": {
+    "name": "Ninja Inflatable Park Logo",
+    "image": "logos/logo_transparent.png",
+    "is_active": true,
+    "created_at": "2025-12-09T22:19:23.946Z",
+    "updated_at": "2025-12-09T22:19:23.957Z"
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 1,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Saud Ali khan (1hk18is080@hkbk.edu.in): tyyyooiuihisgudvcgsdgfagdfawdfu",
+    "link": "/admin/cms/contact-messages/20",
+    "is_read": true,
+    "created_at": "2025-12-09T23:03:53.528Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 20
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 2,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from Saud Ali khan (1hk18is080@hkbk.edu.in): gygttyyuuygv",
+    "link": "/admin/cms/contact-messages/21",
+    "is_read": true,
+    "created_at": "2025-12-10T13:03:57.022Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 21
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 3,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohandaas for 2025-12-13",
+    "link": "/admin/bookings/12",
+    "is_read": true,
+    "created_at": "2025-12-12T09:30:15.154Z",
+    "booking_id": 12,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 4,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Test Session User for 2025-12-15",
+    "link": "/admin/bookings/13",
+    "is_read": true,
+    "created_at": "2025-12-12T12:27:39.310Z",
+    "booking_id": 13,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 5,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from Test Party User for 2025-12-16",
+    "link": "/admin/party-bookings/34",
+    "is_read": true,
+    "created_at": "2025-12-12T12:27:41.387Z",
+    "booking_id": null,
+    "party_booking_id": 34,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 6,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from John Smith for 2025-12-19",
+    "link": "/admin/bookings/14",
+    "is_read": true,
+    "created_at": "2025-12-12T13:04:30.833Z",
+    "booking_id": 14,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 7,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from Jennifer Martinez for 2025-12-26",
+    "link": "/admin/party-bookings/35",
+    "is_read": true,
+    "created_at": "2025-12-12T13:04:39.104Z",
+    "booking_id": null,
+    "party_booking_id": 35,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 8,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Sauoan for 2025-12-15",
+    "link": "/admin/bookings/15",
+    "is_read": true,
+    "created_at": "2025-12-12T19:16:08.370Z",
+    "booking_id": 15,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 9,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from looan for 2025-12-20",
+    "link": "/admin/party-bookings/36",
+    "is_read": true,
+    "created_at": "2025-12-14T08:11:12.438Z",
+    "booking_id": null,
+    "party_booking_id": 36,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 10,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Saud Ali khan for 2025-12-18",
+    "link": "/admin/bookings/16",
+    "is_read": true,
+    "created_at": "2025-12-14T19:38:49.440Z",
+    "booking_id": 16,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 11,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from martin for 2025-12-20",
+    "link": "/admin/bookings/17",
+    "is_read": true,
+    "created_at": "2025-12-14T23:00:42.839Z",
+    "booking_id": 17,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 12,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from Suresh for 2025-12-17",
+    "link": "/admin/bookings/18",
+    "is_read": true,
+    "created_at": "2025-12-14T23:50:39.205Z",
+    "booking_id": 18,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 13,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from kareem (1hk18is080@hkbk.edu.in): this is regarding the web its amazing",
+    "link": "/admin/cms/contact-messages/22",
+    "is_read": true,
+    "created_at": "2025-12-15T00:27:31.168Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 22
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 14,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from  aman  for 2025-12-27",
+    "link": "/admin/party-bookings/37",
+    "is_read": true,
+    "created_at": "2025-12-15T00:46:19.207Z",
+    "booking_id": null,
+    "party_booking_id": 37,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 15,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from peter for 2025-12-18",
+    "link": "/admin/bookings/19",
+    "is_read": true,
+    "created_at": "2025-12-16T09:55:54.790Z",
+    "booking_id": 19,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 16,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from mohsin (1hk18is080@hkbk.edu.in): its regarding group enquiry can u reach me out",
+    "link": "/admin/cms/contact-messages/23",
+    "is_read": true,
+    "created_at": "2025-12-16T10:09:24.240Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 23
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 17,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from sanjay for 2025-12-17",
+    "link": "/admin/party-bookings/38",
+    "is_read": true,
+    "created_at": "2025-12-16T10:24:31.662Z",
+    "booking_id": null,
+    "party_booking_id": 38,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 18,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from mohit for 2025-12-19",
+    "link": "/admin/bookings/20",
+    "is_read": true,
+    "created_at": "2025-12-16T10:37:33.930Z",
+    "booking_id": 20,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 19,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from rehman for 2000-02-12",
+    "link": "/admin/party-bookings/39",
+    "is_read": true,
+    "created_at": "2025-12-18T11:02:03.048Z",
+    "booking_id": null,
+    "party_booking_id": 39,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 20,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from   prateek for 2025-12-20",
+    "link": "/admin/party-bookings/40",
+    "is_read": true,
+    "created_at": "2025-12-18T12:34:31.602Z",
+    "booking_id": null,
+    "party_booking_id": 40,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 21,
+  "fields": {
+    "type": "PARTY_BOOKING",
+    "title": "New Party Booking",
+    "message": "New party booking from  fitoor  for 2025-12-25",
+    "link": "/admin/party-bookings/41",
+    "is_read": true,
+    "created_at": "2025-12-18T22:26:00.753Z",
+    "booking_id": null,
+    "party_booking_id": 41,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 22,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from alaadin for 2025-12-30",
+    "link": "/admin/bookings/21",
+    "is_read": true,
+    "created_at": "2025-12-18T22:45:01.083Z",
+    "booking_id": 21,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 23,
+  "fields": {
+    "type": "CONTACT_MESSAGE",
+    "title": "New Contact Message",
+    "message": "Message from sak (saksaudalikhan7@gmail.com): hi im  ahgasygdasugdugasdudcasdasdbdjchbdcuygsauyd...",
+    "link": "/admin/cms/contact-messages/24",
+    "is_read": false,
+    "created_at": "2025-12-24T08:16:51.371Z",
+    "booking_id": null,
+    "party_booking_id": null,
+    "contact_message_id": 24
+  }
+},
+{
+  "model": "core.notification",
+  "pk": 24,
+  "fields": {
+    "type": "BOOKING",
+    "title": "New Session Booking",
+    "message": "New booking from md yusuf for 2026-01-10",
+    "link": "/admin/bookings/22",
+    "is_read": false,
+    "created_at": "2025-12-24T20:18:33.245Z",
+    "booking_id": 22,
+    "party_booking_id": null,
+    "contact_message_id": null
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 1,
+  "fields": {
+    "name": "Mohammed Nooruddin Asrar",
+    "email": "asrar@azuria.in",
+    "phone": "9481155714",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.165Z",
+    "updated_at": "2025-12-04T00:57:52.165Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 2,
+  "fields": {
+    "name": "Sakiya Sultana",
+    "email": "sakiya@azuria.in",
+    "phone": "9481155714",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.181Z",
+    "updated_at": "2025-12-04T00:57:52.181Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 3,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.181Z",
+    "updated_at": "2025-12-04T00:57:52.181Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 4,
+  "fields": {
+    "name": "Final Admin",
+    "email": "final@admin.com",
+    "phone": "1231231234",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.184Z",
+    "updated_at": "2025-12-04T00:57:52.184Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 5,
+  "fields": {
+    "name": "Future Admin",
+    "email": "future@admin.com",
+    "phone": "1231231235",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.185Z",
+    "updated_at": "2025-12-04T00:57:52.185Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 6,
+  "fields": {
+    "name": "Past Admin",
+    "email": "past@admin.com",
+    "phone": "1231231234",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.186Z",
+    "updated_at": "2025-12-04T00:57:52.186Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 7,
+  "fields": {
+    "name": "Manual Admin 2",
+    "email": "manual2@admin.com",
+    "phone": "9998887777",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.187Z",
+    "updated_at": "2025-12-04T00:57:52.187Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 8,
+  "fields": {
+    "name": "Manual Admin",
+    "email": "manual@admin.com",
+    "phone": "9998887777",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.188Z",
+    "updated_at": "2025-12-04T00:57:52.188Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 9,
+  "fields": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "9845471611",
+    "notes": null,
+    "created_at": "2025-12-04T00:57:52.190Z",
+    "updated_at": "2025-12-04T00:57:52.190Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 10,
+  "fields": {
+    "name": "Test",
+    "email": "test@test.com",
+    "phone": "123",
+    "notes": null,
+    "created_at": "2025-12-04T03:27:20.374Z",
+    "updated_at": "2025-12-04T03:27:20.382Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 11,
+  "fields": {
+    "name": "Test User",
+    "email": "test2@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T03:42:52.916Z",
+    "updated_at": "2025-12-04T03:42:52.924Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 12,
+  "fields": {
+    "name": "Test User",
+    "email": "test4@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T04:21:44.511Z",
+    "updated_at": "2025-12-04T04:21:44.520Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 13,
+  "fields": {
+    "name": "Test User",
+    "email": "test5@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T04:23:05.708Z",
+    "updated_at": "2025-12-04T04:23:05.714Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 14,
+  "fields": {
+    "name": "Test User",
+    "email": "test6@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T04:23:50.361Z",
+    "updated_at": "2025-12-04T04:23:50.366Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 15,
+  "fields": {
+    "name": "API Test User",
+    "email": "apitest@example.com",
+    "phone": "9876543210",
+    "notes": null,
+    "created_at": "2025-12-04T12:40:57.462Z",
+    "updated_at": "2025-12-04T12:40:57.462Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 16,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "notes": null,
+    "created_at": "2025-12-04T18:49:26.427Z",
+    "updated_at": "2025-12-04T18:49:26.436Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 17,
+  "fields": {
+    "name": "Test Party Host",
+    "email": "host_39b1e780-6ec5-443e-9d25-6c02d77c186e@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T18:52:52.551Z",
+    "updated_at": "2025-12-04T18:52:52.551Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 18,
+  "fields": {
+    "name": "Debug User 2",
+    "email": "debug2@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-04T19:50:40.998Z",
+    "updated_at": "2025-12-04T19:50:40.998Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 19,
+  "fields": {
+    "name": "Test Session User",
+    "email": "testsession@example.com",
+    "phone": "1234567890",
+    "notes": null,
+    "created_at": "2025-12-12T12:27:39.279Z",
+    "updated_at": "2025-12-12T12:27:39.294Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 20,
+  "fields": {
+    "name": "Test Party User",
+    "email": "testparty@example.com",
+    "phone": "0987654321",
+    "notes": null,
+    "created_at": "2025-12-12T12:27:41.372Z",
+    "updated_at": "2025-12-12T12:27:41.372Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 21,
+  "fields": {
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "555-0101",
+    "notes": null,
+    "created_at": "2025-12-12T13:04:30.799Z",
+    "updated_at": "2025-12-12T13:04:30.817Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 22,
+  "fields": {
+    "name": "Jennifer Martinez",
+    "email": "jennifer.martinez@example.com",
+    "phone": "555-0201",
+    "notes": null,
+    "created_at": "2025-12-12T13:04:39.083Z",
+    "updated_at": "2025-12-12T13:04:39.083Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 23,
+  "fields": {
+    "name": "martin",
+    "email": "martin123@gmail.com",
+    "phone": "7411025896",
+    "notes": null,
+    "created_at": "2025-12-14T23:00:42.803Z",
+    "updated_at": "2025-12-14T23:00:42.814Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 24,
+  "fields": {
+    "name": "sanjay",
+    "email": "saksak56@gmail.com",
+    "phone": "7411078987",
+    "notes": null,
+    "created_at": "2025-12-16T10:24:31.640Z",
+    "updated_at": "2025-12-16T10:24:31.640Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 25,
+  "fields": {
+    "name": "alaadin",
+    "email": "winglyy3@gamil.com",
+    "phone": "8787459845",
+    "notes": null,
+    "created_at": "2025-12-18T22:45:00.974Z",
+    "updated_at": "2025-12-18T22:45:00.975Z"
+  }
+},
+{
+  "model": "bookings.customer",
+  "pk": 26,
+  "fields": {
+    "name": "md yusuf",
+    "email": "mdyusuf76@gmail.com",
+    "phone": "9685743214",
+    "notes": null,
+    "created_at": "2025-12-24T20:18:33.202Z",
+    "updated_at": "2025-12-24T20:18:33.202Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 1,
+  "fields": {
+    "uuid": "09e67c8c-d2ae-4adc-8aca-0cd7632ea1d9",
+    "name": "Mohammed Nooruddin Asrar",
+    "email": "asrar@azuria.in",
+    "phone": "9481155714",
+    "date": "2025-12-02",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 1,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-13T09:21:20.030Z",
+    "created_at": "2025-12-01T11:32:46.897Z",
+    "updated_at": "2025-12-13T09:21:20.032Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 2,
+  "fields": {
+    "uuid": "f45e433e-9d06-40f6-8e25-c034815fe6ee",
+    "name": "Mohammed Nooruddin Asrar",
+    "email": "asrar@azuria.in",
+    "phone": "9481155714",
+    "date": "2025-12-03",
+    "time": "11:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 1,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-01T11:34:15.901Z",
+    "updated_at": "2025-12-03T19:50:21.717Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 3,
+  "fields": {
+    "uuid": "d5df6513-3ffc-4c90-8fa1-6276ee88d5a6",
+    "name": "Sakiya Sultana",
+    "email": "sakiya@azuria.in",
+    "phone": "9481155714",
+    "date": "2025-12-04",
+    "time": "15:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 2,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-01T11:36:06.652Z",
+    "updated_at": "2025-12-01T13:31:10.081Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 4,
+  "fields": {
+    "uuid": "b744dab9-9fb2-41d2-ae1b-c1d5227cb6f6",
+    "name": "Mohammed Nooruddin Asrar",
+    "email": "asrar@azuria.in",
+    "phone": "9481155714",
+    "date": "2025-12-03",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 1,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-13T18:05:31.864Z",
+    "created_at": "2025-12-01T13:51:20.067Z",
+    "updated_at": "2025-12-13T18:05:31.866Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 5,
+  "fields": {
+    "uuid": "fc95633a-f3af-4640-b6aa-781447037457",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-25",
+    "time": "17:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-13T18:06:47.405Z",
+    "created_at": "2025-12-03T16:32:44.408Z",
+    "updated_at": "2025-12-13T18:06:47.408Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 6,
+  "fields": {
+    "uuid": "8b710b66-3d73-4068-9644-7b89953b5590",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2025-12-11",
+    "time": "19:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 2,
+    "spectators": 0,
+    "subtotal": "1899.00",
+    "discount_amount": "0.00",
+    "amount": "2240.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 16,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-20T11:15:42.690Z",
+    "created_at": "2025-12-04T18:49:26.450Z",
+    "updated_at": "2025-12-20T11:15:42.693Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 7,
+  "fields": {
+    "uuid": "d4a5ab21-b6e9-453a-ae70-1f8943da4c57",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2025-12-30",
+    "time": "17:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "1399.00",
+    "discount_amount": "0.00",
+    "amount": "1650.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 16,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-04T21:44:11.646Z",
+    "updated_at": "2025-12-04T21:44:11.646Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 8,
+  "fields": {
+    "uuid": "9c77ecf3-fbe4-4e69-a41b-cf441686cd08",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-08",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 1,
+    "subtotal": "1549.00",
+    "discount_amount": "0.00",
+    "amount": "1827.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-07T00:10:05.012Z",
+    "updated_at": "2025-12-07T00:50:34.560Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 9,
+  "fields": {
+    "uuid": "e72c4023-883d-4753-bd44-393adc9ac8d4",
+    "name": "zuhaib",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-10",
+    "time": "17:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "1399.00",
+    "discount_amount": "0.00",
+    "amount": "1650.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-07T00:48:14.752Z",
+    "updated_at": "2025-12-07T00:48:14.752Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 10,
+  "fields": {
+    "uuid": "55f1e3e9-2e4e-4257-8c7c-75a4129428a1",
+    "name": "Samiyy",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-17",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "2298.00",
+    "discount_amount": "0.00",
+    "amount": "2711.64",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-08T01:13:46.603Z",
+    "updated_at": "2025-12-08T01:13:46.603Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 11,
+  "fields": {
+    "uuid": "b0e331b7-b9fb-4d5f-b78a-0e4abc1b1ac4",
+    "name": "Sauan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-11",
+    "time": "17:00:00",
+    "duration": 60,
+    "adults": 8,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "7192.00",
+    "discount_amount": "1436.96",
+    "amount": "7049.60",
+    "voucher_code": "ninja20",
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-09T20:56:52.331Z",
+    "updated_at": "2025-12-09T20:56:52.331Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 12,
+  "fields": {
+    "uuid": "526cd5e9-8900-483a-b6e1-8014bb5a91d6",
+    "name": "mohandaas",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-13",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 3,
+    "kids": 3,
+    "spectators": 2,
+    "subtotal": "4497.00",
+    "discount_amount": "898.50",
+    "amount": "4407.96",
+    "voucher_code": "ninja20",
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": 3,
+    "arrived": true,
+    "arrived_at": "2025-12-12T20:09:07.910Z",
+    "created_at": "2025-12-12T09:30:15.140Z",
+    "updated_at": "2025-12-12T20:09:07.915Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 13,
+  "fields": {
+    "uuid": "7b72be6a-2f08-4359-86ff-4135ac68ac7f",
+    "name": "Test Session User",
+    "email": "testsession@example.com",
+    "phone": "1234567890",
+    "date": "2025-12-15",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "0.00",
+    "discount_amount": "0.00",
+    "amount": "50.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PAID",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 19,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-20T11:15:39.331Z",
+    "created_at": "2025-12-12T12:27:39.303Z",
+    "updated_at": "2025-12-20T11:15:39.334Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 14,
+  "fields": {
+    "uuid": "6be44071-7199-4441-a4d3-40db7db978d0",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "555-0101",
+    "date": "2025-12-19",
+    "time": "14:00:00",
+    "duration": 90,
+    "adults": 3,
+    "kids": 2,
+    "spectators": 1,
+    "subtotal": "0.00",
+    "discount_amount": "0.00",
+    "amount": "120.00",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PAID",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 21,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-12T20:08:57.193Z",
+    "created_at": "2025-12-12T13:04:30.825Z",
+    "updated_at": "2025-12-12T20:08:57.195Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 15,
+  "fields": {
+    "uuid": "769b8dc2-f328-4e80-8a80-8409436eeb9e",
+    "name": "Sauoan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-15",
+    "time": "12:00:00",
+    "duration": 60,
+    "adults": 5,
+    "kids": 5,
+    "spectators": 5,
+    "subtotal": "7745.00",
+    "discount_amount": "0.00",
+    "amount": "9139.10",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-14T19:06:46.707Z",
+    "created_at": "2025-12-12T19:16:08.349Z",
+    "updated_at": "2025-12-14T19:06:46.708Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 16,
+  "fields": {
+    "uuid": "3a7ee174-27ff-4a3d-b92b-097e99ecfcff",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-18",
+    "time": "11:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 2,
+    "spectators": 0,
+    "subtotal": "2798.00",
+    "discount_amount": "0.00",
+    "amount": "3301.64",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-20T11:15:35.919Z",
+    "created_at": "2025-12-14T19:38:49.427Z",
+    "updated_at": "2025-12-20T11:15:35.923Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 17,
+  "fields": {
+    "uuid": "6b3b452c-dd1d-4eb3-b57d-a8767b4c6c8b",
+    "name": "martin",
+    "email": "martin123@gmail.com",
+    "phone": "7411025896",
+    "date": "2025-12-20",
+    "time": "10:00:00",
+    "duration": 60,
+    "adults": 3,
+    "kids": 3,
+    "spectators": 2,
+    "subtotal": "4497.00",
+    "discount_amount": "0.00",
+    "amount": "5306.46",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 23,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-19T13:55:18.502Z",
+    "created_at": "2025-12-14T23:00:42.826Z",
+    "updated_at": "2025-12-19T13:55:18.503Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 18,
+  "fields": {
+    "uuid": "5bef57c5-170d-4771-ac94-7260ed6d9ff4",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2025-12-17",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 1,
+    "kids": 0,
+    "spectators": 0,
+    "subtotal": "899.00",
+    "discount_amount": "0.00",
+    "amount": "1060.82",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 16,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-16T18:33:44.760Z",
+    "created_at": "2025-12-14T23:50:39.183Z",
+    "updated_at": "2025-12-16T18:33:44.761Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 19,
+  "fields": {
+    "uuid": "a2eeab7c-07c8-4328-91fa-6433f7dbf825",
+    "name": "peter",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-18",
+    "time": "15:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 2,
+    "spectators": 0,
+    "subtotal": "2798.00",
+    "discount_amount": "0.00",
+    "amount": "3301.64",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-16T09:56:22.971Z",
+    "created_at": "2025-12-16T09:55:54.742Z",
+    "updated_at": "2025-12-16T09:56:22.978Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 20,
+  "fields": {
+    "uuid": "f1dc863a-b1fb-459e-8784-1bc233f8cc96",
+    "name": "mohit",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "date": "2025-12-19",
+    "time": "13:00:00",
+    "duration": 60,
+    "adults": 3,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "3197.00",
+    "discount_amount": "0.00",
+    "amount": "3772.46",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 3,
+    "voucher": null,
+    "arrived": true,
+    "arrived_at": "2025-12-16T11:06:57.877Z",
+    "created_at": "2025-12-16T10:37:33.904Z",
+    "updated_at": "2025-12-16T11:06:57.884Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 21,
+  "fields": {
+    "uuid": "550fcdff-b4f3-4271-a872-f4306419d3a4",
+    "name": "alaadin",
+    "email": "winglyy3@gamil.com",
+    "phone": "8787459845",
+    "date": "2025-12-30",
+    "time": "14:00:00",
+    "duration": 60,
+    "adults": 3,
+    "kids": 1,
+    "spectators": 0,
+    "subtotal": "3197.00",
+    "discount_amount": "0.00",
+    "amount": "3772.46",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 25,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-18T22:45:01.031Z",
+    "updated_at": "2025-12-18T22:45:01.031Z"
+  }
+},
+{
+  "model": "bookings.booking",
+  "pk": 22,
+  "fields": {
+    "uuid": "68b6688a-fc56-43f1-a37d-1172f9a19c1a",
+    "name": "md yusuf",
+    "email": "mdyusuf76@gmail.com",
+    "phone": "9685743214",
+    "date": "2026-01-10",
+    "time": "18:00:00",
+    "duration": 60,
+    "adults": 2,
+    "kids": 2,
+    "spectators": 0,
+    "subtotal": "2798.00",
+    "discount_amount": "0.00",
+    "amount": "3301.64",
+    "voucher_code": null,
+    "status": "CONFIRMED",
+    "booking_status": "CONFIRMED",
+    "waiver_status": "PENDING",
+    "payment_status": "PENDING",
+    "type": "SESSION",
+    "qr_code": null,
+    "customer": 26,
+    "voucher": null,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-24T20:18:33.224Z",
+    "updated_at": "2025-12-24T20:18:33.224Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 1,
+  "fields": {
+    "uuid": "42f70395-57fb-4fe7-a158-2437b3a167a3",
+    "name": "Test User",
+    "email": "test@example.com",
+    "phone": "9845471611",
+    "date": "2025-12-15",
+    "time": "14:00:00",
+    "package_name": "Standard",
+    "kids": 15,
+    "adults": 0,
+    "amount": "26550.00",
+    "birthday_child_name": "Birthday Kid",
+    "birthday_child_age": 8,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "customer": 9,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-03T13:48:37.284Z",
+    "updated_at": "2025-12-03T13:48:37.284Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 2,
+  "fields": {
+    "uuid": "b26b2dd8-6832-499a-a064-0545f757b568",
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-10",
+    "time": "14:00:00",
+    "package_name": "Standard",
+    "kids": 20,
+    "adults": 0,
+    "amount": "35400.00",
+    "birthday_child_name": "sak",
+    "birthday_child_age": 10,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "CONFIRMED",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-03T19:41:52.581Z",
+    "updated_at": "2025-12-03T19:49:56.653Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 23,
+  "fields": {
+    "uuid": "c537ebfc-755f-4a5d-98cd-300aa6e0e178",
+    "name": "saksaud",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "date": "2001-11-12",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "18880.00",
+    "birthday_child_name": "saioop",
+    "birthday_child_age": 12,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2000-02-11",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": true
+        }
+      ],
+      "minors": [
+        {
+          "id": "1765147908857",
+          "dob": "2000-12-21",
+          "name": "sasad",
+          "guardian": "agycgauy"
+        },
+        {
+          "id": "1765147909399",
+          "dob": "2121-11-12",
+          "name": "ajshcas",
+          "guardian": "ahgsag"
+        },
+        {
+          "id": "1765147909627",
+          "dob": "2001-04-15",
+          "name": "jahfah",
+          "guardian": "hagsag"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-07T22:52:29.748Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 16,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-07T22:51:32.219Z",
+    "updated_at": "2025-12-07T22:52:29.750Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 26,
+  "fields": {
+    "uuid": "601dd7b3-3339-425e-b279-6f3a044de932",
+    "name": "Sahan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-18",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "sam dikshit ",
+    "birthday_child_age": 12,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2012-02-11",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": true
+        }
+      ],
+      "minors": [
+        {
+          "id": "1765224559003",
+          "dob": "2000-11-11",
+          "name": "asas",
+          "guardian": "sasas"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-08T20:09:29.836Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-08T20:08:57.182Z",
+    "updated_at": "2025-12-08T20:09:29.836Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 27,
+  "fields": {
+    "uuid": "2f104cf6-19dd-40cd-b57f-adb34681c854",
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "date": "2025-12-15",
+    "time": "12:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "prretam",
+    "birthday_child_age": 10,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2222-02-11",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": true
+        }
+      ],
+      "minors": []
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-09T10:54:47.490Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 16,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-09T10:54:31.829Z",
+    "updated_at": "2025-12-09T10:54:47.494Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 28,
+  "fields": {
+    "uuid": "eb468c30-4054-43c3-bdd3-b3ac1efe49ea",
+    "name": "nabeel Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2026-01-19",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "sameer",
+    "birthday_child_age": 10,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-09T12:41:05.050Z",
+    "updated_at": "2025-12-09T12:41:05.050Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 29,
+  "fields": {
+    "uuid": "46f8f629-e5ee-465e-8ef0-e1324358d18d",
+    "name": "nabeel Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2026-01-19",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "sameer",
+    "birthday_child_age": 10,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-09T12:41:14.440Z",
+    "updated_at": "2025-12-09T12:41:14.440Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 31,
+  "fields": {
+    "uuid": "b3944a54-4a8e-4980-9173-8b0331ec6ba1",
+    "name": "Sauan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-12",
+    "time": "12:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "prrem",
+    "birthday_child_age": 12,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2000-02-21",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "07411091256",
+          "isPrimary": true
+        }
+      ],
+      "minors": [
+        {
+          "id": "1765291420083",
+          "dob": "5201-02-12",
+          "name": "bhjhjhj",
+          "guardian": "nbbnb"
+        },
+        {
+          "id": "1765291421052",
+          "dob": "4444-05-04",
+          "name": "hjhjhjjh",
+          "guardian": "hjhjhjhj"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-09T14:44:28.147Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-09T14:43:24.232Z",
+    "updated_at": "2025-12-09T14:44:28.148Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 34,
+  "fields": {
+    "uuid": "6e1d8545-6dda-4e28-8f3a-22aec09ab31a",
+    "name": "Test Party User",
+    "email": "testparty@example.com",
+    "phone": "0987654321",
+    "date": "2025-12-16",
+    "time": "15:00:00",
+    "package_name": "Premium Party",
+    "kids": 10,
+    "adults": 3,
+    "amount": "200.00",
+    "birthday_child_name": "Little Johnny",
+    "birthday_child_age": 8,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "CONFIRMED",
+    "customer": 20,
+    "arrived": true,
+    "arrived_at": "2025-12-16T10:05:30.957Z",
+    "created_at": "2025-12-12T12:27:41.379Z",
+    "updated_at": "2025-12-16T10:05:30.958Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 35,
+  "fields": {
+    "uuid": "2d81f647-68fa-498e-a7c6-3e3ef3dc0aca",
+    "name": "Jennifer Martinez",
+    "email": "jennifer.martinez@example.com",
+    "phone": "555-0201",
+    "date": "2025-12-26",
+    "time": "15:00:00",
+    "package_name": "Ultimate Party Package",
+    "kids": 12,
+    "adults": 5,
+    "amount": "450.00",
+    "birthday_child_name": "Sofia Martinez",
+    "birthday_child_age": 8,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "CONFIRMED",
+    "customer": 22,
+    "arrived": true,
+    "arrived_at": "2025-12-16T10:19:17.442Z",
+    "created_at": "2025-12-12T13:04:39.099Z",
+    "updated_at": "2025-12-16T10:19:17.446Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 36,
+  "fields": {
+    "uuid": "3bcba731-e7f8-40a8-b331-4a9254501c5e",
+    "name": "looan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-20",
+    "time": "12:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "kareem",
+    "birthday_child_age": 12,
+    "participants": null,
+    "waiver_signed": false,
+    "waiver_signed_at": null,
+    "waiver_ip_address": null,
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-14T08:11:12.423Z",
+    "updated_at": "2025-12-14T08:11:12.423Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 37,
+  "fields": {
+    "uuid": "0e12b026-524f-453a-a59c-c622f195b13c",
+    "name": " aman ",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-27",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "naman mathur",
+    "birthday_child_age": 12,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "1985-02-02",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "07411091256",
+          "isPrimary": true
+        },
+        {
+          "id": "1765759606970",
+          "dob": "2000-12-12",
+          "name": "peter ",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1765759607862",
+          "dob": "2000-12-12",
+          "name": "rod",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        }
+      ],
+      "minors": [
+        {
+          "id": "1765759647390",
+          "dob": "2018-12-12",
+          "name": "sameer",
+          "guardian": "sam"
+        },
+        {
+          "id": "1765759650948",
+          "dob": "2020-04-04",
+          "name": "asasa",
+          "guardian": "asasad"
+        },
+        {
+          "id": "1765759651651",
+          "dob": "2019-02-11",
+          "name": "wewew",
+          "guardian": "asdd"
+        },
+        {
+          "id": "1765759703749",
+          "dob": "2018-12-12",
+          "name": "asasa",
+          "guardian": "asasas"
+        },
+        {
+          "id": "1765759706102",
+          "dob": "2018-12-12",
+          "name": "asadew",
+          "guardian": "asasasas"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-15T00:49:48.547Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": true,
+    "arrived_at": "2025-12-16T10:26:08.682Z",
+    "created_at": "2025-12-15T00:46:19.161Z",
+    "updated_at": "2025-12-16T10:26:08.683Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 38,
+  "fields": {
+    "uuid": "13963829-a371-4930-9ae9-f641d4519e90",
+    "name": "sanjay",
+    "email": "saksak56@gmail.com",
+    "phone": "7411078987",
+    "date": "2025-12-17",
+    "time": "14:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "sherya",
+    "birthday_child_age": 10,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "1990-04-04",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "07411091256",
+          "isPrimary": true
+        },
+        {
+          "id": "1765880712012",
+          "dob": "2000-12-12",
+          "name": "mahb",
+          "email": "saskknds@gmail.com",
+          "phone": "8978945615",
+          "isPrimary": false
+        },
+        {
+          "id": "1765880712917",
+          "dob": "2000-11-12",
+          "name": "marei",
+          "email": "sakk@gmail.com",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1765880889197",
+          "dob": "2010-04-04",
+          "name": "dfdfdfd",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1765880889899",
+          "dob": "2010-12-12",
+          "name": "fdfdfd",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1765880890586",
+          "dob": "2011-11-01",
+          "name": "dfdfdf",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        }
+      ],
+      "minors": [
+        {
+          "id": "1765880853990",
+          "dob": "2019-02-11",
+          "name": "saj",
+          "guardian": "sasa"
+        },
+        {
+          "id": "1765880855157",
+          "dob": "2019-02-21",
+          "name": "fdd",
+          "guardian": "dfdfd"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-16T10:28:48.218Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 24,
+    "arrived": true,
+    "arrived_at": "2025-12-16T11:07:00.494Z",
+    "created_at": "2025-12-16T10:24:31.654Z",
+    "updated_at": "2025-12-16T11:07:00.495Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 39,
+  "fields": {
+    "uuid": "d163854e-1c58-4e71-90d5-380fcde7d6cb",
+    "name": "rehman",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2000-02-12",
+    "time": "12:00:00",
+    "package_name": "Standard Party",
+    "kids": 10,
+    "adults": 0,
+    "amount": "17700.00",
+    "birthday_child_name": "sameer",
+    "birthday_child_age": 12,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2000-11-12",
+          "name": "Saud Ali khan",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": true
+        },
+        {
+          "id": "1766055790213",
+          "dob": "2005-02-11",
+          "name": "Suresh",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1766055790945",
+          "dob": "2000-12-12",
+          "name": "jkdnkdf",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "89874511214",
+          "isPrimary": false
+        }
+      ],
+      "minors": [
+        {
+          "id": "1766055742921",
+          "dob": "2018-02-04",
+          "name": "ashhds",
+          "guardian": "jnfdjn"
+        },
+        {
+          "id": "1766055743511",
+          "dob": "2019-11-05",
+          "name": "sdndjs",
+          "guardian": "jnfdjndfjb"
+        },
+        {
+          "id": "1766055747946",
+          "dob": "2019-11-12",
+          "name": "jnfdjfd",
+          "guardian": "jnfdjnfkjdn"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-18T11:03:45.818Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-18T11:02:03.031Z",
+    "updated_at": "2025-12-18T11:03:45.820Z"
+  }
+},
+{
+  "model": "bookings.partybooking",
+  "pk": 40,
+  "fields": {
+    "uuid": "05075c95-9366-4b99-a0ce-3ae147f42ef9",
+    "name": "  prateek",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "date": "2025-12-20",
+    "time": "16:00:00",
+    "package_name": "Standard Party",
+    "kids": 12,
+    "adults": 0,
+    "amount": "21240.00",
+    "birthday_child_name": "mathew",
+    "birthday_child_age": 10,
+    "participants": {
+      "adults": [
+        {
+          "id": "1",
+          "dob": "2000-12-12",
+          "name": "mam",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "7894561231",
+          "isPrimary": true
+        },
+        {
+          "id": "1766061384899",
+          "dob": "2000-02-21",
+          "name": "prop",
+          "email": "1hk18is080@hkbk.edu.in",
+          "phone": "07411091256",
+          "isPrimary": false
+        },
+        {
+          "id": "1766061385851",
+          "dob": "2009-12-12",
+          "name": "dude",
+          "email": "saksaudalikhan7@gmail.com",
+          "phone": "7878787784",
+          "isPrimary": false
+        }
+      ],
+      "minors": [
+        {
+          "id": "1766061296512",
+          "dob": "2019-02-12",
+          "name": "abcde",
+          "guardian": "sasas"
+        },
+        {
+          "id": "1766061297105",
+          "dob": "2019-02-11",
+          "name": "ffgfg",
+          "guardian": "dfdfd"
+        },
+        {
+          "id": "1766061297278",
+          "dob": "2020-02-22",
+          "name": "dfdfdf",
+          "guardian": "dfdfdfd"
+        },
+        {
+          "id": "1766061297466",
+          "dob": "2019-02-11",
+          "name": "adsasa",
+          "guardian": "dssds"
+        },
+        {
+          "id": "1766061297690",
+          "dob": "2019-03-22",
+          "name": "sdsdsd",
+          "guardian": "dfdfdf"
+        }
+      ]
+    },
+    "waiver_signed": true,
+    "waiver_signed_at": "2025-12-18T12:37:27.083Z",
+    "waiver_ip_address": "127.0.0.1",
+    "status": "PENDING",
+    "customer": 3,
+    "arrived": false,
+    "arrived_at": null,
+    "created_at": "2025-12-18T12:34:31.586Z",
+    "updated_at": "2025-12-18T12:37:27.084Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 4,
+  "fields": {
+    "name": "Mohammed Nooruddin Asrar",
+    "email": "asrar@azuria.in",
+    "phone": "9481155714",
+    "dob": "2025-12-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-01T13:51:20.292Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": null,
+    "is_verified": true,
+    "minors": [],
+    "adults": [],
+    "booking": 4,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-04T02:48:34.616Z",
+    "updated_at": "2025-12-19T15:54:25.342Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 5,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2025-01-28",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-03T16:32:44.539Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": null,
+    "is_verified": true,
+    "minors": [],
+    "adults": [],
+    "booking": 5,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-04T02:48:34.616Z",
+    "updated_at": "2025-12-19T15:54:26.835Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 43,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "dob": "2000-05-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-08T01:54:31.147Z",
+    "version": "1.0",
+    "emergency_contact": "njbhj",
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-08T01:54:31.147Z",
+    "updated_at": "2025-12-19T15:54:29.294Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 55,
+  "fields": {
+    "name": "mohandaas",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "1990-02-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-12T09:30:15.201Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2009-10-10",
+        "name": "Suresh1"
+      },
+      {
+        "dob": "2009-12-12",
+        "name": "Suresh2"
+      },
+      {
+        "dob": "2007-12-12",
+        "name": "Suresh3"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "2000-12-12",
+        "name": "river",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "2000-05-04",
+        "name": "fever",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      }
+    ],
+    "booking": 12,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T09:30:15.202Z",
+    "updated_at": "2025-12-12T09:30:15.202Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 56,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T12:47:57.506Z",
+    "version": "1.0",
+    "emergency_contact": "",
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T12:47:57.507Z",
+    "updated_at": "2025-12-12T12:47:57.507Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 57,
+  "fields": {
+    "name": "Test Session User",
+    "email": "testsession@example.com",
+    "phone": "1234567890",
+    "dob": null,
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T12:53:06.506Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2015-05-10",
+        "name": "Test Kid 1"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1985-03-15",
+        "name": "Additional Adult",
+        "email": "adult2@test.com",
+        "phone": "9876543210"
+      }
+    ],
+    "booking": 1,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T12:53:06.506Z",
+    "updated_at": "2025-12-12T12:53:06.506Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 59,
+  "fields": {
+    "name": "Test Party User",
+    "email": "testparty@example.com",
+    "phone": "0987654321",
+    "dob": null,
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T12:58:40.153Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "2016-05-10",
+        "name": "Little Johnny"
+      },
+      {
+        "dob": "2015-08-20",
+        "name": "Party Kid 1"
+      },
+      {
+        "dob": "2015-08-20",
+        "name": "Party Kid 2"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1985-03-15",
+        "name": "Party Adult 1",
+        "email": "adult1@party.com",
+        "phone": "5550001"
+      },
+      {
+        "dob": "1985-03-15",
+        "name": "Party Adult 2",
+        "email": "adult2@party.com",
+        "phone": "5550002"
+      }
+    ],
+    "booking": null,
+    "party_booking": 34,
+    "customer": null,
+    "created_at": "2025-12-12T12:58:40.154Z",
+    "updated_at": "2025-12-19T15:54:19.189Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 61,
+  "fields": {
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "555-0101",
+    "dob": "1985-06-15",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T13:04:32.892Z",
+    "version": "1.0",
+    "emergency_contact": "Jane Smith - 555-0102",
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "2015-03-20",
+        "name": "Emma Smith"
+      },
+      {
+        "dob": "2017-08-10",
+        "name": "Liam Smith"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1990-02-14",
+        "name": "Sarah Johnson",
+        "email": "sarah.j@example.com",
+        "phone": "555-0103"
+      },
+      {
+        "dob": "1988-11-30",
+        "name": "Mike Davis",
+        "email": "mike.d@example.com",
+        "phone": "555-0104"
+      }
+    ],
+    "booking": 14,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T13:04:32.892Z",
+    "updated_at": "2025-12-12T13:28:32.530Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 64,
+  "fields": {
+    "name": "Jennifer Martinez",
+    "email": "jennifer.martinez@example.com",
+    "phone": "555-0201",
+    "dob": "1987-04-22",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T13:04:41.163Z",
+    "version": "1.0",
+    "emergency_contact": "Carlos Martinez - 555-0202",
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "2016-05-15",
+        "name": "Sofia Martinez"
+      },
+      {
+        "dob": "2016-07-20",
+        "name": "Lucas Brown"
+      },
+      {
+        "dob": "2015-09-10",
+        "name": "Olivia Garcia"
+      },
+      {
+        "dob": "2017-02-28",
+        "name": "Noah Wilson"
+      },
+      {
+        "dob": "2016-11-05",
+        "name": "Ava Taylor"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1985-08-17",
+        "name": "Carlos Martinez",
+        "email": "carlos.m@example.com",
+        "phone": "555-0202"
+      },
+      {
+        "dob": "1989-12-03",
+        "name": "Lisa Anderson",
+        "email": "lisa.a@example.com",
+        "phone": "555-0203"
+      },
+      {
+        "dob": "1986-01-25",
+        "name": "Robert Thomas",
+        "email": "robert.t@example.com",
+        "phone": "555-0204"
+      },
+      {
+        "dob": "1991-06-30",
+        "name": "Maria Rodriguez",
+        "email": "maria.r@example.com",
+        "phone": "555-0205"
+      }
+    ],
+    "booking": null,
+    "party_booking": 35,
+    "customer": null,
+    "created_at": "2025-12-12T13:04:41.163Z",
+    "updated_at": "2025-12-12T13:43:31.228Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 69,
+  "fields": {
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "555-0101",
+    "dob": "1985-06-15",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T13:15:47.537Z",
+    "version": "1.0",
+    "emergency_contact": "Jane Smith - 555-0102",
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2015-03-20",
+        "name": "Emma Smith"
+      },
+      {
+        "dob": "2017-08-10",
+        "name": "Liam Smith"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1990-02-14",
+        "name": "Sarah Johnson",
+        "email": "sarah.j@example.com",
+        "phone": "555-0103"
+      },
+      {
+        "dob": "1988-11-30",
+        "name": "Mike Davis",
+        "email": "mike.d@example.com",
+        "phone": "555-0104"
+      }
+    ],
+    "booking": 14,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T13:15:47.537Z",
+    "updated_at": "2025-12-12T13:15:47.537Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 72,
+  "fields": {
+    "name": "Sauoan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2000-02-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-12T19:16:08.417Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "1111-11-11",
+        "name": "Suresh"
+      },
+      {
+        "dob": "1111-11-11",
+        "name": "Saud Ali khan"
+      },
+      {
+        "dob": "2222-11-11",
+        "name": "Suresh5"
+      },
+      {
+        "dob": "1212-02-26",
+        "name": "Suresh2"
+      },
+      {
+        "dob": "4212-05-05",
+        "name": "Suresh45"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "5222-05-05",
+        "name": "ghg",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "1212-02-15",
+        "name": "jjnjnj",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "2121-11-12",
+        "name": "nnmbn",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "1121-02-21",
+        "name": "nknj",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "07411091256"
+      }
+    ],
+    "booking": 15,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T19:16:08.418Z",
+    "updated_at": "2025-12-12T20:08:49.345Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 73,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-04-07",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-12T20:07:46.849Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "1211-02-12",
+        "name": "Saud Ali khan"
+      }
+    ],
+    "adults": [],
+    "booking": null,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-12T20:07:46.850Z",
+    "updated_at": "2025-12-12T20:07:46.850Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 74,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-12-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-13T09:22:57.086Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2012-02-02",
+        "name": "sam "
+      }
+    ],
+    "adults": [],
+    "booking": null,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-13T09:22:57.087Z",
+    "updated_at": "2025-12-13T09:22:57.087Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 75,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2000-05-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-14T19:38:49.464Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [],
+    "adults": [],
+    "booking": 16,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-14T19:38:49.465Z",
+    "updated_at": "2025-12-14T19:38:49.465Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 76,
+  "fields": {
+    "name": "martin",
+    "email": "martin123@gmail.com",
+    "phone": "7411025896",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-14T23:00:42.872Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2009-12-12",
+        "name": "oops"
+      },
+      {
+        "dob": "2009-12-12",
+        "name": "doops"
+      },
+      {
+        "dob": "2008-12-20",
+        "name": "loops"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "1985-05-04",
+        "name": "make",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "1990-12-15",
+        "name": "drake",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      }
+    ],
+    "booking": 17,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-14T23:00:42.872Z",
+    "updated_at": "2025-12-14T23:00:42.872Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 77,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7411091256",
+    "dob": "2000-12-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-14T23:50:39.244Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [],
+    "adults": [],
+    "booking": 18,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-14T23:50:39.245Z",
+    "updated_at": "2025-12-17T12:49:36.280Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 78,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "dob": "1985-02-02",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-15T00:49:48.615Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 37,
+    "customer": 3,
+    "created_at": "2025-12-15T00:49:48.616Z",
+    "updated_at": "2025-12-17T12:49:37.128Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 79,
+  "fields": {
+    "name": "peter ",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-15T00:49:48.658Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 37,
+    "customer": 3,
+    "created_at": "2025-12-15T00:49:48.658Z",
+    "updated_at": "2025-12-15T00:49:48.658Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 80,
+  "fields": {
+    "name": "rod",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-15T00:49:48.687Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 37,
+    "customer": 3,
+    "created_at": "2025-12-15T00:49:48.687Z",
+    "updated_at": "2025-12-17T12:49:33.350Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 86,
+  "fields": {
+    "name": "peter",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2000-10-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T09:55:54.896Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2019-11-12",
+        "name": "david"
+      },
+      {
+        "dob": "2018-05-04",
+        "name": "kine"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "2000-12-12",
+        "name": "laio",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      }
+    ],
+    "booking": 19,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-16T09:55:54.896Z",
+    "updated_at": "2025-12-16T09:55:54.896Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 87,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "dob": "1990-04-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.229Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.229Z",
+    "updated_at": "2025-12-19T14:41:55.784Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 88,
+  "fields": {
+    "name": "mahb",
+    "email": "saskknds@gmail.com",
+    "phone": "8978945615",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.239Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.239Z",
+    "updated_at": "2025-12-16T10:28:48.239Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 89,
+  "fields": {
+    "name": "marei",
+    "email": "sakk@gmail.com",
+    "phone": "07411091256",
+    "dob": "2000-11-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.245Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.245Z",
+    "updated_at": "2025-12-16T10:28:48.245Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 90,
+  "fields": {
+    "name": "dfdfdfd",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2010-04-04",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.254Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.254Z",
+    "updated_at": "2025-12-16T10:28:48.254Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 91,
+  "fields": {
+    "name": "fdfdfd",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2010-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.260Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.260Z",
+    "updated_at": "2025-12-16T10:28:48.260Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 92,
+  "fields": {
+    "name": "dfdfdf",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2011-11-01",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:28:48.269Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 38,
+    "customer": 24,
+    "created_at": "2025-12-16T10:28:48.269Z",
+    "updated_at": "2025-12-18T10:32:32.895Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 95,
+  "fields": {
+    "name": "mohit",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "7411091256",
+    "dob": "2001-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-16T10:37:33.967Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "2019-12-12",
+        "name": "mari"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "2010-02-11",
+        "name": "salio",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256"
+      },
+      {
+        "dob": "2011-05-04",
+        "name": "dave",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "07411091256"
+      }
+    ],
+    "booking": 20,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-16T10:37:33.967Z",
+    "updated_at": "2025-12-17T10:39:45.011Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 96,
+  "fields": {
+    "name": "Saud Ali khan",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-11-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T11:03:45.832Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 39,
+    "customer": 3,
+    "created_at": "2025-12-18T11:03:45.832Z",
+    "updated_at": "2025-12-18T11:41:08.717Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 97,
+  "fields": {
+    "name": "Suresh",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "07411091256",
+    "dob": "2005-02-11",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T11:03:45.839Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 39,
+    "customer": 3,
+    "created_at": "2025-12-18T11:03:45.839Z",
+    "updated_at": "2025-12-18T11:41:07.349Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 98,
+  "fields": {
+    "name": "jkdnkdf",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "89874511214",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T11:03:45.847Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 39,
+    "customer": 3,
+    "created_at": "2025-12-18T11:03:45.847Z",
+    "updated_at": "2025-12-18T11:41:04.748Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 102,
+  "fields": {
+    "name": "mam",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7894561231",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-18T12:37:27.042Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "id": "1766061296512",
+        "dob": "2019-02-12",
+        "name": "abcde",
+        "guardian": "sasas"
+      },
+      {
+        "id": "1766061297105",
+        "dob": "2019-02-11",
+        "name": "ffgfg",
+        "guardian": "dfdfd"
+      },
+      {
+        "id": "1766061297278",
+        "dob": "2020-02-22",
+        "name": "dfdfdf",
+        "guardian": "dfdfdfd"
+      },
+      {
+        "id": "1766061297466",
+        "dob": "2019-02-11",
+        "name": "adsasa",
+        "guardian": "dssds"
+      },
+      {
+        "id": "1766061297690",
+        "dob": "2019-03-22",
+        "name": "sdsdsd",
+        "guardian": "dfdfdf"
+      }
+    ],
+    "adults": [
+      {
+        "id": "1766061384899",
+        "dob": "2000-02-21",
+        "name": "prop",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256",
+        "isPrimary": false
+      },
+      {
+        "id": "1766061385851",
+        "dob": "2009-12-12",
+        "name": "dude",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "7878787784",
+        "isPrimary": false
+      }
+    ],
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.042Z",
+    "updated_at": "2025-12-18T16:56:53.347Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 103,
+  "fields": {
+    "name": "prop",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-02-21",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T12:37:27.054Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.054Z",
+    "updated_at": "2025-12-18T16:56:49.219Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 104,
+  "fields": {
+    "name": "dude",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7878787784",
+    "dob": "2009-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T12:37:27.064Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.064Z",
+    "updated_at": "2025-12-18T16:56:46.640Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 105,
+  "fields": {
+    "name": "mam",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7894561231",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-18T12:37:27.098Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "id": "1766061296512",
+        "dob": "2019-02-12",
+        "name": "abcde",
+        "guardian": "sasas"
+      },
+      {
+        "id": "1766061297105",
+        "dob": "2019-02-11",
+        "name": "ffgfg",
+        "guardian": "dfdfd"
+      },
+      {
+        "id": "1766061297278",
+        "dob": "2020-02-22",
+        "name": "dfdfdf",
+        "guardian": "dfdfdfd"
+      },
+      {
+        "id": "1766061297466",
+        "dob": "2019-02-11",
+        "name": "adsasa",
+        "guardian": "dssds"
+      },
+      {
+        "id": "1766061297690",
+        "dob": "2019-03-22",
+        "name": "sdsdsd",
+        "guardian": "dfdfdf"
+      }
+    ],
+    "adults": [
+      {
+        "id": "1766061384899",
+        "dob": "2000-02-21",
+        "name": "prop",
+        "email": "1hk18is080@hkbk.edu.in",
+        "phone": "07411091256",
+        "isPrimary": false
+      },
+      {
+        "id": "1766061385851",
+        "dob": "2009-12-12",
+        "name": "dude",
+        "email": "saksaudalikhan7@gmail.com",
+        "phone": "7878787784",
+        "isPrimary": false
+      }
+    ],
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.098Z",
+    "updated_at": "2025-12-18T16:56:34.180Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 106,
+  "fields": {
+    "name": "prop",
+    "email": "1hk18is080@hkbk.edu.in",
+    "phone": "07411091256",
+    "dob": "2000-02-21",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T12:37:27.111Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.111Z",
+    "updated_at": "2025-12-18T16:56:38.951Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 107,
+  "fields": {
+    "name": "dude",
+    "email": "saksaudalikhan7@gmail.com",
+    "phone": "7878787784",
+    "dob": "2009-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T12:37:27.120Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": 40,
+    "customer": 3,
+    "created_at": "2025-12-18T12:37:27.120Z",
+    "updated_at": "2025-12-18T16:56:37.254Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 108,
+  "fields": {
+    "name": "dudeperfect ",
+    "email": "king@gmail.com",
+    "phone": "9874568745",
+    "dob": "2000-12-12",
+    "participant_type": "ADULT",
+    "is_primary_signer": true,
+    "signed_at": "2025-12-18T22:37:18.721Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "id": "1766097190271",
+        "dob": "2009-12-12",
+        "name": "poring",
+        "guardian": "kuijh"
+      },
+      {
+        "id": "1766097217584",
+        "dob": "2009-05-04",
+        "name": "triop",
+        "guardian": "kopijnh"
+      },
+      {
+        "id": "1766097369720",
+        "dob": "2010-05-06",
+        "name": "juiop",
+        "guardian": "lopioh"
+      },
+      {
+        "id": "1766097370888",
+        "dob": "2008-08-09",
+        "name": "serruing",
+        "guardian": "oiuuuhng"
+      }
+    ],
+    "adults": [
+      {
+        "id": "1766096796688",
+        "dob": "1989-05-14",
+        "name": "jameel",
+        "email": "saksaing@gmail.com",
+        "phone": "8974589578",
+        "isPrimary": false
+      },
+      {
+        "id": "1766097104064",
+        "dob": "2000-04-29",
+        "name": "indio",
+        "email": "kuing562@gmail.com",
+        "phone": "7845952157",
+        "isPrimary": false
+      },
+      {
+        "id": "1766097145631",
+        "dob": "2001-04-05",
+        "name": "poring",
+        "email": "koipo76fg@gmail.com",
+        "phone": "7784459874",
+        "isPrimary": false
+      },
+      {
+        "id": "1766097222519",
+        "dob": "2003-09-21",
+        "name": "oippon",
+        "email": "ytggying@gmail.com",
+        "phone": "8877456895",
+        "isPrimary": false
+      }
+    ],
+    "booking": null,
+    "party_booking": null,
+    "customer": 16,
+    "created_at": "2025-12-18T22:37:18.721Z",
+    "updated_at": "2025-12-19T00:26:37.290Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 109,
+  "fields": {
+    "name": "jameel",
+    "email": "saksaing@gmail.com",
+    "phone": "8974589578",
+    "dob": "1989-05-14",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T22:37:18.729Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": 16,
+    "created_at": "2025-12-18T22:37:18.729Z",
+    "updated_at": "2025-12-19T00:26:52.496Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 110,
+  "fields": {
+    "name": "indio",
+    "email": "kuing562@gmail.com",
+    "phone": "7845952157",
+    "dob": "2000-04-29",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T22:37:18.737Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": 16,
+    "created_at": "2025-12-18T22:37:18.737Z",
+    "updated_at": "2025-12-19T00:26:51.924Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 111,
+  "fields": {
+    "name": "poring",
+    "email": "koipo76fg@gmail.com",
+    "phone": "7784459874",
+    "dob": "2001-04-05",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T22:37:18.746Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": 16,
+    "created_at": "2025-12-18T22:37:18.746Z",
+    "updated_at": "2025-12-19T00:26:50.562Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 112,
+  "fields": {
+    "name": "oippon",
+    "email": "ytggying@gmail.com",
+    "phone": "8877456895",
+    "dob": "2003-09-21",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T22:37:18.755Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": null,
+    "adults": null,
+    "booking": null,
+    "party_booking": null,
+    "customer": 16,
+    "created_at": "2025-12-18T22:37:18.755Z",
+    "updated_at": "2025-12-19T00:26:49.589Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 113,
+  "fields": {
+    "name": "alaadin",
+    "email": "winglyy3@gamil.com",
+    "phone": "8787459845",
+    "dob": "2004-05-21",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-18T22:45:01.242Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": true,
+    "minors": [
+      {
+        "dob": "2010-06-05",
+        "name": "dive"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "2000-11-11",
+        "name": "tingly",
+        "email": "sirrionrio@gmail.com",
+        "phone": "8745895684"
+      },
+      {
+        "dob": "2010-08-09",
+        "name": "kihnggbh",
+        "email": "tuihfgh43@gmail.com",
+        "phone": "96587412301"
+      }
+    ],
+    "booking": 21,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-18T22:45:01.244Z",
+    "updated_at": "2025-12-19T11:27:23.566Z"
+  }
+},
+{
+  "model": "bookings.waiver",
+  "pk": 114,
+  "fields": {
+    "name": "md yusuf",
+    "email": "mdyusuf76@gmail.com",
+    "phone": "9685743214",
+    "dob": "2000-11-10",
+    "participant_type": "ADULT",
+    "is_primary_signer": false,
+    "signed_at": "2025-12-24T20:18:33.284Z",
+    "version": "1.0",
+    "emergency_contact": null,
+    "ip_address": "127.0.0.1",
+    "is_verified": false,
+    "minors": [
+      {
+        "dob": "2015-12-12",
+        "name": "muzu"
+      },
+      {
+        "dob": "2016-08-07",
+        "name": "kiop"
+      }
+    ],
+    "adults": [
+      {
+        "dob": "2000-05-12",
+        "name": "rahim",
+        "email": "sakioi@gmail.com",
+        "phone": "7894561235"
+      }
+    ],
+    "booking": 22,
+    "party_booking": null,
+    "customer": null,
+    "created_at": "2025-12-24T20:18:33.284Z",
+    "updated_at": "2025-12-24T20:18:33.284Z"
+  }
+},
+{
+  "model": "bookings.bookingblock",
+  "pk": 4,
+  "fields": {
+    "start_date": "2025-12-11T04:30:00Z",
+    "end_date": "2025-12-12T05:30:00Z",
+    "reason": "matainace",
+    "type": "MAINTENANCE",
+    "recurring": false,
+    "created_at": "2025-12-07T01:06:50.657Z",
+    "updated_at": "2025-12-07T01:06:50.657Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 1,
+  "fields": {
+    "slug": "home",
+    "title": "Ninja Inflatable Park - Home",
+    "description": "Welcome to the ultimate inflatable park experience!",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.299Z",
+    "updated_at": "2025-12-07T02:47:01.962Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 2,
+  "fields": {
+    "slug": "about",
+    "title": "About Us - Ninja Inflatable Park",
+    "description": "Learn about our story and mission.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.308Z",
+    "updated_at": "2025-12-07T02:47:01.977Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 3,
+  "fields": {
+    "slug": "pricing",
+    "title": "Pricing - Ninja Inflatable Park",
+    "description": "Check our session and party prices.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.316Z",
+    "updated_at": "2025-12-07T02:47:01.981Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 4,
+  "fields": {
+    "slug": "parties",
+    "title": "Parties - Ninja Inflatable Park",
+    "description": "Book the best birthday party ever!",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.323Z",
+    "updated_at": "2025-12-07T02:47:01.985Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 5,
+  "fields": {
+    "slug": "attractions",
+    "title": "Attractions - Ninja Inflatable Park",
+    "description": "Explore our amazing inflatable attractions.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.331Z",
+    "updated_at": "2025-12-07T02:47:01.989Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 6,
+  "fields": {
+    "slug": "contact",
+    "title": "Contact Us - Ninja Inflatable Park",
+    "description": "Get in touch with us.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.337Z",
+    "updated_at": "2025-12-07T02:47:01.992Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 7,
+  "fields": {
+    "slug": "facilities",
+    "title": "Facilities - Ninja Inflatable Park",
+    "description": "Our park facilities and amenities.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.344Z",
+    "updated_at": "2025-12-07T02:47:01.995Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 8,
+  "fields": {
+    "slug": "groups",
+    "title": "Group Bookings - Ninja Inflatable Park",
+    "description": "Special rates for schools and large groups.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.351Z",
+    "updated_at": "2025-12-07T02:47:01.997Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 9,
+  "fields": {
+    "slug": "guidelines",
+    "title": "Safety Guidelines - Ninja Inflatable Park",
+    "description": "Important safety rules and guidelines.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.357Z",
+    "updated_at": "2025-12-07T02:47:02.002Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 10,
+  "fields": {
+    "slug": "privacy",
+    "title": "Privacy Policy - Ninja Inflatable Park",
+    "description": "Our privacy policy.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.364Z",
+    "updated_at": "2025-12-07T02:47:02.005Z"
+  }
+},
+{
+  "model": "cms.page",
+  "pk": 11,
+  "fields": {
+    "slug": "waiver-terms",
+    "title": "Waiver Terms - Ninja Inflatable Park",
+    "description": "Terms and conditions for waivers.",
+    "keywords": null,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.371Z",
+    "updated_at": "2025-12-07T02:47:02.009Z"
+  }
+},
+{
+  "model": "cms.banner",
+  "pk": 2,
+  "fields": {
+    "title": "Book Your Adventure Today",
+    "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920&h=600&fit=crop",
+    "link": null,
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-02T17:49:21.474Z",
+    "updated_at": "2025-12-23T21:42:16.830Z"
+  }
+},
+{
+  "model": "cms.banner",
+  "pk": 4,
+  "fields": {
+    "title": "Book Now",
+    "image_url": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1920",
+    "link": null,
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-02T17:51:48.138Z",
+    "updated_at": "2025-12-23T21:42:16.831Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 36,
+  "fields": {
+    "name": "Ninja Warrior Course",
+    "slug": null,
+    "short_description": null,
+    "description": "this is a obstacle course",
+    "image_url": "uploads/20251206_212150_fe55de4f_attraction6.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-05T06:17:48.861Z",
+    "updated_at": "2025-12-23T21:42:16.812Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 37,
+  "fields": {
+    "name": "Giant Slides",
+    "slug": null,
+    "short_description": null,
+    "description": "Experience the thrill of our massive inflatable slides. Perfect for speed demons and adrenaline junkies!",
+    "image_url": "uploads/20251206_212222_7e768e5b_attraction11.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-05T06:17:48.866Z",
+    "updated_at": "2025-12-23T21:42:16.817Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 38,
+  "fields": {
+    "name": "Wipeout Zone",
+    "slug": null,
+    "short_description": null,
+    "description": "Navigate through spinning obstacles and bouncing challenges. Can you make it across without falling?",
+    "image_url": "uploads/20251224_025405_49e6ddaf_1763947163648.jpg",
+    "gallery": [],
+    "active": true,
+    "order": 3,
+    "created_at": "2025-12-05T06:17:48.873Z",
+    "updated_at": "2025-12-23T21:42:16.818Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 39,
+  "fields": {
+    "name": "Bounce Arena",
+    "slug": null,
+    "short_description": null,
+    "description": "Jump, flip, and bounce to your heart's content in our massive bounce arena. Fun for all ages!",
+    "image_url": "uploads/20251206_212311_7225e49f_attraction1.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 4,
+    "created_at": "2025-12-05T06:17:48.878Z",
+    "updated_at": "2025-12-23T21:42:16.819Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 40,
+  "fields": {
+    "name": "Obstacle Challenge",
+    "slug": null,
+    "short_description": null,
+    "description": "Race through tunnels, climb walls, and dodge obstacles in this action-packed challenge course!",
+    "image_url": "/images/uploads/img-5.jpg",
+    "gallery": [],
+    "active": true,
+    "order": 5,
+    "created_at": "2025-12-05T06:17:48.885Z",
+    "updated_at": "2025-12-05T06:17:48.885Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 41,
+  "fields": {
+    "name": "Mega Slides",
+    "slug": null,
+    "short_description": null,
+    "description": "Our tallest and fastest slides for the ultimate sliding experience. Hold on tight!",
+    "image_url": "/images/uploads/img-6.jpg",
+    "gallery": [],
+    "active": true,
+    "order": 6,
+    "created_at": "2025-12-05T06:17:48.890Z",
+    "updated_at": "2025-12-05T06:17:48.890Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 43,
+  "fields": {
+    "name": "Toddler Zone",
+    "slug": null,
+    "short_description": null,
+    "description": "Safe and fun area designed specifically for our youngest ninjas aged 1-7 years.",
+    "image_url": "/images/uploads/img-8.jpg",
+    "gallery": [],
+    "active": true,
+    "order": 8,
+    "created_at": "2025-12-05T06:17:48.902Z",
+    "updated_at": "2025-12-05T06:17:48.902Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 44,
+  "fields": {
+    "name": "Climbing Walls",
+    "slug": null,
+    "short_description": null,
+    "description": "Scale our inflatable climbing walls and reach new heights! Multiple difficulty levels available.",
+    "image_url": "uploads/20251207_091409_4db31295_attraction7wallclimbing.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 9,
+    "created_at": "2025-12-05T06:17:48.908Z",
+    "updated_at": "2025-12-23T21:42:16.819Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 45,
+  "fields": {
+    "name": "Party Zones",
+    "slug": null,
+    "short_description": null,
+    "description": "Private party areas perfect for birthdays and celebrations. Make your special day unforgettable!",
+    "image_url": "/images/uploads/img-10.jpg",
+    "gallery": [],
+    "active": true,
+    "order": 10,
+    "created_at": "2025-12-05T06:17:48.913Z",
+    "updated_at": "2025-12-05T06:17:48.913Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 47,
+  "fields": {
+    "name": "Ninja Obstacle Course",
+    "slug": "ninja-obstacle-course",
+    "short_description": "Ultimate ninja warrior-style inflatable course",
+    "description": "Test your agility and strength on our ultimate ninja warrior-style inflatable course. Climb, jump, and conquer!",
+    "image_url": "uploads/20251205_141324_d9eda80b_attraction1.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-05T10:43:17.442Z",
+    "updated_at": "2025-12-23T21:42:16.820Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 48,
+  "fields": {
+    "name": "TEKKEN",
+    "slug": "",
+    "short_description": "Massive inflatable slides with multiple lanes",
+    "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+    "image_url": "uploads/20251206_212434_49af383f_game1.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-05T10:43:17.453Z",
+    "updated_at": "2025-12-23T21:42:16.821Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 52,
+  "fields": {
+    "name": "Dinosaur Guard",
+    "slug": "dinosaur-guard",
+    "short_description": "Prehistoric adventure zone",
+    "description": "Navigate past the inflatable dinosaurs in this prehistoric adventure zone!",
+    "image_url": "uploads/20251205_133605_61d5c552_enterdino.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 6,
+    "created_at": "2025-12-05T10:43:17.485Z",
+    "updated_at": "2025-12-23T21:42:16.822Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 53,
+  "fields": {
+    "name": "Balance Beam Challenge",
+    "slug": "balance-beam",
+    "short_description": "Test your balance skills",
+    "description": "Test your balance skills on our inflatable beam. Don't fall off!",
+    "image_url": "uploads/20251205_140842_0eb9e4d6_attraction6.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 7,
+    "created_at": "2025-12-05T10:43:17.493Z",
+    "updated_at": "2025-12-23T21:42:16.823Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 57,
+  "fields": {
+    "name": "Wave Bed",
+    "slug": "wave-bed",
+    "short_description": "Bouncy inflatable bed for groups",
+    "description": "Ride the waves on our bouncy inflatable bed. Perfect for group fun!",
+    "image_url": "uploads/20251207_155807_41e43632_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 11,
+    "created_at": "2025-12-05T10:43:17.525Z",
+    "updated_at": "2025-12-23T21:42:16.824Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 58,
+  "fields": {
+    "name": "Giant Slides",
+    "slug": "giant-slides",
+    "short_description": "Massive inflatable slides with multiple lanes",
+    "description": "Experience the thrill of our massive inflatable slides. Race your friends down multiple lanes!",
+    "image_url": "uploads/20251205_133456_2a794495_bigslide .jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-07T02:47:02.090Z",
+    "updated_at": "2025-12-23T21:42:16.825Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 59,
+  "fields": {
+    "name": "Wipe-Out Challenge",
+    "slug": "wipe-out-challenge",
+    "short_description": "Balance through spinning obstacles",
+    "description": "Can you stay balanced? Navigate the spinning obstacles without falling into the soft landing zone!",
+    "image_url": "uploads/20251205_132226_c26b1787_attraction2.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 3,
+    "created_at": "2025-12-07T02:47:02.095Z",
+    "updated_at": "2025-12-23T21:42:16.826Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 60,
+  "fields": {
+    "name": "Inflatable Maze",
+    "slug": "inflatable-maze",
+    "short_description": "Colorful maze with twists and turns",
+    "description": "Get lost in our colorful maze! Find your way through twists, turns, and surprise obstacles.",
+    "image_url": "uploads/20251206_220639_ff0d1565_attraction3.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 4,
+    "created_at": "2025-12-07T02:47:02.099Z",
+    "updated_at": "2025-12-23T21:42:16.827Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 61,
+  "fields": {
+    "name": "Giant Jumping Balls",
+    "slug": "giant-jumping-balls",
+    "short_description": "Oversized jumping balls for all ages",
+    "description": "Bounce to new heights on our oversized jumping balls. Perfect for all ages!",
+    "image_url": "uploads/20251207_064945_56077e49_attraction4.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 5,
+    "created_at": "2025-12-07T02:47:02.103Z",
+    "updated_at": "2025-12-23T21:42:16.827Z"
+  }
+},
+{
+  "model": "cms.activity",
+  "pk": 63,
+  "fields": {
+    "name": "Adventure Park",
+    "slug": "adventure-park",
+    "short_description": "Complete adventure experience",
+    "description": "Explore our adventure-themed inflatable park with multiple zones and challenges to discover!",
+    "image_url": "uploads/20251219_015558_619aa921_bigestslide.jpeg",
+    "gallery": [],
+    "active": true,
+    "order": 10,
+    "created_at": "2025-12-07T02:47:02.122Z",
+    "updated_at": "2025-12-23T21:42:16.828Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 11,
+  "fields": {
+    "question": "What age groups can enjoy Ninja Park?",
+    "answer": "We have zones for everyone! From a dedicated toddler area to challenging courses for teens and adults. It's truly All Ages, All Fun.",
+    "category": "General",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-05T06:17:48.953Z",
+    "updated_at": "2025-12-07T02:47:02.194Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 12,
+  "fields": {
+    "question": "Do I need to book in advance?",
+    "answer": "We highly recommend booking online to secure your slot, especially on weekends. Walk-ins are subject to availability.",
+    "category": "Booking",
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-05T06:17:48.960Z",
+    "updated_at": "2025-12-07T02:47:02.198Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 13,
+  "fields": {
+    "question": "What should I wear?",
+    "answer": "Comfortable athletic wear is best. Socks are MANDATORY for hygiene and safety. We sell grip socks at the counter if you need them.",
+    "category": "General",
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-05T06:17:48.964Z",
+    "updated_at": "2025-12-07T02:47:02.200Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 14,
+  "fields": {
+    "question": "Is the park safe for children?",
+    "answer": "Absolutely! We have a 100% safety record. Our equipment is top-tier, and trained marshals supervise all zones.",
+    "category": "Safety",
+    "order": 4,
+    "active": true,
+    "created_at": "2025-12-05T06:17:48.970Z",
+    "updated_at": "2025-12-07T02:47:02.205Z"
+  }
+},
+{
+  "model": "cms.faq",
+  "pk": 15,
+  "fields": {
+    "question": "Can I host a birthday party here?",
+    "answer": "Yes! We specialize in unforgettable birthday bashes. Check out our Parties page for packages.",
+    "category": "Events",
+    "order": 5,
+    "active": true,
+    "created_at": "2025-12-05T06:17:48.976Z",
+    "updated_at": "2025-12-07T02:47:02.208Z"
+  }
+},
+{
+  "model": "cms.sociallink",
+  "pk": 1,
+  "fields": {
+    "platform": "Facebook",
+    "url": "https://facebook.com/ninjainflatablepark",
+    "icon": "facebook",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-02T17:49:21.586Z",
+    "updated_at": "2025-12-02T17:49:21.586Z"
+  }
+},
+{
+  "model": "cms.sociallink",
+  "pk": 2,
+  "fields": {
+    "platform": "Instagram",
+    "url": "https://instagram.com/ninjainflatablepark",
+    "icon": "instagram",
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-02T17:49:21.598Z",
+    "updated_at": "2025-12-02T17:49:21.598Z"
+  }
+},
+{
+  "model": "cms.sociallink",
+  "pk": 3,
+  "fields": {
+    "platform": "Twitter",
+    "url": "https://twitter.com/ninjainflatablepark",
+    "icon": "twitter",
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-02T17:49:21.606Z",
+    "updated_at": "2025-12-02T17:49:21.606Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 21,
+  "fields": {
+    "title": "Promo Party",
+    "image_url": "/promo-party.jpg",
+    "category": "parties_carousel",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-10T10:05:20.848Z",
+    "updated_at": "2025-12-10T10:05:20.848Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 22,
+  "fields": {
+    "title": "Birthday Party",
+    "image_url": "/park-birthday-party.jpg",
+    "category": "parties_carousel",
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-10T10:05:20.859Z",
+    "updated_at": "2025-12-10T10:05:20.859Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 25,
+  "fields": {
+    "title": "1763947163648",
+    "image_url": "uploads/20251210_160007_1b570d5a_1763947163648.jpg",
+    "category": "General",
+    "order": 6,
+    "active": true,
+    "created_at": "2025-12-10T10:30:07.887Z",
+    "updated_at": "2025-12-23T21:42:16.834Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 27,
+  "fields": {
+    "title": "1763947047133",
+    "image_url": "uploads/20251210_160041_ac5e178c_1763947047133.jpg",
+    "category": "General",
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-10T10:30:42.150Z",
+    "updated_at": "2025-12-24T07:30:47.840Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 28,
+  "fields": {
+    "title": "bigestslide",
+    "image_url": "uploads/20251210_160156_9687db56_bigestslide.jpeg",
+    "category": "General",
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-10T10:31:56.936Z",
+    "updated_at": "2025-12-23T21:42:16.836Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 29,
+  "fields": {
+    "title": "wipeoutvid",
+    "image_url": "uploads/20251210_160157_633f30c9_wipeoutvid.jpeg",
+    "category": "General",
+    "order": 4,
+    "active": true,
+    "created_at": "2025-12-10T10:31:57.472Z",
+    "updated_at": "2025-12-23T21:42:16.837Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 30,
+  "fields": {
+    "title": "enterdino",
+    "image_url": "uploads/20251210_160157_ce4047ef_enterdino.jpeg",
+    "category": "General",
+    "order": 5,
+    "active": true,
+    "created_at": "2025-12-10T10:31:57.993Z",
+    "updated_at": "2025-12-23T21:42:16.837Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 31,
+  "fields": {
+    "title": "overview",
+    "image_url": "uploads/20251210_160158_e59ac9eb_overview.jpeg",
+    "category": "General",
+    "order": 6,
+    "active": true,
+    "created_at": "2025-12-10T10:31:58.539Z",
+    "updated_at": "2025-12-23T21:42:16.838Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 32,
+  "fields": {
+    "title": "ninja",
+    "image_url": "uploads/20251210_160158_93503054_ninja.jpeg",
+    "category": "General",
+    "order": 7,
+    "active": true,
+    "created_at": "2025-12-10T10:31:59.086Z",
+    "updated_at": "2025-12-23T21:42:16.839Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 33,
+  "fields": {
+    "title": "WhatsApp Image 2025-11-26 at 3",
+    "image_url": "uploads/20251210_160159_82703492_WhatsApp%20Image%202025-11-26%20at%203.24.23%20AM.jpeg",
+    "category": "General",
+    "order": 8,
+    "active": true,
+    "created_at": "2025-12-10T10:31:59.661Z",
+    "updated_at": "2025-12-23T21:42:16.840Z"
+  }
+},
+{
+  "model": "cms.galleryitem",
+  "pk": 34,
+  "fields": {
+    "title": "1763947002913",
+    "image_url": "uploads/20251210_160451_011360c9_1763947002913.jpg",
+    "category": "parties_carousel",
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-10T10:34:52.176Z",
+    "updated_at": "2025-12-23T21:42:16.841Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 9,
+  "fields": {
+    "label": "Sq Ft of Fun",
+    "value": "20,000+",
+    "unit": "Sq Ft of Fun",
+    "icon": "Zap",
+    "color": "primary",
+    "page": "about",
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-05T06:17:48.987Z",
+    "updated_at": "2025-12-07T02:47:02.071Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 10,
+  "fields": {
+    "label": "Happy Ninjas",
+    "value": "50,000+",
+    "unit": "Happy Ninjas",
+    "icon": "Users",
+    "color": "secondary",
+    "page": "about",
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-05T06:17:48.992Z",
+    "updated_at": "2025-12-07T02:47:02.074Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 11,
+  "fields": {
+    "label": "Unique Zones",
+    "value": "11+",
+    "unit": "Unique Zones",
+    "icon": "Trophy",
+    "color": "accent",
+    "page": "about",
+    "active": true,
+    "order": 3,
+    "created_at": "2025-12-05T06:17:48.998Z",
+    "updated_at": "2025-12-07T02:47:02.077Z"
+  }
+},
+{
+  "model": "cms.statcard",
+  "pk": 12,
+  "fields": {
+    "label": "Safety Record",
+    "value": "100%",
+    "unit": "Safety Record",
+    "icon": "Shield",
+    "color": "primary",
+    "page": "about",
+    "active": true,
+    "order": 4,
+    "created_at": "2025-12-05T06:17:49.003Z",
+    "updated_at": "2025-12-07T02:47:02.080Z"
+  }
+},
+{
+  "model": "cms.menusection",
+  "pk": 1,
+  "fields": {
+    "category": "Veg",
+    "items": [
+      "sandwichs",
+      "manchuri",
+      "rolls"
+    ],
+    "icon": null,
+    "color": "secondary",
+    "active": true,
+    "order": 0,
+    "created_at": "2025-12-10T10:48:16.049Z",
+    "updated_at": "2025-12-10T10:48:16.049Z"
+  }
+},
+{
+  "model": "cms.grouppackage",
+  "pk": 1,
+  "fields": {
+    "name": "School Groups",
+    "subtitle": "Perfect for field trips & educational outings",
+    "min_size": "15+ Students",
+    "icon": "Building2",
+    "price": "699.00",
+    "price_note": "per student",
+    "features": [
+      "Discounted group rates",
+      "Teacher/Chaperone free entry",
+      "Dedicated supervision area",
+      "Flexible timing slots",
+      "Educational team building activities",
+      "Safe & secure environment"
+    ],
+    "color": "primary",
+    "popular": false,
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-05T15:05:01.867Z",
+    "updated_at": "2025-12-05T15:05:01.867Z"
+  }
+},
+{
+  "model": "cms.grouppackage",
+  "pk": 2,
+  "fields": {
+    "name": "Corporate Teams",
+    "subtitle": "Team building & employee engagement",
+    "min_size": "10+ Employees",
+    "icon": "Trophy",
+    "price": "799.00",
+    "price_note": "per person",
+    "features": [
+      "Customized team challenges",
+      "Private session options",
+      "Corporate invoicing available",
+      "Refreshments can be arranged",
+      "Team building activities",
+      "Photography services available"
+    ],
+    "color": "secondary",
+    "popular": true,
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-05T15:05:01.879Z",
+    "updated_at": "2025-12-06T19:05:02.750Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 10,
+  "fields": {
+    "title": "General Safety",
+    "icon": "Shield",
+    "items": [
+      "Follow all instructions from Court Marshals",
+      "One person per trampoline at a time",
+      "No double bouncing or rough play",
+      "Always land on two feet or your back",
+      "No running on the pads",
+      "Empty pockets before jumping"
+    ],
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-06T17:18:23.105Z",
+    "updated_at": "2025-12-06T17:18:23.105Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 11,
+  "fields": {
+    "title": "Dress Code",
+    "icon": "Users",
+    "items": [
+      "Ninja Grip Socks are MANDATORY",
+      "Remove all jewelry and loose objects",
+      "Empty pockets completely",
+      "No belt buckles or clothing studs",
+      "Long hair must be tied back",
+      "Remove glasses if possible"
+    ],
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-06T17:18:23.120Z",
+    "updated_at": "2025-12-06T17:18:23.120Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 12,
+  "fields": {
+    "title": "Health Restrictions",
+    "icon": "AlertTriangle",
+    "items": [
+      "Do not jump if pregnant",
+      "Do not jump with health limitations",
+      "Do not jump under influence of alcohol/drugs",
+      "Weight limit: 120kg",
+      "Waiver must be signed by all jumpers",
+      "Report any accidents immediately"
+    ],
+    "active": true,
+    "order": 3,
+    "created_at": "2025-12-06T17:18:23.131Z",
+    "updated_at": "2025-12-06T17:18:23.131Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 13,
+  "fields": {
+    "title": "Kids Zone Rules",
+    "icon": "Users",
+    "items": [
+      "Strictly for ages 7 and under",
+      "Adult supervision required at all times",
+      "No big kids allowed in this zone",
+      "Gentle play only",
+      "One child per slide lane",
+      "No climbing up the slides"
+    ],
+    "active": true,
+    "order": 4,
+    "created_at": "2025-12-06T17:18:23.147Z",
+    "updated_at": "2025-12-06T17:18:23.147Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 14,
+  "fields": {
+    "title": "Spectator Policy",
+    "icon": "Shield",
+    "items": [
+      "Spectators must stay in designated areas",
+      "Do not enter the inflatable arenas",
+      "No food or drink on the course",
+      "Keep clear of landing zones",
+      "Follow marshal instructions",
+      "Respect all participants"
+    ],
+    "active": true,
+    "order": 5,
+    "created_at": "2025-12-06T17:18:23.164Z",
+    "updated_at": "2025-12-06T17:18:23.164Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 15,
+  "fields": {
+    "title": "Equipment Safety",
+    "icon": "Shield",
+    "items": [
+      "Empty pockets before jumping",
+      "No keys, phones, or sharp objects",
+      "Remove heavy jewelry/watches",
+      "Do not chew gum or eat while jumping",
+      "Secure glasses/goggles",
+      "Grip socks intact and clean"
+    ],
+    "active": true,
+    "order": 6,
+    "created_at": "2025-12-06T17:18:23.182Z",
+    "updated_at": "2025-12-06T17:18:23.182Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 16,
+  "fields": {
+    "title": "Before You Jump",
+    "icon": "AlertCircle",
+    "items": [
+      "Remove all sharp objects (jewelry, watches, keys, etc.)",
+      "Wear comfortable athletic clothing",
+      "Grip socks are MANDATORY - available for purchase",
+      "Complete waiver form before entry",
+      "Listen carefully to safety briefing"
+    ],
+    "active": true,
+    "order": 1,
+    "created_at": "2025-12-07T02:56:58.412Z",
+    "updated_at": "2025-12-07T02:56:58.412Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 17,
+  "fields": {
+    "title": "While Playing",
+    "icon": "Activity",
+    "items": [
+      "Follow all marshal instructions",
+      "One person on slides at a time",
+      "No pushing, shoving, or rough play",
+      "Stay in age-appropriate zones",
+      "Take breaks when tired",
+      "Stay hydrated"
+    ],
+    "active": true,
+    "order": 2,
+    "created_at": "2025-12-07T02:56:58.419Z",
+    "updated_at": "2025-12-07T02:56:58.419Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 18,
+  "fields": {
+    "title": "Health & Safety",
+    "icon": "Heart",
+    "items": [
+      "Not recommended if pregnant",
+      "Inform staff of any medical conditions",
+      "No food or drinks in play areas",
+      "First aid available on-site",
+      "Emergency exits clearly marked"
+    ],
+    "active": true,
+    "order": 3,
+    "created_at": "2025-12-07T02:56:58.424Z",
+    "updated_at": "2025-12-07T02:56:58.424Z"
+  }
+},
+{
+  "model": "cms.guidelinecategory",
+  "pk": 19,
+  "fields": {
+    "title": "Age Restrictions",
+    "icon": "Users",
+    "items": [
+      "Toddler zone: Ages 1-7 only",
+      "Main zones: Ages 8 and above",
+      "Adult supervision required for children under 12",
+      "Height/weight restrictions apply to certain attractions",
+      "Separate sessions for different age groups"
+    ],
+    "active": true,
+    "order": 4,
+    "created_at": "2025-12-07T02:56:58.428Z",
+    "updated_at": "2025-12-07T02:56:58.428Z"
+  }
+},
+{
+  "model": "cms.legaldocument",
+  "pk": 8,
+  "fields": {
+    "document_type": "TERMS",
+    "title": "Terms & Conditions",
+    "intro": "Please read these terms and conditions carefully before using Ninja Inflatable Park.",
+    "sections": [
+      {
+        "title": "Acceptance of Terms",
+        "content": "By entering Ninja Inflatable Park, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you must not use our facilities."
+      },
+      {
+        "title": "Age Requirements",
+        "content": "Participants must be at least 1 year old. Children under 12 must be accompanied by an adult (18+) who remains on the premises. Separate zones are designated for different age groups to ensure safety."
+      },
+      {
+        "title": "Health & Safety",
+        "content": "Participants must be in good health and free from any medical conditions that could be aggravated by physical activity. Pregnant women, individuals with heart conditions, back problems, or recent injuries should not participate. If you have any medical concerns, please consult your doctor before visiting."
+      },
+      {
+        "title": "Rules & Regulations",
+        "content": "All participants must follow park rules and staff instructions at all times. Failure to comply may result in immediate removal from the park without refund. Grip socks are mandatory for all participants and can be purchased at the facility."
+      },
+      {
+        "title": "Liability",
+        "content": "Ninja Inflatable Park takes every precaution to ensure safety, but participation in activities is at your own risk. By entering the park, you acknowledge that inflatable activities carry inherent risks and agree to waive any claims against the park for injuries sustained during normal use."
+      },
+      {
+        "title": "Booking & Payments",
+        "content": "All bookings must be paid in advance. Cancellations made 24 hours before the session are eligible for a full refund. Late cancellations or no-shows are non-refundable. We reserve the right to cancel sessions due to maintenance or safety concerns with full refunds provided."
+      },
+      {
+        "title": "Photography & Media",
+        "content": "By entering the park, you consent to being photographed or recorded for promotional purposes. If you do not wish to be included in promotional materials, please inform staff upon entry."
+      },
+      {
+        "title": "Personal Belongings",
+        "content": "Ninja Inflatable Park is not responsible for lost, stolen, or damaged personal belongings. Lockers are available for rent. We recommend leaving valuables at home."
+      },
+      {
+        "title": "Right to Refuse Entry",
+        "content": "We reserve the right to refuse entry or remove any person from the premises who appears intoxicated, under the influence of drugs, or behaves in a manner deemed unsafe or inappropriate."
+      },
+      {
+        "title": "Changes to Terms",
+        "content": "These terms and conditions may be updated from time to time. Continued use of our facilities constitutes acceptance of any changes."
+      }
+    ],
+    "active": true,
+    "created_at": "2025-12-06T17:18:23.211Z",
+    "updated_at": "2025-12-08T01:33:20.701Z"
+  }
+},
+{
+  "model": "cms.legaldocument",
+  "pk": 9,
+  "fields": {
+    "document_type": "WAIVER",
+    "title": "Participant Waiver & Release of Liability",
+    "intro": "This waiver must be signed by all participants (or their legal guardian if under 18) before entry.",
+    "sections": [
+      {
+        "title": "Assumption of Risk",
+        "content": "I acknowledge that participation in inflatable park activities involves inherent risks including but not limited to: falls, collisions, sprains, fractures, and other injuries. I voluntarily assume all risks associated with participation."
+      },
+      {
+        "title": "Health Declaration",
+        "content": "I certify that I (or the minor participant) am in good physical condition and have no medical conditions that would prevent safe participation. I agree to immediately inform staff of any health issues that arise during my visit."
+      },
+      {
+        "title": "Release of Liability",
+        "content": "I hereby release, waive, discharge, and covenant not to sue Ninja Inflatable Park, its owners, employees, and agents from any and all liability, claims, demands, or causes of action arising from participation in park activities, including those caused by negligence."
+      },
+      {
+        "title": "Medical Treatment Authorization",
+        "content": "In the event of injury, I authorize Ninja Inflatable Park staff to provide first aid and, if necessary, arrange for emergency medical treatment. I agree to be responsible for any medical expenses incurred."
+      },
+      {
+        "title": "Rules Compliance",
+        "content": "I agree to follow all posted rules, safety guidelines, and instructions from park staff. I understand that failure to comply may result in immediate removal from the facility without refund."
+      },
+      {
+        "title": "Parental Consent (For Minors)",
+        "content": "As the parent or legal guardian, I consent to the minor's participation and agree to all terms on their behalf. I understand that I am responsible for supervising the minor and ensuring their compliance with all rules."
+      },
+      {
+        "title": "Photo/Video Consent",
+        "content": "I grant permission for Ninja Inflatable Park to use photographs or videos taken during my visit for promotional purposes without compensation."
+      },
+      {
+        "title": "Acknowledgment",
+        "content": "I have read this waiver carefully, understand its contents, and sign it voluntarily. I acknowledge that this is a legal document that affects my legal rights."
+      }
+    ],
+    "active": true,
+    "created_at": "2025-12-06T17:18:23.231Z",
+    "updated_at": "2025-12-07T03:23:35.878Z"
+  }
+},
+{
+  "model": "cms.legaldocument",
+  "pk": 10,
+  "fields": {
+    "document_type": "PRIVACY",
+    "title": "Privacy Policy",
+    "intro": "Ninja Inflatable Park is committed to protecting your privacy. This policy explains how we collect, use, and safeguard your personal information.",
+    "sections": [
+      {
+        "title": "Information We Collect",
+        "content": "We collect personal information including name, email, phone number, date of birth, and emergency contact details when you book sessions or sign waivers. We also collect payment information for transactions and may use cookies on our website to improve user experience."
+      },
+      {
+        "title": "How We Use Your Information",
+        "content": "Your information is used to: process bookings and payments, communicate about your reservations, send promotional offers (with your consent), maintain safety records and waivers, improve our services, and comply with legal obligations."
+      },
+      {
+        "title": "Data Security",
+        "content": "We implement industry-standard security measures to protect your personal information. Payment data is processed through secure, PCI-compliant payment gateways. However, no method of transmission over the internet is 100% secure."
+      },
+      {
+        "title": "Information Sharing",
+        "content": "We do not sell or rent your personal information to third parties. We may share information with: payment processors for transactions, emergency services if required for safety, legal authorities when required by law, and service providers who assist in our operations (under strict confidentiality agreements)."
+      },
+      {
+        "title": "Data Retention",
+        "content": "We retain your personal information for as long as necessary to fulfill the purposes outlined in this policy, comply with legal obligations, and resolve disputes. Waiver forms are kept for 7 years as required by law."
+      },
+      {
+        "title": "Your Rights",
+        "content": "You have the right to: access your personal data, request corrections to inaccurate information, request deletion of your data (subject to legal requirements), opt-out of marketing communications, and withdraw consent for data processing."
+      },
+      {
+        "title": "Cookies & Tracking",
+        "content": "Our website uses cookies to enhance user experience, analyze site traffic, and personalize content. You can control cookie preferences through your browser settings."
+      },
+      {
+        "title": "Children's Privacy",
+        "content": "We collect minimal information from children under 13, only as necessary for safety and booking purposes, always with parental consent. Parents have the right to review and request deletion of their child's information."
+      },
+      {
+        "title": "Changes to Privacy Policy",
+        "content": "We may update this privacy policy periodically. Significant changes will be communicated via email or website notice. Continued use of our services constitutes acceptance of the updated policy."
+      },
+      {
+        "title": "Contact Us",
+        "content": "For privacy-related questions or to exercise your rights, contact us at: Email: privacy@ninjapark.com, Phone: +91 98454 71611, Address: Gopalan Innovation Mall, Bangalore."
+      }
+    ],
+    "active": true,
+    "created_at": "2025-12-06T17:18:23.246Z",
+    "updated_at": "2025-12-07T04:01:05.695Z"
+  }
+},
+{
+  "model": "cms.legaldocument",
+  "pk": 11,
+  "fields": {
+    "document_type": "WAIVER_TERMS",
+    "title": "Waiver Terms & Conditions",
+    "intro": "Additional terms specific to the waiver agreement.",
+    "sections": [
+      {
+        "title": "Waiver Validity",
+        "content": "This waiver is valid for one calendar year from the date of signing. Participants must sign a new waiver annually or if there are significant changes to health status."
+      },
+      {
+        "title": "Electronic Signatures",
+        "content": "Electronic signatures are legally binding and have the same effect as handwritten signatures. By signing electronically, you confirm your identity and intent to be bound by this agreement."
+      },
+      {
+        "title": "Waiver Requirements",
+        "content": "All participants must have a signed waiver on file before entry. No exceptions will be made. Waivers can be completed online in advance or at the facility before your session."
+      },
+      {
+        "title": "Guardian Responsibility",
+        "content": "Parents or legal guardians must sign waivers for all participants under 18 years of age. The guardian signing the waiver must be present during the minor's visit."
+      },
+      {
+        "title": "Waiver Storage",
+        "content": "Signed waivers are stored securely in our system for 7 years as required by law. You may request a copy of your signed waiver at any time."
+      }
+    ],
+    "active": true,
+    "created_at": "2025-12-07T03:23:35.895Z",
+    "updated_at": "2025-12-07T03:23:35.895Z"
+  }
+},
+{
+  "model": "cms.legaldocument",
+  "pk": 12,
+  "fields": {
+    "document_type": "DETAILED_RULES",
+    "title": "Detailed Park Rules",
+    "intro": "Comprehensive rules and regulations for all participants.",
+    "sections": [
+      {
+        "title": "Entry Requirements",
+        "content": "Valid booking confirmation required. Grip socks mandatory (available for purchase). Waiver must be signed before entry. Arrive 15 minutes before session start time. Late arrivals may result in reduced session time."
+      },
+      {
+        "title": "Dress Code",
+        "content": "Wear comfortable athletic clothing. Remove all jewelry, watches, glasses, and sharp objects. Tie long hair back. No shoes allowed in play areas (grip socks only). No loose clothing that could catch on equipment."
+      },
+      {
+        "title": "Prohibited Items",
+        "content": "Food and drinks (except water in sealed bottles). Chewing gum. Electronic devices in play areas. Sharp objects of any kind. Bags or backpacks (use lockers). Outside equipment or toys."
+      },
+      {
+        "title": "Behavior Rules",
+        "content": "Follow all staff instructions immediately. No pushing, shoving, or rough play. One person on slides at a time. No running in non-play areas. No climbing on safety barriers. Respect other participants. No inappropriate language or behavior."
+      },
+      {
+        "title": "Safety Zones",
+        "content": "Toddler Zone (1-7 years): Dedicated area for young children. Main Zones (8+ years): Age-appropriate challenges. Respect zone boundaries. Do not enter zones not suitable for your age/size."
+      },
+      {
+        "title": "Supervision Requirements",
+        "content": "Children under 12 must have adult supervision. Supervising adults must remain on premises. One adult can supervise maximum 4 children. Adults must be able to respond quickly in emergencies."
+      },
+      {
+        "title": "Health & Hygiene",
+        "content": "Wash hands before entering play areas. Use hand sanitizer stations provided. Cover coughs and sneezes. Do not participate if feeling unwell. Inform staff immediately of any accidents or spills."
+      },
+      {
+        "title": "Emergency Procedures",
+        "content": "In case of emergency, follow staff instructions. Know the location of emergency exits. First aid available on-site. Emergency contact numbers posted throughout facility. Do not leave premises without informing staff in emergencies."
+      },
+      {
+        "title": "Capacity Limits",
+        "content": "Maximum capacity enforced for safety. Wait your turn if an area is full. Time limits may be imposed during busy periods. Staff have final say on capacity decisions."
+      },
+      {
+        "title": "Consequences of Rule Violations",
+        "content": "First violation: Verbal warning. Second violation: Temporary removal from activity. Third violation: Removal from park without refund. Serious violations: Immediate removal and potential ban. No refunds for rule violations."
+      }
+    ],
+    "active": true,
+    "created_at": "2025-12-07T03:23:35.901Z",
+    "updated_at": "2025-12-07T03:30:27.456Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 1,
+  "fields": {
+    "page": "home",
+    "section_key": "hero",
+    "title": "ARE YOU A NINJA?",
+    "subtitle": "Get ready to jump, climb, bounce, and conquer the ultimate inflatable adventure!",
+    "content": "Get ready to jump, climb, bounce, and conquer the ultimate inflatable adventure!",
+    "image_url": "uploads/20251207_085248_e1751e6d_entere.jpeg",
+    "video_url": null,
+    "cta_text": "Book Now",
+    "cta_link": "/book",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.421Z",
+    "updated_at": "2025-12-23T21:42:16.852Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 2,
+  "fields": {
+    "page": "about",
+    "section_key": "hero",
+    "title": "India's Biggest Inflatable Adventure Park!",
+    "subtitle": "Experience the thrill of jumping, sliding, and bouncing in a safe and fun environment.",
+    "content": "Experience the thrill of jumping, sliding, and bouncing in a safe and fun environment.",
+    "image_url": "uploads/20251205_132326_48cf3a03_entere.jpeg",
+    "video_url": null,
+    "cta_text": "",
+    "cta_link": "",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-04T23:35:15.430Z",
+    "updated_at": "2025-12-23T21:42:16.848Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 3,
+  "fields": {
+    "page": "home",
+    "section_key": "about",
+    "title": "India's Biggest Inflatable Park",
+    "subtitle": null,
+    "content": "Ninja Inflatable Park was born from a simple idea: create a space where people of all ages can unleash their inner ninja, challenge themselves, and have an absolute blast doing it.",
+    "image_url": "/park-slides-action.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-05T01:51:23.132Z",
+    "updated_at": "2025-12-10T10:28:07.354Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 4,
+  "fields": {
+    "page": "about",
+    "section_key": "story",
+    "title": "Our Story",
+    "subtitle": null,
+    "content": "<p>Ninja Inflatable Park was born from a simple idea: create a space where people of all ages can unleash their inner ninja, challenge themselves, and have an absolute blast doing it.</p>\n<p>Spanning over 20,000 square feet, we've created India's largest inflatable adventure park with 11+ unique zones designed to thrill, challenge, and entertain.</p>\n<p>Whether you're looking for a fun family outing, an adrenaline-pumping workout, or the perfect venue for your next celebration, Ninja Park is your destination for unforgettable memories.</p>",
+    "image_url": "/park-slides-action.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-05T01:51:23.463Z",
+    "updated_at": "2025-12-07T02:47:02.032Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 5,
+  "fields": {
+    "page": "attractions",
+    "section_key": "hero",
+    "title": "Our Attractions!",
+    "subtitle": "Explore our world-class inflatable courses and ninja challenges!",
+    "content": "From ninja obstacle courses to giant slides, we've got something for everyone. Choose your adventure!",
+    "image_url": "uploads/20251207_195732_c66169a0_WhatsApp%20Image%202025-11-24%20at%206.31.02%20AM%20(2).jpeg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.348Z",
+    "updated_at": "2025-12-23T21:42:16.850Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 6,
+  "fields": {
+    "page": "pricing",
+    "section_key": "hero",
+    "title": "Pricing Plans",
+    "subtitle": "Choose the perfect pass for your adventure.",
+    "content": "Choose the perfect package for your ninja adventure.",
+    "image_url": "uploads/20251207_055052_473fb540_Gemini_Generated_Image_jjyfsljjyfsljjyf.png",
+    "video_url": null,
+    "cta_text": "",
+    "cta_link": "",
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.359Z",
+    "updated_at": "2025-12-23T21:42:16.853Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 7,
+  "fields": {
+    "page": "guidelines",
+    "section_key": "hero",
+    "title": "Safety Guidelines",
+    "subtitle": "Your safety is our priority. Please review the rules before you jump.",
+    "content": "Please read our safety guidelines carefully before jumping.",
+    "image_url": "uploads/20251206_225933_e72aaa89_Gemini_Generated_Image_gvi0uogvi0uogvi0.png",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.369Z",
+    "updated_at": "2025-12-23T21:42:16.851Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 8,
+  "fields": {
+    "page": "parties",
+    "section_key": "hero",
+    "title": "PARTY PACKAGES",
+    "subtitle": "Celebrate your special day with us!",
+    "content": "Celebrate your special day with us!",
+    "image_url": "/park-slides-action.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.378Z",
+    "updated_at": "2025-12-05T15:26:54.378Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 9,
+  "fields": {
+    "page": "party-booking",
+    "section_key": "hero",
+    "title": "BOOK YOUR PARTY",
+    "subtitle": "Complete the form below to reserve your celebration.",
+    "content": "Complete the form below to reserve your celebration.",
+    "image_url": "uploads/20251207_180519_ad434a39_WhatsApp%20Image%202025-11-26%20at%203.24.06%20AM.jpeg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.389Z",
+    "updated_at": "2025-12-23T21:42:16.852Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 10,
+  "fields": {
+    "page": "contact",
+    "section_key": "hero",
+    "title": "CONTACT US",
+    "subtitle": "We are here to help! Get in touch with our team.",
+    "content": "We are here to help! Get in touch with our team.",
+    "image_url": "/park-slides-action.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.398Z",
+    "updated_at": "2025-12-05T15:26:54.398Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 11,
+  "fields": {
+    "page": "groups",
+    "section_key": "hero",
+    "title": "GROUP BOOKINGS",
+    "subtitle": "Special rates for schools, corporates, and large groups.",
+    "content": "Special rates for schools, corporates, and large groups.",
+    "image_url": "/park-slides-action.jpg",
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 0,
+    "active": true,
+    "created_at": "2025-12-05T15:26:54.409Z",
+    "updated_at": "2025-12-05T15:26:54.409Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 12,
+  "fields": {
+    "page": "party-booking",
+    "section_key": "terms",
+    "title": "Parties Terms & Conditions",
+    "subtitle": null,
+    "content": "<ul class=\"list-disc pl-5 space-y-2\">\n        <li>Minimum of 10 participants required for all party packages.</li>\n        <li>A non-refundable deposit is required to secure your booking.</li>\n        <li>Party duration includes jump time and party room access.</li>\n        <li>Outside food and drinks are not permitted (except for birthday cakes).</li>\n        <li>Waivers must be signed for all participants.</li>\n        <li>Socks are required for all jumpers.</li>\n    </ul>",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 1,
+    "active": true,
+    "created_at": "2025-12-05T16:20:54.425Z",
+    "updated_at": "2025-12-05T16:20:54.425Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 13,
+  "fields": {
+    "page": "home",
+    "section_key": "about_extended",
+    "title": null,
+    "subtitle": null,
+    "content": "Spanning over 20,000 square feet, we've created India's largest inflatable adventure park with 11+ unique zones designed to thrill, challenge, and entertain.",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.824Z",
+    "updated_at": "2025-12-07T02:47:02.019Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 14,
+  "fields": {
+    "page": "home",
+    "section_key": "gallery",
+    "title": "See The Action",
+    "subtitle": null,
+    "content": "Real moments, real fun! Check out what awaits you at Ninja Inflatable Park.",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 4,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.827Z",
+    "updated_at": "2025-12-07T02:47:02.022Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 15,
+  "fields": {
+    "page": "home",
+    "section_key": "cta",
+    "title": "Ready to BOUNCE?",
+    "subtitle": null,
+    "content": "Book your tickets now and experience the ultimate inflatable adventure!",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 5,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.833Z",
+    "updated_at": "2025-12-07T02:47:02.026Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 16,
+  "fields": {
+    "page": "about",
+    "section_key": "reviews",
+    "title": "People Reviews on Ninja",
+    "subtitle": null,
+    "content": "Check out these amazing reviews from our visitors!",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 3,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.845Z",
+    "updated_at": "2025-12-07T02:47:02.035Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 17,
+  "fields": {
+    "page": "about",
+    "section_key": "cta",
+    "title": "Join the Adventure!",
+    "subtitle": null,
+    "content": "Experience the thrill of India's biggest inflatable park today!",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 4,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.849Z",
+    "updated_at": "2025-12-07T02:47:02.040Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 18,
+  "fields": {
+    "page": "pricing",
+    "section_key": "group_booking",
+    "title": "GROUP BOOKING",
+    "subtitle": null,
+    "content": "Custom Pricing for Groups 10+",
+    "image_url": null,
+    "video_url": null,
+    "cta_text": null,
+    "cta_link": null,
+    "order": 2,
+    "active": true,
+    "created_at": "2025-12-07T02:38:38.857Z",
+    "updated_at": "2025-12-07T02:47:02.049Z"
+  }
+},
+{
+  "model": "cms.pagesection",
+  "pk": 19,
+  "fields": {
+    "page": "pricing",
+    "section_key": "important_info",
+    "title": "Important Info",
+    "subtitle": null,
+    "content": 
