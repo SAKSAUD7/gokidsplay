@@ -7,8 +7,7 @@ import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
     "Contact Us",
-    "Go Kids Play is Leicester's go-to destination for fun and entertainment, offering rollerskating, bowling, party bookings and more. CALL US: 07349110865 EMAIL us today.",
-    true
+    "Get in touch with Go Kids Play Coventry. We'd love to hear from you — visit us, call us, or send a message. Find our address, opening hours and contact details here."
 );
 
 export default async function ContactPage() {
