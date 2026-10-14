@@ -1,65 +1,47 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
-import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
-
-const ENDPOINT = API_ENDPOINTS.cms.party_packages;
-
-export async function getPartyPackages() {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
-    } catch (error) {
-        return [];
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[party-packages]', r.status, url); return null; }
+        return r.json();
+    } catch(e) { console.error('[party-packages] error:', e); return null; }
 }
 
-export async function getPartyPackage(id: string) {
-    try {
-        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
-    } catch (error) {
-        return null;
-    }
+export async function getPartyPackages() {
+    const data = await sf(`${BASE}/cms/party-packages/`);
+    if (!data) return [];
+    const list = Array.isArray(data) ? data : (data.results || []);
+    return list.filter((p: any) => p.active !== false);
+}
+
+export async function deletePartyPackage(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/party-packages/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
+    });
+    return r.ok;
 }
 
 export async function createPartyPackage(data: any) {
-    try {
-        const token = cookies().get('admin_token')?.value;
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
-
-        const result = await postAPI(ENDPOINT, data, { headers });
-        revalidatePath('/admin/cms/pricing-plans'); // Also revalidate pricing admin
-        revalidatePath('/parties');
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: 'Failed to create party package' };
-    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await sf(`${BASE}/cms/party-packages/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
+    return r;
 }
 
-export async function updatePartyPackage(id: string, data: any) {
-    try {
-        const token = cookies().get('admin_token')?.value;
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
-
-        const result = await putAPI(`${ENDPOINT}${id}/`, data, { headers });
-        revalidatePath('/admin/cms/pricing-plans');
-        revalidatePath('/parties');
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: 'Failed to update party package' };
-    }
-}
-
-export async function deletePartyPackage(id: string) {
-    try {
-        const token = cookies().get('admin_token')?.value;
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
-
-        await deleteAPI(`${ENDPOINT}${id}/`, { headers });
-        revalidatePath('/admin/cms/pricing-plans');
-        revalidatePath('/parties');
-        return { success: true };
-    } catch (error) {
-        return { success: false, error: 'Failed to delete party package' };
-    }
+export async function updatePartyPackage(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await sf(`${BASE}/cms/party-packages/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
+    return r;
 }

@@ -22,6 +22,11 @@ interface PartyContentProps {
     carouselImages?: string[];
 }
 
+export const metadata = getMetadata(
+    "Birthday Party Coventry",
+    "Book an unforgettable kids birthday party at Go Kids Play Coventry. Our £250 party package includes entry for 10 kids, 75 mins play (Soft Play, Laser Arena & Go Karts), party room, food, and online invitations."
+);
+
 export default function PartyContent({ packages, menus, hero, settings, terms, carouselImages }: PartyContentProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -64,7 +69,7 @@ export default function PartyContent({ packages, menus, hero, settings, terms, c
                             {heroSubtitle}
                         </p>
                         <p className="text-sm text-secondary font-bold">
-                            Available: {settings?.party_availability || "Thursday - Sunday"}
+                            Available: {settings?.party_availability || "Wednesday - Sunday"}
                         </p>
                     </ScrollReveal>
                 </div>
@@ -90,73 +95,80 @@ export default function PartyContent({ packages, menus, hero, settings, terms, c
                         </div>
                     </ScrollReveal>
 
+                    {/* Single Official GKP Party Package */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Dynamic Packages */}
-                        {packages && packages.length > 0 ? packages.map((pkg, idx) => (
-                            <ScrollReveal key={pkg.id || idx} animation="slideUp" delay={idx * 0.1}>
-                                <div className="bg-surface-800/50 backdrop-blur-md p-6 rounded-2xl border-2 border-primary h-full flex flex-col">
-                                    <h3 className="text-2xl font-display font-bold mb-2 flex items-center gap-2 text-primary">
+                        <ScrollReveal animation="slideUp" delay={0.1}>
+                            <div className="bg-surface-800/50 backdrop-blur-md p-6 rounded-2xl border-2 border-primary h-full flex flex-col">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-2xl font-display font-bold flex items-center gap-2 text-primary">
                                         <PartyPopper className="w-6 h-6" />
-                                        {pkg.name} - £{pkg.price}
+                                        Go Kids Play Party
                                     </h3>
-                                    <p className="text-white/70 mb-4 text-sm">{pkg.description}</p>
-                                    <ul className="space-y-3 text-white/80 flex-1">
-                                        {Array.isArray(pkg.includes) && pkg.includes.map((item: string, i: number) => (
-                                            <li key={i} className="flex items-start gap-3">
-                                                <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                                <span>{typeof item === 'string' ? item : (item as any).value || (item as any).name || ""}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <span className="text-3xl font-black text-white">£250</span>
                                 </div>
-                            </ScrollReveal>
-                        )) : (
-                            <ScrollReveal animation="slideUp" delay={0.1}>
-                                <div className="bg-surface-800/50 backdrop-blur-md p-6 rounded-2xl border-2 border-primary h-full flex flex-col">
-                                    <h3 className="text-2xl font-display font-bold mb-4 flex items-center gap-2 text-primary">
-                                        <PartyPopper className="w-6 h-6" />
-                                        Standard GKP Party - £250
-                                    </h3>
-                                    <ul className="space-y-3 text-white/80 flex-1">
-                                        {[
-                                            "Entry for 10 Kids",
-                                            "Free entry for 10 adults",
-                                            "75 Minutes of Play (Soft Play, Laser Quest & Go Kart)",
-                                            "45 Minutes use of Party area",
-                                            "Party Food for Kids (Sandwiches, Pizza, Chicken, Chips)",
-                                            "Squash drinks for children & Mini slush",
-                                            "Online Party Invitation"
-                                        ].map((item, i) => (
-                                            <li key={i} className="flex items-start gap-3">
-                                                <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                                                <span>{item}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                <p className="text-white/60 text-sm mb-4">The complete party experience — everything included for 10 kids.</p>
+                                <ul className="space-y-3 text-white/80 flex-1">
+                                    {[
+                                        "Entry for 10 Kids (additional child £20 each)",
+                                        "Free entry for 10 adults (additional adult £4.95 each)",
+                                        "75 Minutes of Play — Soft Play, Laser Arena & Go Karts",
+                                        "45 Minutes use of private Party Room",
+                                        "Party Food for Kids (see menu →)",
+                                        "Squash drinks & Mini Slush for children",
+                                        "Online Party Invitation",
+                                        "Inflatable Park add-on available (+£5 per person)",
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div className="mt-5 pt-4 border-t border-white/10">
+                                    <Link href="/party-booking">
+                                        <BouncyButton size="sm" variant="primary" className="w-full">
+                                            <PartyPopper className="w-4 h-4 mr-2" /> Book This Party
+                                        </BouncyButton>
+                                    </Link>
                                 </div>
-                            </ScrollReveal>
-                        )}
+                            </div>
+                        </ScrollReveal>
 
-                        {/* Party Feast Includes */}
+                        {/* Party Feast */}
                         <ScrollReveal animation="slideUp" delay={0.2}>
                             <div className="bg-surface-800/50 backdrop-blur-md p-6 rounded-2xl border-2 border-secondary h-full flex flex-col">
-                                <h3 className="text-2xl font-display font-bold mb-4 flex items-center gap-2 text-secondary">
+                                <h3 className="text-2xl font-display font-bold mb-2 flex items-center gap-2 text-secondary">
                                     <Utensils className="w-6 h-6" />
-                                    Party Feast Includes
+                                    Party Feast Menu
                                 </h3>
-                                <p className="text-white/80 mb-6 flex-1">
-                                    Our delicious party feast features a full spread of kids' favorites including pizza, chicken nuggets, and more! 
-                                </p>
-                                <button 
-                                    onClick={() => setIsMenuOpen(true)}
-                                    className="w-full py-3 bg-secondary/20 hover:bg-secondary/30 border border-secondary text-secondary font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-                                >
-                                    <Eye className="w-5 h-5" />
-                                    View Full Menu
-                                </button>
-                                <div className="mt-4 pt-4 border-t border-white/10 text-sm font-bold text-accent text-center">
-                                    We cater Vegetarian and Halal food options.
+                                <p className="text-white/50 text-xs mb-4 font-semibold uppercase tracking-wider">Kids only · 1 portion each per item</p>
+                                <div className="grid grid-cols-2 gap-2 flex-1">
+                                    {[
+                                        "🥪 Chocolate & Jam Sandwiches",
+                                        "🍕 Pizza",
+                                        "🍗 Chicken Chunks",
+                                        "🥔 Potato Puffs",
+                                        "🧅 Onion Rings",
+                                        "🧄 Garlic Bread",
+                                        "🍟 Curly Fries",
+                                        "🍟 Chips",
+                                        "🧃 Unlimited Squash",
+                                        "🧊 Slush",
+                                    ].map((item, i) => (
+                                        <div key={i} className="flex items-center gap-2 text-sm text-white/80">
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
                                 </div>
+                                <div className="mt-4 pt-4 border-t border-white/10 text-sm font-bold text-accent text-center">
+                                    ✅ Vegetarian & Halal options available
+                                </div>
+                                <button
+                                    onClick={() => setIsMenuOpen(true)}
+                                    className="mt-3 w-full py-2.5 bg-secondary/10 hover:bg-secondary/20 border border-secondary/40 text-secondary font-semibold rounded-xl transition-all flex items-center justify-center gap-2 text-sm"
+                                >
+                                    <Eye className="w-4 h-4" /> View Full Café Menu
+                                </button>
                             </div>
                         </ScrollReveal>
                     </div>
@@ -209,14 +221,21 @@ export default function PartyContent({ packages, menus, hero, settings, terms, c
                                     <div className="col-span-2 prose prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: terms }} />
                                 ) : (
                                     [
-                                        "50% non-refundable deposit is required to confirm booking",
-                                        "Minimum 10 participants (Under 14s)",
-                                        "Remaining balance due before party starts",
-                                        "Free rescheduling (14+ days notice)",
-                                        "Late reschedule (under 14 days): £50 admin fee applies",
-                                        "All guests must sign waiver prior to arrival",
-                                        "No sparkler candles or confetti allowed",
-                                        "Please arrive 15 minutes before party start time"
+                                        "50% non-refundable deposit confirms your booking",
+                                        "Minimum 10 participants required (under 14s)",
+                                        "Full balance (including extras) due before party starts",
+                                        "Free rescheduling with 14+ days notice (1 change only)",
+                                        "Rescheduling under 14 days: £50 admin fee applies",
+                                        "No rescheduling or refund within 48 hours of party time",
+                                        "Cancellations must be confirmed by email",
+                                        "Party lasts approx 2 hours: 75 mins play + 45 mins party room",
+                                        "Additional adults/children charged at entry",
+                                        "Inflatable Park not included (£5 per person add-on)",
+                                        "Allergy/dietary info must be provided at least 2 days prior",
+                                        "No sparkler candles, flower pot candles, poppers or confetti",
+                                        "Please arrive 15 minutes before your party start time",
+                                        "Extra time in party room: £5 per 15 minutes",
+                                        "Car park: max 3 hours. We accept no liability for parking charges",
                                     ].map((term, index) => (
                                         <div key={index} className="flex gap-2 items-start text-white/80">
                                             <CheckCircle className="w-3 h-3 text-secondary shrink-0 mt-0.5" />

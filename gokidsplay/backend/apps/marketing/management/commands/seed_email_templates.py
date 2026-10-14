@@ -14,25 +14,25 @@ templates = [
     {
         "name": "General Campaign (Default)",
         "type": "GENERAL",
-        "subject": "Update from Spin Pin",
+        "subject": "Update from Go Kids Play",
         "html_content": "{{ content }}",
     },
     {
         "name": "Monthly Newsletter",
         "type": "GENERAL",
-        "subject": "Spin Pin Monthly Newsletter",
-        "html_content": "<h2>Monthly Newsletter</h2><p>Here is what is happening this month at Spin Pin!</p><br/>{{ content }}",
+        "subject": "Go Kids Play Monthly Newsletter",
+        "html_content": "<h2>Monthly Newsletter</h2><p>Here is what is happening this month at Go Kids Play!</p><br/>{{ content }}",
     },
     {
         "name": "Holiday Special Promotion",
         "type": "HOLIDAY",
-        "subject": "Holiday Special at Spin Pin!",
+        "subject": "Holiday Special at Go Kids Play!",
         "html_content": "<div style='text-align: center;'><h2>🎉 Holiday Special! 🎉</h2><p>{{ content }}</p></div>",
     },
     {
         "name": "Birthday Offer",
         "type": "BIRTHDAY",
-        "subject": "Happy Birthday from Spin Pin!",
+        "subject": "Happy Birthday from Go Kids Play!",
         "html_content": "<div style='text-align: center;'><h2>🎂 Happy Birthday! 🎂</h2><p>Celebrate with us!</p><p>{{ content }}</p></div>",
     },
     {
@@ -50,7 +50,7 @@ templates = [
     {
         "name": "New Activity Announcement",
         "type": "PROMOTION",
-        "subject": "New Activity at Spin Pin!",
+        "subject": "New Activity at Go Kids Play!",
         "html_content": "<h2>Check out our newest activity!</h2><p>{{ content }}</p>",
     },
 ]

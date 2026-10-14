@@ -38,31 +38,31 @@ interface AttractionsGridProps {
     activities: Activity[];
 }
 
-// Per-activity Go Kids Play images (indexed)
+// Per-activity Go Kids Play images
 const ACTIVITY_IMAGES: Record<string, string[]> = {
-    "roller skating": [
-        "/images/gokidsplay/unnamed (1).webp",
+    "soft play": [
+        "/images/gokidsplay/unnamed (4).webp",
         "/images/gokidsplay/unnamed (5).webp",
-        "/images/gokidsplay/unnamed (12).webp",
+        "/images/gokidsplay/unnamed (6).webp",
         "/images/gokidsplay/unnamed.webp",
     ],
-    "ten pin bowling": [
-        "/images/gokidsplay/unnamed (2).webp",
+    "laser": [
+        "/images/gokidsplay/unnamed (1).webp",
+        "/images/gokidsplay/unnamed (7).webp",
         "/images/gokidsplay/unnamed (8).webp",
-        "/images/gokidsplay/unnamed (4).webp",
+        "/images/gokidsplay/unnamed (2).webp",
+    ],
+    "go kart": [
+        "/images/gokidsplay/unnamed (9).webp",
+        "/images/gokidsplay/unnamed (10).webp",
+        "/images/gokidsplay/unnamed (11).webp",
+        "/images/gokidsplay/unnamed (3).webp",
+    ],
+    "inflatable": [
+        "/images/gokidsplay/unnamed (12).webp",
         "/images/gokidsplay/2025-04-15.webp",
-    ],
-    "arcade": [
-        "/images/gokidsplay/unnamed (3).webp",
-        "/images/gokidsplay/unnamed (9).webp",
-        "/images/gokidsplay/unnamed (10).webp",
-        "/images/gokidsplay/unnamed (6).webp",
-    ],
-    "arcade games": [
-        "/images/gokidsplay/unnamed (3).webp",
-        "/images/gokidsplay/unnamed (9).webp",
-        "/images/gokidsplay/unnamed (10).webp",
-        "/images/gokidsplay/unnamed (6).webp",
+        "/images/gokidsplay/2025-05-01.webp",
+        "/images/gokidsplay/unnamed.webp",
     ],
 };
 
@@ -75,50 +75,68 @@ const ACTIVITY_META: Record<string, {
     slug: string;
     price: string;
 }> = {
-    "roller skating": {
-        emoji: "🛼",
-        gradient: "from-pink-600 to-rose-700",
-        border: "border-pink-500/40 hover:border-pink-400/70",
-        badge: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-        glowColor: "shadow-pink-500/20",
-        slug: "roller-skating",
-        price: "From £9.95",
+    "soft play": {
+        emoji: "🧨",
+        gradient: "from-yellow-500 to-orange-600",
+        border: "border-yellow-500/40 hover:border-yellow-400/70",
+        badge: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+        glowColor: "shadow-yellow-500/20",
+        slug: "soft-play",
+        price: "From £6.95",
     },
-    "ten pin bowling": {
-        emoji: "🎳",
+    "laser": {
+        emoji: "🔫",
+        gradient: "from-red-600 to-pink-700",
+        border: "border-red-500/40 hover:border-red-400/70",
+        badge: "bg-red-500/20 text-red-300 border-red-500/30",
+        glowColor: "shadow-red-500/20",
+        slug: "laser-arena",
+        price: "From £5.95",
+    },
+    "laser arena": {
+        emoji: "🔫",
+        gradient: "from-red-600 to-pink-700",
+        border: "border-red-500/40 hover:border-red-400/70",
+        badge: "bg-red-500/20 text-red-300 border-red-500/30",
+        glowColor: "shadow-red-500/20",
+        slug: "laser-arena",
+        price: "From £5.95",
+    },
+    "go kart": {
+        emoji: "🏎️",
         gradient: "from-blue-600 to-indigo-700",
         border: "border-blue-500/40 hover:border-blue-400/70",
         badge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
         glowColor: "shadow-blue-500/20",
-        slug: "ten-pin-bowling",
-        price: "From £9.95",
+        slug: "go-karts",
+        price: "From £4.95",
     },
-    "bowling": {
-        emoji: "🎳",
+    "go karts": {
+        emoji: "🏎️",
         gradient: "from-blue-600 to-indigo-700",
         border: "border-blue-500/40 hover:border-blue-400/70",
         badge: "bg-blue-500/20 text-blue-300 border-blue-500/30",
         glowColor: "shadow-blue-500/20",
-        slug: "ten-pin-bowling",
-        price: "From £9.95",
+        slug: "go-karts",
+        price: "From £4.95",
     },
-    "arcade": {
-        emoji: "🕹️",
+    "inflatable": {
+        emoji: "🪂",
         gradient: "from-purple-600 to-violet-700",
         border: "border-purple-500/40 hover:border-purple-400/70",
         badge: "bg-purple-500/20 text-purple-300 border-purple-500/30",
         glowColor: "shadow-purple-500/20",
-        slug: "arcade",
-        price: "Tokens from £5",
+        slug: "inflatable-park",
+        price: "From £9.85",
     },
-    "arcade games": {
-        emoji: "🕹️",
+    "inflatable park": {
+        emoji: "🪂",
         gradient: "from-purple-600 to-violet-700",
         border: "border-purple-500/40 hover:border-purple-400/70",
         badge: "bg-purple-500/20 text-purple-300 border-purple-500/30",
         glowColor: "shadow-purple-500/20",
-        slug: "arcade",
-        price: "Tokens from £5",
+        slug: "inflatable-park",
+        price: "From £9.85",
     },
 };
 
@@ -256,7 +274,7 @@ export const AttractionsGrid = ({ activities }: AttractionsGridProps) => {
                         </span>
                     </h2>
                     <p className="text-white/60 text-lg max-w-xl mx-auto">
-                        From spinning on the rink to striking in the bowling alley — find your perfect activity.
+                        Soft Play · Laser Arena · Go Karts · Inflatable Park — something for every age at Go Kids Play Coventry.
                     </p>
                 </ScrollReveal>
             </div>
@@ -308,26 +326,23 @@ export const AttractionsGrid = ({ activities }: AttractionsGridProps) => {
                                             {activity.description}
                                         </p>
 
-                                        {/* Expand Button */}
-                                        {hasExpandedContent(activity) && (
-                                            <button
-                                                onClick={() => toggleActivity(activity.id)}
+                                        {/* Learn More / Dedicated Page Button */}
+                                        {meta.slug && (
+                                            <Link
+                                                href={`/attractions/${meta.slug}`}
                                                 className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-semibold rounded-xl transition-colors text-sm border border-white/10 mb-3"
                                             >
-                                                {expandedActivity === activity.id ? 'Show Less' : 'Learn More'}
-                                                <ChevronDown className={`w-4 h-4 transition-transform ${expandedActivity === activity.id ? 'rotate-180' : ''}`} />
-                                            </button>
-                                        )}
-
-                                        {/* Book Now Button — hidden for arcade (pay-per-token, not bookable) */}
-                                        {meta.slug !== "arcade" && (
-                                            <Link
-                                                href={meta.slug ? `/book?activity=${meta.slug}` : "/book"}
-                                                className={`mt-auto block w-full py-3.5 px-4 bg-gradient-to-r ${meta.gradient} text-white font-bold text-center rounded-xl hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2`}
-                                            >
-                                                Book {activity.name} <ArrowRight className="w-4 h-4" />
+                                                Learn More <ChevronDown className="w-4 h-4 -rotate-90" />
                                             </Link>
                                         )}
+
+                                        {/* Book Now Button */}
+                                        <Link
+                                            href={meta.slug ? `/book?activity=${meta.slug}` : "/book"}
+                                            className={`mt-auto block w-full py-3.5 px-4 bg-gradient-to-r ${meta.gradient} text-white font-bold text-center rounded-xl hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2`}
+                                        >
+                                            Book {activity.name} <ArrowRight className="w-4 h-4" />
+                                        </Link>
                                     </div>
 
                                     {/* Expanded Content */}
@@ -407,9 +422,9 @@ export const AttractionsGrid = ({ activities }: AttractionsGridProps) => {
                     })
                 ) : (
                     <div className="col-span-full text-center py-20">
-                        <div className="text-6xl mb-4">🛼🎳🕹️</div>
+                        <div className="text-6xl mb-4">🧨🔫🏎️🪂</div>
                         <p className="text-white/60 text-xl">Activities loading...</p>
-                        <p className="text-white/40 text-sm mt-2">Check back soon for our full schedule!</p>
+                        <p className="text-white/40 text-sm mt-2">Soft Play · Laser Arena · Go Karts · Inflatable Park</p>
                     </div>
                 )}
             </div>

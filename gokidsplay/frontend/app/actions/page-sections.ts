@@ -1,122 +1,45 @@
-"use server";
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { fetchAPI } from "../lib/server-api";
-import { requirePermission } from "../lib/admin-auth";
-import { logActivity } from "../lib/audit-log";
-import { revalidatePath } from "next/cache";
-import { transformCmsItem } from "../lib/transformers";
-
-export async function getPageSections(page: string) {
-    // Public access allowed
-    if (!page) return []; // Fail safe or throw error
-    const endpoint = `/cms/page-sections/?page=${page}`;
-    const res = await fetchAPI(endpoint);
-    if (!res || !res.ok) return [];
-    const data = await res.json();
-    return data.map(transformCmsItem);
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[page-sections]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[page-sections] error:', e); return null; }
 }
 
-export async function getPageSection(id: string) {
-    // Public access allowed
-    const res = await fetchAPI(`/cms/page-sections/${id}/`);
-    if (!res || !res.ok) return null;
-    const data = await res.json();
-    return transformCmsItem(data);
+export async function getPageSections(page?: string) {
+    const url = page ? `${BASE}/cms/page-sections/?page=${page}` : `${BASE}/cms/page-sections/`;
+    const data = await sf(url);
+    if (!data) return [];
+    return Array.isArray(data) ? data.filter((s: any) => s.active !== false) : (data.results || []);
+}
+
+export async function updatePageSection(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/page-sections/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
 export async function createPageSection(data: any) {
-    try {
-        await requirePermission('cms', 'write');
-    } catch (error: any) {
-        console.error('Permission error:', error.message);
-        return { success: false, error: error.message || 'Permission denied' };
-    }
-
-    const res = await fetchAPI("/cms/page-sections/", {
-        method: "POST",
-        body: JSON.stringify(data)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/page-sections/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
     });
-
-    if (!res || !res.ok) {
-        const errorText = res ? await res.text().catch(() => 'Unknown error') : 'No response';
-        console.error('API error:', errorText);
-        return { success: false, error: `Failed to create: ${errorText}` };
-    }
-
-    const item = await res.json();
-
-    await logActivity({
-        action: 'CREATE',
-        entity: 'PAGE_SECTION',
-        entityId: item.id.toString(),
-        details: { after: item }
-    });
-
-    // Revalidate all public-facing pages that consume page sections
-    revalidatePath('/admin/cms/page-sections');
-    revalidatePath('/pricing');
-    revalidatePath('/');
-    revalidatePath('/parties');
-    revalidatePath('/attractions');
-    revalidatePath('/contact');
-    revalidatePath('/guidelines');
-    return { success: true, item: transformCmsItem(item) };
 }
 
-export async function updatePageSection(id: string, data: any) {
-    try {
-        await requirePermission('cms', 'write');
-    } catch (error: any) {
-        console.error('Permission error:', error.message);
-        return { success: false, error: error.message || 'Permission denied' };
-    }
-
-    const res = await fetchAPI(`/cms/page-sections/${id}/`, {
-        method: "PATCH",
-        body: JSON.stringify(data)
+export async function deletePageSection(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/page-sections/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
     });
-
-    if (!res || !res.ok) {
-        const errorText = res ? await res.text().catch(() => 'Unknown error') : 'No response';
-        console.error('API error:', errorText);
-        return { success: false, error: `Failed to update: ${errorText}` };
-    }
-
-    const item = await res.json();
-
-    await logActivity({
-        action: 'UPDATE',
-        entity: 'PAGE_SECTION',
-        entityId: id,
-        details: { after: item }
-    });
-
-    // Revalidate all public-facing pages that consume page sections
-    revalidatePath('/admin/cms/page-sections');
-    revalidatePath('/pricing');
-    revalidatePath('/');
-    revalidatePath('/parties');
-    revalidatePath('/attractions');
-    revalidatePath('/contact');
-    revalidatePath('/guidelines');
-    return { success: true, item: transformCmsItem(item) };
-}
-
-export async function deletePageSection(id: string) {
-    await requirePermission('cms', 'delete');
-
-    const res = await fetchAPI(`/cms/page-sections/${id}/`, {
-        method: "DELETE"
-    });
-
-    if (!res || !res.ok) return { success: false };
-
-    await logActivity({
-        action: 'DELETE',
-        entity: 'PAGE_SECTION',
-        entityId: id
-    });
-
-    revalidatePath('/admin/cms/page-sections');
-    return { success: true };
+    return r.ok;
 }

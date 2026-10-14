@@ -1,6 +1,6 @@
 """
-SpinPin CMS seed script - updates pages, config, FAQs, stat cards, socials.
-Run: python seed_spinpin_cms.py  (from backend/ folder with venv active)
+Go Kids Play CMS seed script - updates pages, config, FAQs, stat cards, socials.
+Run: python seed_gokidsplay_cms.py  (from backend/ folder with venv active)
 """
 import os, sys, django
 
@@ -16,14 +16,14 @@ from apps.cms.models import (
 # 1. Fix Page titles (remove Ninja Inflatable Park branding)
 # ------------------------------------------------------------------
 PAGE_TITLES = {
-    "home":        "Spin Pin - Leicester's Premier Entertainment Venue",
-    "about":       "About Us - Spin Pin Leicester",
-    "pricing":     "Pricing - Spin Pin Leicester",
-    "parties":     "Parties and Events - Spin Pin Leicester",
-    "attractions": "Attractions - Spin Pin Leicester",
-    "contact":     "Contact Us - Spin Pin Leicester",
-    "groups":      "Group Bookings - Spin Pin Leicester",
-    "guidelines":  "Safety Guidelines - Spin Pin Leicester",
+    "home":        "Go Kids Play - Leicester's Premier Entertainment Venue",
+    "about":       "About Us - Go Kids Play Leicester",
+    "pricing":     "Pricing - Go Kids Play Leicester",
+    "parties":     "Parties and Events - Go Kids Play Leicester",
+    "attractions": "Attractions - Go Kids Play Leicester",
+    "contact":     "Contact Us - Go Kids Play Leicester",
+    "groups":      "Group Bookings - Go Kids Play Leicester",
+    "guidelines":  "Safety Guidelines - Go Kids Play Leicester",
 }
 
 print("=== Updating Page titles ===")
@@ -33,7 +33,7 @@ for slug, title in PAGE_TITLES.items():
         defaults={
             "title": title,
             "meta_title": title,
-            "meta_description": f"Book your experience at Spin Pin - {slug.replace('-',' ').title()}",
+            "meta_description": f"Book your experience at Go Kids Play - {slug.replace('-',' ').title()}",
             "active": True,
         }
     )
@@ -77,7 +77,7 @@ print(f"  tokens20=GBP{config.token_pack_20_price}  tokens50=GBP{config.token_pa
 print("\n=== Seeding FAQs ===")
 FAQS = [
     ("What activities are available?",
-     "Spin Pin Leicester offers roller skating, ten-pin bowling, and an arcade with VR experiences. All under one roof in Leicester city centre."),
+     "Go Kids Play Leicester offers roller skating, ten-pin bowling, and an arcade with VR experiences. All under one roof in Leicester city centre."),
     ("What are your opening hours?",
      "We are open Tuesday-Friday 2pm-10pm, Saturday 12pm-11pm, Sunday 12pm-10pm. We are closed on Mondays."),
     ("Do I need to book in advance?",
@@ -90,7 +90,7 @@ FAQS = [
      "Yes, we have a secure car park close to the entrance at GBP 3.00 per car. Pay at reception on arrival."),
     ("Do you offer locker hire?",
      "Yes, secure lockers are available to hire for GBP 2.00. Various sizes are available at the venue."),
-    ("Can I host a birthday party at Spin Pin?",
+    ("Can I host a birthday party at Go Kids Play?",
      "Absolutely! We offer fantastic party packages. Contact us to discuss your requirements."),
     ("Is food available at the venue?",
      "Yes! We have a food and drinks area where you can grab refreshments during your visit."),
@@ -123,10 +123,10 @@ print(f"  Seeded {len(STATS)} stat cards")
 # ------------------------------------------------------------------
 print("\n=== Seeding Social Links ===")
 SOCIALS = [
-    ("Instagram",  "instagram", "https://instagram.com/spinpinleicester"),
-    ("Facebook",   "facebook",  "https://facebook.com/spinpinleicester"),
-    ("TikTok",     "tiktok",    "https://tiktok.com/@spinpinleicester"),
-    ("X",          "twitter",   "https://twitter.com/spinpinleicester"),
+    ("Instagram",  "instagram", "https://instagram.com/gokidsplayleicester"),
+    ("Facebook",   "facebook",  "https://facebook.com/gokidsplayleicester"),
+    ("TikTok",     "tiktok",    "https://tiktok.com/@gokidsplayleicester"),
+    ("X",          "twitter",   "https://twitter.com/gokidsplayleicester"),
 ]
 for name, platform, url in SOCIALS:
     SocialLink.objects.update_or_create(
@@ -135,4 +135,4 @@ for name, platform, url in SOCIALS:
     )
 print(f"  Seeded {len(SOCIALS)} social links")
 
-print("\nAll done! CMS seeded with SpinPin branding and correct pricing.")
+print("\nAll done! CMS seeded with Go Kids Play branding and correct pricing.")

@@ -29,6 +29,8 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
+                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link rel="icon" href="/favicon.png" type="image/png" />
                 <link rel="manifest" href="/manifest.json" />
                 <link rel="apple-touch-icon" href="/gokidsplay-logo.png" />
                 <script
@@ -45,14 +47,17 @@ export default function RootLayout({
                                     "url": "https://gokidsplay.co.uk",
                                     "logo": "https://gokidsplay.co.uk/gokidsplay-logo.png",
                                     "image": "https://gokidsplay.co.uk/gokidsplay-logo.png",
-                                    "telephone": "+44-24-0000-0000",
+                                    "telephone": "+44-7349110865",
                                     "email": "info@gokidsplay.co.uk",
                                     "address": {
                                         "@type": "PostalAddress",
+                                        "streetAddress": "310 Kingfield Road",
                                         "addressLocality": "Coventry",
                                         "addressRegion": "West Midlands",
+                                        "postalCode": "CV1 4LD",
                                         "addressCountry": "GB"
                                     },
+
                                     "geo": {
                                         "@type": "GeoCoordinates",
                                         "latitude": 52.4081,

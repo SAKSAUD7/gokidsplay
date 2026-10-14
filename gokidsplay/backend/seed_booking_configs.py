@@ -1,5 +1,5 @@
 """
-Seed SessionBookingConfig and PartyBookingConfig for SpinPin.
+Seed SessionBookingConfig and PartyBookingConfig for Go Kids Play.
 Run from the backend directory: python seed_booking_configs.py
 """
 import os
@@ -49,7 +49,7 @@ if created:
     print("     Skate hire: £2.95 | Shoe hire: £1.50 | Locker: £2.00")
     print("     Token pack 20: £5.00 | Token pack 50: £10.00 | Parking: £3.00")
 else:
-    # Update existing with correct SpinPin prices
+    # Update existing with correct Go Kids Play prices
     session_config.adult_price = '9.95'
     session_config.kid_price = '9.95'
     session_config.spectator_price = '2.95'
@@ -61,7 +61,7 @@ else:
     session_config.parking_price = '3.00'
     session_config.active = True
     session_config.save()
-    print("  🔄 Updated existing SessionBookingConfig with SpinPin prices")
+    print("  🔄 Updated existing SessionBookingConfig with Go Kids Play prices")
 
 print("\n🌱 Seeding PartyBookingConfig...")
 

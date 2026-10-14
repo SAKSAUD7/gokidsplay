@@ -6,7 +6,7 @@ import re
 import os
 from pathlib import Path
 
-ROOT = Path(r"c:\Users\saksa\OneDrive\Desktop\spinpin\spinpin\frontend")
+ROOT = Path(r"c:\Users\saksa\OneDrive\Desktop\Go Kids Play\Go Kids Play\frontend")
 
 def fix_file(path: Path):
     content = path.read_text(encoding="utf-8")

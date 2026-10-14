@@ -1,4 +1,4 @@
-"""Seed SpinPin party packages and party page sections."""
+"""Seed Go Kids Play party packages and party page sections."""
 import os, sys, django
 from decimal import Decimal
 
@@ -60,7 +60,7 @@ packages = [
     ),
     PartyPackage(
         name="Ultimate Party",
-        description="The full Spin Pin experience! Skating AND bowling PLUS arcade tokens for an unforgettable party.",
+        description="The full Go Kids Play experience! Skating AND bowling PLUS arcade tokens for an unforgettable party.",
         price=Decimal("20.00"),
         min_participants=10,
         max_participants=60,
@@ -90,9 +90,9 @@ for page_key in ["party-booking", "parties"]:
         page=page_key,
         section_key="hero",
         defaults={
-            "title": "Book Your Party at Spin Pin",
+            "title": "Book Your Party at Go Kids Play",
             "content": (
-                "Celebrate in style at Spin Pin Leicester! "
+                "Celebrate in style at Go Kids Play Leicester! "
                 "Birthday parties, group events and corporate gatherings. "
                 "Roller skating, bowling and arcade fun all under one roof."
             ),
@@ -100,9 +100,9 @@ for page_key in ["party-booking", "parties"]:
         },
     )
     if not created:
-        hero.title = "Book Your Party at Spin Pin"
+        hero.title = "Book Your Party at Go Kids Play"
         hero.content = (
-            "Celebrate in style at Spin Pin Leicester! "
+            "Celebrate in style at Go Kids Play Leicester! "
             "Birthday parties, group events and corporate gatherings. "
             "Roller skating, bowling and arcade fun all under one roof."
         )

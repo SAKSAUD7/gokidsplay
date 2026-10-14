@@ -4,9 +4,9 @@ export const siteConfig = {
     url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.gokidsplay.co.uk",
     ogImage: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.gokidsplay.co.uk"}/og.jpg`,
     links: {
-        twitter: "https://twitter.com/gokidsgoleic",
-        instagram: "https://www.instagram.com/gokidsgoleic/",
-        facebook: "https://www.facebook.com/gokidsgoleic",
+        twitter: "https://twitter.com/gokidsplay",
+        instagram: "https://www.instagram.com/gokidsplay/",
+        facebook: "https://www.facebook.com/gokidsplay",
     },
     contact: {
         phone: "07349110865",
@@ -15,9 +15,9 @@ export const siteConfig = {
         mapUrl: "https://maps.google.com/?q=310+Kingfield+Road,+Coventry,+CV1+4LD",
     },
     hours: {
-        note: "Open School Holidays & Weekends only",
-        monTue: "Closed (except Bank & School Holidays)",
-        wedSun: "10:00am – 5:30pm",
+        note: "Except Bank & School Holidays",
+        monTue: "Closed",
+        wedSun: "10:00am to 05:30pm",
     },
 };
 
@@ -29,41 +29,47 @@ export const navLinks = [
     { title: "Book Tickets", href: "/book" },
     { title: "Prices", href: "/pricing" },
     { title: "Gallery", href: "/gallery" },
+    { title: "Shop", href: "/shop" },
     { title: "FAQ", href: "/faq" },
+    { title: "Memberships", href: "/memberships" },
     { title: "Contact", href: "/contact" },
 ];
 
 export const footerLinks = [
     {
-        title: "Pages",
+        title: "Explore",
         items: [
             { title: "Home", href: "/" },
             { title: "Activities", href: "/attractions" },
-            { title: "Special Events", href: "/events" },
-            { title: "Pricing", href: "/pricing" },
-            { title: "Birthday Parties", href: "/parties" },
             { title: "Gallery", href: "/gallery" },
+            { title: "Events", href: "/events" },
+            { title: "Memberships", href: "/memberships" },
+            { title: "Testimonies", href: "/testimonies" },
             { title: "About Us", href: "/about" },
+            { title: "Shop", href: "/shop" },
+        ],
+    },
+    {
+        title: "Book & Info",
+        items: [
+            { title: "Book Tickets", href: "/book" },
+            { title: "Birthday Parties", href: "/parties" },
+            { title: "Group Bookings", href: "/groups" },
+            { title: "Pricing", href: "/pricing" },
+            { title: "Facilities", href: "/facilities" },
+            { title: "FAQ's", href: "/faq" },
             { title: "Contact Us", href: "/contact" },
         ],
     },
     {
-        title: "Information",
+        title: "Legal",
         items: [
-            { title: "FAQ's", href: "/faq" },
-            { title: "Guidelines & Safety", href: "/guidelines" },
-            { title: "Facilities", href: "/facilities" },
             { title: "Privacy Policy", href: "/privacy" },
-            { title: "Terms of Service", href: "/terms" },
+            { title: "Cookies", href: "/cookies" },
+            { title: "Your Rights", href: "/rights" },
+            { title: "Security", href: "/security" },
+            { title: "Disclaimer", href: "/disclaimer" },
+            { title: "Terms", href: "/terms" },
         ],
-    },
-    {
-        title: "Bookings",
-        items: [
-            { title: "Book Tickets", href: "/book" },
-            { title: "Birthday Parties", href: "/parties" },
-            { title: "Special Events", href: "/events" },
-            { title: "Admin Portal", href: "/admin" },
-        ],
-    },
+    }
 ];

@@ -173,7 +173,7 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
                                         {booking.activity === 'laser-arena' && '🔫 Laser Arena'}
                                         {booking.activity === 'go-kart' && '🏎️ Go Karts'}
                                         {booking.activity === 'inflatable-park' && '🏰 Inflatable Park'}
-                                        {/* Legacy SpinPin fallback */}
+                                        {/* Legacy Go Kids Play fallback */}
                                         {booking.activity === 'roller-skating' && '🛼 Roller Skating (Legacy)'}
                                         {booking.activity === 'ten-pin-bowling' && '🎳 Ten Pin Bowling (Legacy)'}
                                         {booking.activity === 'arcade' && '🕹️ Arcade (Legacy)'}

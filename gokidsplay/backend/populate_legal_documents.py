@@ -1,5 +1,5 @@
 """
-Populate Legal Documents with SpinPin content
+Populate Legal Documents with Go Kids Play content
 """
 import os
 import sys
@@ -24,12 +24,12 @@ def create_legal_documents():
             'sections': [
                 {
                     "title": "Entry and Admission",
-                    "content": """• Only authorised members of public are allowed into our premises. SpinPin reserves the right to refuse entry, you may be asked to leave for noncompliance of the rules.
+                    "content": """• Only authorised members of public are allowed into our premises. Go Kids Play reserves the right to refuse entry, you may be asked to leave for noncompliance of the rules.
 • In the interest of safety you may be refused entry if found under the influence of alcohol or drugs.
 • Adults must remain on the premises and supervise the child/children under their care at all times.
 • Play time is for the duration of the booked session only.
 • We provide free car park for 2 hours. However, if the play is extended for more than 2 hrs the car registration number must be recorded at the reception to avoid parking penalty ticket. We accept no liability for parking penalties.
-• All children of fee paying age (Under 18) and adults (18+) entering SpinPin must pay the entry fee, regardless of whether they will play or not.
+• All children of fee paying age (Under 18) and adults (18+) entering Go Kids Play must pay the entry fee, regardless of whether they will play or not.
 • We operate a no-refund policy after 10 minutes of admission."""
                 },
                 {
@@ -38,12 +38,12 @@ def create_legal_documents():
 • Please inform a member of staff immediately should a child become lost in the play area
 • We accept no liability for the loss or damage to any valuables.
 • Children and adults must not run around the centre.
-• We have a zero-tolerance policy to all forms of anti-social behaviour. This includes: bullying, fighting, any form of aggressive, or any other type of behaviour deemed to be unsuitable towards SpinPin Staff, management, or other members of the public – from either children or adults. You may be asked to leave following noncompliance and management reserve the right to enforce total bans.
+• We have a zero-tolerance policy to all forms of anti-social behaviour. This includes: bullying, fighting, any form of aggressive, or any other type of behaviour deemed to be unsuitable towards Go Kids Play Staff, management, or other members of the public – from either children or adults. You may be asked to leave following noncompliance and management reserve the right to enforce total bans.
 • You must not carry any sharp objects or weapons into our premises and it is forbidden to bring or consume alcohol or drugs, such items will be confiscated and you will be removed from the premises immediately. Where appropriate, we will contact the police."""
                 },
                 {
                     "title": "Food & Drinks",
-                    "content": """• Only food and drinks purchased at SpinPin can be consumed on the premises.
+                    "content": """• Only food and drinks purchased at Go Kids Play can be consumed on the premises.
 • Waiting time for food during our peak periods can be up to 45 minutes.
 • We keep eating areas separated from the play area for matters of health and safety. Food, drink, sweets and chewing gum are not allowed in close proximity of play area"""
                 },
@@ -55,13 +55,13 @@ def create_legal_documents():
 • Shoes must be worn at all time when using toilet facilities."""
                 },
                 {
-                    "title": "Play Time At SpinPin",
+                    "title": "Play Time At Go Kids Play",
                     "content": """• All play equipment is subject to availability. Management reserves the right to close an activity if required without prior notice. No refunds or deductions will be made.
 • All our play equipment is designed for maximum fun, and has passed stringent requirements regulated by the Play Inspectors. We cannot therefore be held responsible for accidents which occur as a result of playing on our equipment.
 • We have provided separate age appropriate zones, for everyone's safety please adhere to all age and height restrictions.
 • Children who are unwell should not use the play facilities.
 • Children may be refused entry in the play area if they are not wearing appropriate clothing or footwear, if they do not meet the height restriction, if they are unwell, wearing plaster cast or have sustained injuries and when they do not follow rules of play and instructions.
-• Staff at SpinPin will supervise the play area during operation to help maximise your children's play experience, they are not however a replacement for parental supervision"""
+• Staff at Go Kids Play will supervise the play area during operation to help maximise your children's play experience, they are not however a replacement for parental supervision"""
                 }
             ],
             'active': True
@@ -74,7 +74,7 @@ def create_legal_documents():
         document_type='PRIVACY',
         defaults={
             'title': 'Privacy Policy',
-            'intro': 'Spin Pin Limited is the owner and operator of this website. This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.',
+            'intro': 'Go Kids Play Limited is the owner and operator of this website. This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.',
             'sections': [
                 {
                     "title": "Collection Of Information",
@@ -115,7 +115,7 @@ We may use your Personal Information to contact you with newsletters, emails or 
                     "title": "Your Rights",
                     "content": """You have the right to ask us not to process your personal data for marketing purposes or for the use of authorised third party purposes.
 
-You can exercise your right to prevent such processing at any time by contacting us at info@spinpin.co.uk or by contacting us through the contact page on this website."""
+You can exercise your right to prevent such processing at any time by contacting us at info@gokidsplay.co.uk or by contacting us through the contact page on this website."""
                 }
             ],
             'active': True

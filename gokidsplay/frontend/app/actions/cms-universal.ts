@@ -1,156 +1,84 @@
 'use server';
 
 /**
- * Universal CMS Utilities
- *
- * These functions provide a consistent, authenticated interface for saving
- * and deleting CMS items across all models. All requests go through the
- * Django backend with the admin_token cookie so CRUD operations are authorized.
+ * Universal CMS action wrapper — maps a slug to an API endpoint.
+ * Used by generic CMS admin pages to avoid duplicate boilerplate.
  */
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { cookies } from 'next/headers';
-import { revalidatePath } from 'next/cache';
+const SLUG_MAP: Record<string, string> = {
+    'banners': '/cms/banners/',
+    'activities': '/cms/activities/',
+    'gallery': '/cms/gallery/',
+    'party-packages': '/cms/party-packages/',
+    'pricing-plans': '/cms/pricing-plans/',
+    'group-packages': '/cms/group-packages/',
+    'menu-sections': '/cms/menu-sections/',
+    'page-sections': '/cms/page-sections/',
+    'stat-cards': '/cms/stat-cards/',
+    'social-links': '/cms/social-links/',
+    'guideline-categories': '/cms/guideline-categories/',
+    'timeline-items': '/cms/timeline-items/',
+    'value-items': '/cms/value-items/',
+    'facility-items': '/cms/facility-items/',
+    'timing-cards': '/cms/timing-cards/',
+    'instagram-reels': '/cms/instagram-reels/',
+    'faqs': '/cms/faqs/',
+    'booking-information': '/cms/booking-information/',
+    'contact-info': '/cms/contact-info/',
+    'group-benefits': '/cms/group-benefits/',
+    'legal-documents': '/cms/legal-documents/',
+};
 
-// Always resolve via 127.0.0.1 to avoid Node.js IPv6 issues
-const API_URL = (
-    process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1'
-).replace('localhost', '127.0.0.1');
-
-function getAuthHeaders(): Record<string, string> {
-    const token = cookies().get('admin_token')?.value;
-    const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-    };
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-    return headers;
-}
-
-export interface CMSSaveResult {
-    success: boolean;
-    data?: any;
-    error?: string;
-}
-
-/**
- * Save a CMS item (create or update)
- */
-export async function saveCMSItem(
-    model: string,
-    data: Record<string, any>,
-    id?: number
-): Promise<CMSSaveResult> {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        const url = id
-            ? `${API_URL}/cms/${model}/${id}/`
-            : `${API_URL}/cms/${model}/`;
-
-        const method = id ? 'PATCH' : 'POST';
-
-        const res = await fetch(url, {
-            method,
-            headers: getAuthHeaders(),
-            body: JSON.stringify(data),
-            cache: 'no-store',
-        });
-
-        if (!res.ok) {
-            const error = await res.json().catch(() => ({ detail: 'Save failed' }));
-            console.error(`[CMS] saveCMSItem ${method} ${url} failed ${res.status}:`, error);
-            return {
-                success: false,
-                error: error.detail || error.error || `Failed with status ${res.status}`,
-            };
-        }
-
-        // 204 No Content for some updates
-        if (res.status === 204) {
-            return { success: true };
-        }
-
-        const result = await res.json();
-        revalidatePath('/admin/cms');
-        return { success: true, data: result };
-    } catch (error) {
-        console.error('[CMS] saveCMSItem exception:', error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Network error',
-        };
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[cms-universal]', r.status, url); return null; }
+        return r.json();
+    } catch(e) { console.error('[cms-universal] error:', e); return null; }
 }
 
-/**
- * Delete a CMS item
- */
-export async function deleteCMSItem(
-    model: string,
-    id: number
-): Promise<CMSSaveResult> {
-    try {
-        const url = `${API_URL}/cms/${model}/${id}/`;
-
-        const res = await fetch(url, {
-            method: 'DELETE',
-            headers: getAuthHeaders(),
-            cache: 'no-store',
-        });
-
-        // 204 No Content is the standard success for DELETE
-        if (res.ok || res.status === 204) {
-            revalidatePath('/admin/cms');
-            return { success: true };
-        }
-
-        const errorBody = await res.text().catch(() => '');
-        console.error(`[CMS] deleteCMSItem DELETE ${url} failed ${res.status}:`, errorBody);
-        return {
-            success: false,
-            error: `Delete failed (${res.status})`,
-        };
-    } catch (error) {
-        console.error('[CMS] deleteCMSItem exception:', error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Network error',
-        };
-    }
+function getToken() {
+    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
 }
 
-/**
- * Fetch a single CMS item
- */
-export async function getCMSItem(
-    model: string,
-    id: number
-): Promise<any> {
-    const token = cookies().get('admin_token')?.value;
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+export async function cmsGetAll(slug: string) {
+    const path = SLUG_MAP[slug];
+    if (!path) return [];
+    const data = await sf(`${BASE}${path}`, {
+        headers: { 'Authorization': `Bearer ${getToken()}` },
+    });
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
+}
 
-    const res = await fetch(`${API_URL}/cms/${model}/${id}/`, {
-        headers,
+export async function cmsCreate(slug: string, data: any) {
+    const path = SLUG_MAP[slug];
+    if (!path) return null;
+    return sf(`${BASE}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify(data),
+    });
+}
+
+export async function cmsUpdate(slug: string, id: number, data: any) {
+    const path = SLUG_MAP[slug];
+    if (!path) return null;
+    return sf(`${BASE}${path}${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify(data),
+    });
+}
+
+export async function cmsDelete(slug: string, id: number) {
+    const path = SLUG_MAP[slug];
+    if (!path) return false;
+    const r = await fetch(`${BASE}${path}${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getToken()}` },
         cache: 'no-store',
     });
-
-    if (!res.ok) throw new Error('Failed to fetch item');
-    return res.json();
-}
-
-/**
- * Fetch all items for a model
- */
-export async function getCMSItems(model: string): Promise<any[]> {
-    const token = cookies().get('admin_token')?.value;
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const res = await fetch(`${API_URL}/cms/${model}/`, {
-        headers,
-        cache: 'no-store',
-    });
-
-    if (!res.ok) throw new Error('Failed to fetch items');
-    return res.json();
+    return r.ok;
 }

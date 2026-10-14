@@ -1,51 +1,19 @@
-﻿"use server";
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-
-export async function validateVoucher(
-    code: string,
-    orderAmount: number,
-    bookingDateTime?: string // ISO format: "2026-01-12T15:30:00"
-) {
+export async function validateVoucher(code: string, orderAmount: number, bookingDatetime?: string) {
     try {
-        if (!code) {
-            return { success: false, error: "Voucher code is required" };
-        }
-
-        // Use backend validation endpoint
-        const response = await fetch(`${API_URL}/shop/vouchers/validate/`, {
+        const body: any = { code, order_amount: orderAmount };
+        if (bookingDatetime) body.booking_datetime = bookingDatetime;
+        const r = await fetch(`${BASE}/shop/vouchers/validate/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                code: code.toUpperCase(),
-                order_amount: orderAmount,
-                booking_datetime: bookingDateTime
-            }),
-            cache: "no-store"
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+            cache: 'no-store',
         });
-
-        const result = await response.json();
-
-        if (!result.valid) {
-            return {
-                success: false,
-                error: result.error || "Invalid voucher"
-            };
-        }
-
-        return {
-            success: true,
-            discount: result.discount_amount,
-            type: result.voucher.discount_type,
-            value: result.voucher.discount_value,
-            code: result.voucher.code,
-            description: result.voucher.description
-        };
-
-    } catch (error) {
-        console.error("Voucher validation error:", error);
-        return { success: false, error: "Failed to validate voucher" };
+        const json = await r.json();
+        return json;
+    } catch(e: any) {
+        return { valid: false, error: e.message || 'Network error' };
     }
 }

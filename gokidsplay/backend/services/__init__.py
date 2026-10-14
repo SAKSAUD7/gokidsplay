@@ -1,1 +1,1 @@
-# SpinPin Email Services Package
+# Go Kids Play Email Services Package

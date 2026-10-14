@@ -1,8 +1,8 @@
 """
-SumUp Payment Gateway Integration for SpinPin.
+SumUp Payment Gateway Integration for Go Kids Play.
 
 Dual-Merchant Setup:
-  - Roller Skating & Arcade → SpinPin Ltd account (SUMUP_SKATING_*)
+  - Roller Skating & Arcade → Go Kids Play Ltd account (SUMUP_SKATING_*)
   - Ten Pin Bowling         → Twinkle Town Ltd account (SUMUP_BOWLING_*)
 
 Uses SumUp Checkout API (hosted redirect flow):
@@ -32,7 +32,7 @@ SUMUP_API_BASE = "https://api.sumup.com/v0.1"
 # Activities routed to Twinkle Town Ltd (bowling account)
 BOWLING_ACTIVITIES = {"ten-pin-bowling", "bowling"}
 
-# Activities routed to SpinPin Ltd (skating account)
+# Activities routed to Go Kids Play Ltd (skating account)
 SKATING_ACTIVITIES = {"roller-skating", "skating", "arcade"}
 
 
@@ -42,9 +42,9 @@ def _get_merchant_credentials(activity: Optional[str]) -> Dict[str, str]:
 
     Routing logic:
       - ten-pin-bowling  → Twinkle Town Ltd (SUMUP_BOWLING_*)
-      - roller-skating   → SpinPin Ltd     (SUMUP_SKATING_*)
-      - arcade           → SpinPin Ltd     (SUMUP_SKATING_*)
-      - unknown/None     → SpinPin Ltd     (SUMUP_SKATING_*) as default
+      - roller-skating   → Go Kids Play Ltd     (SUMUP_SKATING_*)
+      - arcade           → Go Kids Play Ltd     (SUMUP_SKATING_*)
+      - unknown/None     → Go Kids Play Ltd     (SUMUP_SKATING_*) as default
     """
     activity_lower = (activity or "").lower().strip()
 
@@ -56,7 +56,7 @@ def _get_merchant_credentials(activity: Optional[str]) -> Dict[str, str]:
         # Skating, Arcade, or default
         api_key       = getattr(settings, "SUMUP_SKATING_API_KEY", "")
         merchant_code = getattr(settings, "SUMUP_SKATING_MERCHANT_CODE", "")
-        account_name  = "SpinPin Ltd"
+        account_name  = "Go Kids Play Ltd"
 
     # Final fallback to legacy single-key settings
     if not api_key:
@@ -77,7 +77,7 @@ class SumUpGateway(BasePaymentGateway):
 
     The correct merchant credentials are selected automatically based on the
     booking's activity field:
-      - roller-skating / arcade → SpinPin Ltd
+      - roller-skating / arcade → Go Kids Play Ltd
       - ten-pin-bowling         → Twinkle Town Ltd
     """
 
@@ -96,7 +96,7 @@ class SumUpGateway(BasePaymentGateway):
             frontend_url = (
                 getattr(settings, "FRONTEND_URL", "")
                 or getattr(settings, "NEXT_PUBLIC_FRONTEND_URL", "")
-                or "https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net"
+                or "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net"
             )
             self.return_url = f"{frontend_url.rstrip('/')}/book/success"
         logger.info(f"SumUp gateway initialized. Return URL: {self.return_url}")
@@ -118,7 +118,7 @@ class SumUpGateway(BasePaymentGateway):
           - order_id:     the checkout_id from SumUp
           - checkout_url: URL to redirect customer to
           - provider:     'sumup'
-          - merchant:     which account was used ('SpinPin Ltd' or 'Twinkle Town Ltd')
+          - merchant:     which account was used ('Go Kids Play Ltd' or 'Twinkle Town Ltd')
           - amount, currency
         """
         from apps.bookings.models import PartyBooking
@@ -170,7 +170,7 @@ class SumUpGateway(BasePaymentGateway):
         )
 
         import os
-        webhook_base = f"https://{os.environ.get('WEBSITE_HOSTNAME')}" if os.environ.get('WEBSITE_HOSTNAME') else "https://spinpin-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net"
+        webhook_base = f"https://{os.environ.get('WEBSITE_HOSTNAME')}" if os.environ.get('WEBSITE_HOSTNAME') else "https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net"
         webhook_url = f"{webhook_base}/api/v1/payments/sumup-webhook/"
 
         payload = {
@@ -405,7 +405,7 @@ class SumUpGateway(BasePaymentGateway):
         """
         Look up which merchant API key to use for a checkout verification/refund
         by checking the stored Payment's provider_response._activity field.
-        Falls back to SpinPin Ltd (skating) keys if not determinable.
+        Falls back to Go Kids Play Ltd (skating) keys if not determinable.
         """
         try:
             payment = Payment.objects.get(order_id=checkout_id)  # type: ignore[attr-defined]
@@ -416,7 +416,7 @@ class SumUpGateway(BasePaymentGateway):
         except Payment.DoesNotExist:  # type: ignore[attr-defined]
             pass
 
-        # Default: SpinPin Ltd
+        # Default: Go Kids Play Ltd
         return (
             getattr(settings, "SUMUP_SKATING_API_KEY", "")
             or getattr(settings, "SUMUP_API_KEY", "")

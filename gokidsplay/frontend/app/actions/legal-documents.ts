@@ -1,55 +1,32 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
-
-const ENDPOINT = API_ENDPOINTS.cms.legal_documents;
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[legal-documents]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[legal-documents] error:', e); return null; }
+}
 
 export async function getLegalDocuments() {
-    try {
-        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
-    } catch (error) {
-        return [];
-    }
+    const data = await sf(`${BASE}/cms/legal-documents/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
 }
 
-export async function getLegalDocument(id: string) {
-    try {
-        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
-    } catch (error) {
-        return null;
-    }
+export async function getLegalDocument(slug: string) {
+    const data = await sf(`${BASE}/cms/legal-documents/?slug=${slug}`);
+    if (!data) return null;
+    const list = Array.isArray(data) ? data : (data.results || []);
+    return list.find((d: any) => d.slug === slug) || null;
 }
 
-export async function createLegalDocument(data: any) {
-    try {
-        const result = await postAPI(ENDPOINT, data);
-        revalidatePath('/admin/cms/guidelines');
-        revalidatePath('/guidelines');
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to create legal document' };
-    }
-}
-
-export async function updateLegalDocument(id: string, data: any) {
-    try {
-        const result = await putAPI(`${ENDPOINT}${id}/`, data);
-        revalidatePath('/admin/cms/guidelines');
-        revalidatePath('/guidelines');
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to update legal document' };
-    }
-}
-
-export async function deleteLegalDocument(id: string) {
-    try {
-        await deleteAPI(`${ENDPOINT}${id}/`);
-        revalidatePath('/admin/cms/guidelines');
-        revalidatePath('/guidelines');
-        return { success: true };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to delete legal document' };
-    }
+export async function updateLegalDocument(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/legal-documents/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }

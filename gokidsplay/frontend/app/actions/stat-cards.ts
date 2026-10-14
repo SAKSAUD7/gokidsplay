@@ -1,58 +1,45 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
-
-const ENDPOINT = API_ENDPOINTS.cms.stat_cards; // Need to ensure this exists in lib/api.ts
-
-export async function getStatCards(page?: string) {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        const url = page ? `${ENDPOINT}?page=${page}` : ENDPOINT;
-        return await fetchAPI(url, { next: { revalidate: 60 } });
-    } catch (error) {
-        return [];
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[stat-cards]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[stat-cards] error:', e); return null; }
 }
 
+export async function getStatCards(page?: string) {
+    const url = page ? `${BASE}/cms/stat-cards/?page=${page}` : `${BASE}/cms/stat-cards/`;
+    const data = await sf(url);
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
+}
 
-export async function getStatCard(id: string) {
-    try {
-        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
-    } catch (error) {
-        return null;
-    }
+export async function updateStatCard(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/stat-cards/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
 export async function createStatCard(data: any) {
-    try {
-        const result = await postAPI(ENDPOINT, data);
-        revalidatePath('/admin/cms/stat-cards');
-        revalidatePath('/'); // Stat cards might be on homepage
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to create stat card' };
-    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/stat-cards/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
-export async function updateStatCard(id: string, data: any) {
-    try {
-        const result = await putAPI(`${ENDPOINT}${id}/`, data);
-        revalidatePath('/admin/cms/stat-cards');
-        revalidatePath('/');
-        return { success: true, item: result };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to update stat card' };
-    }
+export async function deleteStatCard(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/stat-cards/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
+    });
+    return r.ok;
 }
-
-export async function deleteStatCard(id: string) {
-    try {
-        await deleteAPI(`${ENDPOINT}${id}/`);
-        revalidatePath('/admin/cms/stat-cards');
-        revalidatePath('/');
-        return { success: true };
-    } catch (error) {
-        return { success: false, error: error instanceof Error ? error.message : 'Failed to delete stat card' };
-    }
-}
-

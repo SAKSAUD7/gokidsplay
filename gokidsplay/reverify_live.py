@@ -1,6 +1,6 @@
 import requests
 
-API_URL = 'https://spinpin-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net/api/v1'
+API_URL = 'https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net/api/v1'
 
 def reverify_stuck_payments():
     # IDs from the screenshot that are stuck

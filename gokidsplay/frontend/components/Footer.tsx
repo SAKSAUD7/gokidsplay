@@ -29,8 +29,10 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
                         if (url.startsWith('/')) {
                             url = apiUrl.replace('/api/v1', '') + url;
                         }
-                        // Force HTTPS — Azure terminates SSL at the load balancer
-                        url = url.replace(/^http:\/\//i, 'https://');
+                        // Only force HTTPS in production
+                        if (!url.includes('localhost') && !url.includes('127.0.0.1')) {
+                            url = url.replace(/^http:\/\//i, 'https://');
+                        }
                         setLogoUrl(url);
                     }
                 }

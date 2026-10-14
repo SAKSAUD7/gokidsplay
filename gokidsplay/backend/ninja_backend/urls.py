@@ -21,7 +21,7 @@ def health_check(request):
     """Root health check endpoint so the backend root doesn't return 404."""
     return JsonResponse({
         "status": "online",
-        "service": "SpinPin Backend API",
+        "service": "Go Kids Play Backend API",
         "version": "1.0",
         "api_docs": "/api/docs/",
         "admin": "/admin/",
@@ -30,7 +30,7 @@ def health_check(request):
 
 def seed_database(request):
     try:
-        command = "python populate_spinpin_content.py && python full_seed.py && python cms_seed_spinpin.py"
+        command = "python populate_gokidsplay_content.py && python full_seed.py && python cms_seed_gokidsplay.py"
         subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR)
         return JsonResponse({"status": "All 3 Seed scripts started in background!"})
     except Exception as e:
@@ -44,8 +44,8 @@ def reset_admin_password(request):
         # 1. Reset / create admin user
         from django.contrib.auth import get_user_model
         User = get_user_model()
-        NEW_PASSWORD = "SpinPin2026!"
-        ADMIN_EMAIL = "admin@spinpin.co.uk"
+        NEW_PASSWORD = "GoKidsPlay2026!"
+        ADMIN_EMAIL = "admin@gokidsplay.co.uk"
         try:
             user = User.objects.get(email=ADMIN_EMAIL)
             user.set_password(NEW_PASSWORD)
@@ -60,7 +60,7 @@ def reset_admin_password(request):
             user = User(
                 email=ADMIN_EMAIL,
                 username='admin',
-                name='SpinPin Admin',
+                name='Go Kids Play Admin',
                 role='ADMIN',
                 is_staff=True,
                 is_superuser=True,
@@ -76,11 +76,11 @@ def reset_admin_password(request):
             if not Logo.objects.filter(is_active=True).exists():
                 import urllib.request
                 from django.core.files import File
-                logo_url = "https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/logo_transparent.png"
-                tmp_path = "/tmp/spinpin_logo.png"
+                logo_url = "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/logo_transparent.png"
+                tmp_path = "/tmp/gokidsplay_logo.png"
                 try:
                     urllib.request.urlretrieve(logo_url, tmp_path)
-                    logo = Logo(name="SpinPin Logo", is_active=True)
+                    logo = Logo(name="Go Kids Play Logo", is_active=True)
                     with open(tmp_path, 'rb') as f:
                         logo.image.save("logo_transparent.png", File(f), save=True)
                     results['logo'] = "Logo created from frontend public folder"
@@ -97,7 +97,7 @@ def reset_admin_password(request):
 
 
 def fix_logo(request):
-    """Endpoint to set the correct circular SpinPin logo as active."""
+    """Endpoint to set the correct circular Go Kids Play logo as active."""
     try:
         from apps.core.models import Logo
         import os
@@ -107,7 +107,7 @@ def fix_logo(request):
 
         # We'll use a permanent logo that is checked into the git repository
         # This prevents the 404 error caused by Azure App Service wiping uploaded files on deploy
-        logo_image_path = "logos/spinpin-logo.png"
+        logo_image_path = "logos/Go Kids Play-logo.png"
         
         # Ensure the logo file actually exists in the persistent MEDIA_ROOT
         import shutil
@@ -116,23 +116,23 @@ def fix_logo(request):
         
         target_dir = Path(settings.MEDIA_ROOT) / 'logos'
         target_dir.mkdir(parents=True, exist_ok=True)
-        target_path = target_dir / 'spinpin-logo.png'
+        target_path = target_dir / 'Go Kids Play-logo.png'
         
         # Source path is where git put it (relative to BASE_DIR)
-        source_path = settings.BASE_DIR / 'media' / 'logos' / 'spinpin-logo.png'
+        source_path = settings.BASE_DIR / 'media' / 'logos' / 'Go Kids Play-logo.png'
         
         if source_path.exists() and not target_path.exists():
             shutil.copy2(source_path, target_path)
 
         # We can just create a new logo that references this path
         # django-storages will correctly resolve it to Azure Blob storage or local serve
-        logo = Logo(name="SpinPin Logo", is_active=True)
+        logo = Logo(name="Go Kids Play Logo", is_active=True)
         logo.image.name = logo_image_path
         logo.save()
 
         return JsonResponse({
             "status": "success",
-            "message": "SpinPin logo successfully set as active.",
+            "message": "Go Kids Play logo successfully set as active.",
             "logo_id": logo.id,
             "image": str(logo.image)
         })

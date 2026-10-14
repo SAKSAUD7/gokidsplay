@@ -69,8 +69,8 @@ export const Hero = () => {
                         className="mb-8"
                     >
                         <img
-                            src="/spinpin-logo.png"
-                            alt="SpinPin"
+                            src="/gokidsplay-logo.png"
+                            alt="Go Kids Play"
                             className="mx-auto h-28 md:h-36 lg:h-44 w-auto object-contain drop-shadow-2xl"
                         />
                     </motion.div>

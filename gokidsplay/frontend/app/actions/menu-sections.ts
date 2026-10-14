@@ -1,63 +1,44 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
-import { transformCmsItem } from '@/app/lib/transformers';
-
-const ENDPOINT = API_ENDPOINTS.cms.menu_sections;
-
-export async function getMenuSections() {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        const data = await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
-        return Array.isArray(data) ? data.map(transformCmsItem) : [];
-    } catch (error) {
-        console.error("Error fetching menu sections:", error);
-        return [];
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[menu-sections]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[menu-sections] error:', e); return null; }
 }
 
-export async function getMenuSection(id: string) {
-    try {
-        const data = await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
-        return transformCmsItem(data);
-    } catch (error) {
-        console.error(`Error fetching menu section ${id}:`, error);
-        return null;
-    }
+export async function getMenuSections() {
+    const data = await sf(`${BASE}/cms/menu-sections/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data.filter((m: any) => m.active !== false) : (data.results || []);
 }
 
 export async function createMenuSection(data: any) {
-    try {
-        const result = await postAPI(ENDPOINT, data);
-        revalidatePath('/admin/cms/menu');
-        revalidatePath('/parties'); // Update public page
-        return { success: true, item: result };
-    } catch (error: any) {
-        console.error("Error creating menu section:", error);
-        return { success: false, error: 'Failed to create menu section' };
-    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/menu-sections/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
-export async function updateMenuSection(id: string, data: any) {
-    try {
-        const result = await putAPI(`${ENDPOINT}${id}/`, data);
-        revalidatePath('/admin/cms/menu');
-        revalidatePath('/parties'); // Update public page
-        return { success: true, item: result };
-    } catch (error: any) {
-        console.error("Error updating menu section:", error);
-        return { success: false, error: 'Failed to update menu section' };
-    }
+export async function updateMenuSection(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/menu-sections/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
-export async function deleteMenuSection(id: string) {
-    try {
-        await deleteAPI(`${ENDPOINT}${id}/`);
-        revalidatePath('/admin/cms/menu');
-        revalidatePath('/parties'); // Update public page
-        return { success: true };
-    } catch (error: any) {
-        console.error("Error deleting menu section:", error);
-        return { success: false, error: 'Failed to delete menu section' };
-    }
+export async function deleteMenuSection(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/menu-sections/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
+    });
+    return r.ok;
 }

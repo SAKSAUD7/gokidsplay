@@ -1,100 +1,39 @@
-"use client";
+import type { Metadata } from "next";
+import { getMetadata } from "@/seo/seo.config";
 
-import { ScrollReveal, SectionDivider } from "@repo/ui";
-import { Lock, Eye, FileText, Shield } from "lucide-react";
+export const metadata: Metadata = getMetadata(
+    "Privacy Policy | Go Kids Play",
+    "Privacy Policy for Go Kids Play Coventry."
+);
 
 export default function PrivacyPage() {
-    const sections = [
-        {
-            title: "Information We Collect",
-            icon: <Eye className="w-6 h-6 text-primary" />,
-            content: [
-                "We collect information you provide directly to us, such as when you book a ticket, sign a waiver, or contact us.",
-                "This may include your name, email address, phone number, and payment information.",
-                "We also automatically collect certain information about your device and how you interact with our website."
-            ]
-        },
-        {
-            title: "How We Use Your Information",
-            icon: <FileText className="w-6 h-6 text-secondary" />,
-            content: [
-                "To process your bookings and payments.",
-                "To send you confirmations, updates, and administrative messages.",
-                "To respond to your comments and questions.",
-                "To improve our website and services."
-            ]
-        },
-        {
-            title: "Data Security",
-            icon: <Lock className="w-6 h-6 text-accent" />,
-            content: [
-                "We implement appropriate technical and organizational measures to protect your personal data.",
-                "Your payment information is processed securely by our payment providers and is not stored on our servers."
-            ]
-        },
-        {
-            title: "Your Rights",
-            icon: <Shield className="w-6 h-6 text-primary" />,
-            content: [
-                "You have the right to access, correct, or delete your personal information.",
-                "You may opt out of receiving promotional communications from us at any time.",
-                "If you have any questions about this Privacy Policy, please contact us."
-            ]
-        }
-    ];
-
     return (
-        <main className="min-h-screen bg-background text-white pt-24">
-            {/* Header */}
-            <section className="relative py-20 px-4 bg-gradient-to-b from-background-dark to-background">
-                <div className="max-w-7xl mx-auto text-center">
-                    <ScrollReveal animation="slideUp">
-                        <h1 className="text-5xl md:text-7xl font-display font-black mb-6">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                Privacy Policy
-                            </span>
-                        </h1>
-                        <p className="text-xl text-white/70 max-w-2xl mx-auto">
-                            We are committed to protecting your privacy and ensuring your personal information is secure.
-                        </p>
-                    </ScrollReveal>
-                </div>
-                <SectionDivider position="bottom" variant="curve" color="fill-background" />
-            </section>
+        <main className="min-h-screen bg-background text-white pt-32 pb-20 px-4">
+            <div className="max-w-4xl mx-auto prose prose-invert prose-p:text-white/70 prose-headings:text-white">
+                <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-8">
+                    Privacy Policy
+                </h1>
+                <p>Last updated: September 2026</p>
+                
+                <h2>1. Introduction</h2>
+                <p>Welcome to Go Kids Play. We are committed to protecting your personal information and your right to privacy. If you have any questions or concerns about this privacy notice, or our practices with regards to your personal information, please contact us at info@gokidsplay.co.uk.</p>
+                
+                <h2>2. Information We Collect</h2>
+                <p>We collect personal information that you voluntarily provide to us when you register on the website, express an interest in obtaining information about us or our products and Services, when you participate in activities on the Website or otherwise when you contact us.</p>
+                
+                <h2>3. How We Use Your Information</h2>
+                <p>We use personal information collected via our Website for a variety of business purposes described below. We process your personal information for these purposes in reliance on our legitimate business interests, in order to enter into or perform a contract with you, with your consent, and/or for compliance with our legal obligations.</p>
 
-            {/* Content */}
-            <section className="relative py-16 px-4">
-                <div className="max-w-4xl mx-auto space-y-12">
-                    {sections.map((section, index) => (
-                        <ScrollReveal key={index} animation="fade" delay={index * 0.1}>
-                            <div className="bg-surface-800/50 p-8 rounded-3xl border border-white/10 hover:border-white/20 transition-colors">
-                                <div className="flex items-center gap-4 mb-6">
-                                    <div className="bg-white/5 p-3 rounded-xl">
-                                        {section.icon}
-                                    </div>
-                                    <h2 className="text-2xl font-display font-bold text-white">
-                                        {section.title}
-                                    </h2>
-                                </div>
-                                <ul className="space-y-4">
-                                    {section.content.map((item, i) => (
-                                        <li key={i} className="flex items-start gap-3 text-white/70">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-white/30 mt-2 shrink-0" />
-                                            <span>{item}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </ScrollReveal>
-                    ))}
+                <h2>4. Sharing Your Information</h2>
+                <p>We only share information with your consent, to comply with laws, to provide you with services, to protect your rights, or to fulfill business obligations.</p>
 
-                    <div className="text-center pt-12 border-t border-white/10">
-                        <p className="text-white/50 text-sm">
-                            Last updated: November 2025
-                        </p>
-                    </div>
-                </div>
-            </section>
+                <h2>5. Contact Us</h2>
+                <p>If you have questions or comments about this notice, you may email us at info@gokidsplay.co.uk or by post to:<br/><br/>
+                Go Kids Play<br/>
+                310 Kingfield Road<br/>
+                Coventry, CV14LD
+                </p>
+            </div>
         </main>
     );
 }

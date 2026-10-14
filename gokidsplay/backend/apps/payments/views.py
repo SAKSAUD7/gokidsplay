@@ -143,7 +143,7 @@ def verify_payment(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        # If order_id is a SpinPin reference (SP-...), look up the actual checkout ID
+        # If order_id is a Go Kids Play reference (SP-...), look up the actual checkout ID
         if order_id.startswith('SP-'):
             from .models import Payment
             from django.db.models import Q

@@ -1,4 +1,4 @@
-# PARTY BOOKING FLOW — SpinPin Platform
+# PARTY BOOKING FLOW — Go Kids Play Platform
 ## Complete End-to-End Documentation
 
 ---

@@ -5,7 +5,7 @@ django.setup()
 
 from django.db import connection
 
-BASE = '/images/spinpin'
+BASE = '/images/Go Kids Play'
 
 SECTION_IMGS = [
     ('home',        'hero',    'unnamed (1).webp'),

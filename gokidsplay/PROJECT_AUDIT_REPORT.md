@@ -1,12 +1,12 @@
-# 🚀 SpinPin Complete Project Audit Report
+# 🚀 Go Kids Play Complete Project Audit Report
 
-I have conducted a comprehensive, top-to-bottom technical audit of the entire SpinPin project, including the frontend UI, backend systems, database architecture, third-party integrations, and Azure deployment pipeline. 
+I have conducted a comprehensive, top-to-bottom technical audit of the entire Go Kids Play project, including the frontend UI, backend systems, database architecture, third-party integrations, and Azure deployment pipeline. 
 
 Overall, the codebase is in **excellent shape** and completely production-ready. Below is the detailed breakdown of the current system health.
 
 ### 1. System Infrastructure & Deployment
-- **✅ Azure CI/CD Pipeline:** GitHub Actions are correctly configured for both `spinpin-frontend` and `spinpin-backend`. Deployments are fully automated.
-- **✅ SSL & Security:** HTTPS is enforced. CORS and CSRF trusted origins are strictly bound to `spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net` and `spinpin.co.uk`.
+- **✅ Azure CI/CD Pipeline:** GitHub Actions are correctly configured for both `gokidsplay-frontend` and `gokidsplay-backend`. Deployments are fully automated.
+- **✅ SSL & Security:** HTTPS is enforced. CORS and CSRF trusted origins are strictly bound to `gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net` and `gokidsplay.co.uk`.
 - **✅ Media Storage:** Azure Blob Storage is fully configured for file uploads, ensuring images are persisted across backend container restarts.
 - **⚠️ Database Migration (Future-Proofing):** The backend is currently running on `db.sqlite3` stored on a persistent Azure volume (`/home/data`). While this works flawlessly for low-to-medium traffic, for a busy commercial venue, we should eventually consider migrating this to a managed **Azure Database for PostgreSQL** to ensure high availability and prevent database locking during heavy concurrent bookings.
 

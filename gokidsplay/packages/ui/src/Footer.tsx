@@ -44,8 +44,8 @@ export const Footer = ({ settings, socialLinks = [] }: { settings?: any, socialL
                     <div className="lg:col-span-2">
                         <Link href="/" className="inline-block mb-4">
                             <img
-                                src="/spinpin-logo.png"
-                                alt="SpinPin"
+                                src="/gokidsplay-logo.png"
+                                alt="Go Kids Play"
                                 className="h-16 w-auto drop-shadow-neon-blue"
                             />
                         </Link>

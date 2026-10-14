@@ -1,45 +1,35 @@
-"use server";
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { fetchAPI } from "../lib/server-api";
-import { requirePermission } from "../lib/admin-auth";
-import { logActivity } from "../lib/audit-log";
-import { revalidatePath } from "next/cache";
-import { transformCmsItem } from "../lib/transformers";
-
-export async function getPages() {
-    // Public access allowed
-    const res = await fetchAPI("/cms/pages/");
-    if (!res || !res.ok) return [];
-    const data = await res.json();
-    return data.map(transformCmsItem);
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[pages]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[pages] error:', e); return null; }
 }
 
-export async function getPage(slug: string) {
-    // Public access allowed
-    const res = await fetchAPI(`/cms/pages/${slug}/`);
-    if (!res || !res.ok) return null;
-    const data = await res.json();
-    return transformCmsItem(data);
+function getToken() {
+    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
 }
 
-export async function updatePage(slug: string, data: any) {
-    await requirePermission('cms', 'write');
+export async function getCmsPages() {
+    const data = await sf(`${BASE}/cms/pages/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
+}
 
-    const res = await fetchAPI(`/cms/pages/${slug}/`, {
-        method: "PATCH",
-        body: JSON.stringify(data)
+export async function getCmsPage(slug: string) {
+    const data = await sf(`${BASE}/cms/pages/?slug=${slug}`);
+    if (!data) return null;
+    const list = Array.isArray(data) ? data : (data.results || []);
+    return list.find((p: any) => p.slug === slug) || null;
+}
+
+export async function updateCmsPage(id: number, data: any) {
+    return sf(`${BASE}/cms/pages/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+        body: JSON.stringify(data),
     });
-
-    if (!res || !res.ok) return { success: false };
-
-    await logActivity({
-        action: 'UPDATE',
-        entity: 'PAGE',
-        entityId: slug,
-        details: { after: data }
-    });
-
-    revalidatePath('/admin/cms');
-    revalidatePath(`/admin/cms/${slug}`);
-    return { success: true };
 }

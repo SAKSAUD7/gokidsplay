@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 (
                     "empty_state_subtitle",
                     models.CharField(
-                        default="Book your first session at Spin Pin!", max_length=255
+                        default="Book your first session at Go Kids Play!", max_length=255
                     ),
                 ),
                 (

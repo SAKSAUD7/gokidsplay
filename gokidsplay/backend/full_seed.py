@@ -1,5 +1,5 @@
 """
-Full SpinPin database seed — run from backend directory:
+Full Go Kids Play database seed — run from backend directory:
   python full_seed.py
 """
 import os
@@ -23,7 +23,7 @@ from apps.cms.models import (
     Activity, Banner, PricingPlan, PageSection, StatCard
 )
 
-print("Starting SpinPin full DB seed...")
+print("Starting Go Kids Play full DB seed...")
 
 # 1. Session Booking Config
 print("1. Seeding SessionBookingConfig...")
@@ -86,16 +86,16 @@ print("3. Seeding ContactInfo...")
 ContactInfo.objects.all().delete()
 contacts = [
     ContactInfo(key="phone", label="Call Us", value="07349 110 865", category="PHONE", link="tel:07349110865"),
-    ContactInfo(key="email", label="Email Us", value="info@spinpin.co.uk", category="EMAIL", link="mailto:info@spinpin.co.uk"),
+    ContactInfo(key="email", label="Email Us", value="info@gokidsplay.co.uk", category="EMAIL", link="mailto:info@gokidsplay.co.uk"),
     ContactInfo(key="address", label="Address", value="Ramdoot House, First Floor - 2/3 Navigation Street, Leicester, LE1 3UR", category="ADDRESS", link="https://maps.google.com/maps?q=Navigation+Street+Leicester"),
     ContactInfo(key="hours_mon", label="Monday", value="CLOSED", category="HOURS"),
     ContactInfo(key="hours_tue_thu", label="Tue - Thu", value="14:00 - 22:00", category="HOURS"),
     ContactInfo(key="hours_fri", label="Friday", value="12:00 - 22:00", category="HOURS"),
     ContactInfo(key="hours_sat", label="Saturday", value="12:00 - 23:00", category="HOURS"),
     ContactInfo(key="hours_sun", label="Sunday", value="12:00 - 22:00", category="HOURS"),
-    ContactInfo(key="social_fb", label="Facebook", value="Spin Pin Leicester", category="SOCIAL", link="https://www.facebook.com/profile.php?id=61572375597421"),
-    ContactInfo(key="social_ig", label="Instagram", value="@spinpinleicester", category="SOCIAL", link="https://www.instagram.com/spinpinleicester"),
-    ContactInfo(key="social_tt", label="TikTok", value="@spinpinleicester", category="SOCIAL", link="https://www.tiktok.com/@spinpinleicester"),
+    ContactInfo(key="social_fb", label="Facebook", value="Go Kids Play Leicester", category="SOCIAL", link="https://www.facebook.com/profile.php?id=61572375597421"),
+    ContactInfo(key="social_ig", label="Instagram", value="@gokidsplayleicester", category="SOCIAL", link="https://www.instagram.com/gokidsplayleicester"),
+    ContactInfo(key="social_tt", label="TikTok", value="@gokidsplayleicester", category="SOCIAL", link="https://www.tiktok.com/@gokidsplayleicester"),
 ]
 ContactInfo.objects.bulk_create(contacts)
 print(f"   {len(contacts)} ContactInfo entries created")
@@ -107,22 +107,22 @@ activities = [
     Activity(
         name="Roller Skating",
         slug="roller-skating",
-        description="Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family. Whether you are a first-timer or a seasoned skater, our spacious rink caters to all abilities.",
+        description="Roller skating at Go Kids Play Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family. Whether you are a first-timer or a seasoned skater, our spacious rink caters to all abilities.",
         short_description="Experience Leicester's First Roller Skating Rink. Fun for all ages!",
         active=True,
     ),
     Activity(
         name="Ten Pin Bowling",
         slug="ten-pin-bowling",
-        description="Bowling at Spin Pin is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre. With bumpers available for younger players and an automatic scoring system, it is perfect for competitive fun with friends and family.",
+        description="Bowling at Go Kids Play is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre. With bumpers available for younger players and an automatic scoring system, it is perfect for competitive fun with friends and family.",
         short_description="Strike it big in our ten pin bowling lanes. Fun for everyone!",
         active=True,
     ),
     Activity(
         name="Arcade Games",
         slug="arcade-games",
-        description="Step into Spin Pin Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between. From redemption machines to racing simulators, air hockey, basketball, and VR experiences - there is something for everyone. Purchase token packs and win prizes at the redemption counter.",
-        short_description="Level Up at Spin Pin! Classic hits, modern gaming, and VR.",
+        description="Step into Go Kids Play Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between. From redemption machines to racing simulators, air hockey, basketball, and VR experiences - there is something for everyone. Purchase token packs and win prizes at the redemption counter.",
+        short_description="Level Up at Go Kids Play! Classic hits, modern gaming, and VR.",
         active=True,
     ),
 ]
@@ -155,13 +155,13 @@ try:
         page="home",
         section_key="hero",
         defaults={
-            "title": "Welcome to Spin Pin",
+            "title": "Welcome to Go Kids Play",
             "content": "Leicester's ultimate entertainment venue. Roller skating, ten pin bowling, and arcade games all under one roof.",
             "active": True,
         }
     )
     if not created:
-        hero.title = "Welcome to Spin Pin"
+        hero.title = "Welcome to Go Kids Play"
         hero.content = "Leicester's ultimate entertainment venue. Roller skating, ten pin bowling, and arcade games all under one roof."
         hero.active = True
         hero.save()
@@ -185,5 +185,5 @@ except Exception as e:
     print("   StatCards skipped:", e)
 
 print("")
-print("SpinPin DB seed complete!")
+print("Go Kids Play DB seed complete!")
 print("Admin: http://localhost:9000/django-admin/")

@@ -1,5 +1,5 @@
 """
-Seed all legal documents for the SpinPin Guidelines page.
+Seed all legal documents for the Go Kids Play Guidelines page.
 Run with:
     python manage.py shell < seed_legal_documents.py
 
@@ -14,15 +14,15 @@ LEGAL_DOCS = [
     {
         "document_type": "TERMS",
         "title": "Terms & Conditions",
-        "intro": "Please read these terms carefully before visiting Spin Pin Leicester.",
+        "intro": "Please read these terms carefully before visiting Go Kids Play Leicester.",
         "sections": [
             {
                 "title": "General Rules",
-                "content": "• Only paid and authorised members of public are allowed into our premises. SpinPin reserves the right to refuse entry; you may be asked to leave for noncompliance of the rules.\n• In the interest of safety you may be refused entry if found under the influence of alcohol or drugs.\n• Adults must remain on the premises and supervise the child/children under their care at all times.\n• Paid parking available on site. Pay at reception and enter your vehicle registration.\n• We operate a no-refund policy after 10 minutes of admission.\n• We operate no compensation / refund policy for unavailability of our activity.\n• Our premises and all activities are subject to availability and safety checks. The management reserves the right to close the premises or any activity at any time without prior notice.\n• Please inform us if you or your child has any sort of accident, however minor – one of our qualified first aiders can assess/attend to the injury.\n• We accept no liability for the loss or damage to any valuables.\n• Children and adults must not run around the area.\n• Children and adults must not skate on the carpeted area, arcade, or bowling area.\n• Skates must not be worn in the toilets, bowling or arcade area.\n• We have a zero-tolerance policy to all forms of anti-social behaviour. This includes: bullying, fighting, any form of aggressive behaviour, or any other type of behaviour deemed to be unsuitable towards SpinPin staff, management, or other members of the public. You may be asked to leave following noncompliance and management reserve the right to enforce total bans.\n• You must not carry any sharp objects or weapons into our premises and it is forbidden to bring or consume alcohol or drugs; such items will be confiscated and you will be removed from the premises immediately. Where appropriate, we will contact the police."
+                "content": "• Only paid and authorised members of public are allowed into our premises. Go Kids Play reserves the right to refuse entry; you may be asked to leave for noncompliance of the rules.\n• In the interest of safety you may be refused entry if found under the influence of alcohol or drugs.\n• Adults must remain on the premises and supervise the child/children under their care at all times.\n• Paid parking available on site. Pay at reception and enter your vehicle registration.\n• We operate a no-refund policy after 10 minutes of admission.\n• We operate no compensation / refund policy for unavailability of our activity.\n• Our premises and all activities are subject to availability and safety checks. The management reserves the right to close the premises or any activity at any time without prior notice.\n• Please inform us if you or your child has any sort of accident, however minor – one of our qualified first aiders can assess/attend to the injury.\n• We accept no liability for the loss or damage to any valuables.\n• Children and adults must not run around the area.\n• Children and adults must not skate on the carpeted area, arcade, or bowling area.\n• Skates must not be worn in the toilets, bowling or arcade area.\n• We have a zero-tolerance policy to all forms of anti-social behaviour. This includes: bullying, fighting, any form of aggressive behaviour, or any other type of behaviour deemed to be unsuitable towards Go Kids Play staff, management, or other members of the public. You may be asked to leave following noncompliance and management reserve the right to enforce total bans.\n• You must not carry any sharp objects or weapons into our premises and it is forbidden to bring or consume alcohol or drugs; such items will be confiscated and you will be removed from the premises immediately. Where appropriate, we will contact the police."
             },
             {
                 "title": "Food & Drinks",
-                "content": "• Only food and drinks purchased at SpinPin can be consumed on the premises.\n• Waiting time for food during our peak periods can be up to 45 minutes.\n• No food or drinks are allowed in the skating area."
+                "content": "• Only food and drinks purchased at Go Kids Play can be consumed on the premises.\n• Waiting time for food during our peak periods can be up to 45 minutes.\n• No food or drinks are allowed in the skating area."
             },
             {
                 "title": "Health & Safety",
@@ -34,11 +34,11 @@ LEGAL_DOCS = [
             },
             {
                 "title": "Assumption of Risk",
-                "content": "By participating in roller skating activities at Spin Pin, I voluntarily assume all risks associated with these activities, whether known or unknown, foreseeable or unforeseeable, including injury to myself or others, and damage to property. I am fully responsible for my actions while participating and acknowledge that I am free to stop skating at any time if I feel unsafe or uncomfortable."
+                "content": "By participating in roller skating activities at Go Kids Play, I voluntarily assume all risks associated with these activities, whether known or unknown, foreseeable or unforeseeable, including injury to myself or others, and damage to property. I am fully responsible for my actions while participating and acknowledge that I am free to stop skating at any time if I feel unsafe or uncomfortable."
             },
             {
                 "title": "Waiver and Release",
-                "content": "In consideration for being permitted to participate in roller skating and related activities at Spin Pin, I hereby release, discharge, and agree to hold harmless Spin Pin, its owners, employees, agents, contractors, volunteers, and affiliates from any and all claims, demands, causes of action, or liabilities for personal injury, death, or property damage arising out of my participation in roller skating activities."
+                "content": "In consideration for being permitted to participate in roller skating and related activities at Go Kids Play, I hereby release, discharge, and agree to hold harmless Go Kids Play, its owners, employees, agents, contractors, volunteers, and affiliates from any and all claims, demands, causes of action, or liabilities for personal injury, death, or property damage arising out of my participation in roller skating activities."
             },
             {
                 "title": "Health and Safety (Waiver)",
@@ -46,11 +46,11 @@ LEGAL_DOCS = [
             },
             {
                 "title": "Compliance with Venue Rules",
-                "content": "I agree to follow all posted rules and regulations of Spin Pin and to comply with any instructions given by the staff or personnel. I understand that failure to adhere to these rules or behave in an unsafe or disruptive manner may result in my removal from the venue without refund."
+                "content": "I agree to follow all posted rules and regulations of Go Kids Play and to comply with any instructions given by the staff or personnel. I understand that failure to adhere to these rules or behave in an unsafe or disruptive manner may result in my removal from the venue without refund."
             },
             {
                 "title": "Photo and Video Consent",
-                "content": "I grant permission to Spin Pin to take photos and/or video recordings of my participation in roller skating activities, which may be used for promotional, marketing, or other business purposes. I waive any right to compensation or royalties regarding such use."
+                "content": "I grant permission to Go Kids Play to take photos and/or video recordings of my participation in roller skating activities, which may be used for promotional, marketing, or other business purposes. I waive any right to compensation or royalties regarding such use."
             },
             {
                 "title": "Minors",
@@ -65,7 +65,7 @@ LEGAL_DOCS = [
     {
         "document_type": "PRIVACY",
         "title": "Privacy Policy",
-        "intro": "Spin Pin Limited is the owner and operator of this website. This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site. By visiting our website you are accepting and consenting to the practices described in this policy.\n\nFor the purpose of the Data Protection Act 1998 (the Act), the data controller is Spin Pin Limited, a Company Registered address 21 High View Close, Hamilton, Leicester, Leicestershire LE4 9LJ.",
+        "intro": "Go Kids Play Limited is the owner and operator of this website. This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site. By visiting our website you are accepting and consenting to the practices described in this policy.\n\nFor the purpose of the Data Protection Act 1998 (the Act), the data controller is Go Kids Play Limited, a Company Registered address 21 High View Close, Hamilton, Leicester, Leicestershire LE4 9LJ.",
         "sections": [
             {
                 "title": "Collection Of Information",
@@ -85,7 +85,7 @@ LEGAL_DOCS = [
             },
             {
                 "title": "Disclosure Of Information",
-                "content": "We may share your personal information with any member of our group, as defined in section 1159 of the UK Companies Act 2006.\n\nWe may share your information with selected third parties including:\n• Advertisers and advertising networks that require the data to select and serve relevant adverts to you and others.\n• Business partners, suppliers and sub-contractors for the performance of any contract we enter into with you.\n• Analytics and search engine providers that assist us in the improvement and optimisation of our site.\n\nWe may disclose your personal information to third parties if we are under a duty to disclose or share your personal data in order to comply with any legal obligation, or in order to enforce or apply our Terms and Conditions and other agreements; or to protect the rights, property, or safety of Spin Pin Ltd, our customers, or others."
+                "content": "We may share your personal information with any member of our group, as defined in section 1159 of the UK Companies Act 2006.\n\nWe may share your information with selected third parties including:\n• Advertisers and advertising networks that require the data to select and serve relevant adverts to you and others.\n• Business partners, suppliers and sub-contractors for the performance of any contract we enter into with you.\n• Analytics and search engine providers that assist us in the improvement and optimisation of our site.\n\nWe may disclose your personal information to third parties if we are under a duty to disclose or share your personal data in order to comply with any legal obligation, or in order to enforce or apply our Terms and Conditions and other agreements; or to protect the rights, property, or safety of Go Kids Play Ltd, our customers, or others."
             },
             {
                 "title": "Storing Of Information",
@@ -126,7 +126,7 @@ LEGAL_DOCS = [
         "sections": [
             {
                 "title": "Your Data Rights",
-                "content": "You have the right to ask us not to process your personal data for marketing purposes or for the use of authorised third party purposes.\n\nYou can exercise your right to prevent such processing at any time by contacting us at info@spinpin.co.uk or by contacting us through the contact page on this website."
+                "content": "You have the right to ask us not to process your personal data for marketing purposes or for the use of authorised third party purposes.\n\nYou can exercise your right to prevent such processing at any time by contacting us at info@gokidsplay.co.uk or by contacting us through the contact page on this website."
             },
         ],
     },

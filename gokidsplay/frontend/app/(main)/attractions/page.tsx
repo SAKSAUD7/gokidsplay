@@ -7,9 +7,8 @@ import { getAttractionVideo } from "../../actions/attraction-video";
 import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
-    "Ten Pin Bowling, Roller Skating & Arcade Games Leicester",
-    "Enjoy ten pin bowling, Leicester's first roller skating rink, and the best arcade games at Go Kids Play Leicester! Play on top lanes, compete with friends, and experience the best entertainment in Leicester city centre.",
-    true
+    "Our Attractions",
+    "Explore all the amazing attractions at Go Kids Play Coventry — Soft Play, Laser Arena, Go Karts, Inflatable Park and more. Fun for all ages, open weekends and school holidays."
 );
 
 export default async function AttractionsPage() {

@@ -1,6 +1,6 @@
-#  spinpin- Management System
+# Go Kids Play Management System
 
-A comprehensive web-based management system for Ninja Inflatable Park, featuring session bookings, party bookings, waiver management, and a full CMS.
+A comprehensive web-based management system for Go Kids Play Coventry, featuring session bookings, party bookings, waiver management, and a full CMS.
 
 ## 🚀 Tech Stack
 
@@ -33,7 +33,7 @@ A comprehensive web-based management system for Ninja Inflatable Park, featuring
 This is a **monorepo** managed with **Turborepo**, containing the frontend, backend, and shared packages.
 
 ```
-ninjainflatablepark-4/
+gokidsplay/
 ├── backend/                 # Django backend
 │   ├── apps/
 │   │   ├── bookings/       # Session & party bookings
@@ -76,7 +76,7 @@ ninjainflatablepark-4/
 ### 1. Clone Repository
 ```bash
 git clone <repository-url>
-cd ninjainflatablepark-4
+cd gokidsplay
 ```
 
 ### 2. Backend Setup
@@ -365,13 +365,13 @@ For issues or questions:
 
 ## 📄 License
 
-Proprietary - Ninja Inflatable Park
+Proprietary - Go Kids Play
 
 ---
 
 ## 👥 Credits
 
-**Developed for**: Ninja Inflatable Park  
+**Developed for**: Go Kids Play  
 **Technology**: Next.js, Django, React, PostgreSQL  
 **Version**: 1.0.0
 

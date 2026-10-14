@@ -3,14 +3,14 @@ import re
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), 'frontend')
 
-# Order matters: we want to replace Spin Pin before SpinPin
+# Order matters: we want to replace Go Kids Play before Go Kids Play
 REPLACEMENTS = [
     (r'Spin\s*Pin', 'Go Kids Play'),
-    (r'SpinPin', 'GoKidsPlay'),
-    (r'spinpin', 'gokidsplay'),
-    (r'spin-pin', 'gokidsplay'),
+    (r'Go Kids Play', 'GoKidsPlay'),
+    (r'Go Kids Play', 'gokidsplay'),
+    (r'Go Kids Play', 'gokidsplay'),
     (r'SPIN\s*PIN', 'GO KIDS PLAY'),
-    (r'SPINPIN', 'GOKIDSPLAY')
+    (r'Go Kids Play', 'GOKIDSPLAY')
 ]
 
 def process_file(filepath):

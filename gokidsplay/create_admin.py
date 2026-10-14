@@ -12,7 +12,7 @@ from django.contrib.auth import get_user_model
 
 def create_admin_user():
     User = get_user_model()
-    email = 'admin@spinpin.com'
+    email = 'admin@Go Kids Play.com'
     password = 'admin123'
     name = 'Super Admin'
 

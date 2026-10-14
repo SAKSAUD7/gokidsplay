@@ -1,7 +1,7 @@
 """Fix corrupted emoji/special chars in BookingWizard.tsx"""
 import re
 
-path = r'c:\Users\saksa\OneDrive\Desktop\spinpin\spinpin\frontend\components\BookingWizard.tsx'
+path = r'c:\Users\saksa\OneDrive\Desktop\Go Kids Play\Go Kids Play\frontend\components\BookingWizard.tsx'
 
 with open(path, 'rb') as f:
     raw = f.read()

@@ -19,8 +19,8 @@ from apps.cms.models import (
     LegalDocument, Banner, PartyPackage, PageSection, StatCard
 )
 
-def seed_spinpin_data():
-    print("🚀 Starting SpinPin Data Seeding...")
+def seed_gokidsplay_data():
+    print("🚀 Starting Go Kids Play Data Seeding...")
 
     # 1. Activities
     print("Creating Activities...")
@@ -31,7 +31,7 @@ def seed_spinpin_data():
         Activity(
             name="Roller Skating",
             slug="roller-skating",
-            description="Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family.",
+            description="Roller skating at Go Kids Play Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family.",
             short_description="Experience Leicester's First Roller Skating Rink. Fun for all ages!",
             image_url="/assets/images/roller-skating.jpg", 
             why_choose_us="First Roller Skating Rink in Leicester. Perfect for Parties. Central Location. Family-Friendly Fun.",
@@ -40,7 +40,7 @@ def seed_spinpin_data():
         Activity(
             name="Ten Pin Bowling",
             slug="ten-pin-bowling",
-            description="Bowling at Spin Pin is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre.",
+            description="Bowling at Go Kids Play is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre.",
             short_description="Strike big in our ten pin bowling lanes. Fun for everyone!",
             image_url="/assets/images/bowling.jpg", 
             why_choose_us="Ten Pin Bowling Leicester. Central Location. Perfect for Groups. Kids and Family Friendly.",
@@ -49,8 +49,8 @@ def seed_spinpin_data():
         Activity(
             name="Arcade Games",
             slug="arcade-games",
-            description="Step into Spin Pin Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between.",
-            short_description="Level Up at Spin Pin! Classic hits, modern gaming, and VR.",
+            description="Step into Go Kids Play Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between.",
+            short_description="Level Up at Go Kids Play! Classic hits, modern gaming, and VR.",
             image_url="/assets/images/arcade.jpg", 
             why_choose_us="Arcade Leicester. All Ages Welcome. Contactless. Indoor Fun, Rain or Shine.",
             what_to_expect="Dozens of machines including racing, shooters, claw games, air hockey, basketball, and VR Arcade Games.",
@@ -137,26 +137,26 @@ def seed_spinpin_data():
     
     contacts = [
         ContactInfo(key="phone", label="Call Us", value="07349 110 865", category="PHONE", link="tel:07349110865"),
-        ContactInfo(key="email", label="Email Us", value="info@spinpin.co.uk", category="EMAIL", link="mailto:info@spinpin.co.uk"),
+        ContactInfo(key="email", label="Email Us", value="info@gokidsplay.co.uk", category="EMAIL", link="mailto:info@gokidsplay.co.uk"),
         ContactInfo(key="address", label="Address", value="Ramdoot House, First Floor - 2/3 Navigation Street, Leicester, LE13UR", category="ADDRESS", link="https://maps.google.com"),
         ContactInfo(key="hours_tue_fri", label="Tue - Fri", value="14:00 - 22:00", category="HOURS"),
         ContactInfo(key="hours_sat", label="Saturday", value="12:00 - 23:00", category="HOURS"),
         ContactInfo(key="hours_sun", label="Sunday", value="12:00 - 22:00", category="HOURS"),
-        ContactInfo(key="social_fb", label="Facebook", value="Spin Pin Leicester", category="SOCIAL", link="https://www.facebook.com/profile.php?id=61572375597421"),
-        ContactInfo(key="social_ig", label="Instagram", value="@spinpinleicester", category="SOCIAL", link="https://www.instagram.com/spinpinleicester"),
+        ContactInfo(key="social_fb", label="Facebook", value="Go Kids Play Leicester", category="SOCIAL", link="https://www.facebook.com/profile.php?id=61572375597421"),
+        ContactInfo(key="social_ig", label="Instagram", value="@gokidsplayleicester", category="SOCIAL", link="https://www.instagram.com/gokidsplayleicester"),
     ]
     ContactInfo.objects.bulk_create(contacts)
     print("✅ Contact Info updated.")
 
     if not Banner.objects.exists():
         Banner.objects.create(
-            title="Welcome to Spin Pin",
+            title="Welcome to Go Kids Play",
             image_url="/assets/images/hero_bg.jpg",
             link="/session-booking/information",
             active=True
         )
 
-    print("✅ SpinPin Data Seeding Complete!")
+    print("✅ Go Kids Play Data Seeding Complete!")
 
 if __name__ == "__main__":
-    seed_spinpin_data()
+    seed_gokidsplay_data()

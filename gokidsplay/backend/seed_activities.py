@@ -19,7 +19,7 @@ ACTIVITY_DATA = [
             "• Family-Friendly Fun — We welcome kids, teens, and adults, making it the ideal spot for family days out or group activities."
         ),
         "what_to_expect": (
-            "When you visit Spin Pin's roller rink, you are in for an exciting experience:\n\n"
+            "When you visit Go Kids Play's roller rink, you are in for an exciting experience:\n\n"
             "• Spacious indoor skating rink with quality rental skates\n"
             "• Music and lights to boost the fun atmosphere\n"
             "• Friendly team ready to assist beginners and kids\n"
@@ -28,7 +28,7 @@ ACTIVITY_DATA = [
             "We focus on creating a roller skating experience that is safe, fun, and memorable for all."
         ),
         "location_info": (
-            "Spin Pin is located just minutes from Leicester's city centre, with great public transport links and parking available on site. "
+            "Go Kids Play is located just minutes from Leicester's city centre, with great public transport links and parking available on site. "
             "Ramdoot House, First Floor – 2/3 Navigation Street, Leicester, LE1 3UR."
         ),
     },
@@ -42,7 +42,7 @@ ACTIVITY_DATA = [
             "• Kids and Family Friendly — Our bumper lanes, lighter balls, and soft seating make bowling accessible and fun for even the youngest players."
         ),
         "what_to_expect": (
-            "When you visit Spin Pin, you will get more than just bowling:\n\n"
+            "When you visit Go Kids Play, you will get more than just bowling:\n\n"
             "• Fully equipped lanes with automatic scoring\n"
             "• Friendly staff ready to help beginners and families\n"
             "• Food and drink options available on site\n"
@@ -64,14 +64,14 @@ ACTIVITY_DATA = [
             "• Indoor Fun, Rain or Shine — A go-to spot when you want proper entertainment without worrying about the weather."
         ),
         "what_to_expect": (
-            "Spin Pin's arcade in Leicester is set up to give you that old school feel without feeling outdated. Here is what you will find inside:\n\n"
+            "Go Kids Play's arcade in Leicester is set up to give you that old school feel without feeling outdated. Here is what you will find inside:\n\n"
             "• Dozens of machines including racing, shooters, claw games, air hockey, basketball, and more\n"
             "• Neon lights, immersive sounds, and a buzzing atmosphere\n"
             "• VR Arcade Games\n\n"
             "Whether you are aiming for the prize counter or just here for the fun, our Leicester arcade has something that will keep you coming back."
         ),
         "location_info": (
-            "Spin Pin Arcade is right in the heart of Leicester city centre. "
+            "Go Kids Play Arcade is right in the heart of Leicester city centre. "
             "Ramdoot House, First Floor – 2/3 Navigation Street, Leicester, LE1 3UR."
         ),
     },

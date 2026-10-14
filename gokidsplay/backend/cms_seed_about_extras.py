@@ -1,5 +1,5 @@
 """
-SpinPin CMS - Timeline Items, Value Items, Booking Information, & Legal Docs seed
+Go Kids Play CMS - Timeline Items, Value Items, Booking Information, & Legal Docs seed
 Run: python cms_seed_about_extras.py
 """
 import os, django
@@ -26,7 +26,7 @@ with transaction.atomic():
              "description": "Began major refurbishment and fit-out of Ramdoot House. Installing bowling lanes, the skating rink, and 100+ arcade machines.",
              "order": 3},
             {"year": "2022", "title": "Grand Opening",
-             "description": "Spin Pin Leicester opened its doors! Hundreds of visitors experienced roller skating, bowling and arcade games for the first time at our venue.",
+             "description": "Go Kids Play Leicester opened its doors! Hundreds of visitors experienced roller skating, bowling and arcade games for the first time at our venue.",
              "order": 4},
             {"year": "2023", "title": "Growing With Leicester",
              "description": "Became Leicester's most-reviewed entertainment venue. Added VR gaming experiences and expanded our arcade with over 100 machines.",
@@ -35,7 +35,7 @@ with transaction.atomic():
              "description": "Launched school trip packages, corporate events, and birthday party packages. Hosted over 500+ parties and group events.",
              "order": 6},
             {"year": "2025", "title": "Going From Strength to Strength",
-             "description": "Continued expanding with new improvements, a refreshed party menu, and more — cementing Spin Pin as Leicester's #1 family entertainment destination.",
+             "description": "Continued expanding with new improvements, a refreshed party menu, and more — cementing Go Kids Play as Leicester's #1 family entertainment destination.",
              "order": 7},
         ]
         for t in timeline:
@@ -84,7 +84,7 @@ with transaction.atomic():
             booking_type="SESSION",
             title="Book a Session",
             subtitle="Roller Skating · Ten Pin Bowling · Arcade Games",
-            content="Walk-ins are always welcome at Spin Pin Leicester! However, we strongly recommend booking online — especially for weekends and school holidays — to guarantee your spot. Book in advance and save time at the venue.",
+            content="Walk-ins are always welcome at Go Kids Play Leicester! However, we strongly recommend booking online — especially for weekends and school holidays — to guarantee your spot. Book in advance and save time at the venue.",
             rules_content="Please arrive 15 minutes before your session. Last entry is 1 hour before closing. Children under 7 must be accompanied by an adult at all times. Safety equipment is highly recommended for all skaters.",
             sessions_info=[
                 {"label": "Term Time (Tue-Fri)", "hours": "2:00 PM – 9:00 PM", "note": "Last entry 8 PM"},
@@ -99,7 +99,7 @@ with transaction.atomic():
             booking_type="PARTY",
             title="Book a Party",
             subtitle="Birthday Parties · School Trips · Corporate Events",
-            content="We love hosting parties at Spin Pin Leicester! Whether it's a birthday bash, school trip, or corporate team event, we have packages to suit every occasion and budget. Get in touch to discuss your requirements and we'll create the perfect experience.",
+            content="We love hosting parties at Go Kids Play Leicester! Whether it's a birthday bash, school trip, or corporate team event, we have packages to suit every occasion and budget. Get in touch to discuss your requirements and we'll create the perfect experience.",
             rules_content="Party bookings require a deposit at the time of booking. Minimum 10 guests for party packages. Final numbers must be confirmed 48 hours before the event. All party guests must sign in at reception. We provide a dedicated party host for all party packages.",
             sessions_info=[
                 {"label": "Booking Lead Time", "hours": "Minimum 2 weeks advance notice", "note": "4+ weeks recommended for weekends"},
@@ -120,52 +120,52 @@ with transaction.atomic():
         for doc_type, title, intro, sections_data in [
             (
                 "TERMS", "Terms & Conditions", 
-                "By visiting and using Spin Pin Leicester, you agree to these terms and conditions. Please read them carefully before your visit.",
+                "By visiting and using Go Kids Play Leicester, you agree to these terms and conditions. Please read them carefully before your visit.",
                 [
                     {"title": "Acceptance of Terms",
-                     "content": "By entering Spin Pin Leicester, you agree to abide by all rules, guidelines, and terms of use as stated. These terms apply to all visitors, regardless of age."},
+                     "content": "By entering Go Kids Play Leicester, you agree to abide by all rules, guidelines, and terms of use as stated. These terms apply to all visitors, regardless of age."},
                     {"title": "Liability Disclaimer",
-                     "content": "Spin Pin Leicester operates a safe venue but cannot accept liability for personal injury, loss, or damage caused by failure to follow posted guidelines or staff instructions. Participation in all activities is at your own risk."},
+                     "content": "Go Kids Play Leicester operates a safe venue but cannot accept liability for personal injury, loss, or damage caused by failure to follow posted guidelines or staff instructions. Participation in all activities is at your own risk."},
                     {"title": "Health & Safety",
                      "content": "Visitors with health conditions should consult their doctor before participating. Pregnant visitors are advised not to participate in roller skating or VR experiences."},
                     {"title": "Booking & Refunds",
                      "content": "Bookings are non-refundable but may be transferred to another date with at least 48 hours' notice. In the event of venue closure, a full refund or rebooking will be offered."},
                     {"title": "Photography",
-                     "content": "Spin Pin may photograph or video record the venue for promotional purposes. By entering the venue you consent to being photographed. Please inform staff if you do not wish to be included."},
+                     "content": "Go Kids Play may photograph or video record the venue for promotional purposes. By entering the venue you consent to being photographed. Please inform staff if you do not wish to be included."},
                     {"title": "Lost Property",
-                     "content": "Spin Pin is not responsible for lost or stolen items. We recommend using our lockers (£2.00) to secure your belongings."},
+                     "content": "Go Kids Play is not responsible for lost or stolen items. We recommend using our lockers (£2.00) to secure your belongings."},
                 ]
             ),
             (
                 "PRIVACY", "Privacy Policy",
-                "Your privacy matters to us. This policy explains how Spin Pin Leicester collects, uses, and protects your personal data.",
+                "Your privacy matters to us. This policy explains how Go Kids Play Leicester collects, uses, and protects your personal data.",
                 [
                     {"title": "Data We Collect",
                      "content": "We collect personal information when you make a booking, contact us, or interact with our website. This may include your name, email address, phone number, and payment details (processed securely via third-party payment providers)."},
                     {"title": "How We Use Your Data",
                      "content": "Your data is used to process bookings, send booking confirmations, respond to enquiries, and improve our services. We do not sell your data to third parties."},
                     {"title": "Data Protection",
-                     "content": "We comply with UK GDPR and the Data Protection Act 2018. Your data is stored securely and accessed only by authorised Spin Pin staff."},
+                     "content": "We comply with UK GDPR and the Data Protection Act 2018. Your data is stored securely and accessed only by authorised Go Kids Play staff."},
                     {"title": "Your Rights",
-                     "content": "You have the right to access, correct, or delete your personal data at any time. Email us at info@spinpin.co.uk to make a data request."},
+                     "content": "You have the right to access, correct, or delete your personal data at any time. Email us at info@gokidsplay.co.uk to make a data request."},
                     {"title": "Contact Us",
-                     "content": "If you have any questions about our privacy policy, please contact us at info@spinpin.co.uk or call 07349110865."},
+                     "content": "If you have any questions about our privacy policy, please contact us at info@gokidsplay.co.uk or call 07349110865."},
                 ]
             ),
             (
                 "WAIVER", "Participant Waiver",
-                "Please read this waiver carefully. All participants must agree to these terms before participating in activities at Spin Pin Leicester.",
+                "Please read this waiver carefully. All participants must agree to these terms before participating in activities at Go Kids Play Leicester.",
                 [
                     {"title": "Acknowledgement of Risk",
                      "content": "I understand that roller skating, bowling, VR, and arcade activities carry inherent risks including the risk of injury. I voluntarily choose to participate knowing these risks."},
                     {"title": "Assumption of Risk",
-                     "content": "I voluntarily assume all risks associated with participation in activities at Spin Pin Leicester, including but not limited to falls, collisions, and equipment-related injuries."},
+                     "content": "I voluntarily assume all risks associated with participation in activities at Go Kids Play Leicester, including but not limited to falls, collisions, and equipment-related injuries."},
                     {"title": "Release of Liability",
-                     "content": "I, on behalf of myself (and any minor children in my care), release Spin Pin Leicester, its owners, employees, and agents from all liability for any injury, loss, or damage sustained during my visit."},
+                     "content": "I, on behalf of myself (and any minor children in my care), release Go Kids Play Leicester, its owners, employees, and agents from all liability for any injury, loss, or damage sustained during my visit."},
                     {"title": "Medical Conditions",
                      "content": "I confirm that I (and any minor children in my care) do not have any medical conditions that would make participation in these activities inappropriate. If unsure, I will consult a doctor before participating."},
                     {"title": "Agreement to Follow Rules",
-                     "content": "I agree to follow all safety rules, guidelines, and staff instructions at all times during my visit to Spin Pin Leicester."},
+                     "content": "I agree to follow all safety rules, guidelines, and staff instructions at all times during my visit to Go Kids Play Leicester."},
                 ]
             ),
         ]:

@@ -32,7 +32,7 @@ class ForceCORSMiddleware:
         if origin:
             response["Access-Control-Allow-Origin"] = origin
         else:
-            response["Access-Control-Allow-Origin"] = "https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net"
+            response["Access-Control-Allow-Origin"] = "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net"
             
         response["Access-Control-Allow-Methods"] = self.ALLOWED_METHODS
         response["Access-Control-Allow-Headers"] = self.ALLOWED_HEADERS

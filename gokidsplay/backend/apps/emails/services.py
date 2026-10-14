@@ -178,8 +178,8 @@ class EmailService:
         from django.conf import settings as django_settings
         import uuid
 
-        from_name = getattr(django_settings, 'EMAIL_SENDER_NAME', 'Spin Pin Leicester')
-        from_email = getattr(django_settings, 'DEFAULT_FROM_EMAIL', 'info@spinpin.co.uk')
+        from_name = getattr(django_settings, 'EMAIL_SENDER_NAME', 'Go Kids Play Coventry')
+        from_email = getattr(django_settings, 'DEFAULT_FROM_EMAIL', 'info@gokidsplay.co.uk')
         from_header = f"{from_name} <{from_email}>"
 
         msg = EmailMultiAlternatives(
@@ -314,7 +314,7 @@ class EmailService:
             email_type='BOOKING_CONFIRMATION',
             recipient_email=booking.email,
             recipient_name=booking.name,
-            subject=f'Your Spin Pin Booking Confirmation',
+            subject=f'Your Go Kids Play Booking Confirmation',
             template_name='emails/booking/session_confirmation.html',
             context=context,
             booking=booking
@@ -348,7 +348,7 @@ class EmailService:
             email_type='POST_VISIT_THANK_YOU',
             recipient_email=booking.email,
             recipient_name=booking.name,
-            subject=f'Thank You for Visiting Spin Pin! ⭐',
+            subject=f'Thank You for Visiting Go Kids Play! ⭐',
             template_name='emails/booking/post_visit_thank_you.html',
             context=context,
             booking=booking
@@ -383,7 +383,7 @@ class EmailService:
             email_type='PARTY_BOOKING_CONFIRMATION',
             recipient_email=party_booking.email,
             recipient_name=party_booking.name,
-            subject=f'Your Spin Pin Party Booking Confirmation',
+            subject=f'Your Go Kids Play Party Booking Confirmation',
             template_name='emails/booking/party_confirmation.html',
             context=context,
             party_booking=party_booking
@@ -405,12 +405,12 @@ class EmailService:
             'subject': contact_message.subject,
         }
         
-        admin_email = "info@spinpin.co.uk"
+        admin_email = "info@gokidsplay.co.uk"
         
         email_log = self.send_email(
             email_type='ADMIN_CONTACT_MESSAGE',
             recipient_email=admin_email,
-            recipient_name="Spin Pin Admin",
+            recipient_name="Go Kids Play Admin",
             subject=f'New Contact Message - {contact_message.subject}',
             template_name='emails/admin/contact_message.html',
             context=context,
@@ -435,7 +435,7 @@ class EmailService:
             email_type='CONTACT_CONFIRMATION',
             recipient_email=contact_message.email,
             recipient_name=contact_message.name,
-            subject='We have received your enquiry - Spin Pin',
+            subject='We have received your enquiry - Go Kids Play',
             template_name='emails/contact_confirmation.html',
             context=context,
             contact_message=contact_message
@@ -471,7 +471,7 @@ class EmailService:
             email_type='WAIVER_CONFIRMATION',
             recipient_email=waiver.email,
             recipient_name=waiver.name,
-            subject=f'Waiver Confirmation - Spin Pin',
+            subject=f'Waiver Confirmation - Go Kids Play',
             template_name='emails/waiver_confirmation.html',
             context=context,
         )

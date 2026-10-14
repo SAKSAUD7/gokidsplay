@@ -74,13 +74,62 @@ class MarketingService:
     
     def send_birthday_batch(self):
         """
-        Birthday automation disabled as it relied on legacy Waivers.
+        Birthday automation: Find PartyBookings from previous years 
+        where the anniversary of the party date is exactly 20 days from today.
+        Send a reminder email to book again.
         """
-        logger.info(f"Birthday Batch skipped (Waivers removed)")
-        pass
+        from apps.bookings.models import PartyBooking
+        today = timezone.now().date()
+        target_date = today + timedelta(days=20)
+        
+        # Find all PartyBookings matching the month and day of target_date
+        # Ensure we only look at bookings from previous years to avoid sending it in the same year they booked.
+        bookings = PartyBooking.objects.filter(
+            date__month=target_date.month,
+            date__day=target_date.day,
+            date__year__lt=target_date.year,
+            booking_status__in=['CONFIRMED', 'COMPLETED']
+        )
+        
+        count = 0
+        for booking in bookings:
+            if not booking.email:
+                continue
+                
+            if self.is_unsubscribed(booking.email):
+                continue
+                
+            # Check if we already sent an email for this specific year
+            if BirthdayEmailTracker.objects.filter(email=booking.email, year=target_date.year).exists():
+                continue
+                
+            self._send_birthday_email(booking, booking.email, booking.name, target_date.year)
+            count += 1
+            
+        logger.info(f"Birthday Batch complete. Sent {count} emails.")
 
-    def _send_birthday_email(self, waiver, email, name, year):
-        pass
+    def _send_birthday_email(self, booking, email, name, year):
+        """Internal helper to send birthday email and track it"""
+        child_name = booking.birthday_child_name or "your child"
+        child_age = f"{booking.birthday_child_age + (year - booking.date.year)}" if booking.birthday_child_age else ""
+        
+        try:
+            email_service.send_transactional_email(
+                to_email=email,
+                subject=f"It's almost {child_name}'s birthday! 🎉",
+                template_name='emails/birthday_reminder.html',
+                context={
+                    'parent_name': name,
+                    'child_name': child_name,
+                    'child_age': child_age,
+                    'unsubscribe_url': self.get_public_unsubscribe_url(email)
+                }
+            )
+            # Log success
+            BirthdayEmailTracker.objects.create(email=email, year=year)
+            logger.info(f"Sent birthday reminder to {email} for {child_name}")
+        except Exception as e:
+            logger.error(f"Failed to send birthday reminder to {email}: {str(e)}")
 
     # ==========================
     # CAMPAIGN SENDING

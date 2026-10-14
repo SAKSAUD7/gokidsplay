@@ -1,6 +1,6 @@
 import os, glob
 
-root = r'c:\Users\saksa\OneDrive\Desktop\spinpin\spinpin\frontend'
+root = r'c:\Users\saksa\OneDrive\Desktop\Go Kids Play\Go Kids Play\frontend'
 files = (
     glob.glob(os.path.join(root, '**', '*.ts'), recursive=True) +
     glob.glob(os.path.join(root, '**', '*.tsx'), recursive=True)
@@ -18,7 +18,7 @@ for f in files:
                 issues.append(('PORT8000', short, line_no, line.strip()))
             elif 'inflatable' in line_l:
                 issues.append(('INFLATABLE', short, line_no, line.strip()))
-            elif "india" in line_l and "spinpin" not in line_l:
+            elif "india" in line_l and "Go Kids Play" not in line_l:
                 issues.append(('INDIA', short, line_no, line.strip()))
             elif 'NIP-' in line:
                 issues.append(('NIP-PREFIX', short, line_no, line.strip()))

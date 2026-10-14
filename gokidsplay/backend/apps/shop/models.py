@@ -39,3 +39,33 @@ class Voucher(models.Model):
     def __str__(self):
         return self.code
 
+class MembershipPlan(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    duration_days = models.IntegerField(default=30, help_text="Duration of membership in days")
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - £{self.price}"
+
+class CustomerMembership(models.Model):
+    customer = models.ForeignKey('bookings.Customer', on_delete=models.CASCADE, related_name='memberships')
+    plan = models.ForeignKey(MembershipPlan, on_delete=models.PROTECT)
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField()
+    is_active = models.BooleanField(default=True)
+    qr_code = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.customer.name} - {self.plan.name} ({self.start_date} to {self.end_date})"
+
+    @property
+    def is_valid(self):
+        from django.utils import timezone
+        return self.is_active and self.start_date <= timezone.now().date() <= self.end_date

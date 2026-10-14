@@ -1,98 +1,43 @@
 'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { fetchAPI } from '../lib/server-api';
-import { revalidatePath } from 'next/cache';
-
-export interface Logo {
-    id: number;
-    name: string;
-    image: string;
-    image_url: string;
-    is_active: boolean;
-    created_at: string;
-    updated_at: string;
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[logos]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[logos] error:', e); return null; }
 }
 
-export async function getLogos(): Promise<Logo[]> {
-    try {
-        const res = await fetchAPI('/core/logos/');
-        if (!res || !res.ok) return [];
-        return await res.json();
-    } catch (error) {
-        console.error('Error fetching logos:', error);
-        return [];
-    }
+export async function getActiveLogo() {
+    const data = await sf(`${BASE}/core/logos/active/`);
+    return data;
 }
 
-export async function getActiveLogo(): Promise<Logo | null> {
-    try {
-        const res = await fetchAPI('/core/logos/active/');
-        if (!res || !res.ok) return null;
-        return await res.json();
-    } catch (error) {
-        console.error('Error fetching active logo:', error);
-        return null;
-    }
+export async function getLogos() {
+    const data = await sf(`${BASE}/core/logos/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
 }
 
-export async function createLogo(formData: FormData) {
+export async function uploadLogo(formData: FormData) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
     try {
-        const res = await fetchAPI('/core/logos/', {
+        const r = await fetch(`${BASE}/core/logos/`, {
             method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData,
-            // Don't set Content-Type header - let browser set it with boundary for multipart
-            headers: undefined
+            cache: 'no-store',
         });
-
-        if (!res || !res.ok) {
-            const error = await res?.json();
-            return { success: false, error: error?.detail || 'Failed to create logo' };
-        }
-
-        revalidatePath('/admin/cms/logos');
-        revalidatePath('/admin/cms');
-        return { success: true };
-    } catch (error) {
-        console.error('Error creating logo:', error);
-        return { success: false, error: 'Failed to create logo' };
-    }
+        if (!r.ok) return null;
+        return r.json();
+    } catch(e) { console.error('[logos upload] error:', e); return null; }
 }
 
 export async function setActiveLogo(id: number) {
-    try {
-        const res = await fetchAPI(`/core/logos/${id}/set_active/`, {
-            method: 'POST'
-        });
-
-        if (!res || !res.ok) {
-            return { success: false, error: 'Failed to set active logo' };
-        }
-
-        revalidatePath('/admin/cms/logos');
-        revalidatePath('/admin/cms');
-        revalidatePath('/');
-        return { success: true };
-    } catch (error) {
-        console.error('Error setting active logo:', error);
-        return { success: false, error: 'Failed to set active logo' };
-    }
-}
-
-export async function deleteLogo(id: number) {
-    try {
-        const res = await fetchAPI(`/core/logos/${id}/`, {
-            method: 'DELETE'
-        });
-
-        if (!res || !res.ok) {
-            return { success: false, error: 'Failed to delete logo' };
-        }
-
-        revalidatePath('/admin/cms/logos');
-        revalidatePath('/admin/cms');
-        return { success: true };
-    } catch (error) {
-        console.error('Error deleting logo:', error);
-        return { success: false, error: 'Failed to delete logo' };
-    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/core/logos/${id}/set_active/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    });
 }

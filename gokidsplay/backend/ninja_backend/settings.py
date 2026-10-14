@@ -50,8 +50,12 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net',
-    'https://spinpin-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net',
+    'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net',
+    'https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net',
+    'http://localhost:5000',
+    'http://localhost:9000',
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:9000',
 ]
 
 
@@ -101,7 +105,7 @@ ROOT_URLCONF = 'ninja_backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -239,8 +243,8 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Spin Pin API',
-    'DESCRIPTION': 'API for Spin Pin - Bowling, Roller Skating & Arcade in Leicester',
+    'TITLE': 'Go Kids Play API',
+    'DESCRIPTION': 'API for Go Kids Play - Bowling, Roller Skating & Arcade in Leicester',
     'VERSION': '1.0.0',
 }
 
@@ -251,18 +255,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5000",
     "http://127.0.0.1:9000",
-    "https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
-    "https://spinpin.co.uk",
-    "https://www.spinpin.co.uk"
+    "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
+    "https://gokidsplay.co.uk",
+    "https://www.gokidsplay.co.uk"
 ]
 # Extend with any environment-provided origins
 CORS_ALLOWED_ORIGINS.extend(get_env_list('FRONTEND_URLS', ''))
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
-    "https://spinpin-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net",
-    "https://spinpin.co.uk",
-    "https://www.spinpin.co.uk"
+    "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
+    "https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net",
+    "https://gokidsplay.co.uk",
+    "https://www.gokidsplay.co.uk"
 ]
 CSRF_TRUSTED_ORIGINS.extend(get_env_list('CORS_ALLOWED_ORIGINS', ''))
 
@@ -324,11 +328,11 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = get_env_bool('EMAIL_USE_TLS', True)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@spinpin.co.uk')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@gokidsplay.co.uk')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
-# Spin Pin sender name
-EMAIL_SENDER_NAME = os.getenv('EMAIL_SENDER_NAME', 'Spin Pin Leicester')
+# Go Kids Play sender name
+EMAIL_SENDER_NAME = os.getenv('EMAIL_SENDER_NAME', 'Go Kids Play Leicester')
 
 # Email retry
 EMAIL_MAX_RETRIES = int(os.getenv('EMAIL_MAX_RETRIES', '3'))
@@ -339,7 +343,7 @@ EMAIL_RETRY_DELAY_MINUTES = int(os.getenv('EMAIL_RETRY_DELAY_MINUTES', '1'))
 # ====================================================
 AZURE_COMMUNICATION_CONNECTION_STRING = os.getenv('AZURE_COMMUNICATION_CONNECTION_STRING', '')
 AZURE_EMAIL_SENDER_ADDRESS = os.getenv('AZURE_EMAIL_SENDER_ADDRESS', 'DoNotReply@838f7a9a-e201-4b80-a0ca-c1c6480f2aec.azurecomm.net')
-AZURE_EMAIL_SENDER_NAME = os.getenv('AZURE_EMAIL_SENDER_NAME', 'Spin Pin')
+AZURE_EMAIL_SENDER_NAME = os.getenv('AZURE_EMAIL_SENDER_NAME', 'Go Kids Play')
 
 # Logging
 LOGGING = {
@@ -366,7 +370,7 @@ LOGGING = {
 PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
 
 # ── SumUp: Roller Skating & Arcade ─────────────────────────────────────
-# Account: SpinPin Ltd
+# Account: Go Kids Play Ltd
 # Used for activity: roller-skating, arcade (and any unknown activity)
 SUMUP_SKATING_API_KEY      = os.getenv('SUMUP_SKATING_API_KEY', '')
 SUMUP_SKATING_MERCHANT_CODE = os.getenv('SUMUP_SKATING_MERCHANT_CODE', '')
@@ -378,13 +382,13 @@ SUMUP_BOWLING_API_KEY      = os.getenv('SUMUP_BOWLING_API_KEY', '')
 SUMUP_BOWLING_MERCHANT_CODE = os.getenv('SUMUP_BOWLING_MERCHANT_CODE', 'M7EN4CMZ')
 
 # Return URL after payment (same for both merchants)
-SUMUP_RETURN_URL = os.getenv('SUMUP_RETURN_URL', 'https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/book/success')
+SUMUP_RETURN_URL = os.getenv('SUMUP_RETURN_URL', 'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/book/success')
 
 # ── Frontend URL (used for redirect URLs, webhooks, etc.) ──────────────────
 # Set FRONTEND_URL env var in Azure to your custom domain once live
 FRONTEND_URL = os.getenv(
     'FRONTEND_URL',
-    'https://spinpin-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net'
+    'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net'
 )
 
 # Legacy single-key fallback (kept for backward compatibility)
@@ -399,3 +403,35 @@ RAZORPAY_KEY_SECRET = os.getenv('RAZORPAY_KEY_SECRET', '')
 ALLOW_PARTIAL_PAYMENTS = False  # Require full payment
 MINIMUM_DEPOSIT_PERCENTAGE = 50  # Not used when ALLOW_PARTIAL_PAYMENTS = False
 
+# ── Security Settings ───────────────────────────────────────────────────
+# These are production-safe defaults. DEBUG=True in .env will relax some of these.
+
+# Session security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SECURE = not DEBUG  # Only HTTPS in production
+
+# CSRF cookie security
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+
+# SSL/HSTS (only in production)
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 63072000  # 2 years
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Password validation hardening
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 10}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]

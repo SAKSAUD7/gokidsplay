@@ -1,30 +1,23 @@
-"use server";
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { fetchAPI } from "../lib/server-api";
-import { requirePermission } from "../lib/admin-auth";
-
-export async function getAuditLogs(filter?: {
-    adminId?: string;
-    entity?: string;
-    action?: string;
-    fromDate?: string;
-    toDate?: string;
-    limit?: number;
-}): Promise<any[]> {
-    await requirePermission('logs', 'read');
-
-    // Note: Django doesn't have AuditLog model yet
-    // This is a placeholder that returns empty array
-    // You would need to create an AuditLog model in Django if you want to persist logs
-    console.log("Audit logs requested with filter:", filter);
-
-    return [];
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[logs]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[logs] error:', e); return null; }
 }
 
-export async function getLogStats(): Promise<any> {
-    return {
-        totalLogs: 0,
-        logsToday: 0,
-        actionsByType: []
-    };
+export async function getLogs(params?: { page?: number; limit?: number; action?: string }) {
+    let url = `${BASE}/core/logs/`;
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.limit) qs.set('limit', String(params.limit));
+    if (params?.action) qs.set('action', params.action);
+    const query = qs.toString();
+    if (query) url += `?${query}`;
+    const data = await sf(url);
+    if (!data) return { results: [], count: 0 };
+    return data;
 }

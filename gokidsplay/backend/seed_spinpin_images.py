@@ -1,28 +1,28 @@
-"""Reseed gallery images, page section images, and activity images with SpinPin photos"""
+"""Reseed gallery images, page section images, and activity images with Go Kids Play photos"""
 import os, django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ninja_backend.settings')
 django.setup()
 
 from django.db import transaction
 
-BASE_URL = "/images/spinpin"
+BASE_URL = "/images/Go Kids Play"
 
 GALLERY = [
-    ("unnamed.webp",      "Spin Pin Leicester Venue",    "Venue",          1),
+    ("unnamed.webp",      "Go Kids Play Leicester Venue",    "Venue",          1),
     ("unnamed (1).webp",  "Roller Skating Rink",         "Roller Skating", 2),
     ("unnamed (2).webp",  "Ten Pin Bowling Lanes",       "Bowling",        3),
     ("unnamed (3).webp",  "Arcade Games Zone",           "Arcade",         4),
     ("unnamed (4).webp",  "Skating Action",              "Roller Skating", 5),
     ("unnamed (5).webp",  "Bowling Fun",                 "Bowling",        6),
     ("unnamed (6).webp",  "Arcade Machines",             "Arcade",         7),
-    ("unnamed (7).webp",  "Spin Pin Group Fun",          "Venue",          8),
+    ("unnamed (7).webp",  "Go Kids Play Group Fun",          "Venue",          8),
     ("unnamed (8).webp",  "Skating Rink Overview",       "Roller Skating", 9),
     ("unnamed (9).webp",  "Bowling Strike",              "Bowling",        10),
     ("unnamed (10).webp", "Arcade Fun",                  "Arcade",         11),
-    ("unnamed (11).webp", "Spin Pin Events",             "Venue",          12),
-    ("unnamed (12).webp", "Spin Pin Night Out",          "Venue",          13),
-    ("2025-04-15.webp",   "Spin Pin Opening Day",        "Venue",          14),
-    ("2025-05-01.webp",   "Spin Pin Bank Holiday",       "Venue",          15),
+    ("unnamed (11).webp", "Go Kids Play Events",             "Venue",          12),
+    ("unnamed (12).webp", "Go Kids Play Night Out",          "Venue",          13),
+    ("2025-04-15.webp",   "Go Kids Play Opening Day",        "Venue",          14),
+    ("2025-05-01.webp",   "Go Kids Play Bank Holiday",       "Venue",          15),
 ]
 
 with transaction.atomic():

@@ -91,8 +91,6 @@ const navigation: NavGroup[] = [
     }
 ];
 
-];
-
 const userMenu: NavItem[] = [
     { name: "My Profile", href: "/admin/profile", icon: "User" },
     { name: "View Site", href: "/", icon: "ExternalLink" },

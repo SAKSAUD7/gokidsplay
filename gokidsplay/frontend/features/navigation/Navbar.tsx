@@ -15,7 +15,8 @@ const navLinks = [
     { href: "/parties", label: "Parties" },
     { href: "/events", label: "Events 🎉" },
     { href: "/pricing", label: "Pricing" },
-    { href: "/guidelines", label: "Guidelines" },
+    { href: "/information", label: "Information" },
+    { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact" },
 ];
 
@@ -39,8 +40,10 @@ export function Navbar({ settings }: { settings?: any }) {
                     const data = await response.json();
                     if (data && data.image_url && typeof data.image_url === 'string' && data.image_url.trim() !== '') {
                         let resolvedUrl = data.image_url.startsWith('http') ? data.image_url : `${baseUrl}${data.image_url}`;
-                        // Force HTTPS — Azure terminates SSL at the load balancer so backend URLs can be http://
-                        resolvedUrl = resolvedUrl.replace(/^http:\/\//i, 'https://');
+                        // Only force HTTPS in production (not localhost)
+                        if (!resolvedUrl.includes('localhost') && !resolvedUrl.includes('127.0.0.1')) {
+                            resolvedUrl = resolvedUrl.replace(/^http:\/\//i, 'https://');
+                        }
                         setLogoUrl(resolvedUrl);
                     }
                     // If no valid image_url, keep the default '/gokidsplay-logo.png'

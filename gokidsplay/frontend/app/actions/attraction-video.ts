@@ -1,40 +1,23 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { fetchAPI, postAPI } from '@/app/lib/server-api';
-
-const ENDPOINT = '/cms/attraction-video/';
-
-export async function getAttractionVideo() {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        const res = await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
-        // The API returns 200 with null if no video, or 200 with object
-        // If res is not ok, standard error handling
-        if (!res || !res.ok) return null;
-
-        // Handle empty response body if API returns 204 or empty
-        const text = await res.text();
-        if (!text) return null;
-
-        return JSON.parse(text);
-    } catch (error) {
-        console.error('Failed to fetch attraction video:', error);
-        return null;
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[attraction-video]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[attraction-video] error:', e); return null; }
 }
 
-export async function updateAttractionVideo(data: any) {
-    try {
-        // We use POST for update/create as defined in backend view
-        const result = await postAPI(ENDPOINT, data);
-        revalidatePath('/attractions');
-        revalidatePath('/admin/cms/attractions');
-        return { success: true, item: result };
-    } catch (error) {
-        console.error('Failed to update attraction video:', error);
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to update attraction video'
-        };
-    }
+export async function getAttractionVideos() {
+    const data = await sf(`${BASE}/cms/attraction-videos/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data.filter((v: any) => v.active !== false) : (data.results || []);
+}
+
+export async function getAttractionVideo(slug: string) {
+    const data = await sf(`${BASE}/cms/attraction-videos/?slug=${slug}`);
+    if (!data) return null;
+    const list = Array.isArray(data) ? data : (data.results || []);
+    return list.find((v: any) => v.slug === slug) || null;
 }

@@ -1,74 +1,48 @@
-﻿'use server';
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { revalidatePath } from 'next/cache';
-import { fetchAPI, postAPI, putAPI, deleteAPI } from '@/app/lib/server-api';
-
-const ENDPOINT = '/cms/activities/';
-
-export async function getActivities() {
+async function sf(url: string, init: RequestInit = {}) {
     try {
-        const res = await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
-        if (!res || !res.ok) return [];
-        return await res.json();
-    } catch (error) {
-        console.error('Failed to fetch activities:', error);
-        return [];
-    }
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[activities]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[activities] error:', e); return null; }
 }
 
-export async function getActivity(id: string) {
-    try {
-        const res = await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
-        if (!res || !res.ok) return null;
-        return await res.json();
-    } catch (error) {
-        console.error(`Failed to fetch activity ${id}:`, error);
-        return null;
-    }
+export async function getActivities() {
+    const data = await sf(`${BASE}/cms/activities/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data : (data.results || []);
+}
+
+export async function getActivity(id: number) {
+    return sf(`${BASE}/cms/activities/${id}/`);
 }
 
 export async function createActivity(data: any) {
-    try {
-        const result = await postAPI(ENDPOINT, data);
-        revalidatePath('/admin/cms/attractions');
-        return { success: true, item: result };
-    } catch (error) {
-        console.error('Failed to create activity:', error);
-        // Return plain object instead of Error instance
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to create activity'
-        };
-    }
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/activities/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
-export async function updateActivity(id: string, data: any) {
-    try {
-        const result = await putAPI(`${ENDPOINT}${id}/`, data);
-        revalidatePath('/admin/cms/attractions');
-        revalidatePath(`/admin/cms/attractions/${id}`);
-        return { success: true, item: result };
-    } catch (error) {
-        console.error(`Failed to update activity ${id}:`, error);
-        // Return plain object instead of Error instance
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to update activity'
-        };
-    }
+export async function updateActivity(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/activities/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
+    });
 }
 
-export async function deleteActivity(id: string) {
-    try {
-        await deleteAPI(`${ENDPOINT}${id}/`);
-        revalidatePath('/admin/cms/attractions');
-        return { success: true };
-    } catch (error) {
-        console.error(`Failed to delete activity ${id}:`, error);
-        // Return plain object instead of Error instance
-        return {
-            success: false,
-            error: error instanceof Error ? error.message : 'Failed to delete activity'
-        };
-    }
+export async function deleteActivity(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/activities/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
+    });
+    return r.ok;
 }

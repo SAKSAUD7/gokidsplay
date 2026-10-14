@@ -732,7 +732,7 @@ class CustomerAccountConfig(models.Model):
     
     # Empty State
     empty_state_title = models.CharField(max_length=255, default="No bookings yet")
-    empty_state_subtitle = models.CharField(max_length=255, default="Book your first session at Spin Pin!")
+    empty_state_subtitle = models.CharField(max_length=255, default="Book your first session at Go Kids Play!")
     empty_state_button_text = models.CharField(max_length=100, default="Book Now")
     
     # Additional Support / Contact logic can be added here

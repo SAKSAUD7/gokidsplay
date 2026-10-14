@@ -1,4 +1,4 @@
-# EMAIL SETUP GUIDE — SpinPin Platform
+# EMAIL SETUP GUIDE — Go Kids Play Platform
 ## For Hosting Team
 
 ---
@@ -20,10 +20,10 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=spinpin@gmail.com
+EMAIL_HOST_USER=Go Kids Play@gmail.com
 EMAIL_HOST_PASSWORD=xxxx-xxxx-xxxx-xxxx   ← App password (16 chars, no spaces)
-DEFAULT_FROM_EMAIL=SpinPin Leicester <spinpin@gmail.com>
-ADMIN_EMAIL=admin@spinpin.co.uk
+DEFAULT_FROM_EMAIL=Go Kids Play Leicester <Go Kids Play@gmail.com>
+ADMIN_EMAIL=admin@gokidsplay.co.uk
 ```
 
 ---
@@ -41,8 +41,8 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=apikey
 EMAIL_HOST_PASSWORD=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-DEFAULT_FROM_EMAIL=SpinPin Leicester <noreply@spinpin.co.uk>
-ADMIN_EMAIL=info@spinpin.co.uk
+DEFAULT_FROM_EMAIL=Go Kids Play Leicester <noreply@gokidsplay.co.uk>
+ADMIN_EMAIL=info@gokidsplay.co.uk
 ```
 
 ---
@@ -54,10 +54,10 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.mailgun.org
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=postmaster@mg.spinpin.co.uk
+EMAIL_HOST_USER=postmaster@mg.gokidsplay.co.uk
 EMAIL_HOST_PASSWORD=your-mailgun-smtp-password
-DEFAULT_FROM_EMAIL=SpinPin Leicester <noreply@spinpin.co.uk>
-ADMIN_EMAIL=info@spinpin.co.uk
+DEFAULT_FROM_EMAIL=Go Kids Play Leicester <noreply@gokidsplay.co.uk>
+ADMIN_EMAIL=info@gokidsplay.co.uk
 ```
 
 ---
@@ -83,8 +83,8 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'SpinPin Leicester <noreply@spinpin.co.uk>')
-ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'info@spinpin.co.uk')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Go Kids Play Leicester <noreply@gokidsplay.co.uk>')
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'info@gokidsplay.co.uk')
 ```
 
 ---

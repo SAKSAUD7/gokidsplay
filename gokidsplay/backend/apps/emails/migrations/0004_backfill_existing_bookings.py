@@ -16,7 +16,7 @@ def backfill_emails(apps, schema_editor):
                 email_type='ACCOUNT_WELCOME',
                 recipient_email=c.email,
                 recipient_name=c.name,
-                subject='Welcome to SpinPin!',
+                subject='Welcome to Go Kids Play!',
                 status='SENT',
                 template_name='emails/welcome.html',
                 context_data={}

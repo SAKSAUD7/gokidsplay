@@ -1,6 +1,6 @@
 """
-Populate SpinPin About Page Content
-This script adds SpinPin-specific content for the About page including:
+Populate Go Kids Play About Page Content
+This script adds Go Kids Play-specific content for the About page including:
 - Hero section
 - Story section  
 - Timeline items
@@ -20,14 +20,14 @@ django.setup()
 from apps.cms.models import PageSection, TimelineItem, ValueItem, StatCard
 
 def populate_about_content():
-    print("Populating SpinPin About Page Content...")
+    print("Populating Go Kids Play About Page Content...")
     
     # Hero Section
     hero, created = PageSection.objects.update_or_create(
         page='about',
         section_key='hero',
         defaults={
-            'title': 'About Spin Pin Leicester',
+            'title': 'About Go Kids Play Leicester',
             'content': "Leicester's Premier Entertainment Destination for Bowling, Skating & Gaming",
             'active': True,
             'order': 1
@@ -41,15 +41,15 @@ def populate_about_content():
         section_key='story',
         defaults={
             'title': 'Our Story',
-            'content': """Welcome to Spin Pin Leicester, your ultimate destination for fun and entertainment in the heart of Leicester!
+            'content': """Welcome to Go Kids Play Leicester, your ultimate destination for fun and entertainment in the heart of Leicester!
 
-We are proud to be home to Leicester's first and only roller skating rink, alongside our state-of-the-art ten pin bowling lanes and exciting arcade games. Whether you're looking for a fun day out with family, a unique date night, or an action-packed party venue, Spin Pin has something for everyone.
+We are proud to be home to Leicester's first and only roller skating rink, alongside our state-of-the-art ten pin bowling lanes and exciting arcade games. Whether you're looking for a fun day out with family, a unique date night, or an action-packed party venue, Go Kids Play has something for everyone.
 
 Our mission is simple: to create unforgettable memories through quality entertainment in a safe, welcoming environment. From our special themed skating sessions to competitive bowling leagues, we're dedicated to bringing joy to the Leicester community.
 
 Located at Ramdoot House on Navigation Street, we're easily accessible and offer convenient parking facilities. Our friendly staff are always ready to ensure you have the best possible experience, whether it's your first visit or you're a regular guest.
 
-Join us at Spin Pin Leicester - where fun never stops rolling!""",
+Join us at Go Kids Play Leicester - where fun never stops rolling!""",
             'active': True,
             'order': 2
         }
@@ -61,7 +61,7 @@ Join us at Spin Pin Leicester - where fun never stops rolling!""",
         {
             'year': 2023,
             'title': 'Grand Opening',
-            'description': 'Spin Pin Leicester opens its doors as the city\'s first roller skating rink, bringing a new era of entertainment to Leicester.',
+            'description': 'Go Kids Play Leicester opens its doors as the city\'s first roller skating rink, bringing a new era of entertainment to Leicester.',
             'order': 1
         },
         {

@@ -1,5 +1,5 @@
 """
-Update PartyBookingConfig with SpinPin party availability days.
+Update PartyBookingConfig with Go Kids Play party availability days.
 Run: python update_party_settings.py (from backend/ folder)
 """
 import os, sys, django

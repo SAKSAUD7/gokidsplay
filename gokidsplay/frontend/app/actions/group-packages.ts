@@ -1,84 +1,44 @@
-﻿"use server";
+'use server';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
-import { fetchAPI } from "../lib/server-api";
-import { requirePermission } from "../lib/admin-auth";
-import { logActivity } from "../lib/audit-log";
-import { revalidatePath } from "next/cache";
-import { transformCmsItem } from "../lib/transformers";
-
-export async function getGroupPackages() {
-    const res = await fetchAPI("/cms/group-packages/", { next: { revalidate: 60 } });
-    if (!res || !res.ok) return [];
-    const data = await res.json();
-    return data.map(transformCmsItem);
+async function sf(url: string, init: RequestInit = {}) {
+    try {
+        const r = await fetch(url, { ...init, cache: 'no-store' });
+        if (!r.ok) { console.error('[group-packages]', r.status); return null; }
+        return r.json();
+    } catch(e) { console.error('[group-packages] error:', e); return null; }
 }
 
-export async function getGroupPackage(id: string) {
-    const res = await fetchAPI(`/cms/group-packages/${id}/`);
-    if (!res || !res.ok) return null;
-    const data = await res.json();
-    return transformCmsItem(data);
+export async function getGroupPackages() {
+    const data = await sf(`${BASE}/cms/group-packages/`);
+    if (!data) return [];
+    return Array.isArray(data) ? data.filter((g: any) => g.active !== false) : (data.results || []);
 }
 
 export async function createGroupPackage(data: any) {
-    await requirePermission('cms', 'write');
-
-    const res = await fetchAPI("/cms/group-packages/", {
-        method: "POST",
-        body: JSON.stringify(data)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/group-packages/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
     });
-
-    if (!res || !res.ok) return { success: false };
-
-    const item = await res.json();
-
-    await logActivity({
-        action: 'CREATE',
-        entity: 'GROUP_PACKAGE',
-        entityId: item.id.toString(),
-        details: { after: item }
-    });
-
-    revalidatePath('/admin/cms/group-packages');
-    return { success: true, item: transformCmsItem(item) };
 }
 
-export async function updateGroupPackage(id: string, data: any) {
-    await requirePermission('cms', 'write');
-
-    const res = await fetchAPI(`/cms/group-packages/${id}/`, {
-        method: "PATCH",
-        body: JSON.stringify(data)
+export async function updateGroupPackage(id: number, data: any) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    return sf(`${BASE}/cms/group-packages/${id}/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(data),
     });
-
-    if (!res || !res.ok) return { success: false };
-
-    await logActivity({
-        action: 'UPDATE',
-        entity: 'GROUP_PACKAGE',
-        entityId: id,
-        details: { after: data }
-    });
-
-    revalidatePath('/admin/cms/group-packages');
-    return { success: true };
 }
 
-export async function deleteGroupPackage(id: string) {
-    await requirePermission('cms', 'delete');
-
-    const res = await fetchAPI(`/cms/group-packages/${id}/`, {
-        method: "DELETE"
+export async function deleteGroupPackage(id: number) {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+    const r = await fetch(`${BASE}/cms/group-packages/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+        cache: 'no-store',
     });
-
-    if (!res || !res.ok) return { success: false };
-
-    await logActivity({
-        action: 'DELETE',
-        entity: 'GROUP_PACKAGE',
-        entityId: id
-    });
-
-    revalidatePath('/admin/cms/group-packages');
-    return { success: true };
+    return r.ok;
 }

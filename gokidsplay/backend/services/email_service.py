@@ -1,5 +1,5 @@
 """
-SpinPin Email Service Layer
+Go Kids Play Email Service Layer
 ===========================
 Production-grade email service for booking confirmations, party notifications,
 and admin alerts. Supports SMTP, SendGrid, and Mailgun providers.
@@ -10,10 +10,10 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@spinpin.co.uk
+EMAIL_HOST_USER=your-email@gokidsplay.co.uk
 EMAIL_HOST_PASSWORD=your-app-password
-DEFAULT_FROM_EMAIL=SpinPin Leicester <noreply@spinpin.co.uk>
-ADMIN_EMAIL=admin@spinpin.co.uk
+DEFAULT_FROM_EMAIL=Go Kids Play Leicester <noreply@gokidsplay.co.uk>
+ADMIN_EMAIL=admin@gokidsplay.co.uk
 
 For Gmail: Create an App Password at https://myaccount.google.com/apppasswords
 For SendGrid: Use smtp.sendgrid.net with port 587, user = apikey, password = SG.xxx
@@ -30,13 +30,13 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     """
-    Centralised email service for SpinPin.
+    Centralised email service for Go Kids Play.
     All email sending is routed through this class so configuration
     is in one place and easily swapped for production.
     """
 
-    FROM_EMAIL = getattr(settings, "DEFAULT_FROM_EMAIL", "SpinPin Leicester <noreply@spinpin.co.uk>")
-    ADMIN_EMAIL = getattr(settings, "ADMIN_EMAIL", "info@spinpin.co.uk")
+    FROM_EMAIL = getattr(settings, "DEFAULT_FROM_EMAIL", "Go Kids Play Leicester <noreply@gokidsplay.co.uk>")
+    ADMIN_EMAIL = getattr(settings, "ADMIN_EMAIL", "info@gokidsplay.co.uk")
 
     # ──────────────────────────────────────────────────────────────────────────
     # PARTY BOOKING EMAILS
@@ -58,7 +58,7 @@ class EmailService:
             text_body = f"""
 Hi {booking.name},
 
-Your party booking at Spin Pin Leicester has been received!
+Your party booking at Go Kids Play Leicester has been received!
 
 BOOKING DETAILS
 ─────────────────────────────────
@@ -81,13 +81,13 @@ NEXT STEPS
 
 If you have any questions, please contact us:
   📞 07349 110865
-  📧 info@spinpin.co.uk
+  📧 info@gokidsplay.co.uk
   📍 Merlin Works, 8 Exploration Dr, Leicester LE4 5FX
 
 We can't wait to make it a memorable day!
 
-The Spin Pin Team
-spinpin.co.uk
+The Go Kids Play Team
+gokidsplay.co.uk
 """
 
             html_body = f"""
@@ -117,7 +117,7 @@ spinpin.co.uk
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>🎉 SPIN PIN LEICESTER</h1>
+    <h1>🎉 Go Kids Play LEICESTER</h1>
     <p>Merlin Works, 8 Exploration Dr, Leicester LE4 5FX</p>
   </div>
   <div class="body">
@@ -147,8 +147,8 @@ spinpin.co.uk
     </div>
   </div>
   <div class="footer">
-    <p><a href="mailto:info@spinpin.co.uk">info@spinpin.co.uk</a> | 07349 110865 | <a href="https://spinpin.co.uk">spinpin.co.uk</a></p>
-    <p>© {timezone.now().year} Spin Pin Leicester. All rights reserved.</p>
+    <p><a href="mailto:info@gokidsplay.co.uk">info@gokidsplay.co.uk</a> | 07349 110865 | <a href="https://gokidsplay.co.uk">gokidsplay.co.uk</a></p>
+    <p>© {timezone.now().year} Go Kids Play Leicester. All rights reserved.</p>
   </div>
 </div>
 </body>
@@ -215,7 +215,7 @@ View in admin: http://localhost:9000/admin/bookings/partybooking/{booking.id}/ch
             text_body = f"""
 Hi {booking.name},
 
-Your session at Spin Pin Leicester has been confirmed!
+Your session at Go Kids Play Leicester has been confirmed!
 
 Date:     {booking.date}
 Time:     {booking.time}
@@ -225,7 +225,7 @@ Amount:   £{float(booking.amount):.2f}
 Ref:      {booking.booking_number or f"SP-{booking.id}"}
 
 See you soon!
-The Spin Pin Team
+The Go Kids Play Team
 """
             send_mail(subject, text_body, cls.FROM_EMAIL, [booking.email], fail_silently=False)
             logger.info(f"[EmailService] Session confirmation sent to {booking.email}")

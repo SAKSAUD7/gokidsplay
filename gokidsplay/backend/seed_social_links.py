@@ -7,10 +7,10 @@ django.setup()
 from apps.cms.models import SocialLink
 
 SOCIALS = [
-    ("instagram", "https://instagram.com/spinpinleicester", "instagram"),
-    ("facebook",  "https://facebook.com/spinpinleicester",  "facebook"),
-    ("tiktok",    "https://tiktok.com/@spinpinleicester",   "tiktok"),
-    ("twitter",   "https://twitter.com/spinpinleicester",   "twitter"),
+    ("instagram", "https://instagram.com/gokidsplayleicester", "instagram"),
+    ("facebook",  "https://facebook.com/gokidsplayleicester",  "facebook"),
+    ("tiktok",    "https://tiktok.com/@gokidsplayleicester",   "tiktok"),
+    ("twitter",   "https://twitter.com/gokidsplayleicester",   "twitter"),
 ]
 
 for platform, url, icon in SOCIALS:

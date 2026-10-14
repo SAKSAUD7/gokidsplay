@@ -1,11 +1,11 @@
-# SYSTEM ARCHITECTURE — SpinPin Platform
+# SYSTEM ARCHITECTURE — Go Kids Play Platform
 ## Last Updated: June 2026
 
 ---
 
 ## Overview
 
-SpinPin is a full-stack party and leisure booking platform for Spin Pin Leicester. It consists of:
+Go Kids Play is a full-stack party and leisure booking platform for Go Kids Play Leicester. It consists of:
 
 - **Frontend**: Next.js 14 (App Router) — port `5000` (dev)
 - **Backend**: Django 5.1 + Django REST Framework — port `9000` (dev)
@@ -17,7 +17,7 @@ SpinPin is a full-stack party and leisure booking platform for Spin Pin Leiceste
 ## Repository Structure
 
 ```
-spinpin/
+Go Kids Play/
 ├── frontend/               # Next.js 14 App Router
 │   ├── app/
 │   │   ├── (main)/         # Public-facing pages
@@ -111,7 +111,7 @@ Step 5: Confirmation + PDF Download
 ```env
 DEBUG=True
 SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:pass@localhost/spinpin_db
+DATABASE_URL=postgresql://user:pass@localhost/gokidsplay_db
 
 # CORS
 CORS_ALLOWED_ORIGINS=http://localhost:5000,https://yourdomain.com
@@ -123,8 +123,8 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=your@email.com
 EMAIL_HOST_PASSWORD=your-app-password
-DEFAULT_FROM_EMAIL=SpinPin Leicester <noreply@spinpin.co.uk>
-ADMIN_EMAIL=admin@spinpin.co.uk
+DEFAULT_FROM_EMAIL=Go Kids Play Leicester <noreply@gokidsplay.co.uk>
+ADMIN_EMAIL=admin@gokidsplay.co.uk
 
 # SumUp Payment Gateway
 SUMUP_API_KEY=your-sumup-api-key

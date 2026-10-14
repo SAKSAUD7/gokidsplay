@@ -1,6 +1,6 @@
 """
-Complete SpinPin CMS Content Update Script
-Updates all database content from Ninja Park to SpinPin
+Complete Go Kids Play CMS Content Update Script
+Updates all database content from Ninja Park to Go Kids Play
 """
 
 import os
@@ -32,10 +32,10 @@ def delete_old_activities():
     print(f"\n✓ Deleted {deleted} activities")
     return deleted
 
-def create_spinpin_activities():
-    """Create new SpinPin activities"""
+def create_gokidsplay_activities():
+    """Create new Go Kids Play activities"""
     print("\n" + "="*60)
-    print("CREATING SPINPIN ACTIVITIES")
+    print("CREATING Go Kids Play ACTIVITIES")
     print("="*60)
     
     activities_data = [
@@ -43,10 +43,10 @@ def create_spinpin_activities():
             'name': 'Roller Skating',
             'slug': 'roller-skating',
             'subtitle': "Experience Leicester's First Roller Skating Rink",
-            'description': "Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family.",
+            'description': "Roller skating at Go Kids Play Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre, providing the perfect place to rollerskate, party, and enjoy time with friends and family.",
             'long_description': """### Your New Favourite Roller Skating Rink in Leicester
 
-Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre.
+Roller skating at Go Kids Play Leicester is all about movement, energy, and pure fun. Our indoor skating rink is right in the heart of Leicester city centre.
 
 #### Why Roller Skate With Us?
 
@@ -69,10 +69,10 @@ Roller skating at Spin Pin Leicester is all about movement, energy, and pure fun
             'name': 'Ten Pin Bowling',
             'slug': 'ten-pin-bowling',
             'subtitle': 'Ten Pin Bowling in Leicester',
-            'description': "Bowling at Spin Pin is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre, offering a space where people can turn up, play, and enjoy themselves.",
-            'long_description': """### Ten Pin Bowling in Leicester, Fun for All at Spin Pin
+            'description': "Bowling at Go Kids Play is all about energy, atmosphere, and straight up good times. Our ten pin bowling lanes are located right in the Leicester city centre, offering a space where people can turn up, play, and enjoy themselves.",
+            'long_description': """### Ten Pin Bowling in Leicester, Fun for All at Go Kids Play
 
-Bowling at Spin Pin is all about energy, atmosphere, and straight up good times.
+Bowling at Go Kids Play is all about energy, atmosphere, and straight up good times.
 
 #### Why Bowl With Us?
 
@@ -94,10 +94,10 @@ Bowling at Spin Pin is all about energy, atmosphere, and straight up good times.
             'name': 'Arcade Games',
             'slug': 'arcade-games',
             'subtitle': 'Play, Compete, and Win!',
-            'description': "Step into Spin Pin Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between. With flashing lights, nostalgic sounds, and a competitive buzz in the air, our Leicester arcade is the perfect space to get stuck into some serious button bashing fun.",
-            'long_description': """### Arcade Games in Leicester - Level Up at Spin Pin
+            'description': "Step into Go Kids Play Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between. With flashing lights, nostalgic sounds, and a competitive buzz in the air, our Leicester arcade is the perfect space to get stuck into some serious button bashing fun.",
+            'long_description': """### Arcade Games in Leicester - Level Up at Go Kids Play
 
-Step into Spin Pin Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between.
+Step into Go Kids Play Arcade in Leicester and rediscover the thrill of classic hits, modern gaming, and everything in between.
 
 Our arcade area is built for people who want to switch off and enjoy something different, no pressure, no long queues, just pure gaming.
 
@@ -136,12 +136,12 @@ def update_homepage():
     
     home, created = HomePage.objects.get_or_create(id=1)
     
-    home.hero_title = "Welcome To Spin Pin"
+    home.hero_title = "Welcome To Go Kids Play"
     home.hero_subtitle = "Bowling, Roller Skating & Arcade in Leicester"
     home.welcome_title = "Skating, Bowling & Arcade Fun – All in One Place"
-    home.welcome_text = """Welcome to Spin Pin – The ultimate destination in Leicester for fun and excitement! Whether you're looking to glide across the roller rink, strike big in our ten pin bowling lanes, or challenge your friends to thrilling arcade games, we've got something for everyone.
+    home.welcome_text = """Welcome to Go Kids Play – The ultimate destination in Leicester for fun and excitement! Whether you're looking to glide across the roller rink, strike big in our ten pin bowling lanes, or challenge your friends to thrilling arcade games, we've got something for everyone.
 
-Perfect for roller skating parties, group outings, or a spontaneous day of adventure, Spin Pin offers an unforgettable experience filled with energy, music, and non-stop entertainment."""
+Perfect for roller skating parties, group outings, or a spontaneous day of adventure, Go Kids Play offers an unforgettable experience filled with energy, music, and non-stop entertainment."""
     
     home.save()
     print(f"✓ Homepage {'created' if created else 'updated'}")
@@ -159,13 +159,13 @@ def update_about_page():
     
     about.hero_title = "About Us"
     about.hero_subtitle = "Where Fun Never Stops!"
-    about.content = """## Welcome to SpinPin – Where Fun Never Stops!
+    about.content = """## Welcome to Go Kids Play – Where Fun Never Stops!
 
-At SpinPin, we believe in creating unforgettable experiences filled with excitement, energy, and endless entertainment. Whether you're gliding across our roller rink, aiming for a perfect strike in our bowling alley, or challenging your friends to the latest arcade games, we offer something for everyone.
+At Go Kids Play, we believe in creating unforgettable experiences filled with excitement, energy, and endless entertainment. Whether you're gliding across our roller rink, aiming for a perfect strike in our bowling alley, or challenging your friends to the latest arcade games, we offer something for everyone.
 
 ## Our Story
 
-SpinPin was founded with one mission in mind – to bring people together through fun and engaging experiences. We wanted to create a space where visitors of all ages could enjoy a mix of classic and modern entertainment under one roof.
+Go Kids Play was founded with one mission in mind – to bring people together through fun and engaging experiences. We wanted to create a space where visitors of all ages could enjoy a mix of classic and modern entertainment under one roof.
 
 ## What We Offer
 
@@ -175,7 +175,7 @@ SpinPin was founded with one mission in mind – to bring people together throug
 - **Party & Event Bookings**: Celebrate birthdays and special occasions with us
 - **Session Booking**: Book your session in advance for a hassle-free experience
 
-## Why Choose SpinPin?
+## Why Choose Go Kids Play?
 
 - A Welcoming Atmosphere for everyone
 - A Variety of Activities for all ages
@@ -195,8 +195,8 @@ def update_pricing_page():
     pricing, created = PricingPage.objects.get_or_create(id=1)
     
     pricing.hero_title = "Our Prices"
-    pricing.hero_subtitle = "Spin Pin Leicester"
-    pricing.content = """## Spin Pin Pricing
+    pricing.hero_subtitle = "Go Kids Play Leicester"
+    pricing.content = """## Go Kids Play Pricing
 
 - **Skating / Bowling / VR Participants**: £9.95 per game / per person
 - **Roller Skate Hire**: £2.95 Each
@@ -219,7 +219,7 @@ BOOK ONLINE TO PAY BY CARD."""
 def main():
     """Run all CMS updates"""
     print("\n" + "="*70)
-    print(" " * 15 + "SPINPIN CMS CONTENT UPDATE")
+    print(" " * 15 + "Go Kids Play CMS CONTENT UPDATE")
     print("="*70)
     
     try:
@@ -227,7 +227,7 @@ def main():
         deleted_count = delete_old_activities()
         
         # Create new activities
-        new_activities = create_spinpin_activities()
+        new_activities = create_gokidsplay_activities()
         
         # Update pages
         update_homepage()
@@ -239,9 +239,9 @@ def main():
         print("="*70)
         print("\nSummary:")
         print(f"  - Deleted: {deleted_count} old Ninja activities")
-        print(f"  - Created: {len(new_activities)} new SpinPin activities")
+        print(f"  - Created: {len(new_activities)} new Go Kids Play activities")
         print(f"  - Updated: Homepage, About Us, Pricing pages")
-        print("\nAll CMS content has been successfully updated to SpinPin!")
+        print("\nAll CMS content has been successfully updated to Go Kids Play!")
         print("="*70 + "\n")
         
     except Exception as e:

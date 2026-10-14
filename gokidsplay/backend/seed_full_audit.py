@@ -1,10 +1,10 @@
 """
-SpinPin Full Site Audit Seed Script
+Go Kids Play Full Site Audit Seed Script
 Seeds all missing CMS data found during deep audit:
 - FAQs (seeded if empty)
 - Timing Cards (opening hours)
 - Admin Session Booking times
-- Verify all data is SpinPin-correct
+- Verify all data is Go Kids Play-correct
 """
 import os, sys, django
 from decimal import Decimal
@@ -43,7 +43,7 @@ print("   {} timing cards created".format(len(timing_cards)))
 print("2. Seeding FAQs...")
 if Faq.objects.count() == 0:
     faqs = [
-        FAQ(question="What activities are available at Spin Pin?", answer="Spin Pin Leicester offers Roller Skating, Ten Pin Bowling, Arcade Games, and VR Experiences. We also have a Cafe and Party Rooms available.", category="General", active=True, order=1),
+        FAQ(question="What activities are available at Go Kids Play?", answer="Go Kids Play Leicester offers Roller Skating, Ten Pin Bowling, Arcade Games, and VR Experiences. We also have a Cafe and Party Rooms available.", category="General", active=True, order=1),
         FAQ(question="Do I need to book in advance?", answer="We strongly recommend booking online to guarantee your session. Walk-ins are welcome subject to availability, but busy sessions (weekends, school holidays) fill up fast!", category="Booking", active=True, order=2),
         FAQ(question="What are your opening hours?", answer="We're open Wednesday to Thursday 12:00–21:00, Friday 12:00–22:00, Saturday 10:00–22:00, and Sunday 10:00–21:00. We're closed Monday and Tuesday.", category="General", active=True, order=3),
         FAQ(question="Is there parking available?", answer="Yes, there is parking nearby at the Highcross Shopping Centre car park and NCP car parks within walking distance of Navigation Street.", category="General", active=True, order=4),
@@ -54,10 +54,10 @@ if Faq.objects.count() == 0:
         FAQ(question="Can we bring our own food and cake?", answer="External food and drinks are not permitted in the arena. We have a licensed cafe with a great food and drink menu. Birthday cakes are welcome for party bookings!", category="Parties", active=True, order=9),
         FAQ(question="What is your cancellation policy?", answer="Session bookings can be cancelled or rescheduled with 48 hours notice for a full refund. Party bookings require 2 weeks notice. Late cancellations may incur a fee.", category="Booking", active=True, order=10),
         FAQ(question="Do I need to sign a waiver?", answer="Yes, all participants must sign a digital waiver before their session. This can be done online in advance or at our kiosk on arrival. Minors require a parent/guardian signature.", category="Safety", active=True, order=11),
-        FAQ(question="Is Spin Pin wheelchair accessible?", answer="Yes, Spin Pin is accessible. Our venue has step-free access and accessible facilities. Please contact us in advance if you have specific accessibility requirements so we can prepare.", category="General", active=True, order=12),
+        FAQ(question="Is Go Kids Play wheelchair accessible?", answer="Yes, Go Kids Play is accessible. Our venue has step-free access and accessible facilities. Please contact us in advance if you have specific accessibility requirements so we can prepare.", category="General", active=True, order=12),
         FAQ(question="Are there age or weight restrictions?", answer="Roller skating is suitable for children aged 4+ with an adult present. Bowling is suitable for all ages. Please check our Guidelines page for full safety requirements.", category="Safety", active=True, order=13),
         FAQ(question="Do you offer group discounts?", answer="Yes! We offer special rates for groups of 10 or more. Visit our Groups page or contact us directly for a tailored quote.", category="Booking", active=True, order=14),
-        FAQ(question="How do I contact Spin Pin?", answer="You can call us on 07349110865, email info@spinpin.co.uk, or use the contact form on our Contact page. We aim to respond within 24 hours.", category="General", active=True, order=15),
+        FAQ(question="How do I contact Go Kids Play?", answer="You can call us on 07349110865, email info@gokidsplay.co.uk, or use the contact form on our Contact page. We aim to respond within 24 hours.", category="General", active=True, order=15),
     ]
     Faq.objects.bulk_create(faqs)
     print("   {} FAQs created".format(len(faqs)))
@@ -83,13 +83,13 @@ except Exception as e:
 print("4. Seeding missing PageSections...")
 
 missing_sections = [
-    ("faq", "hero", "Frequently Asked Questions", "Got questions? We have answers! Find everything you need to know about visiting Spin Pin Leicester.", True),
-    ("about", "hero", "About Spin Pin Leicester", "Discover the story behind Leicester's premier entertainment venue.", True),
-    ("contact", "hero", "Get In Touch", "We'd love to hear from you! Contact Spin Pin Leicester for bookings, enquiries, and more.", True),
+    ("faq", "hero", "Frequently Asked Questions", "Got questions? We have answers! Find everything you need to know about visiting Go Kids Play Leicester.", True),
+    ("about", "hero", "About Go Kids Play Leicester", "Discover the story behind Leicester's premier entertainment venue.", True),
+    ("contact", "hero", "Get In Touch", "We'd love to hear from you! Contact Go Kids Play Leicester for bookings, enquiries, and more.", True),
     ("groups", "hero", "Group Bookings", "Planning a group visit? We offer special rates and packages for schools, corporate events, and large groups.", True),
     ("pricing", "hero", "Pricing & Tickets", "Affordable fun for everyone. Check out our session prices for roller skating, bowling, and more.", True),
-    ("guidelines", "hero", "Safety Guidelines", "Your safety is our priority. Please read our guidelines before your visit to Spin Pin Leicester.", True),
-    ("attractions", "hero", "Our Attractions", "From roller skating to bowling to arcade games — there's something for everyone at Spin Pin Leicester.", True),
+    ("guidelines", "hero", "Safety Guidelines", "Your safety is our priority. Please read our guidelines before your visit to Go Kids Play Leicester.", True),
+    ("attractions", "hero", "Our Attractions", "From roller skating to bowling to arcade games — there's something for everyone at Go Kids Play Leicester.", True),
 ]
 
 for page, key, title, content, active in missing_sections:

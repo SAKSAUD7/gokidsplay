@@ -9,7 +9,7 @@ import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
     "Go Kids Play Party Booking",
-    "Book your ultimate birthday party or group event at Go Kids Play Leicester. We offer amazing packages including entry for 10 participants, food, drinks, and dedicated party hosts.",
+    "Book your ultimate birthday party or group event at Go Kids Play Coventry. We offer amazing packages including entry for participants, food, drinks, and a dedicated party host.",
     true
 );
 

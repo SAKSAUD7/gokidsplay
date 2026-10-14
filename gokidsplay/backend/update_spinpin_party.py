@@ -1,5 +1,5 @@
 """
-Update party package with SpinPin content
+Update party package with Go Kids Play content
 """
 import os
 import sys
@@ -13,13 +13,13 @@ django.setup()
 from apps.cms.models import PartyPackage, PageSection
 
 def update_party_content():
-    """Update party package and page sections with SpinPin content"""
+    """Update party package and page sections with Go Kids Play content"""
     
     # Delete existing party packages
     PartyPackage.objects.all().delete()
     print("✓ Deleted old party packages")
     
-    # Create the SpinPin party package
+    # Create the Go Kids Play party package
     party_package = PartyPackage.objects.create(
         name="£250 Party Package",
         description="Looking for a fun way to celebrate? Our £250 Party Package is the perfect choice for UNDER 14s. This package includes everything you need for a great time: 2 hours of play and party time, roller skate rentals, a dedicated party area, and much more! Book your party today and get ready for a fantastic time!",
@@ -56,7 +56,7 @@ def update_party_content():
         page='party-booking',
         section_key='hero',
         defaults={
-            'title': 'Spin Pin Party Booking',
+            'title': 'Go Kids Play Party Booking',
             'content': "Celebrate with the ultimate adventure! Available from Thursday's to Sunday's",
             'order': 1
         }
@@ -100,8 +100,8 @@ def update_party_content():
         <li>Party price is same for weekdays or weekend party (peak or off peak). However, the activities will operate as per their scheduled operating days only (peak and off peak activity condition applies).</li>
         <li>Restricted car park for 2 hours only, for extra parking time, please enters your correct car registration number at the reception. Maximum Car park stay 3 hours. We do not accept any liability for car park penalty charges.</li>
         <li>All participants must sign a waiver prior to participating. Party host must ensure the waiver are complete for their invited guest participants.</li>
-        <li>Rules and terms & Conditions apply at all times. Visit www.spinpin.co.uk for full list of T&C & Rules of Play.</li>
-        <li>By receiving the confirmation email or by signing the booking form you agree to abide by the above mentioned terms and authorise Spin Pin.</li>
+        <li>Rules and terms & Conditions apply at all times. Visit www.gokidsplay.co.uk for full list of T&C & Rules of Play.</li>
+        <li>By receiving the confirmation email or by signing the booking form you agree to abide by the above mentioned terms and authorise Go Kids Play.</li>
     </ol>
 </div>
 """

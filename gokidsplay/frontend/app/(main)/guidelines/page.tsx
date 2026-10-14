@@ -7,10 +7,11 @@ import GuidelinesContent from "./components/GuidelinesContent";
 import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
-    "Roller Skating Guidelines | Information",
-    "Go Kids Play is Leicester's go-to destination for fun and entertainment, offering rollerskating, bowling, party bookings and more.",
+    "Park Guidelines & Safety | Go Kids Play Coventry",
+    "Read the Go Kids Play Coventry safety guidelines before visiting. Rules for all attractions including Soft Play, Laser Arena, Go Karts, and the Inflatable Park to keep everyone safe.",
     true
 );
+
 
 export default async function GuidelinesPage() {
     // Fetch all data in parallel
