@@ -95,3 +95,7 @@ node_modules
 
 AZURE_SECRETS.md
 
+
+# Files uploaded through the admin portal (keep the folder, not the uploads)
+backend/media/uploads/*
+!backend/media/uploads/.gitkeep
