@@ -112,7 +112,6 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class PartyBookingSerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
-    spectators = serializers.SerializerMethodField()
     qr_code = serializers.SerializerMethodField()
     payment_status = serializers.SerializerMethodField()
     waiver_status = serializers.SerializerMethodField()
@@ -136,15 +135,10 @@ class PartyBookingSerializer(serializers.ModelSerializer):
         return f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={obj.uuid}"
 
     def get_payment_status(self, obj):
-        # Party bookings usually default to PENDING until deposit is paid
-        # But we'll map the main status to payment status for now
-        if obj.status == 'CONFIRMED' or obj.status == 'COMPLETED':
-            return 'PAID'
-        return 'PENDING'
+        # The payment flow records PENDING / PARTIAL (deposit) / PAID / REFUNDED on the booking
+        return obj.payment_status or 'PENDING'
 
     def get_waiver_status(self, obj):
-        if obj.waivers.exists():
-            return 'SIGNED'
         return 'SIGNED' if obj.waiver_signed else 'PENDING'
 
     def get_booking_status(self, obj):

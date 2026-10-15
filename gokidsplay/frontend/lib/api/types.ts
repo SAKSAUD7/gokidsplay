@@ -184,7 +184,8 @@ export const bookingSchema = z.object({
     name: z.string()
         .min(3, "Name must be at least 3 characters")
         .max(100, "Name is too long")
-        .regex(/^[a-zA-Z\s.'-]+$/, "Name can only contain letters, spaces, dots, hyphens and apostrophes")
+        // Any alphabet (Zoë, José, Siobhán…), plus spaces, dots, hyphens and straight/curly apostrophes
+        .regex(/^[\p{L}\p{M}\s.'’-]+$/u, "Name can only contain letters, spaces, dots, hyphens and apostrophes")
         .transform((name) => name.trim()),
 
     email: z.string()
@@ -276,35 +277,39 @@ export function isValidBookingDate(date: string): boolean {
 //
 // ROLLER SKATING — 60-min slot intervals (multiple sessions on rink simultaneously)
 // TEN PIN BOWLING — 90-min slot intervals (lane turnover time)
-export function getAvailableTimeSlots(date: string, activity?: string): string[] {
-    const selectedDate = new Date(date + 'T12:00:00');
-    const dayOfWeek = selectedDate.getDay(); // 0=Sun, 1=Mon, 2=Tue...
+/**
+ * Go Kids Play opening hours (24h clock) — must match "Opening Hours" in the CMS.
+ * School & bank holidays use HOLIDAY_HOURS on any day of the week.
+ */
+export const SESSION_LENGTH_HOURS = 2;
+export const WEEKLY_OPENING_HOURS: Record<number, { open: number; close: number } | null> = {
+    0: { open: 12, close: 20 }, // Sunday
+    1: null,                    // Monday — closed (except holidays)
+    2: null,                    // Tuesday — closed (except holidays)
+    3: null,                    // Wednesday — closed (except holidays)
+    4: { open: 15, close: 20 }, // Thursday
+    5: { open: 15, close: 20 }, // Friday
+    6: { open: 12, close: 20 }, // Saturday
+};
+export const HOLIDAY_HOURS = { open: 10, close: 20 };
 
-    // Monday is CLOSED unless it's a school holiday or public holiday
-    if (dayOfWeek === 1 && !isHolidayOpen(date)) return [];
+/** Opening hours for a date (YYYY-MM-DD), or null when closed. */
+export function getOpeningHours(date: string): { open: number; close: number } | null {
+    if (isHolidayOpen(date)) return HOLIDAY_HOURS;
+    return WEEKLY_OPENING_HOURS[new Date(date + 'T12:00:00').getDay()] ?? null;
+}
 
-    const isBowling = activity === 'ten-pin-bowling';
-    const isSaturday = dayOfWeek === 6;
-    let allSlots: string[];
+/**
+ * Bookable session start times for a date: hourly from opening time, with the
+ * last start leaving a full session before closing.
+ */
+export function getAvailableTimeSlots(date: string, _activity?: string): string[] {
+    const hours = getOpeningHours(date);
+    if (!hours) return [];
 
-    const isHoliday = isHolidayOpen(date);
-
-    if (isBowling) {
-        // 90-min intervals
-        if (isSaturday || dayOfWeek === 0 || isHoliday) {
-            allSlots = ["12:00", "13:30", "15:00", "16:30", "18:00", "19:30", "21:00"];
-        } else {
-            allSlots = ["14:00", "15:30", "17:00", "18:30", "20:00"];
-        }
-    } else {
-        // Skating: hourly slots
-        if (isSaturday) {
-            allSlots = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"];
-        } else if (dayOfWeek === 0 || isHoliday) {
-            allSlots = ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"];
-        } else {
-            allSlots = ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"];
-        }
+    const allSlots: string[] = [];
+    for (let h = hours.open; h + SESSION_LENGTH_HOURS <= hours.close; h++) {
+        allSlots.push(`${String(h).padStart(2, '0')}:00`);
     }
 
     // For today's date, only show slots that are at least 2 hours from now (UK time)
@@ -317,8 +322,7 @@ export function getAvailableTimeSlots(date: string, activity?: string): string[]
         const minSlotHour = currentMinute > 0 ? currentHour + 3 : currentHour + 2;
         return allSlots.filter(slot => {
             const [slotHour, slotMin] = slot.split(':').map(Number);
-            const slotTotalMins = slotHour * 60 + slotMin;
-            return slotTotalMins >= minSlotHour * 60;
+            return slotHour * 60 + slotMin >= minSlotHour * 60;
         });
     }
     return allSlots;

@@ -1,5 +1,6 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets, permissions
+from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
@@ -138,7 +139,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             paginator.page_size = int(page_size)
             self._paginator_instance = paginator
 
-        return queryset.select_related('customer', 'voucher').prefetch_related('waivers', 'transactions')
+        return queryset.select_related('customer', 'voucher').prefetch_related('transactions')
     
     def get_permissions(self):
         # Allow public access ONLY for create and ticket retrieval
@@ -166,8 +167,21 @@ class BookingViewSet(viewsets.ModelViewSet):
         from .availability_service import GKPAvailabilityService
         from datetime import date as date_type
 
+        # ── Public (non-staff) bookings: never trust money/status fields ──────
+        # The website creates bookings anonymously, so anyone could call this
+        # endpoint directly. Only an allowlist of fields is accepted and the
+        # price is recalculated server-side from the CMS booking config.
+        is_staff = bool(request.user and request.user.is_authenticated and request.user.is_staff)
+        voucher_to_count = None
+        if is_staff:
+            data = request.data
+        else:
+            data, pricing_error, voucher_to_count = self._sanitize_public_booking(request.data)
+            if pricing_error:
+                return Response({'detail': pricing_error, 'code': 'INVALID_VOUCHER'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
         # ── Extract key fields ────────────────────────────────────────────────
-        data = request.data
         req_date_str = data.get('date')
         req_time = str(data.get('time', ''))[:5]   # normalise to "HH:MM"
         req_adults = int(data.get('adults') or 0)
@@ -208,26 +222,21 @@ class BookingViewSet(viewsets.ModelViewSet):
                     )
 
                 # ── Capacity OK — proceed with normal DRF create ──────────────
-                try:
-                    response = super().create(request, *args, **kwargs)
-                except Exception as e:
-                    import traceback
-                    error_msg = str(e)
-                    logger.error(f"CRITICAL: Booking creation failed: {error_msg}")
-                    logger.error(traceback.format_exc())
-                    return Response(
-                        {
-                            "detail": f"Server Error: {error_msg}",
-                            "traceback": traceback.format_exc().split('\n')
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                serializer = self.get_serializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                if voucher_to_count is not None:
+                    from django.db.models import F
+                    type(voucher_to_count).objects.filter(pk=voucher_to_count.pk).update(used_count=F('used_count') + 1)
+                response = Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        except Exception as e:
+        except drf_serializers.ValidationError:
+            raise  # field errors go back to the client as a normal 400
+        except Exception:
             import traceback
-            logger.error(f"Transaction failed: {str(e)}")
+            logger.error(f"Booking creation failed:\n{traceback.format_exc()}")
             return Response(
-                {"detail": f"Booking could not be completed: {str(e)}"},
+                {"detail": "Booking could not be completed. Please try again or contact us."},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -240,6 +249,56 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         return response
 
+
+    # Fields a member of the public may set when creating a session booking
+    PUBLIC_BOOKING_FIELDS = (
+        'name', 'email', 'phone', 'date', 'time', 'duration', 'adults', 'kids', 'spectators',
+        'activity', 'parking_plates', 'customer',
+    )
+
+    def _sanitize_public_booking(self, raw):
+        """Build the booking payload for a non-staff request: allowlisted fields + server-side price."""
+        from .pricing import price_session_booking
+
+        def as_int(value):
+            try:
+                return max(0, int(value or 0))
+            except (TypeError, ValueError):
+                return 0
+
+        clean = {key: raw.get(key) for key in self.PUBLIC_BOOKING_FIELDS if key in raw}
+        adults, kids, spectators = as_int(raw.get('adults')), as_int(raw.get('kids')), as_int(raw.get('spectators'))
+        clean.update({'adults': adults, 'kids': kids, 'spectators': spectators})
+
+        booking_datetime = (
+            f"{raw.get('date')}T{str(raw.get('time', ''))[:5]}" if raw.get('date') and raw.get('time') else None
+        )
+        price = price_session_booking(
+            adults=adults, kids=kids, spectators=spectators,
+            add_ons=raw.get('add_ons'),
+            voucher_code=raw.get('voucher_code'),
+            booking_datetime=booking_datetime,
+            include_online_fee=True,
+        )
+        if price.error:
+            return None, price.error, None
+
+        status_value = raw.get('booking_status')
+        clean.update({
+            'subtotal': str(price.subtotal),
+            'discount_amount': str(price.discount),
+            'amount': str(price.amount),
+            'add_ons': price.add_ons or None,
+            'voucher': price.voucher.pk if price.voucher else None,
+            'voucher_code': price.voucher_code,
+            # Payment is never set by the client — it is recorded by the payment flow
+            'paid_amount': '0.00',
+            'payment_status': 'PENDING',
+            'booking_status': status_value if status_value in ('PENDING', 'CONFIRMED') else 'PENDING',
+            'status': status_value if status_value in ('PENDING', 'CONFIRMED') else 'PENDING',
+            'type': 'SESSION',
+        })
+        return clean, '', price.voucher
 
     @action(detail=True, methods=['post'], permission_classes=[IsStaffUser])
     def update_status(self, request, pk=None):
@@ -574,102 +633,121 @@ class PublicSiteAlertViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 # Custom function-based view for party booking creation (bypasses serializer bug)
+def _party_booking_summary(booking):
+    return {
+        'id': booking.id,
+        'uuid': str(booking.uuid),
+        'name': booking.name,
+        'email': booking.email,
+        'phone': booking.phone,
+        'date': str(booking.date),
+        'time': str(booking.time),
+        'package_name': booking.package_name,
+        'kids': booking.kids,
+        'adults': booking.adults,
+        'amount': float(booking.amount),
+        'deposit_amount': float(booking.deposit_amount),
+        'payment_type': booking.payment_type,
+        'payment_status': booking.payment_status,
+        'birthday_child_name': booking.birthday_child_name,
+        'birthday_child_age': booking.birthday_child_age,
+        'status': booking.status,
+        'created_at': booking.created_at.isoformat(),
+        'updated_at': booking.updated_at.isoformat(),
+    }
+
+
 @api_view(['POST', 'GET'])
-@authentication_classes([])
-@permission_classes([permissions.AllowAny])
+@permission_classes([permissions.AllowAny])  # POST is public (website wizard); GET is checked below
 def create_party_booking_view(request):
-    """Custom view to create party bookings without using ModelSerializer"""
+    """List party bookings (staff only) or create one (public website wizard or staff)."""
+    import logging
+    logger = logging.getLogger(__name__)
+    is_staff = bool(request.user and request.user.is_authenticated and request.user.is_staff)
+
     if request.method == 'GET':
-        # List all party bookings
+        # Customer names, emails and phone numbers — staff only
+        if not is_staff:
+            return Response({'detail': 'Authentication credentials were not provided.'},
+                            status=status.HTTP_401_UNAUTHORIZED)
         bookings = PartyBooking.objects.select_related('customer').order_by('-created_at')
-        data = []
-        for booking in bookings:
-            data.append({
-                'id': booking.id,
-                'uuid': str(booking.uuid),
-                'name': booking.name,
-                'email': booking.email,
-                'phone': booking.phone,
-                'date': str(booking.date),
-                'time': str(booking.time),
-                'package_name': booking.package_name,
-                'kids': booking.kids,
-                'adults': booking.adults,
-                'amount': float(booking.amount),
-                'birthday_child_name': booking.birthday_child_name,
-                'birthday_child_age': booking.birthday_child_age,
-                'status': booking.status,
-                'created_at': booking.created_at.isoformat(),
-                'updated_at': booking.updated_at.isoformat(),
-            })
-        return Response(data)
-    
-    elif request.method == 'POST':
+        return Response([_party_booking_summary(b) for b in bookings])
+
+    data = request.data
+
+    def as_int(value, default=0):
         try:
-            data = request.data
-            
-            # Create or get customer
+            return max(0, int(value))
+        except (TypeError, ValueError):
+            return default
+
+    for required in ('name', 'email', 'phone', 'date', 'time'):
+        if not data.get(required):
+            return Response({'detail': f'{required} is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    kids = as_int(data.get('kids'))
+    adults = as_int(data.get('adults'))
+    payment_type = 'FULL' if data.get('payment_type') == 'FULL' else 'DEPOSIT'
+    voucher_to_count = None
+
+    if is_staff:
+        # Staff/admin bookings may set custom amounts and statuses
+        amount = Decimal(str(data.get('amount') or 0))
+        package_price = Decimal(str(data.get('package_price') or 250))
+        deposit_amount = Decimal(str(data.get('deposit_amount') or 0))
+        booking_status = data.get('status') or 'PENDING'
+    else:
+        # Public bookings: price is always calculated server-side
+        from .pricing import price_party_booking
+        price = price_party_booking(kids=kids, adults=adults, voucher_code=data.get('voucher_code'))
+        amount, package_price, deposit_amount = price.amount, price.package_price, price.deposit
+        booking_status = 'PENDING'
+        voucher_to_count = price.voucher
+
+    try:
+        with transaction.atomic():
             customer = None
             if data.get('email'):
                 customer, created = Customer.objects.get_or_create(
                     email=data['email'],
-                    defaults={
-                        'name': data.get('name', ''),
-                        'phone': data.get('phone', ''),
-                    }
+                    defaults={'name': data.get('name', ''), 'phone': data.get('phone', '')},
                 )
                 if not created and not customer.name:
                     customer.name = data.get('name', '')
                     customer.phone = data.get('phone', '')
                     customer.save()
-            
-            # Create party booking
+
             booking = PartyBooking.objects.create(
                 name=data.get('name'),
                 email=data.get('email'),
                 phone=data.get('phone'),
                 date=data.get('date'),
                 time=data.get('time'),
-                package_name=data.get('package_name', 'Standard Party'),
-                kids=int(data.get('kids', 0)),
-                adults=int(data.get('adults', 0)),
-                amount=float(data.get('amount', 0)),
-                package_price=float(data.get('package_price', 250.0)),
-                deposit_amount=float(data.get('deposit_amount', 0)),
-                payment_type=data.get('payment_type', 'FULL'),
+                package_name=data.get('package_name') or 'Standard Party',
+                kids=kids,
+                adults=adults,
+                spectators=adults,
+                amount=amount,
+                package_price=package_price,
+                deposit_amount=deposit_amount,
+                payment_type=payment_type,
                 birthday_child_name=data.get('birthday_child_name'),
-                birthday_child_age=int(data.get('birthday_child_age')) if data.get('birthday_child_age') else None,
+                birthday_child_age=as_int(data.get('birthday_child_age'), None) if data.get('birthday_child_age') else None,
                 special_requests=data.get('special_requests'),
                 dietary_restrictions=data.get('dietary_restrictions'),
-                status=data.get('status', 'PENDING'),
+                status=booking_status,
+                payment_status='PENDING',
                 customer=customer,
-                waiver_signed=data.get('waiver_signed', False),
             )
-            
-            return Response({
-                'id': booking.id,
-                'uuid': str(booking.uuid),
-                'name': booking.name,
-                'email': booking.email,
-                'phone': booking.phone,
-                'date': str(booking.date),
-                'time': str(booking.time),
-                'package_name': booking.package_name,
-                'kids': booking.kids,
-                'adults': booking.adults,
-                'amount': float(booking.amount),
-                'birthday_child_name': booking.birthday_child_name,
-                'birthday_child_age': booking.birthday_child_age,
-                'status': booking.status,
-                'created_at': booking.created_at.isoformat(),
-                'updated_at': booking.updated_at.isoformat(),
-            }, status=status.HTTP_201_CREATED)
-            
-        except Exception as e:
-            return Response({
-                'error': str(e),
-                'detail': 'Failed to create party booking'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            if voucher_to_count is not None:
+                from django.db.models import F
+                type(voucher_to_count).objects.filter(pk=voucher_to_count.pk).update(used_count=F('used_count') + 1)
+    except Exception:
+        logger.exception('Party booking creation failed')
+        return Response({'detail': 'Failed to create party booking. Please check your details and try again.'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(_party_booking_summary(booking), status=status.HTTP_201_CREATED)
 
 class PartyBookingViewSet(viewsets.ModelViewSet):
     queryset = PartyBooking.objects.all()
@@ -787,7 +865,7 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def add_participants(self, request, pk=None):
-        """Add participant details to party booking and create individual waivers"""
+        """Add participant details to a party booking"""
         from django.utils import timezone
         
         party_booking = self.get_object()
@@ -808,56 +886,9 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
             party_booking.waiver_ip_address = ip_address
         party_booking.save()
         
-        # Delete existing waivers for this party booking to prevent duplicates
-        # This makes the endpoint idempotent - calling it multiple times won't create duplicates
-        Waiver.objects.filter(party_booking=party_booking).delete()
+        # Participants are stored on the booking (party_booking.participants) — there is
         
-        # Find the primary adult
-        primary_adult = None
-        additional_adults = []
-        
-        for adult in participants.get('adults', []):
-            if adult.get('is_primary', False):
-                primary_adult = adult
-            else:
-                additional_adults.append(adult)
-        
-        # If no primary adult is marked, use the first adult
-        if not primary_adult and participants.get('adults'):
-            primary_adult = participants['adults'][0]
-            additional_adults = participants['adults'][1:]
-        
-        # Create waiver for primary adult with minors nested
-        if primary_adult:
-            Waiver.objects.create(
-                name=primary_adult.get('name'),
-                email=primary_adult.get('email'),
-                phone=primary_adult.get('phone'),
-                dob=primary_adult.get('dob'),
-                participant_type='ADULT',
-                is_primary_signer=True,
-                party_booking=party_booking,
-                customer=party_booking.customer,
-                ip_address=ip_address,
-                version='1.0',
-                minors=participants.get('minors', []),  # Store minors in JSON field
-                adults=additional_adults  # Store additional adults in JSON field
-            )
-        
-        # Create separate waiver records for additional adults only
-        for adult in additional_adults:
-            Waiver.objects.create(
-                name=adult.get('name'),
-                email=adult.get('email'),
-                phone=adult.get('phone'),
-                dob=adult.get('dob'),
-                participant_type='ADULT',
-                is_primary_signer=False,
-                party_booking=party_booking,
-                customer=party_booking.customer,
-                ip_address=ip_address,
-                version='1.0'
-            )
+        # no separate waiver record any more.
         
         return Response({
             'success': True,
@@ -990,56 +1021,9 @@ def add_party_participants_view(request, uuid):
         party_booking.waiver_ip_address = ip_address
     party_booking.save()
     
-    # Delete existing waivers for this party booking to prevent duplicates
-    # This makes the endpoint idempotent - calling it multiple times won't create duplicates
-    Waiver.objects.filter(party_booking=party_booking).delete()
+    # Participants are stored on the booking (party_booking.participants) — there is
     
-    # Find the primary adult
-    primary_adult = None
-    additional_adults = []
-    
-    for adult in participants.get('adults', []):
-        if adult.get('is_primary', False):
-            primary_adult = adult
-        else:
-            additional_adults.append(adult)
-    
-    # If no primary adult is marked, use the first adult
-    if not primary_adult and participants.get('adults'):
-        primary_adult = participants['adults'][0]
-        additional_adults = participants['adults'][1:]
-    
-    # Create waiver for primary adult with minors nested
-    if primary_adult:
-        Waiver.objects.create(
-            name=primary_adult.get('name'),
-            email=primary_adult.get('email'),
-            phone=primary_adult.get('phone'),
-            dob=primary_adult.get('dob'),
-            participant_type='ADULT',
-            is_primary_signer=True,
-            party_booking=party_booking,
-            customer=party_booking.customer,
-            ip_address=ip_address,
-            version='1.0',
-            minors=participants.get('minors', []),  # Store minors in JSON field
-            adults=additional_adults  # Store additional adults in JSON field
-        )
-    
-    # Create separate waiver records for additional adults only
-    for adult in additional_adults:
-        Waiver.objects.create(
-            name=adult.get('name'),
-            email=adult.get('email'),
-            phone=adult.get('phone'),
-            dob=adult.get('dob'),
-            participant_type='ADULT',
-            is_primary_signer=False,
-            party_booking=party_booking,
-            customer=party_booking.customer,
-            ip_address=ip_address,
-            version='1.0'
-        )
+    # no separate waiver record any more.
     
     return Response({
         'success': True,

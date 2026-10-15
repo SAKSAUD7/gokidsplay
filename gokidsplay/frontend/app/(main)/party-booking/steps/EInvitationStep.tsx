@@ -117,7 +117,7 @@ export default function EInvitationStep({ bookingId, bookingDetails, onNext, onS
                     custom_message: customMessage,
                     party_date: bookingDetails.date,
                     party_time: bookingDetails.time,
-                    venue: "Go Kids Play Leicester"
+                    venue: "Go Kids Play Coventry"
                 })
             });
 
@@ -195,7 +195,7 @@ export default function EInvitationStep({ bookingId, bookingDetails, onNext, onS
                                                 {bookingDetails.date ? new Date(bookingDetails.date).toLocaleDateString() : 'Date'}
                                             </p>
                                             <p className="font-bold">@ {bookingDetails.time || 'Time'}</p>
-                                            <p className="text-sm opacity-90 mt-2">Go Kids Play Leicester</p>
+                                            <p className="text-sm opacity-90 mt-2">Go Kids Play Coventry</p>
                                         </div>
 
                                         {customMessage && (

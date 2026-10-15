@@ -4,7 +4,7 @@ Tests for bookings app models
 import pytest
 from django.utils import timezone
 from datetime import date, time
-from apps.bookings.models import Customer, Booking, PartyBooking, Waiver
+from apps.bookings.models import Customer, Booking, PartyBooking
 
 
 @pytest.mark.django_db
@@ -100,41 +100,3 @@ class TestPartyBookingModel:
         assert party.birthday_child_name == "Little Johnny"
         assert party.status == 'PENDING'
         assert party.uuid is not None
-
-
-@pytest.mark.django_db
-class TestWaiverModel:
-    """Test Waiver model"""
-    
-    def test_create_waiver(self):
-        """Test creating a waiver"""
-        waiver = Waiver.objects.create(
-            name="John Doe",
-            email="john@example.com",
-            participant_type='ADULT',
-            is_primary_signer=True
-        )
-        assert waiver.name == "John Doe"
-        assert waiver.participant_type == 'ADULT'
-        assert waiver.is_primary_signer is True
-        assert "John Doe" in str(waiver)
-    
-    def test_waiver_with_booking(self):
-        """Test waiver linked to booking"""
-        booking = Booking.objects.create(
-            name="Test User",
-            email="test@example.com",
-            phone="1234567890",
-            date=date.today(),
-            time=time(14, 0),
-            duration=60,
-            amount=1000.00
-        )
-        waiver = Waiver.objects.create(
-            name="Test User",
-            email="test@example.com",
-            participant_type='ADULT',
-            booking=booking
-        )
-        assert waiver.booking == booking
-        assert booking.waivers.count() == 1

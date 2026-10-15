@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 interface BookingDetails {
+    duration?: string | number; // session length in minutes
     date: string;
     time: string;
     name: string;
@@ -53,16 +54,14 @@ interface PaymentStepProps {
     onBack: () => void;
 }
 
-const MERCHANT_LABELS: Record<string, string> = {
-    "roller-skating":  "Go Kids Play Ltd",
-    "arcade":          "Go Kids Play Ltd",
-    "ten-pin-bowling": "Twinkle Town Ltd",
-};
+// All Go Kids Play activities are paid to the same merchant account
+const MERCHANT_LABELS: Record<string, string> = {};
 
 const ACTIVITY_LABELS: Record<string, string> = {
-    "roller-skating":  "Roller Skating",
-    "ten-pin-bowling": "Ten Pin Bowling",
-    "arcade":          "Arcade",
+    "soft-play":       "Mega Soft Play",
+    "laser-arena":     "Laser Arena",
+    "go-karts":        "Go Karts",
+    "inflatable-park": "Inflatable Park",
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
@@ -80,11 +79,10 @@ function formatDate(dateStr: string) {
     } catch { return dateStr; }
 }
 
-function formatTime(time: string, activity?: string | null) {
+function formatTime(time: string, durationMins: number = 60) {
     if (!time) return "—";
     const [h, m] = time.split(":").map(Number);
     const startMins = h * 60 + m;
-    const durationMins = activity === "ten-pin-bowling" ? 90 : 60;
     const endMins = startMins + durationMins;
     const fmtTime = (mins: number) => {
         const hh = Math.floor(mins / 60) % 24;
@@ -144,21 +142,19 @@ export function PaymentStep({
     const notes        = d.notes || "N/a";
 
     // Derived totals
-    let ticketsAdults    = adults * adultPrice;
-    let ticketsKids      = kids   * kidPrice;
+    // Go Kids Play sessions are flat per-person prices — no duration multiplier
+    // (must match the booking wizard total and the server-side price)
+    const ticketsAdults    = adults * adultPrice;
+    const ticketsKids      = kids   * kidPrice;
     const ticketsSpecs     = spectators * specPrice;
-    
-    if (d.duration === "120") {
-        ticketsAdults += adults * adultPrice;
-        ticketsKids += kids * kidPrice;
-    }
     
     const totalTickets     = ticketsAdults + ticketsKids + ticketsSpecs;
     
     // For party bookings, recalculate based on base package
     const partyBasePrice   = d.partyBasePrice ?? 250.00;
     const partyExtraKids   = d.partyExtraKids ?? Math.max(0, kids - 10);
-    const partyExtraSpecs  = d.partyExtraSpectators ?? Math.max(0, spectators - 10);
+    // Party wizard passes accompanying adults as `adults`
+    const partyExtraSpecs  = d.partyExtraSpectators ?? Math.max(0, (bookingType === "party" ? adults : spectators) - 10);
     const partyExtraKidsCost = partyExtraKids * (d.partyExtraKidPrice ?? 19.95);
     const partyExtraSpecsCost = partyExtraSpecs * (d.partyExtraSpectatorPrice ?? 2.95);
     
@@ -180,22 +176,7 @@ export function PaymentStep({
         setLoading(true);
         setError(null);
         try {
-            // Sync payment_type for party bookings based on selected amount
-            if (bookingType === "party") {
-                try {
-                    const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-                    await fetch(`${API}/bookings/party-bookings/${bookingId}/`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            payment_type: parseFloat(amountGBP) >= afterDiscount ? "FULL" : "DEPOSIT"
-                        })
-                    });
-                } catch (e) {
-                    console.error("Failed to sync payment_type", e);
-                }
-            }
-            
+            // (The party payment type — deposit or full — is stored when the booking is created.)
             // Use internal /api/payments/create-order proxy to avoid mixed-content (HTTPS→HTTP) errors
             const res = await fetch(`/api/payments/create-order`, {
                 method:  "POST",
@@ -250,13 +231,14 @@ export function PaymentStep({
                         </thead>
                         <tbody>
                             <Row label="Session Date"    value={formatDate(d.date)} />
-                            <Row label="Session Time"    value={formatTime(d.time, activity)} />
+                            <Row label="Session Time"    value={formatTime(d.time, Number(d.duration) || 60)} />
                             <Row label="Activity"        value={actLabel} />
 
                             {bookingType === "party" ? (
                                 <>
-                                    <Row label="Party Package Participants" value={`${adults + kids} (Up to 10 included)`} />
-                                    {spectators > 0 && <Row label="Spectators" value={`${spectators} (Up to 10 included)`} />}
+                                    {/* For parties: kids = participants, adults = spectators (accompanying adults) */}
+                                    <Row label="Party Participants (kids)" value={`${kids} (up to 10 included)`} />
+                                    {adults > 0 && <Row label="Accompanying adults" value={`${adults} (up to 10 included)`} />}
                                     
                                     <Row label="Party Base Package Price" value={fmt(partyBasePrice)} />
                                     {partyExtraKids > 0 && <Row label={`Extra Kids Price (${partyExtraKids} × ${fmt(d.partyExtraKidPrice ?? 19.95)})`} value={fmt(partyExtraKidsCost)} />}
@@ -265,11 +247,11 @@ export function PaymentStep({
                             ) : (
                                 <>
                                     <Row
-                                        label={activity === "ten-pin-bowling" ? "Bowlers Quantity" : "Skaters Quantity"}
+                                        label="Visitors"
                                         value={String(adults + kids)}
                                     />
                                     {spectators > 0 && (
-                                        <Row label="Spectators Quantity" value={String(spectators)} />
+                                        <Row label="Non-playing adults" value={String(spectators)} />
                                     )}
 
                                     {/* Add-ons */}
@@ -279,8 +261,8 @@ export function PaymentStep({
                                     {parkingQty > 0 && <Row label="Parking Spaces"     value={String(parkingQty)} />}
 
                                     {/* Pricing breakdown */}
-                                    <Row label={activity === "ten-pin-bowling" ? "Total Bowler Tickets Price" : "Total Skater Tickets Price"} value={fmt(ticketsAdults + ticketsKids)} />
-                                    {spectators > 0 && <Row label="Total Spectators Tickets Price" value={fmt(ticketsSpecs)} />}
+                                    <Row label="Visitor Tickets" value={fmt(ticketsAdults + ticketsKids)} />
+                                    {spectators > 0 && <Row label="Non-playing adult tickets" value={fmt(ticketsSpecs)} />}
                                     {skateQty  > 0 && <Row label="Total Skate Hire Price"  value={fmt(skateTotal)} />}
                                     {shoeQty   > 0 && <Row label="Total Shoe Hire Price"   value={fmt(shoeTotal)} />}
                                     {lockerQty > 0 && <Row label="Total Locker Hire Price" value={fmt(lockerTotal)} />}
@@ -288,10 +270,13 @@ export function PaymentStep({
                                 </>
                             )}
 
-                            <Row label="Paying Full Amount?" value="Yes" />
+                            <Row
+                                label="Paying Full Amount?"
+                                value={amount >= Math.round(grandTotal * 100) ? "Yes" : `No — paying ${fmt(amount / 100)} now`}
+                            />
 
                             <Row
-                                label="Amount Paying"
+                                label="Subtotal"
                                 value={fmt(afterDiscount)}
                                 bold
                             />
@@ -307,11 +292,12 @@ export function PaymentStep({
                                 <Row label="Discount Applied" value="No" accent />
                             )}
 
-                            <Row label="Pay For Locker?" value={lockerQty > 0 ? fmt(lockerTotal) : "£0"} />
+                            {lockerQty > 0 && <Row label="Pay For Locker?" value={fmt(lockerTotal)} />}
                             <Row label="Pay For Parking?" value={parkingQty > 0 ? fmt(parkingTotal) : "£0"} />
 
                             <Row label="Notes" value={notes} />
 
+                            {onlineFee > 0 && (
                             <tr className="bg-gray-50 border-b border-gray-200">
                                 <td className="py-2.5 px-4 text-sm text-gray-600">
                                     Online Booking Charge
@@ -320,6 +306,7 @@ export function PaymentStep({
                                 </td>
                                 <td className="py-2.5 px-4 text-sm text-gray-800 font-medium">{fmt(onlineFee)}</td>
                             </tr>
+                            )}
 
                             {/* Grand total */}
                             <tr className="bg-gray-900 text-white">

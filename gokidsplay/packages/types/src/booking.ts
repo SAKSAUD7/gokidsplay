@@ -56,7 +56,8 @@ export const bookingSchema = z.object({
     name: z.string()
         .min(3, "Name must be at least 3 characters")
         .max(100, "Name is too long")
-        .regex(/^[a-zA-Z\s.'-]+$/, "Name can only contain letters, spaces, dots, hyphens and apostrophes")
+        // Any alphabet (Zoë, José, Siobhán…), plus spaces, dots, hyphens and straight/curly apostrophes
+        .regex(/^[\p{L}\p{M}\s.'’-]+$/u, "Name can only contain letters, spaces, dots, hyphens and apostrophes")
         .transform((name) => name.trim()),
 
     email: z.string()

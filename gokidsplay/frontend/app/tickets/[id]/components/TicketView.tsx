@@ -3,7 +3,8 @@
 import { format } from "date-fns";
 import { Printer, Download, MapPin, Calendar, Clock, Users, CheckCircle, User } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -14,6 +15,17 @@ interface TicketViewProps {
 export const TicketView = ({ booking }: TicketViewProps) => {
     const componentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [qrDataUrl, setQrDataUrl] = useState<string>("");
+
+    // The QR code identifies the booking by its UUID; generated locally so no
+    // booking data is sent to a third-party QR service
+    useEffect(() => {
+        const ref = booking?.uuid || booking?.id;
+        if (!ref) return;
+        QRCode.toDataURL(String(ref), { errorCorrectionLevel: "M", width: 256, margin: 1 })
+            .then(setQrDataUrl)
+            .catch(() => setQrDataUrl(""));
+    }, [booking?.uuid, booking?.id]);
 
     const handleDownload = async () => {
         if (!componentRef.current) return;
@@ -75,8 +87,8 @@ export const TicketView = ({ booking }: TicketViewProps) => {
                     {/* Header */}
                     <div className="bg-black text-white p-8 flex justify-between items-center print:bg-black print:text-white">
                         <div>
-                            <h2 className="text-3xl font-black font-display uppercase tracking-wider">Go Kids Play Leicester</h2>
-                            <p className="opacity-70 text-sm mt-1">Skating · Bowling · Arcade</p>
+                            <h2 className="text-3xl font-black font-display uppercase tracking-wider">Go Kids Play Coventry</h2>
+                            <p className="opacity-70 text-sm mt-1">Soft Play · Laser Arena · Go Karts · Inflatable Park</p>
                         </div>
                         <div className="text-right">
                             <p className="text-xs opacity-50 uppercase tracking-widest">Booking Ref</p>
@@ -100,7 +112,7 @@ export const TicketView = ({ booking }: TicketViewProps) => {
                                     <p className="text-xs uppercase tracking-widest text-gray-500 mb-1">Time</p>
                                     <div className="flex items-center gap-2 font-bold text-lg">
                                         <Clock className="w-5 h-5 text-primary" />
-                                        {booking.time} ({booking.duration} min)
+                                        {String(booking.time || '').slice(0, 5)} ({booking.duration} min)
                                     </div>
                                 </div>
                             </div>
@@ -164,36 +176,34 @@ export const TicketView = ({ booking }: TicketViewProps) => {
                                 <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">Location</p>
                                 <div className="flex items-start gap-2 text-sm text-gray-600">
                                     <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
-                                    <p>Go Kids Play, Navigation Street, Leicester, LE1 3UR</p>
+                                    <p>Go Kids Play, 310 Kingfield Road, Coventry, CV1 4LD</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* QR Code & Status */}
                         <div className="flex flex-col items-center justify-center space-y-6 border-l border-gray-100 pl-8 print:border-l print:pl-8">
-                            {booking.qrCode && (
+                            {qrDataUrl && (
                                 <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-100">
-                                    <img src={booking.qrCode} alt="Booking QR Code" className="w-32 h-32 object-contain" />
+                                    <img src={qrDataUrl} alt="Booking QR Code" className="w-32 h-32 object-contain" />
                                 </div>
                             )}
                             <div className="text-center space-y-2">
                                 <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${booking.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                                     <CheckCircle size={12} /> {booking.paymentStatus === 'PAID' ? 'Paid' : 'Pay at Venue'}
                                 </div>
-                                <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${booking.waiverStatus === 'SIGNED' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                                    {booking.waiverStatus === 'SIGNED' ? 'Waiver Signed' : 'Waiver Pending'}
-                                </div>
                             </div>
                             <div className="text-center">
-                                <p className="text-xs text-gray-400 uppercase tracking-widest">Total Paid</p>
-                                <p className="text-2xl font-black text-black">£ {(booking.amount / 100).toFixed(2)}</p>
+                                <p className="text-xs text-gray-400 uppercase tracking-widest">{booking.paymentStatus === 'PAID' ? 'Total Paid' : 'Total'}</p>
+                                {/* amount is stored in pounds */}
+                                <p className="text-2xl font-black text-black">£{Number(booking.amount || 0).toFixed(2)}</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Footer */}
                     <div className="bg-gray-50 p-6 text-center text-xs text-gray-400 border-t border-gray-100 print:bg-gray-50 print:text-gray-400">
-                        <p>Please arrive 15 minutes before your scheduled session. Grip socks required for skating.</p>
+                        <p>Please arrive 15 minutes before your scheduled session. Grip socks required for soft play and the inflatable park.</p>
                         <p className="mt-1">For support, contact info@gokidsplay.co.uk or call 07349 110 865</p>
                     </div>
                 </div>

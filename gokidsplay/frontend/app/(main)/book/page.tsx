@@ -6,7 +6,7 @@ import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
     "Book a Play Session",
-    "Book your play session at Go Kids Play Coventry online. Roller skating, laser arena, go karts, soft play & more. Open weekends and school holidays. Easy, fast online booking."
+    "Book your play session at Go Kids Play Coventry online. Soft play, laser arena, go karts, inflatable park & more. Open weekends and school holidays. Easy, fast online booking."
 );
 
 export default async function BookingPage() {

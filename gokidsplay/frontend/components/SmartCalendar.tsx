@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { isSchoolHoliday, isHolidayOpen, nowInUK, todayInUK } from "@/lib/api/types";
+import { isSchoolHoliday, isHolidayOpen, getOpeningHours, nowInUK, todayInUK } from "@/lib/api/types";
 import type { BookingBlock } from "@/lib/api/booking-blocks";
 
 interface SmartCalendarProps {
@@ -35,8 +35,8 @@ function getDayType(
         if (dateStr >= start && dateStr <= end) return "blocked";
     }
 
-    // Monday: CLOSED unless it's a school holiday or public holiday
-    if (dow === 1 && !isHolidayOpen(dateStr)) return "closed";
+    // Closed days (Mon–Wed in term time) — same opening hours as the time-slot picker
+    if (!getOpeningHours(dateStr)) return "closed";
 
     // Weekend
     if (dow === 0 || dow === 6) return "weekend";
@@ -70,7 +70,7 @@ const TYPE_STYLES: Record<string, { cell: string; dot: string; label: string }> 
     "school-holiday": {
         cell: "hover:bg-emerald-500/20 cursor-pointer",
         dot: "bg-emerald-400",
-        label: "Open (12pm+)",
+        label: "Open (10am+)",
     },
     weekend: {
         cell: "hover:bg-primary/20 cursor-pointer",
@@ -189,8 +189,8 @@ export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, ma
             <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                 {[
                     { dot: "bg-red-500", label: "Closed" },
-                    { dot: "bg-yellow-400", label: "Term-time (12pm+)" },
-                    { dot: "bg-emerald-400", label: "School holiday (12pm+)" },
+                    { dot: "bg-yellow-400", label: "Thu–Fri (3pm+)" },
+                    { dot: "bg-emerald-400", label: "School holiday (10am+)" },
                     { dot: "bg-primary", label: "Weekend (12pm+)" },
                 ].map(l => (
                     <div key={l.label} className="flex items-center gap-1">

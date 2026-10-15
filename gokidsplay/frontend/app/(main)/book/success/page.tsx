@@ -391,8 +391,8 @@ function SuccessPageContent() {
                     <div className="flex items-start gap-3 bg-white/5 border border-white/10 rounded-xl p-4 mb-8">
                         <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-white font-bold text-sm">Go Kids Play Leicester</p>
-                            <p className="text-white/50 text-xs">Ramdoot House, Navigation Street, Leicester, LE1 3UR</p>
+                            <p className="text-white font-bold text-sm">Go Kids Play Coventry</p>
+                            <p className="text-white/50 text-xs">310 Kingfield Road, Coventry, CV1 4LD</p>
                         </div>
                     </div>
 

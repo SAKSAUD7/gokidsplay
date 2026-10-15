@@ -51,7 +51,7 @@ export default function InstagramReels({ reels = [] }: { reels?: InstagramReel[]
 
                 <div className="mt-8 text-center">
                     <Link
-                        href="https://www.instagram.com/gokidsplayleicester"
+                        href="https://www.instagram.com/gokidsplay/"
                         target="_blank"
                         className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:opacity-90 transition-opacity shadow-lg shadow-purple-600/20"
                     >

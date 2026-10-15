@@ -128,15 +128,22 @@ export async function createPartyBooking(formData: any) {
             deposit_amount: totalAmount * depositPercentage,
             payment_type: paymentOption === 'full' ? 'FULL' : 'DEPOSIT',
             discount_amount: discountAmount,
+            voucher_code: voucherCode,
             booking_status: "PENDING",
             payment_status: "PENDING",
             waiver_status: "PENDING",
             customer_id: formData.customerId || null,
         };
 
+        // Staff bookings carry the admin token; public bookings are priced server-side by the API
+        const { cookies } = await import("next/headers");
+        const adminToken = cookies().get("admin_token")?.value;
         const bookingRes = await fetch(`${API_URL}/bookings/party-bookings/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+            },
             body: JSON.stringify(partyBookingPayload)
         });
 
@@ -156,8 +163,9 @@ export async function createPartyBooking(formData: any) {
             bookingId: booking.uuid || String(booking.id),
             bookingIntId: booking.id,
             booking,
-            amount: totalAmount,
-            depositAmount: totalAmount * depositPercentage // 50% deposit
+            // Charge exactly what the API stored
+            amount: Number(booking.amount ?? totalAmount),
+            depositAmount: Number(booking.deposit_amount ?? totalAmount * depositPercentage),
 
         };
     } catch (error) {

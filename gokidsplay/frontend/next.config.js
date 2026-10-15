@@ -150,7 +150,13 @@ const nextConfig = {
             },
             {
                 source: '/information/disclaimer',
-                destination: '/safety',
+                destination: '/disclaimer',
+                permanent: true,
+            },
+            {
+                // The old SpinPin roller-skating safety page — Go Kids Play's rules live on /guidelines
+                source: '/safety',
+                destination: '/guidelines',
                 permanent: true,
             },
             {

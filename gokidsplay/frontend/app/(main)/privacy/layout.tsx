@@ -2,7 +2,7 @@ import { getMetadata } from "@/seo/seo.config";
 
 export const metadata = getMetadata(
     "Privacy Policy | Information",
-    "Go Kids Play is Leicester's go-to destination for fun and entertainment, offering rollerskating, bowling, party bookings and more.",
+    "Go Kids Play is Coventry's indoor play centre — soft play, laser arena, go karts, inflatable park and birthday parties.",
     true
 );
 

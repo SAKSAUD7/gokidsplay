@@ -101,7 +101,7 @@ export default function ContactContent({ settings, hours, content }: ContactCont
                         alt={hero.title}
                         className="w-full h-full object-cover opacity-30"
                         onError={(e) => {
-                            e.currentTarget.src = "/hero-background.jpg";
+                            e.currentTarget.src = "/images/hero-background.jpg";
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/80 to-background" />

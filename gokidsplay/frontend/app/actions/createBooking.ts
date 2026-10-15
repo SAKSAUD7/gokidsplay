@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { bookingSchema, formatPhoneNumber } from "@repo/types";
-import QRCode from "qrcode";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
@@ -21,7 +20,8 @@ function generateBookingNumber(): string {
 function sanitizeString(input: string): string {
     return input
         .replace(/[<>]/g, '') // Remove < and > to prevent HTML injection
-        .replace(/[^\w\s.@'-]/g, '') // Allow only alphanumeric, spaces, dots, @, hyphens, apostrophes
+        // Allow letters/digits in any alphabet (Zoë, José…), spaces, dots, @, hyphens, apostrophes
+        .replace(/[^\p{L}\p{M}\p{N}\s.@'’-]/gu, '')
         .trim();
 }
 
@@ -41,8 +41,17 @@ function isValidPhone(phone: string): boolean {
 
 export async function createBooking(formData: any) {
     try {
-        // Admin manual bookings don't have waiver/DOB fields — use a simpler schema
-        const isAdminBooking = formData.waiverAccepted === undefined;
+        // Admin manual bookings are identified by the signed-in admin session (never by a
+        // client-supplied flag, since server actions can be called by anyone). They use a
+        // simpler schema, skip the online booking fee, and are sent to the API as staff.
+        const { getAdminSession } = await import("@/app/lib/admin-auth");
+        const adminSession = await getAdminSession().catch(() => null);
+        const isAdminBooking = !!adminSession;
+        const adminToken = isAdminBooking ? (await import("next/headers")).cookies().get("admin_token")?.value : undefined;
+        const apiHeaders: Record<string, string> = {
+            "Content-Type": "application/json",
+            ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+        };
 
         let data: any;
 
@@ -209,7 +218,7 @@ export async function createBooking(formData: any) {
         // Check for duplicate bookings using the dedicated public endpoint
         const checkDuplicateRes = await fetch(
             `${API_URL}/bookings/bookings/check_duplicate/?email=${encodeURIComponent(sanitizedEmail)}&date=${data.date}&time=${data.time}`,
-            { next: { revalidate: 60 } }
+            { cache: "no-store" }
         );
 
         if (checkDuplicateRes.ok) {
@@ -249,9 +258,11 @@ export async function createBooking(formData: any) {
             customer_id: formData.customerId || null,
         };
 
+        // The API recalculates the price for public bookings, so the amount below is
+        // informational for staff bookings only
         const bookingRes = await fetch(`${API_URL}/bookings/bookings/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: apiHeaders,
             body: JSON.stringify(bookingPayload)
         });
 
@@ -280,59 +291,6 @@ export async function createBooking(formData: any) {
 
         const booking = await bookingRes.json();
 
-        // Create waiver ONLY if customer accepted it
-        if (data.waiverAccepted) {
-            const waiverPayload = {
-                name: sanitizedName,
-                email: sanitizedEmail,
-                phone: sanitizedPhone,
-                dob: data.dateOfBirth || null,
-                participant_type: 'ADULT',
-                is_primary_signer: true,
-                version: "1.0",
-                minors: data.minors || [],
-                adults: data.adultGuests || [],
-                booking: booking.id
-            };
-
-            await fetch(`${API_URL}/bookings/waivers/`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(waiverPayload)
-            });
-
-            // Update booking waiver status to SIGNED (since waiver was just created)
-            await fetch(`${API_URL}/bookings/bookings/${booking.id}/`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ waiver_status: "SIGNED" })
-            });
-        }
-        // If waiver not accepted, status stays PENDING (default)
-
-        // Generate QR Code for the booking
-        const qrData = JSON.stringify({
-            id: booking.uuid || booking.id,
-            name: booking.name,
-            date: booking.date,
-            time: booking.time,
-            guests: booking.adults + booking.kids + booking.spectators
-        });
-
-        const qrCode = await QRCode.toDataURL(qrData, {
-            errorCorrectionLevel: 'H',
-            type: 'image/png',
-            width: 300,
-            margin: 2,
-        });
-
-        // Update booking with QR code
-        await fetch(`${API_URL}/bookings/bookings/${booking.id}/`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ qr_code: qrCode })
-        });
-
         console.log("Booking created successfully:", {
             id: booking.id,
             uuid: booking.uuid,
@@ -350,7 +308,8 @@ export async function createBooking(formData: any) {
             bookingId: booking.uuid || booking.id, // UUID for display/tracking
             bookingIntId: booking.id, // Integer ID for backend operations (payments)
             bookingNumber: bookingNumber,
-            amount: Number(totalAmount.toFixed(2)), // Total amount for SumUp payment
+            // Charge exactly what the API stored (it prices public bookings server-side)
+            amount: Number(booking.amount ?? totalAmount),
         };
     } catch (error) {
         console.error("Failed to create booking:", error);

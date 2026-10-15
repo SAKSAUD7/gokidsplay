@@ -44,7 +44,7 @@ export default async function AdminLoginPage() {
                                 Admin Portal
                             </span>
                             <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-                            <p className="text-slate-500 text-sm mt-1">Sign in to manage Go Kids Play Leicester</p>
+                            <p className="text-slate-500 text-sm mt-1">Sign in to manage Go Kids Play Coventry</p>
                         </div>
 
                         <AdminLoginForm loginAction={loginAdmin as any} />
@@ -57,7 +57,7 @@ export default async function AdminLoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-slate-500 text-xs mt-4">
-                    &copy; {new Date().getFullYear()} Go Kids Play Leicester
+                    &copy; {new Date().getFullYear()} Go Kids Play Coventry
                 </p>
             </div>
         </div>

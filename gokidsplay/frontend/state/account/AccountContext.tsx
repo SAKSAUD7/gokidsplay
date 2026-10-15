@@ -15,8 +15,8 @@ interface AccountContextType {
     customer: Customer | null;
     token: string | null;
     loading: boolean;
-    login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-    register: (name: string, email: string, phone: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    login: (email: string, password: string) => Promise<{ success: boolean; error?: string; customer?: { id: number } & Record<string, any> }>;
+    register: (name: string, email: string, phone: string, password: string) => Promise<{ success: boolean; error?: string; customer?: { id: number } & Record<string, any> }>;
     logout: () => void;
     updateProfile: (data: { name?: string; phone?: string }) => Promise<boolean>;
 }
@@ -71,7 +71,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem(TOKEN_KEY, data.token);
                 setToken(data.token);
                 setCustomer(data.customer);
-                return { success: true };
+                return { success: true, customer: data.customer };
             }
             return { success: false, error: data.error || "Login failed." };
         } catch {
@@ -91,7 +91,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem(TOKEN_KEY, data.token);
                 setToken(data.token);
                 setCustomer(data.customer);
-                return { success: true };
+                return { success: true, customer: data.customer };
             }
             return { success: false, error: data.error || "Registration failed." };
         } catch {

@@ -12,7 +12,7 @@ import { PartyBookingPDF } from "../../../components/PartyBookingPDF";
 import { fetchBookingBlocks, isDateBlocked, BookingBlock } from "@/lib/api/booking-blocks";
 import { PageSection } from "@/lib/cms/types";
 import { SmartCalendar } from "@/components/SmartCalendar";
-import { isSchoolHoliday, isHolidayOpen } from "@/lib/api/types";
+import { isSchoolHoliday, isHolidayOpen, getAvailableTimeSlots } from "@/lib/api/types";
 import { useAccount } from "@/state/account/AccountContext";
 
 interface PartyBookingWizardProps {
@@ -145,11 +145,25 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         // ...
 
         setParticipantError("");
-        setIsSubmitting(true);
 
+        // The booking is only created once the customer is signed in, so visitors who
+        // leave at the sign-in step don't leave abandoned party bookings behind.
+        if (customer) {
+            await createBookingAndContinue(customer.id);
+        } else {
+            setStep(2); // Auth gate
+        }
+    };
+
+    /** Create the party booking (once per wizard run) and move on to the participants step. */
+    const createBookingAndContinue = async (customerId?: number | string) => {
+        if (tempBookingId) {
+            setStep(3);
+            return;
+        }
+        setIsSubmitting(true);
         try {
-            // Create the initial booking
-            const result = await createPartyBooking({ ...formData, customerId: customer?.id, paymentOption });
+            const result = await createPartyBooking({ ...formData, customerId: customerId ?? customer?.id, paymentOption });
 
             if (result.success) {
                 setTempBookingId(result.bookingId);            // UUID string
@@ -160,12 +174,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                     ...result.booking,
                     bookingId: result.bookingId
                 });
-                // If already logged in, skip to participants
-                if (customer) {
-                    setStep(3);
-                } else {
-                    setStep(2); // Auth gate
-                }
+                setStep(3);
             } else {
                 alert(result.error || "Failed to create booking. Please try again.");
             }
@@ -188,7 +197,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         }
         setIsAuthenticating(false);
         if (res.success) {
-            setStep(3); // Go to participants
+            await createBookingAndContinue(res.customer?.id);
         } else {
             setAuthError(res.error || "Authentication failed. Please try again.");
         }
@@ -539,18 +548,25 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                             onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                                             className="w-full px-4 py-3 bg-background-dark border-2 border-surface-700 rounded-xl focus:border-primary focus:outline-none transition-colors text-white"
                                         >
-                                            <option value="">Select time</option>
-                                            {(config?.available_time_slots || ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"]).filter((slot: string) => {
-                                                if (!formData.date) return true;
-                                                const dow = new Date(formData.date + 'T12:00:00').getDay();
-                                                const isHoliday = isHolidayOpen(formData.date);
-                                                // Tue-Fri (2-5) open at 14:00 unless holiday
-                                                if (dow >= 2 && dow <= 5 && !isHoliday) {
-                                                    const hour = parseInt(slot.split(':')[0]);
-                                                    if (hour < 14) return false;
-                                                }
-                                                return true;
-                                            }).map((slot: string) => (
+                                            <option value="">{formData.date ? "Select time" : "Select a date first"}</option>
+                                            {(() => {
+                                                if (!formData.date) return [];
+                                                // Same opening hours as session bookings; a party lasts 2 hours,
+                                                // so the last start time leaves a full party before closing.
+                                                const openSlots = getAvailableTimeSlots(formData.date);
+                                                // Admin-configured party start times may be "2:00 PM" or "14:00" — normalise to 24h
+                                                const to24h = (t: string) => {
+                                                    const m = String(t).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);
+                                                    if (!m) return "";
+                                                    let h = parseInt(m[1], 10);
+                                                    if (m[3]) h = (h % 12) + (m[3].toUpperCase() === "PM" ? 12 : 0);
+                                                    return `${String(h).padStart(2, "0")}:${m[2]}`;
+                                                };
+                                                const configured: string[] = Array.isArray(config?.available_time_slots)
+                                                    ? config.available_time_slots.map(to24h).filter(Boolean)
+                                                    : [];
+                                                return configured.length > 0 ? openSlots.filter((slot) => configured.includes(slot)) : openSlots;
+                                            })().map((slot: string) => (
                                                 <option key={slot} value={slot}>{slot}</option>
                                             ))}
                                         </select>
@@ -606,7 +622,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                             onChange={(e) => setFormData({ ...formData, spectators: parseInt(e.target.value) || 0 })}
                                             className="w-full px-4 py-3 bg-background-dark border-2 border-surface-700 rounded-xl focus:border-primary focus:outline-none transition-colors text-white"
                                         />
-                                        <p className="text-xs text-white/50 mt-1">First {config?.free_spectators ?? 2} accompanying adults free</p>
+                                        <p className="text-xs text-white/50 mt-1">First {config?.free_spectators ?? 10} accompanying adults free</p>
                                     </div>
                                 </div>
 
@@ -816,6 +832,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                             bookingDetails={{
                                 date: formData.date,
                                 time: formData.time,
+                                duration: 120, // parties last 2 hours
                                 name: formData.name,
                                 email: formData.email,
                                 phone: formData.phone,

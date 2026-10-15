@@ -43,7 +43,7 @@ export default function RootLayout({
                                     "@type": "LocalBusiness",
                                     "@id": "https://gokidsplay.co.uk/#localbusiness",
                                     "name": "Go Kids Play",
-                                    "description": "Go Kids Play is Coventry's premier indoor family entertainment centre offering roller skating, laser arena, go-karts, soft play and party bookings.",
+                                    "description": "Go Kids Play is Coventry's premier indoor family entertainment centre offering soft play, laser arena, go-karts, an inflatable park and party bookings.",
                                     "url": "https://gokidsplay.co.uk",
                                     "logo": "https://gokidsplay.co.uk/gokidsplay-logo.png",
                                     "image": "https://gokidsplay.co.uk/gokidsplay-logo.png",

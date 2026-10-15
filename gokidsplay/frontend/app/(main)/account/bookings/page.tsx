@@ -163,7 +163,7 @@ export default function AccountBookingsPage() {
                     <div className="flex items-center justify-between">
                         <div>
                             <div className="text-white font-bold">{pageConfig?.cta_title || "Book Another Session"}</div>
-                            <div className="text-white/50 text-sm">{pageConfig?.cta_subtitle || "Skating, bowling — book your next visit"}</div>
+                            <div className="text-white/50 text-sm">{pageConfig?.cta_subtitle || "Soft play, laser arena, go karts — book your next visit"}</div>
                         </div>
                         <ChevronRight className="w-5 h-5 text-pink-400 group-hover:translate-x-1 transition-transform" />
                     </div>

@@ -22,7 +22,7 @@ import {
 
 import { motion, AnimatePresence } from "framer-motion";
 
-import { bookingSchema, type BookingFormData, getAvailableTimeSlots, isTimeInPast, isSchoolHoliday, isPublicHoliday, isHolidayOpen } from "../lib/api/types";
+import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningHours, isTimeInPast, isSchoolHoliday, isPublicHoliday, isHolidayOpen } from "../lib/api/types";
 
 import { useToast } from "./ToastProvider";
 
@@ -36,6 +36,15 @@ import { fetchBookingBlocks, isDateBlocked, BookingBlock } from "../lib/api/book
 import { SmartCalendar } from "./SmartCalendar";
 
 
+
+/** Per-activity add-on (none are currently offered — parking is a global add-on). */
+interface ActivityAddOn {
+    id: string;
+    emoji: string;
+    label: string;
+    description: string;
+    price: number;
+}
 
 // --- Activity definitions -----------------------------------------------------
 // NOTE: Arcade is walk-in only (tokens bought at venue). Only Skating + Bowling bookable.
@@ -52,7 +61,7 @@ const ACTIVITIES = [
         accentColor: "text-pink-400",
         borderColor: "border-pink-500/40",
         bgColor: "bg-pink-500/10",
-        addOns: [],
+        addOns: [] as ActivityAddOn[],
         minAge: { adults: "18+", kids: "0–12 yrs", note: "Under 5s have dedicated zone" },
     },
     {
@@ -66,7 +75,7 @@ const ACTIVITIES = [
         accentColor: "text-blue-400",
         borderColor: "border-blue-500/40",
         bgColor: "bg-blue-500/10",
-        addOns: [],
+        addOns: [] as ActivityAddOn[],
         minAge: { adults: "18+", kids: "5+ yrs", note: "Minimum age 5 years" },
     },
     {
@@ -80,7 +89,7 @@ const ACTIVITIES = [
         accentColor: "text-orange-400",
         borderColor: "border-orange-500/40",
         bgColor: "bg-orange-500/10",
-        addOns: [],
+        addOns: [] as ActivityAddOn[],
         minAge: { adults: "18+", kids: "3+ yrs", note: "Height restrictions may apply" },
     },
     {
@@ -94,7 +103,7 @@ const ACTIVITIES = [
         accentColor: "text-purple-400",
         borderColor: "border-purple-500/40",
         bgColor: "bg-purple-500/10",
-        addOns: [],
+        addOns: [] as ActivityAddOn[],
         minAge: { adults: "18+", kids: "4+ yrs", note: "Grip socks required" },
     }
 ]
@@ -368,8 +377,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
             }
 
             // Set duration to 120 mins
-            const availabilityMap = getAvailableTimeSlots(formData.date);
-            const slots = Object.keys(availabilityMap);
+            const slots = getAvailableTimeSlots(formData.date);
 
             setAvailableSlots(slots);
 
@@ -426,7 +434,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     // Build activity add-ons with CMS prices applied
     // GKP activities currently have no per-activity add-ons — only global add-ons (parking) apply.
-    const getActivityAddOns = (_activityId: string) => [];
+    const getActivityAddOns = (_activityId: string): ActivityAddOn[] => [];
 
 
 
@@ -578,7 +586,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                 setAppliedVoucher(result.code || voucher);
 
-                setVoucherMessage(`? Voucher applied: ${(result.discount / 100).toFixed(2)} off`);
+                setVoucherMessage(`✅ Voucher applied: £${(result.discount / 100).toFixed(2)} off`);
 
                 setValue("voucherCode", result.code);
 
@@ -599,6 +607,22 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
     };
 
 
+
+    // Surface validation problems instead of failing silently when "Pay" is pressed
+    const handleInvalid = (formErrors: Record<string, any>) => {
+        const findMessage = (err: any): string | undefined => {
+            if (!err) return undefined;
+            if (typeof err.message === "string" && err.message) return err.message;
+            for (const value of Object.values(err)) {
+                const msg = findMessage(value);
+                if (msg) return msg;
+            }
+            return undefined;
+        };
+        const firstKey = Object.keys(formErrors)[0];
+        console.warn("Booking form invalid:", formErrors);
+        showToast("error", findMessage(formErrors) || `Please check the "${firstKey}" field and try again.`);
+    };
 
     const handlePayment = async (data: BookingFormData) => {
 
@@ -723,7 +747,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                         <div className="col-span-2"><span className="block text-xs text-white/50 uppercase font-bold mb-1">Amount Paid</span>
 
-                            <span className="font-bold text-primary text-2xl">{Math.max(0, totals.total - discount / 100).toFixed(2)}</span></div>
+                            <span className="font-bold text-primary text-2xl">£{Math.max(0, totals.total - discount / 100).toFixed(2)}</span></div>
 
                     </div>
 
@@ -773,7 +797,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         <FormProvider {...methods}>
 
-            <form onSubmit={handleSubmit(handlePayment)}>
+            <form onSubmit={handleSubmit(handlePayment, handleInvalid)}>
 
                 <div className="bg-surface-800/50 backdrop-blur-md rounded-2xl md:rounded-[2rem] shadow-glass overflow-hidden max-w-5xl mx-auto border border-white/10">
 
@@ -791,9 +815,10 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                     const Icon = s.icon;
 
-                                    const isActive = step === i + 1;
+                                    // step is 0-based (0 = Activity … 5 = Summary, 6 = payment)
+                                    const isActive = step === i;
 
-                                    const isDone = step > i + 1;
+                                    const isDone = step > i;
 
                                     return (
 
@@ -945,7 +970,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className={`mt-5 flex items-center gap-2 text-sm font-bold ${act.accentColor}`}>
 
-                                                    From {prices.adult.toFixed(2)} / person <ChevronRight className="w-4 h-4" />
+                                                    From £{prices.adult.toFixed(2)} / person <ChevronRight className="w-4 h-4" />
 
                                                 </div>
 
@@ -1090,7 +1115,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                         <School className="w-4 h-4 mt-0.5 flex-shrink-0" />
 
-                                                        <span><strong>Holiday!</strong> We're open from <strong>12:00 PM</strong> today 🎉 Perfect for families!</span>
+                                                        <span><strong>Holiday!</strong> We're open from <strong>{getOpeningHours(formData.date)?.open ?? 10}:00</strong> today 🎉 Perfect for families!</span>
 
                                                     </div>
 
@@ -1113,21 +1138,21 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             }
 
-                                            const hoursMap: Record<number, string> = {
-
-                                                0: 'Sun: 12:00 – 22:00', 2: 'Tue: 14:00 – 22:00',
-
-                                                3: 'Wed: 14:00 – 22:00', 4: 'Thu: 14:00 – 22:00',
-
-                                                5: 'Fri: 14:00 – 22:00', 6: 'Sat: 12:00 – 23:00',
-
-                                            };
+                                            const dayHours = getOpeningHours(formData.date);
+                                            if (!dayHours) {
+                                                return (
+                                                    <p className="text-red-400 text-xs mt-2 flex items-center gap-1">
+                                                        <AlertCircle className="w-3 h-3" /> We are closed on this day — please pick another date.
+                                                    </p>
+                                                );
+                                            }
+                                            const dayName = new Date(formData.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' });
 
                                             return (
 
                                                 <p className="text-white/50 text-xs mt-2 flex items-center gap-1">
 
-                                                    <Clock className="w-3 h-3" /> Open {hoursMap[dow]} on this day
+                                                    <Clock className="w-3 h-3" /> Open {dayName}: {dayHours.open}:00 – {dayHours.close}:00 on this day
 
                                                 </p>
 
@@ -1310,14 +1335,14 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             {
                                                 key: "adults" as const,
-                                                label: activity?.minAge.adults === "Any" ? "Adults & Kids" : `Adults & Kids (${activity?.minAge.adults})`,
+                                                label: activity?.minAge.adults === "Any" ? "Adults" : `Adults (${activity?.minAge.adults})`,
                                                 note: `\u00A3${prices.adult.toFixed(2)} per person`,
                                                 emoji: "\u{1F9D1}",
                                                 min: 1,
                                             },
                                             {
                                                 key: "kids" as const,
-                                                label: `Young Kids (${activity?.minAge.kids})`,
+                                                label: `Kids (${activity?.minAge.kids})`,
                                                 note: `\u00A3${prices.kid.toFixed(2)} per child`,
                                                 emoji: "\u{1F476}",
                                                 min: 0,
@@ -1352,6 +1377,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <button type="button"
 
+                                                        aria-label={`Remove one: ${g.label}`}
                                                         onClick={() => setValue(g.key, Math.max(g.min, (formData[g.key] || 0) - 1), { shouldValidate: true })}
 
                                                         className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all font-bold text-lg">
@@ -1368,6 +1394,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <button type="button"
 
+                                                        aria-label={`Add one: ${g.label}`}
                                                         onClick={() => setValue(g.key, (formData[g.key] || 0) + 1, { shouldValidate: true })}
 
                                                         className="w-9 h-9 rounded-full bg-primary/80 hover:bg-primary text-black flex items-center justify-center transition-all">
@@ -1419,7 +1446,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                                     <div className="text-white font-semibold">{ao.label}</div>
 
-                                                                    <div className="text-white/50 text-xs">{ao.description}  {ao.price.toFixed(2)} each</div>
+                                                                    <div className="text-white/50 text-xs">{ao.description} · £{ao.price.toFixed(2)} each</div>
 
                                                                 </div>
 
@@ -1429,6 +1456,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                                 <button type="button"
 
+                                                                    aria-label={`Remove one: ${ao.label}`}
                                                                     onClick={() => setSelectedAddOns(prev => ({ ...prev, [ao.id]: Math.max(0, (prev[ao.id] || 0) - 1) }))}
 
                                                                     className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center">
@@ -1441,6 +1469,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                                 <button type="button"
 
+                                                                    aria-label={`Add one: ${ao.label}`}
                                                                     onClick={() => setSelectedAddOns(prev => ({ ...prev, [ao.id]: (prev[ao.id] || 0) + 1 }))}
 
                                                                     className="w-8 h-8 rounded-full bg-primary/70 hover:bg-primary text-black flex items-center justify-center">
@@ -1479,7 +1508,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <button type="button"
+                                                        <button type="button" aria-label="Remove one parking space"
                                                             onClick={() => {
                                                                 const next = Math.max(0, (selectedGlobalAddOns['parking'] || 0) - 1);
                                                                 setSelectedGlobalAddOns(prev => ({ ...prev, parking: next }));
@@ -1490,7 +1519,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                             <Minus className="w-4 h-4" />
                                                         </button>
                                                         <span className="text-white font-black text-xl w-6 text-center">{selectedGlobalAddOns['parking'] || 0}</span>
-                                                        <button type="button"
+                                                        <button type="button" aria-label="Add one parking space"
                                                             onClick={() => {
                                                                 const next = Math.min(5, (selectedGlobalAddOns['parking'] || 0) + 1);
                                                                 setSelectedGlobalAddOns(prev => ({ ...prev, parking: next }));
@@ -1544,7 +1573,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
 
-                                                {totals.total.toFixed(2)}
+                                                £{totals.total.toFixed(2)}
 
                                             </span>
 
@@ -1805,9 +1834,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className="flex justify-between text-sm text-white/80">
 
-                                                    <span>Adults/Kids (7+)  {formData.adults}</span>
+                                                    <span>Adults × {formData.adults}</span>
 
-                                                    <span className="font-bold">{(formData.adults * prices.adult).toFixed(2)}</span>
+                                                    <span className="font-bold">£{(formData.adults * prices.adult).toFixed(2)}</span>
 
                                                 </div>
 
@@ -1817,9 +1846,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className="flex justify-between text-sm text-white/80">
 
-                                                    <span>Young Kids (16)  {formData.kids}</span>
+                                                    <span>Kids × {formData.kids}</span>
 
-                                                    <span className="font-bold">{(formData.kids * prices.kid).toFixed(2)}</span>
+                                                    <span className="font-bold">£{(formData.kids * prices.kid).toFixed(2)}</span>
 
                                                 </div>
 
@@ -1831,7 +1860,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <span>Spectators  {formData.spectators}</span>
 
-                                                    <span className="font-bold">{(formData.spectators * prices.spectator).toFixed(2)}</span>
+                                                    <span className="font-bold">£{(formData.spectators * prices.spectator).toFixed(2)}</span>
 
                                                 </div>
 
@@ -1853,7 +1882,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                         <span>{ao.emoji} {ao.label}  {qty}</span>
 
-                                                        <span className="font-bold">{(ao.price * qty).toFixed(2)}</span>
+                                                        <span className="font-bold">£{(ao.price * qty).toFixed(2)}</span>
 
                                                     </div>
 
@@ -1905,7 +1934,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className="flex justify-between text-white/60 text-sm mb-1">
 
-                                                    <span>Subtotal</span><span>{totals.subtotal.toFixed(2)}</span>
+                                                    <span>Subtotal</span><span>£{totals.subtotal.toFixed(2)}</span>
 
                                                 </div>
 
@@ -1913,7 +1942,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <div className="flex justify-between text-white/60 text-sm mb-1">
 
-                                                        <span>Tax</span><span>{totals.gst.toFixed(2)}</span>
+                                                        <span>VAT</span><span>£{totals.gst.toFixed(2)}</span>
 
                                                     </div>
 
@@ -1921,7 +1950,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className="flex justify-between text-white/60 text-sm mb-1">
 
-                                                    <span>Online Booking Fee</span><span>{totals.onlineBookingFee.toFixed(2)}</span>
+                                                    <span>Online Booking Fee</span><span>£{totals.onlineBookingFee.toFixed(2)}</span>
 
                                                 </div>
 
@@ -1929,7 +1958,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <div className="flex justify-between text-green-400 text-sm mb-1">
 
-                                                        <span>Discount</span><span>- {(discount / 100).toFixed(2)}</span>
+                                                        <span>Discount</span><span>- £{(discount / 100).toFixed(2)}</span>
 
                                                     </div>
 
@@ -1941,7 +1970,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                     <span className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
 
-                                                        {Math.max(0, totals.total - discount / 100).toFixed(2)}
+                                                        £{Math.max(0, totals.total - discount / 100).toFixed(2)}
 
                                                     </span>
 
@@ -2011,7 +2040,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             ) : (
 
-                                                <><CreditCard className="w-5 h-5" /> Pay {Math.max(0, totals.total - discount / 100).toFixed(2)}</>
+                                                <><CreditCard className="w-5 h-5" /> Pay £{Math.max(0, totals.total - discount / 100).toFixed(2)}</>
 
                                             )}
 
@@ -2021,7 +2050,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                         <p className="text-center text-white/40 text-xs">
 
-                                            ?? Secure payment. Your data is protected. By booking you agree to our Terms & Conditions.
+                                            🔒 Secure payment. Your data is protected. By booking you agree to our Terms & Conditions.
 
                                         </p>
 
@@ -2047,6 +2076,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                         bookingDetails={{
                                             date: formData.date,
                                             time: formData.time,
+                                            duration: formData.duration,
                                             name: formData.name,
                                             email: formData.email,
                                             phone: formData.phone,
@@ -2058,7 +2088,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                             kidPrice: prices.kid,
                                             spectatorPrice: prices.spectator,
                                             lockerQty,
-                                            lockerPrice: prices.lockerHire,
+                                            lockerPrice: 0,
                                             parkingQty,
                                             parkingPrice: prices.parking,
                                             discount: discount / 100,

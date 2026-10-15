@@ -62,7 +62,7 @@ export default function BookingConfirmationPage() {
         if (navigator.share && booking) {
             await navigator.share({
                 title: "Go Kids Play Booking Confirmation",
-                text: `My booking at Go Kids Play Leicester: ${booking.activity} on ${new Date(booking.date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} at ${booking.time}`,
+                text: `My booking at Go Kids Play Coventry: ${booking.activity} on ${new Date(booking.date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} at ${booking.time}`,
                 url: window.location.href,
             });
         } else {
@@ -148,7 +148,7 @@ export default function BookingConfirmationPage() {
                         {booking.status === "PENDING" ? "Booking Pending ⏱️" : "Booking Confirmed! 🎉"}
                     </h1>
                     <p className="text-white/60">
-                        {booking.status === "PENDING" ? "Complete your payment to secure your session." : "Your session at Go Kids Play Leicester is all set."}
+                        {booking.status === "PENDING" ? "Complete your payment to secure your session." : "Your session at Go Kids Play Coventry is all set."}
                     </p>
                     <div className={`inline-block mt-4 border font-bold px-4 py-2 rounded-full text-sm ${booking.status === "PENDING" ? "bg-amber-500/10 border-amber-500/30 text-amber-400" : "bg-green-500/10 border-green-500/30 text-green-400"}`}>
                         Booking #: {booking.booking_number}
@@ -169,7 +169,7 @@ export default function BookingConfirmationPage() {
                                 <div className="text-5xl">{activityEmoji}</div>
                                 <div>
                                     <h2 className="text-2xl font-black text-white">{booking.activity}</h2>
-                                    <p className="text-white/80 text-sm">Go Kids Play Leicester — Navigation Street</p>
+                                    <p className="text-white/80 text-sm">Go Kids Play — 310 Kingfield Road, Coventry</p>
                                 </div>
                             </div>
                             {booking.status === "PENDING" && (
@@ -220,7 +220,7 @@ export default function BookingConfirmationPage() {
                                 </div>
                                 <div>
                                     <p className="text-white/40 text-xs uppercase tracking-wide">Venue</p>
-                                    <p className="text-white font-bold">Navigation Street, Leicester</p>
+                                    <p className="text-white font-bold">310 Kingfield Road, Coventry</p>
                                 </div>
                             </div>
                         </div>
@@ -303,7 +303,7 @@ export default function BookingConfirmationPage() {
                         <li>✅ Arrive <strong className="text-white">10 minutes early</strong> to allow time at reception</li>
                         <li>✅ Bring this <strong className="text-white">confirmation</strong> (screenshot or printed)</li>
                         <li>✅ Wear <strong className="text-white">comfortable clothing</strong> suitable for activity</li>
-                        <li>✅ Socks required for <strong className="text-white">skating and bowling</strong></li>
+                        <li>✅ Grip socks required for <strong className="text-white">soft play and the inflatable park</strong></li>
                         <li>✅ Free parking — <strong className="text-white">register your plate</strong> at reception</li>
                     </ul>
                 </div>

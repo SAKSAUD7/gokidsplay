@@ -30,96 +30,22 @@ class VoucherViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def validate(self, request):
         """Validate a voucher code and calculate discount"""
-        code = request.data.get('code', '').upper()
-        order_amount = Decimal(str(request.data.get('order_amount', 0)))
-        
-        if not code:
-            return Response({
-                'valid': False,
-                'error': 'Voucher code is required'
-            }, status=http_status.HTTP_400_BAD_REQUEST)
-        
+        from .services import evaluate_voucher
+
+        code = request.data.get('code', '')
         try:
-            voucher = Voucher.objects.get(code__iexact=code)
-        except Voucher.DoesNotExist:
-            return Response({
-                'valid': False,
-                'error': 'Invalid voucher code'
-            })
-        
-        # Check if voucher is active
-        if not voucher.is_active:
-            return Response({
-                'valid': False,
-                'error': 'This voucher is no longer active'
-            })
-        
-        # Check expiry date
-        if voucher.expiry_date and voucher.expiry_date < timezone.now():
-            return Response({
-                'valid': False,
-                'error': 'This voucher has expired'
-            })
-        
-        # Check usage limit
-        if voucher.usage_limit and voucher.used_count >= voucher.usage_limit:
-            return Response({
-                'valid': False,
-                'error': 'This voucher has reached its usage limit'
-            })
-        
-        # Check minimum order amount
-        if voucher.min_order_amount and order_amount < voucher.min_order_amount:
-            return Response({
-                'valid': False,
-                'error': f'Minimum order amount of £{voucher.min_order_amount:.2f} required'
-            })
-        
-        # Check minimum hours before booking slot
-        if voucher.min_hours_before_slot > 0:
-            booking_datetime_str = request.data.get('booking_datetime')
-            
-            if not booking_datetime_str:
-                return Response({
-                    'valid': False,
-                    'error': 'Please select a booking time to apply this voucher'
-                })
-            
-            try:
-                # Parse booking datetime (ISO format from frontend)
-                from datetime import datetime
-                booking_datetime = datetime.fromisoformat(booking_datetime_str.replace('Z', '+00:00'))
-                
-                # Make timezone-aware if naive
-                if timezone.is_naive(booking_datetime):
-                    booking_datetime = timezone.make_aware(booking_datetime)
-                
-                # Calculate time difference
-                time_until_booking = booking_datetime - timezone.now()
-                hours_until_booking = time_until_booking.total_seconds() / 3600
-                
-                if hours_until_booking < voucher.min_hours_before_slot:
-                    return Response({
-                        'valid': False,
-                        'error': f'This voucher requires booking at least {voucher.min_hours_before_slot} hours in advance. Please select a later time slot.'
-                    })
-            except (ValueError, TypeError) as e:
-                return Response({
-                    'valid': False,
-                    'error': 'Invalid booking time format'
-                })
-        
-        # Calculate discount
-        if voucher.discount_type == 'PERCENTAGE':
-            discount_amount = (order_amount * voucher.discount_value) / 100
-        else:  # FLAT
-            discount_amount = voucher.discount_value
-        
-        # Ensure discount doesn't exceed order amount
-        discount_amount = min(discount_amount, order_amount)
-        
-        final_amount = order_amount - discount_amount
-        
+            order_amount = Decimal(str(request.data.get('order_amount', 0)))
+        except Exception:
+            order_amount = Decimal('0')
+        if not str(code).strip():
+            return Response({'valid': False, 'error': 'Voucher code is required'},
+                            status=http_status.HTTP_400_BAD_REQUEST)
+
+        result = evaluate_voucher(code, order_amount, request.data.get('booking_datetime'))
+        if not result.valid:
+            return Response({'valid': False, 'error': result.error})
+
+        voucher = result.voucher
         return Response({
             'valid': True,
             'voucher': {
@@ -127,10 +53,10 @@ class VoucherViewSet(viewsets.ModelViewSet):
                 'code': voucher.code,
                 'discount_type': voucher.discount_type,
                 'discount_value': float(voucher.discount_value),
-                'description': voucher.description
+                'description': voucher.description,
             },
-            'discount_amount': float(discount_amount),
-            'final_amount': float(final_amount)
+            'discount_amount': float(result.discount),
+            'final_amount': float(order_amount - result.discount),
         })
 
 class MembershipPlanViewSet(viewsets.ModelViewSet):

@@ -6,7 +6,7 @@ class InvitationTemplate(models.Model):
     name = models.CharField(max_length=255)
     background_image = models.ImageField(upload_to='invitation_templates/')
     default_title = models.CharField(max_length=255, default="You're Invited!")
-    default_message = models.TextField(default="Come join us for a party at Ninja Inflatable Park!")
+    default_message = models.TextField(default="Come join us for a party at Go Kids Play Coventry!")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
