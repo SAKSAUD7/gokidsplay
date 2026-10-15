@@ -11,18 +11,19 @@ import { AccountProvider } from "@/state/account/AccountContext";
 export const dynamic = 'force-dynamic';
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
+    // getSettings() returns the single site-settings record (camelCase) or null
     const [settingsData, socialLinksData] = await Promise.all([
         getSettings(),
         getPublicSocialLinks()
-    ]) as [any[], any[]];
+    ]) as [any, any[]];
 
-    const settings = settingsData && settingsData.length > 0 ? {
-        parkName: settingsData[0].park_name,
-        contactPhone: settingsData[0].contact_phone,
-        contactEmail: settingsData[0].contact_email,
-        address: settingsData[0].address,
-        mapUrl: settingsData[0].map_url,
-        openingHours: settingsData[0].opening_hours,
+    const settings = settingsData ? {
+        parkName: settingsData.parkName,
+        contactPhone: settingsData.contactPhone,
+        contactEmail: settingsData.contactEmail,
+        address: settingsData.address,
+        mapUrl: settingsData.mapUrl,
+        openingHours: settingsData.openingHours,
     } : undefined;
 
     const socialLinks = socialLinksData ? socialLinksData.filter((l: any) => l.active) : [];

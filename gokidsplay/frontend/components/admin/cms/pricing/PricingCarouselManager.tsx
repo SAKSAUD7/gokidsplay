@@ -49,7 +49,7 @@ export default function PricingCarouselManager() {
 
         try {
             // Dynamically import to ensure client-side compatibility if needed, though usually fine at top
-            const { uploadImage } = await import('@/app/actions/upload-image');
+            const { uploadMediaFile: uploadImage } = await import('@/lib/cms/upload-client');
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];

@@ -1,44 +1,68 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿'use server';
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[facility-items]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[facility-items] error:', e); return null; }
-}
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
+
+const ENDPOINT = API_ENDPOINTS.cms.facility_items;
 
 export async function getFacilityItems() {
-    const data = await sf(`${BASE}/cms/facility-items/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data.filter((f: any) => f.active !== false) : (data.results || []);
+    try {
+        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
+    } catch (error) {
+        return [];
+    }
+}
+
+export async function getFacilityItem(id: string) {
+    try {
+        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createFacilityItem(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/facility-items/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+    try {
+        const token = cookies().get('admin_token')?.value;
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
+
+        const result = await postAPI(ENDPOINT, data, { headers });
+        revalidatePath('/admin/cms/attractions');
+        revalidatePath('/attractions');
+        revalidatePath('/facilities');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to create facility' };
+    }
 }
 
-export async function updateFacilityItem(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/facility-items/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function updateFacilityItem(id: string, data: any) {
+    try {
+        const token = cookies().get('admin_token')?.value;
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
+
+        const result = await putAPI(`${ENDPOINT}${id}/`, data, { headers });
+        revalidatePath('/admin/cms/attractions');
+        revalidatePath('/attractions');
+        revalidatePath('/facilities');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to update facility' };
+    }
 }
 
-export async function deleteFacilityItem(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/facility-items/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function deleteFacilityItem(id: string) {
+    try {
+        const token = cookies().get('admin_token')?.value;
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : undefined;
+
+        await deleteAPI(`${ENDPOINT}${id}/`, { headers });
+        revalidatePath('/admin/cms/attractions');
+        revalidatePath('/attractions');
+        revalidatePath('/facilities');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to delete facility' };
+    }
 }

@@ -40,7 +40,15 @@ interface GalleryImage {
     category?: string;
 }
 
-export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[] }) {
+export default function GalleryContent({
+    cmsImages,
+    content,
+}: {
+    cmsImages: GalleryImage[];
+    /** Resolved "gallery" page content — see lib/cms/page-registry.ts */
+    content: Record<string, Record<string, string> | null>;
+}) {
+    const hero = content.hero;
     const [activeCategory, setActiveCategory] = useState("");
     const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
@@ -95,7 +103,7 @@ export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[
                         className="inline-flex items-center gap-2 py-1.5 px-5 rounded-full bg-primary/20 border border-primary/40 text-primary font-bold text-sm mb-6 uppercase tracking-wider"
                     >
                         <Camera className="w-4 h-4" />
-                        Photo Gallery
+                        {hero?.badge ?? "Photo Gallery"}
                     </motion.div>
 
                     <motion.h1
@@ -104,7 +112,7 @@ export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl lg:text-7xl font-black mb-5 text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent leading-tight"
                     >
-                        Our Gallery
+                        {hero?.title ?? "Our Gallery"}
                     </motion.h1>
 
                     <motion.p
@@ -113,7 +121,7 @@ export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[
                         transition={{ delay: 0.2 }}
                         className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto"
                     >
-                        Take a look inside Coventry's ultimate indoor play centre. Real moments, real fun!
+                        {hero?.subtitle ?? "Take a look inside Coventry's ultimate indoor play centre. Real moments, real fun!"}
                     </motion.p>
 
                     {/* Stats row */}
@@ -125,9 +133,9 @@ export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[
                     >
                         {[
                             { label: "Photos", value: allImages.length + "+" },
-                            { label: "Attractions", value: "6+" },
-                            { label: "Happy Visitors", value: "5,000+" },
-                        ].map((stat) => (
+                            { label: hero?.stat2_label ?? "Attractions", value: hero?.stat2_value ?? "6+" },
+                            { label: hero?.stat3_label ?? "Happy Visitors", value: hero?.stat3_value ?? "5,000+" },
+                        ].filter((stat) => stat.label || stat.value).map((stat) => (
                             <div key={stat.label} className="text-center">
                                 <div className="text-2xl font-black text-white">{stat.value}</div>
                                 <div className="text-xs text-white/50 mt-0.5">{stat.label}</div>
@@ -166,7 +174,7 @@ export default function GalleryContent({ cmsImages }: { cmsImages: GalleryImage[
                 <div className="max-w-6xl mx-auto">
                     {filtered.length === 0 ? (
                         <div className="text-center py-20 text-white/40">
-                            <Images className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                            <ImageIcon className="w-12 h-12 mx-auto mb-4 opacity-30" />
                             <p>No photos in this category yet.</p>
                         </div>
                     ) : (

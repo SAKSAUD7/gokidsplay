@@ -4,23 +4,30 @@ import { ScrollReveal, BouncyButton, SectionDivider } from "@repo/ui";
 import { motion } from "framer-motion";
 import { Users, Clock, Check, Trophy, Sparkles, Building2, Star } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { getMediaUrl } from "@/lib/media-utils";
+import { listItems } from "@/lib/cms/page-registry";
 
 interface GroupsContentProps {
-    hero?: {
-        title: string;
-        subtitle: string;
-        image: string;
-    };
     packages: any[];
     benefits: any[];
+    /** Resolved "groups" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
 }
 
-export default function GroupsContent({ hero, packages, benefits }: GroupsContentProps) {
-    // Default hero values
-    const heroTitle = hero?.title || "Group Bookings";
-    const heroSubtitle = hero?.subtitle || "Bring your team, class, or friends for an unforgettable adventure! Enjoy exclusive group rates and dedicated support.";
-    const heroImage = hero?.image || "/images/gallery-1.jpg";
+const STEP_COLORS = ["primary", "secondary", "accent"] as const;
+const STEP_CLASSES: Record<string, string> = {
+    primary: "bg-primary/20 text-primary",
+    secondary: "bg-secondary/20 text-secondary",
+    accent: "bg-accent/20 text-accent",
+};
+
+export default function GroupsContent({ packages, benefits, content }: GroupsContentProps) {
+    const { hero, packages: packagesText, how, help } = content;
+    const heroImage = getMediaUrl(hero?.image) || "/images/gallery-1.jpg";
+    const steps = listItems(how?.steps).map((line) => {
+        const [title = "", desc = ""] = line.split("|").map((part) => part.trim());
+        return { title, desc };
+    });
 
     const getIcon = (iconName: string) => {
         const icons: any = {
@@ -49,11 +56,12 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
     return (
         <main className="bg-background text-white min-h-screen pt-24">
             {/* Header */}
+            {hero && (
             <section className="relative py-16 md:py-32 px-4 overflow-hidden">
                 <div className="absolute inset-0">
                     <img
                         src={heroImage}
-                        alt="Group Bookings"
+                        alt={hero.title}
                         className="w-full h-full object-cover opacity-30"
                         onError={(e) => {
                             e.currentTarget.src = "/hero-background.jpg";
@@ -64,19 +72,20 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
                 <div className="max-w-7xl mx-auto text-center relative z-10">
                     <ScrollReveal animation="slideUp">
                         <span className="inline-block py-2 px-6 rounded-full bg-accent text-black font-black text-sm mb-6 tracking-widest uppercase">
-                            Special Group Rates
+                            {hero.badge}
                         </span>
                         <h1 className="text-4xl md:text-5xl lg:text-7xl font-display font-black mb-6">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                {heroTitle}
+                                {hero.title}
                             </span>
                         </h1>
                         <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto mb-8">
-                            {heroSubtitle}
+                            {hero.subtitle}
                         </p>
                     </ScrollReveal>
                 </div>
             </section>
+            )}
 
             {/* Benefits Section */}
             {benefits.length > 0 && (
@@ -102,17 +111,18 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
                 </section>
             )}
 
-            {/* Group Packages */}
+            {/* Group Packages — shown once packages exist in the CMS */}
+            {packagesText && packages.length > 0 && (
             <section className="relative px-4 pb-32 md:pb-40 bg-background">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="fade" className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl lg:text-6xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
-                                Choose Your Package
+                                {packagesText.title}
                             </span>
                         </h2>
                         <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto">
-                            Select the perfect package for your group and let us handle the rest!
+                            {packagesText.subtitle}
                         </p>
                     </ScrollReveal>
 
@@ -128,7 +138,7 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
                                 >
                                     {pkg.popular && (
                                         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-black font-bold py-1 px-4 rounded-full text-sm">
-                                            MOST POPULAR
+                                            {packagesText.popular_label}
                                         </div>
                                     )}
 
@@ -159,9 +169,9 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
                                         ))}
                                     </ul>
 
-                                    <Link href="/contact#contactForm" className="w-full">
+                                    <Link href={packagesText.button_link || "/contact#contactForm"} className="w-full">
                                         <BouncyButton size="lg" variant={pkg.color as any || 'primary'} className="w-full">
-                                            Enquire Now
+                                            {packagesText.button_text}
                                         </BouncyButton>
                                     </Link>
                                 </motion.div>
@@ -170,58 +180,56 @@ export default function GroupsContent({ hero, packages, benefits }: GroupsConten
                     </div>
                 </div>
             </section>
+            )}
 
-            {/* Additional Info / How It Works - Keeping this static as per plan or could be dynamic later */}
+            {/* How It Works & help line */}
+            {(how || help) && (
             <section className="relative py-12 md:py-20 px-4 bg-background-light">
                 <div className="max-w-4xl mx-auto">
+                    {how && steps.length > 0 && (
                     <ScrollReveal animation="fade">
                         <div className="bg-surface-800/50 backdrop-blur-md p-8 rounded-3xl border border-primary/30">
                             <h3 className="text-3xl font-display font-black mb-6 text-center">
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                                    How It Works
+                                    {how.title}
                                 </span>
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <div className="text-center">
-                                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4 text-primary font-black text-xl">
-                                        1
-                                    </div>
-                                    <h4 className="font-bold mb-2">Contact Us</h4>
-                                    <p className="text-sm text-white/60">Fill out the enquiry form with your group details</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-4 text-secondary font-black text-xl">
-                                        2
-                                    </div>
-                                    <h4 className="font-bold mb-2">Get Quote</h4>
-                                    <p className="text-sm text-white/60">We'll send you a customized quote within 24 hours</p>
-                                </div>
-                                <div className="text-center">
-                                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4 text-accent font-black text-xl">
-                                        3
-                                    </div>
-                                    <h4 className="font-bold mb-2">Book & Enjoy</h4>
-                                    <p className="text-sm text-white/60">Confirm your booking and have an amazing time!</p>
-                                </div>
+                                {steps.map((step, i) => {
+                                    const color = STEP_COLORS[i % STEP_COLORS.length];
+                                    return (
+                                        <div key={i} className="text-center">
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 font-black text-xl ${STEP_CLASSES[color]}`}>
+                                                {i + 1}
+                                            </div>
+                                            <h4 className="font-bold mb-2">{step.title}</h4>
+                                            <p className="text-sm text-white/60">{step.desc}</p>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </ScrollReveal>
+                    )}
 
+                    {help && (
                     <div className="mt-12 text-center">
                         <ScrollReveal animation="scale">
                             <p className="text-white/70 mb-6">
-                                Have questions? Our team is here to help!
+                                {help.title}
                             </p>
-                            <Link href="/contact#contactForm">
+                            <Link href={help.button_link || "/contact#contactForm"}>
                                 <BouncyButton size="lg" variant="primary">
-                                    Contact Us Now
+                                    {help.button_text}
                                 </BouncyButton>
                             </Link>
                         </ScrollReveal>
                     </div>
+                    )}
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background" />
             </section>
+            )}
         </main>
     );
 }

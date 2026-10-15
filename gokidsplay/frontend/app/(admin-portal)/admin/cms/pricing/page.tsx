@@ -8,8 +8,8 @@ import { PartyPackagesManager } from '@/components/admin/cms/pricing/PartyPackag
 import { GroupPackagesManager } from '@/components/admin/cms/pricing/GroupPackagesManager';
 import PricingCarouselManager from '@/components/admin/cms/pricing/PricingCarouselManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
+import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
-import { PageSectionEditor } from '@/app/(admin-portal)/admin/components/PageSectionEditor';
 
 export default async function PricingAdminPage() {
     // Fetch all data in parallel: Page Sections, Pricing Plans, Party Packages, Group Packages
@@ -35,12 +35,7 @@ export default async function PricingAdminPage() {
             <div className="space-y-12">
                 {/* Pricing Hero Section */}
                 <section>
-                    <PageSectionEditor
-                        page="pricing"
-                        sectionKey="hero"
-                        sectionTitle="Pricing Page Hero"
-                        initialData={heroSection}
-                    />
+                    <PageTextLink pageKey="pricing" />
                 </section>
 
                 {/* Carousel Section */}

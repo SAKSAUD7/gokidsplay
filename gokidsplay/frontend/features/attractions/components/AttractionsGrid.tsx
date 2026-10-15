@@ -244,7 +244,9 @@ function ActivityImageSlider({ images, name }: { images: string[]; name: string 
                         <button
                             key={i}
                             onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                            className={`rounded-full transition-all ${i === current ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`}
+                            aria-label={`Show photo ${i + 1}`}
+                            // min-h/min-w 0: opt out of the global 44px touch-target rule so the dots stay dots
+                            className={`min-h-0 min-w-0 rounded-full transition-all ${i === current ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`}
                         />
                     ))}
                 </div>

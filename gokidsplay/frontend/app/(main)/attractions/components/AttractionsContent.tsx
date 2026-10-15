@@ -9,17 +9,23 @@ import { TimingCardsClient } from "@/components/TimingCardsClient";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { listItems } from "@/lib/cms/page-registry";
 
 interface AttractionsContentProps {
     activities: any[];
     facilities: any[];
-    hero?: {
-        title: string;
-        subtitle: string;
-        image: string;
-    };
     videoData?: any;
+    /** Resolved "attractions" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
 }
+
+// Colour themes cycled across the "everything under one roof" cards
+const HIGHLIGHT_THEMES = [
+    { color: "border-yellow-500/40 bg-yellow-500/5", accent: "text-yellow-400" },
+    { color: "border-red-500/40 bg-red-500/5", accent: "text-red-400" },
+    { color: "border-blue-500/40 bg-blue-500/5", accent: "text-blue-400" },
+    { color: "border-purple-500/40 bg-purple-500/5", accent: "text-purple-400" },
+];
 
 // Activity-specific info to enrich cards if CMS data is sparse
 const ACTIVITY_HIGHLIGHTS: Record<string, { emoji: string; color: string; tagline: string }> = {
@@ -37,10 +43,8 @@ function getActivityMeta(name: string) {
     return { emoji: "⭐", color: "from-primary to-secondary", tagline: "Fun for Everyone" };
 }
 
-export default function AttractionsContent({ activities, facilities, hero, videoData }: AttractionsContentProps) {
-    const heroTitle = hero?.title || "Our Activities";
-    const heroSubtitle = hero?.subtitle || "Soft Play, Laser Arena, Go Karts, and Inflatable Park — Go Kids Play has something for everyone. Perfect for families, friends, and parties in Coventry.";
-    const heroImage = hero?.image || "/images/gokidsplay/unnamed (2).webp";
+export default function AttractionsContent({ activities, facilities, videoData, content }: AttractionsContentProps) {
+    const { hero, highlights, facilities: facilitiesText, cta } = content;
 
     const getIcon = (iconName: string) => {
         const lower = iconName?.toLowerCase() || "";
@@ -53,41 +57,16 @@ export default function AttractionsContent({ activities, facilities, hero, video
         return <Zap className="w-8 h-8 text-primary" />;
     };
 
-    // GoKidsPlay Coventry highlights — 4 key activities
-    const whyGoKidsPlay = [
-        {
-            emoji: "🧨",
-            title: "Soft Play",
-            desc: "Three tier soft play frame with toddler area. Safe and fun for all ages.",
-            color: "border-yellow-500/40 bg-yellow-500/5",
-            accent: "text-yellow-400",
-        },
-        {
-            emoji: "🔫",
-            title: "Laser Arena",
-            desc: "Multi-level laser tag arena. Grab your blaster and enter the battle!",
-            color: "border-red-500/40 bg-red-500/5",
-            accent: "text-red-400",
-        },
-        {
-            emoji: "🏎️",
-            title: "Go Kart",
-            desc: "Indoor go kart racing track. Put your foot down and race to the finish!",
-            color: "border-blue-500/40 bg-blue-500/5",
-            accent: "text-blue-400",
-        },
-        {
-            emoji: "👁️",
-            title: "Inflatable Park",
-            desc: "Massive bouncy castles and inflatable obstacle courses. Jump in!",
-            color: "border-purple-500/40 bg-purple-500/5",
-            accent: "text-purple-400",
-        },
-    ];
+    // "Everything under one roof" cards — each CMS line is "emoji | title | description"
+    const whyGoKidsPlay = listItems(highlights?.cards).map((line, i) => {
+        const [emoji = "", title = "", desc = ""] = line.split("|").map((part) => part.trim());
+        return { emoji, title, desc, ...HIGHLIGHT_THEMES[i % HIGHLIGHT_THEMES.length] };
+    });
 
     return (
         <main className="min-h-screen bg-background text-white">
             {/* ── Hero ──────────────────────────────────── */}
+            {hero && (
             <section className="relative pt-24 md:pt-32 pb-12 md:pb-20 px-4 bg-gradient-to-b from-background-dark to-background overflow-hidden">
                 {/* subtle background glow */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -96,17 +75,17 @@ export default function AttractionsContent({ activities, facilities, hero, video
                 <div className="max-w-7xl mx-auto text-center relative">
                     <ScrollReveal animation="fade">
                         <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-primary/20 border border-primary/30 text-primary font-bold text-sm mb-6 tracking-wider uppercase">
-                            <Sparkles className="w-4 h-4" /> {activities.length > 0 ? `${activities.length} Activities` : "Soft Play · Laser Arena · Go Karts · Inflatables"}
+                            <Sparkles className="w-4 h-4" /> {hero.badge || (activities.length > 0 ? `${activities.length} Activities` : "Soft Play · Laser Arena · Go Karts · Inflatables")}
                         </span>
                     </ScrollReveal>
                     <ScrollReveal animation="slideUp" delay={0.2}>
                         <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-8xl font-display font-black mb-6 leading-tight">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                {heroTitle}
+                                {hero.title}
                             </span>
                         </h1>
                         <p className="text-base md:text-xl lg:text-2xl text-white/70 max-w-3xl mx-auto">
-                            {heroSubtitle}
+                            {hero.subtitle}
                         </p>
                     </ScrollReveal>
 
@@ -114,35 +93,37 @@ export default function AttractionsContent({ activities, facilities, hero, video
                     <ScrollReveal animation="slideUp" delay={0.4}>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                             <Link
-                                href="/book"
+                                href={hero.button1_link || "/book"}
                                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-bold text-lg rounded-full shadow-lg shadow-pink-500/40 hover:scale-105 transition-all"
                             >
-                                🎟️ Book Tickets
+                                {hero.button1_text}
                             </Link>
                             <Link
-                                href="/pricing"
+                                href={hero.button2_link || "/pricing"}
                                 className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/30 text-white font-bold text-lg rounded-full hover:bg-white/10 transition-all"
                             >
-                                View Pricing
+                                {hero.button2_text}
                             </Link>
                         </div>
                     </ScrollReveal>
                 </div>
                 <SectionDivider position="bottom" variant="curve" color="fill-background" />
             </section>
+            )}
 
             {/* Timing Cards — below hero */}
             <TimingCardsClient />
 
             {/* ── Why Go Kids Play ───────────────────────────── */}
+            {highlights && whyGoKidsPlay.length > 0 && (
             <section className="py-12 px-4">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="fade">
-                        <p className="text-center text-white/50 uppercase tracking-widest text-xs font-bold mb-8">Everything under one roof</p>
+                        <p className="text-center text-white/50 uppercase tracking-widest text-xs font-bold mb-8">{highlights.title}</p>
                     </ScrollReveal>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {whyGoKidsPlay.map((item, i) => (
-                            <ScrollReveal key={item.title} animation="slideUp" delay={i * 0.1}>
+                            <ScrollReveal key={`${item.title}-${i}`} animation="slideUp" delay={i * 0.1}>
                                 <motion.div
                                     whileHover={{ y: -4 }}
                                     className={`rounded-2xl border-2 p-6 ${item.color} transition-all`}
@@ -156,6 +137,7 @@ export default function AttractionsContent({ activities, facilities, hero, video
                     </div>
                 </div>
             </section>
+            )}
 
             {/* ── Attraction Video ──────────────────────── */}
             <AttractionVideoSection videoData={videoData} />
@@ -164,18 +146,18 @@ export default function AttractionsContent({ activities, facilities, hero, video
             <AttractionsGrid activities={activities} />
 
             {/* ── Park Facilities ──────────────────────── */}
-            {facilities.length > 0 && (
+            {facilitiesText && facilities.length > 0 && (
                 <section className="relative py-12 md:py-20 px-4 pb-32 md:pb-40 bg-background-light">
                     <div className="max-w-7xl mx-auto">
                         <ScrollReveal animation="slideUp">
                             <div className="text-center mb-16">
                                 <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-black mb-6">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                        Venue Facilities
+                                        {facilitiesText.title}
                                     </span>
                                 </h2>
                                 <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto">
-                                    More than just activities — our venue is designed for your total comfort and enjoyment.
+                                    {facilitiesText.subtitle}
                                 </p>
                             </div>
                         </ScrollReveal>
@@ -233,27 +215,31 @@ export default function AttractionsContent({ activities, facilities, hero, video
             )}
 
             {/* ── Final CTA ────────────────────────────── */}
+            {cta && (
             <section className="py-20 px-4 text-center bg-background">
                 <ScrollReveal animation="slideUp">
                     <h2 className="text-3xl md:text-5xl font-display font-black text-white mb-4">
-                        Ready for a great time?
+                        {cta.title}
                     </h2>
                     <p className="text-white/60 mb-8 text-lg max-w-xl mx-auto">
-                        Book your session online — Soft Play, Laser Arena, Go Karts, or Inflatables, your choice!
+                        {cta.subtitle}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
-                            href="/book"
+                            href={cta.button_link || "/book"}
                             className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 text-white font-black text-xl rounded-full shadow-lg shadow-pink-500/40 hover:scale-105 transition-all"
                         >
-                            🎟️ Book Now — From £9.95
+                            {cta.button_text}
                         </Link>
                     </div>
-                    <p className="mt-6 text-white/40 text-sm flex items-center justify-center gap-1">
-                        <Clock className="w-4 h-4" /> Open Wed–Sun (10am–5:30pm). Also open Bank &amp; School Holidays.
-                    </p>
+                    {cta.note && (
+                        <p className="mt-6 text-white/40 text-sm flex items-center justify-center gap-1">
+                            <Clock className="w-4 h-4" /> {cta.note}
+                        </p>
+                    )}
                 </ScrollReveal>
             </section>
+            )}
         </main>
     );
 }

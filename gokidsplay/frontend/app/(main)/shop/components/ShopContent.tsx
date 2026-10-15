@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, Gift, Tag, Package, Star, ArrowRight, Phone } from 'lucide-react';
 import Link from 'next/link';
+import { getMediaUrl } from "@/lib/media-utils";
 
 const categoryConfig: Record<string, { icon: React.ReactNode; color: string; gradient: string }> = {
     'Gift Card': {
@@ -43,10 +44,15 @@ function groupByCategory(products: any[]) {
 }
 
 interface ShopContentProps {
+    /** Resolved "shop" page content — see lib/cms/page-registry.ts */
+    content: Record<string, Record<string, string> | null>;
     products: any[];
 }
 
-export default function ShopContent({ products }: ShopContentProps) {
+export default function ShopContent({ products, content }: ShopContentProps) {
+    const { hero, buy, banner } = content;
+    const phone = buy?.phone || "07349 110 865";
+    const tel = `tel:${phone.replace(/\s/g, "")}`;
     const grouped = groupByCategory(products);
     const categories = Object.keys(grouped);
 
@@ -68,13 +74,13 @@ export default function ShopContent({ products }: ShopContentProps) {
                     className="text-center mb-16 pt-8"
                 >
                     <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-brand-pink/20 text-brand-pink font-bold text-sm mb-6 tracking-wider uppercase border border-brand-pink/30">
-                        <ShoppingCart className="w-4 h-4" /> Go Kids Play Shop
+                        <ShoppingCart className="w-4 h-4" /> {hero?.badge ?? "Go Kids Play Shop"}
                     </span>
                     <h1 className="text-5xl md:text-7xl font-display font-black text-white mb-6 uppercase leading-tight">
-                        Gift Cards &amp; <span className="text-brand-lime">Merchandise</span>
+                        {hero?.title ?? "Gift Cards &"} <span className="text-brand-lime">{hero?.title_highlight ?? "Merchandise"}</span>
                     </h1>
                     <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto">
-                        Give the gift of adventure! Browse our gift cards, branded merchandise, and party extras.
+                        {hero?.subtitle ?? "Give the gift of adventure! Browse our gift cards, branded merchandise, and party extras."}
                     </p>
                 </motion.div>
 
@@ -82,7 +88,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                 {categories.length === 0 ? (
                     <div className="text-center py-20 text-white/60">
                         <Package className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                        <p className="text-xl">Shop items coming soon! Check back shortly.</p>
+                        <p className="text-xl">{hero?.empty_text ?? "Shop items coming soon! Check back shortly."}</p>
                     </div>
                 ) : (
                     categories.map((category, catIdx) => {
@@ -116,6 +122,17 @@ export default function ShopContent({ products }: ShopContentProps) {
                                             whileHover={{ y: -6, scale: 1.02 }}
                                             className={`bg-gradient-to-br ${config.gradient} border rounded-2xl p-6 flex flex-col backdrop-blur-sm cursor-pointer group transition-shadow hover:shadow-lg hover:shadow-brand-pink/10`}
                                         >
+                                            {product.image_url && (
+                                                <div className="relative -mx-6 -mt-6 mb-5 aspect-[4/3] overflow-hidden rounded-t-2xl bg-black/20">
+                                                    <img
+                                                        src={getMediaUrl(product.image_url)}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                        loading="lazy"
+                                                    />
+                                                </div>
+                                            )}
+
                                             {/* Category badge */}
                                             <div className="flex items-center justify-between mb-4">
                                                 <span className={`text-xs font-bold uppercase tracking-wider ${config.color} bg-white/10 px-3 py-1 rounded-full`}>
@@ -141,7 +158,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                                     £{Number(product.price).toFixed(2)}
                                                 </span>
                                                 <a
-                                                    href={`tel:07349110865`}
+                                                    href={tel}
                                                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm transition-all ${
                                                         product.stock === 0
                                                             ? 'bg-white/10 text-white/40 cursor-not-allowed'
@@ -149,7 +166,7 @@ export default function ShopContent({ products }: ShopContentProps) {
                                                     }`}
                                                     onClick={(e) => product.stock === 0 && e.preventDefault()}
                                                 >
-                                                    {product.stock === 0 ? 'Sold Out' : <>Buy <ArrowRight className="w-4 h-4" /></>}
+                                                    {product.stock === 0 ? 'Sold Out' : <>{buy?.button_text ?? "Buy"} <ArrowRight className="w-4 h-4" /></>}
                                                 </a>
                                             </div>
                                         </motion.div>
@@ -161,32 +178,34 @@ export default function ShopContent({ products }: ShopContentProps) {
                 )}
 
                 {/* Call us banner */}
+                {banner && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="mt-8 bg-gradient-to-r from-brand-pink/20 via-brand-cyan/10 to-brand-lime/10 border border-white/10 rounded-3xl p-8 text-center"
                 >
-                    <h3 className="text-2xl font-bold text-white mb-2">Want to purchase in person?</h3>
+                    <h3 className="text-2xl font-bold text-white mb-2">{banner.title}</h3>
                     <p className="text-white/60 mb-6">
-                        Visit us or give us a call — we're happy to arrange gift cards and merchandise orders over the phone.
+                        {banner.subtitle}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <a
-                            href="tel:07349110865"
+                            href={tel}
                             className="inline-flex items-center gap-2 px-8 py-3 bg-brand-lime text-black font-bold rounded-full hover:bg-white transition-colors"
                         >
                             <Phone className="w-4 h-4" />
-                            07349 110 865
+                            {phone}
                         </a>
                         <Link
-                            href="/contact"
+                            href={banner.button_link || "/contact"}
                             className="inline-flex items-center gap-2 px-8 py-3 border border-white/20 text-white font-bold rounded-full hover:bg-white/10 transition-colors"
                         >
-                            Get In Touch <ArrowRight className="w-4 h-4" />
+                            {banner.button_text} <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </motion.div>
+                )}
             </div>
         </main>
     );

@@ -107,16 +107,20 @@ function BusinessSettings({ settings, onUpdate }: { settings: any; onUpdate: (s:
             parkName: formData.get("parkName"),
             contactPhone: formData.get("contactPhone"),
             contactEmail: formData.get("contactEmail"),
+            address: formData.get("address"),
+            mapUrl: formData.get("mapUrl"),
             gstNumber: formData.get("gstNumber"),
-            sessionDuration: parseInt(formData.get("sessionDuration") as string),
-            adultPrice: parseFloat(formData.get("adultPrice") as string),
-            childPrice: parseFloat(formData.get("childPrice") as string),
         };
 
         try {
-            const updated = await updateSettings(settings.id, data);
-            onUpdate(updated);
-            toast.success("Settings saved successfully");
+            const result = await updateSettings(settings.id, data);
+            if (!result.success) {
+                toast.error("Failed to save settings");
+                return;
+            }
+            // Reload so the form shows exactly what was saved
+            onUpdate(await getSettings());
+            toast.success("Settings saved — the website now shows these details");
         } catch (error) {
             toast.error("Failed to save settings");
         } finally {
@@ -131,13 +135,17 @@ function BusinessSettings({ settings, onUpdate }: { settings: any; onUpdate: (s:
                 <InputGroup name="parkName" label="Park Name" defaultValue={settings.parkName} />
                 <InputGroup name="contactPhone" label="Contact Phone" defaultValue={settings.contactPhone} />
                 <InputGroup name="contactEmail" label="Contact Email" defaultValue={settings.contactEmail} />
-                <InputGroup name="gstNumber" label="GST Number" defaultValue={settings.gstNumber || ""} />
+                <InputGroup name="gstNumber" label="VAT Number (optional)" defaultValue={settings.gstNumber || ""} />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <InputGroup name="sessionDuration" label="Session Duration (mins)" defaultValue={settings.sessionDuration} type="number" />
-                <InputGroup name="adultPrice" label="Adult Price (£)" defaultValue={settings.adultPrice} type="number" />
-                <InputGroup name="childPrice" label="Child Price (£)" defaultValue={settings.childPrice} type="number" />
+            <div className="grid grid-cols-1 gap-6">
+                <InputGroup name="address" label="Address" defaultValue={settings.address || ""} />
+                <InputGroup name="mapUrl" label="Google Maps link" defaultValue={settings.mapUrl || ""} />
             </div>
+            <p className="text-sm text-slate-500 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                These details appear on the Contact page and in the website footer. Ticket prices are set in{" "}
+                <a href="/admin/cms/session-booking" className="text-blue-600 underline">Book Page Content</a>, and the prices shown on the
+                Prices page in <a href="/admin/cms/pricing-plans" className="text-blue-600 underline">Pricing Plans</a>.
+            </p>
             <div className="pt-4">
                 <button
                     disabled={loading}
@@ -187,10 +195,15 @@ function AccountSettings() {
             return;
         }
 
+        const form = e.currentTarget;
         try {
-            await updatePassword(currentPass, newPass);
-            toast.success("Password updated successfully");
-            (e.target as HTMLFormElement).reset();
+            const result = await updatePassword(currentPass, newPass);
+            if (result.success) {
+                toast.success("Password updated successfully");
+                form.reset();
+            } else {
+                toast.error(result.error || "Failed to update password");
+            }
         } catch (error) {
             toast.error("Failed to update password");
         } finally {

@@ -2,10 +2,10 @@ import React from 'react';
 import { getPageSections } from '@/app/actions/page-sections';
 import { getGroupPackages } from '@/app/actions/group-packages';
 import { getGroupBenefits } from '@/app/actions/group-benefits';
-import { HeroEditor } from '@/components/admin/cms/home/HeroEditor';
 import { GroupPackagesManager } from '@/components/admin/cms/groups/GroupPackagesManager';
 import { GroupBenefitsManager } from '@/components/admin/cms/groups/GroupBenefitsManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
+import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 export default async function GroupsAdminPage() {
     // Fetch all data in parallel
@@ -29,7 +29,7 @@ export default async function GroupsAdminPage() {
             <div className="grid gap-8">
                 {/* Hero Section Editor */}
                 <section>
-                    <HeroEditor section={heroSection} pageSlug="groups" />
+                    <PageTextLink pageKey="groups" />
                 </section>
 
                 {/* Group Benefits Manager */}

@@ -83,36 +83,38 @@ export function Navbar({ settings }: { settings?: any }) {
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0118] border-b border-white/10">
-            <div className="w-full max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="w-full max-w-[1440px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
                 <Link href="/" className="relative z-50 block flex-shrink-0">
                     <img
                         src={logoUrl}
                         alt="Go Kids Play"
-                        className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 hover:scale-105"
+                        className="h-7 sm:h-8 xl:h-7 2xl:h-9 w-auto max-w-[60vw] object-contain transition-transform duration-300 hover:scale-105"
                         style={{ background: 'transparent' }}
                         onError={(e) => {
                             // Fall back to default logo if the fetched URL fails to load
-                            if (e.currentTarget.src !== '/gokidsplay-logo.png') {
-                                e.currentTarget.src = '/gokidsplay-logo.png';
+                            const img = e.currentTarget;
+                            if (img.dataset.fallback !== '1') {
+                                img.dataset.fallback = '1';
+                                img.src = '/gokidsplay-logo.png';
                             }
                         }}
                     />
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden md:flex items-center gap-6">
+                <nav className="hidden xl:flex items-center gap-4 2xl:gap-6">
                     {navLinks.map((link) => (
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`text-sm font-bold uppercase tracking-wider transition-colors hover:text-primary ${pathname === link.href ? "text-primary" : "text-white/80"}`}
+                            className={`flex items-center whitespace-nowrap text-[13px] 2xl:text-sm font-bold uppercase tracking-wide 2xl:tracking-wider transition-colors hover:text-primary ${pathname === link.href ? "text-primary" : "text-white/80"}`}
                         >
                             {link.label}
                         </Link>
                     ))}
 
-                    <Link href="/book">
-                        <BouncyButton size="sm" variant="accent" as="div">
+                    <Link href="/book" className="shrink-0">
+                        <BouncyButton size="sm" variant="accent" className="whitespace-nowrap" as="div">
                             Book Now <Ticket className="w-4 h-4 ml-2" />
                         </BouncyButton>
                     </Link>
@@ -158,8 +160,8 @@ export function Navbar({ settings }: { settings?: any }) {
                             </div>
                         ) : (
                             // Logged-out: My Account button
-                            <Link href="/account/login">
-                                <BouncyButton size="sm" variant="outline" className="text-white border-white/30" as="div">
+                            <Link href="/account/login" className="shrink-0">
+                                <BouncyButton size="sm" variant="outline" className="whitespace-nowrap text-white border-white/30" as="div">
                                     <User className="w-4 h-4 mr-1.5" /> My Account
                                 </BouncyButton>
                             </Link>
@@ -170,7 +172,7 @@ export function Navbar({ settings }: { settings?: any }) {
                 </nav>
 
                 {/* Mobile right side */}
-                <div className="md:hidden flex items-center gap-2 relative z-50">
+                <div className="xl:hidden flex items-center gap-2 relative z-50">
                     <Link href="/book">
                         <BouncyButton size="sm" variant="accent" className="text-xs px-3 py-1.5" as="div">
                             Book
@@ -190,7 +192,7 @@ export function Navbar({ settings }: { settings?: any }) {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="fixed inset-0 z-[60] md:hidden"
+                                className="fixed inset-0 z-[60] xl:hidden"
                                 style={{ backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
                                 onClick={() => dispatch({ type: "CLOSE_MOBILE_MENU" })}
                             />
@@ -199,7 +201,7 @@ export function Navbar({ settings }: { settings?: any }) {
                                 animate={{ x: 0 }}
                                 exit={{ x: '100%' }}
                                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                className="fixed top-0 right-0 bottom-0 w-[280px] z-[70] md:hidden bg-[#261645] shadow-2xl"
+                                className="fixed top-0 right-0 bottom-0 w-[280px] z-[70] xl:hidden bg-[#261645] shadow-2xl"
                                 onClick={(e) => e.stopPropagation()}
                             >
                                 <div className="h-full flex flex-col p-5">

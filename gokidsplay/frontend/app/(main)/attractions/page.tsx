@@ -2,7 +2,7 @@ import React from 'react';
 import AttractionsContent from "./components/AttractionsContent";
 import { getActivities } from "../../actions/activities";
 import { getFacilityItems } from "../../actions/facility-items";
-import { getPageSections } from "../../actions/page-sections";
+import { getPublicPageContent } from "@/lib/public-api";
 import { getAttractionVideo } from "../../actions/attraction-video";
 import { getMetadata } from "@/seo/seo.config";
 
@@ -15,14 +15,14 @@ export default async function AttractionsPage() {
     const [
         activitiesRaw,
         facilitiesRaw,
-        pageSectionsRaw,
+        content,
         videoData
     ] = await Promise.all([
         getActivities(),
         getFacilityItems(),
-        getPageSections('attractions'),
+        getPublicPageContent('attractions'),
         getAttractionVideo()
-    ]) as [any[], any[], any[], any];
+    ]) as [any[], any[], Awaited<ReturnType<typeof getPublicPageContent>>, any];
 
     // Transform activities to match Activity interface if needed, or pass as is if they match
     // Activity interface: { id, name, description, imageUrl, active, order }
@@ -50,19 +50,12 @@ export default async function AttractionsPage() {
         .filter((f: any) => !f.hasOwnProperty('active') || f.active)
         .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
 
-    const heroSection = pageSectionsRaw.find((s: any) => s.section_key === 'hero');
-    const hero = heroSection ? {
-        title: heroSection.title,
-        subtitle: heroSection.content,
-        image: heroSection.image_url
-    } : undefined;
-
     return (
         <AttractionsContent
                 activities={activities}
                 facilities={facilities}
-                hero={hero}
                 videoData={videoData}
+                content={content}
             />
     );
 }

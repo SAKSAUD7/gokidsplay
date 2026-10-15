@@ -1,44 +1,96 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[social-links]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[social-links] error:', e); return null; }
-}
+import { fetchAPI } from "../lib/server-api";
+import { requirePermission } from "../lib/admin-auth";
+import { logActivity } from "../lib/audit-log";
+import { revalidatePath } from "next/cache";
+import { transformCmsItem } from "../lib/transformers";
 
 export async function getSocialLinks() {
-    const data = await sf(`${BASE}/cms/social-links/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
+    const res = await fetchAPI("/cms/social-links/", { next: { revalidate: 60 } });
+    if (!res || !res.ok) return [];
+    const data = await res.json();
+    return data.map(transformCmsItem);
 }
 
-export async function updateSocialLink(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/social-links/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function getSocialLink(id: string) {
+    const res = await fetchAPI(`/cms/social-links/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformCmsItem(data);
 }
 
-export async function createSocialLink(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/social-links/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
+export async function createSocialLink(data: {
+    platform: string;
+    url: string;
+    icon?: string;
+    active: boolean;
+    order: number;
+}) {
+    await requirePermission('cms', 'write');
+
+    const res = await fetchAPI("/cms/social-links/", {
+        method: "POST",
+        body: JSON.stringify(data)
     });
+
+    if (!res || !res.ok) return { success: false };
+
+    const item = await res.json();
+
+    await logActivity({
+        action: 'CREATE',
+        entity: 'SOCIAL_LINK',
+        entityId: item.id.toString(),
+        details: { after: item }
+    });
+
+    revalidatePath('/admin/social-links');
+    return { success: true, item: transformCmsItem(item) };
 }
 
-export async function deleteSocialLink(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/social-links/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
+export async function updateSocialLink(id: string, data: Partial<{
+    platform?: string;
+    url?: string;
+    icon?: string;
+    active?: boolean;
+    order?: number;
+}>) {
+    await requirePermission('cms', 'write');
+
+    const res = await fetchAPI(`/cms/social-links/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data)
     });
-    return r.ok;
+
+    if (!res || !res.ok) return { success: false };
+
+    await logActivity({
+        action: 'UPDATE',
+        entity: 'SOCIAL_LINK',
+        entityId: id,
+        details: { after: data }
+    });
+
+    revalidatePath('/admin/social-links');
+    return { success: true };
+}
+
+export async function deleteSocialLink(id: string) {
+    await requirePermission('cms', 'delete');
+
+    const res = await fetchAPI(`/cms/social-links/${id}/`, {
+        method: "DELETE"
+    });
+
+    if (!res || !res.ok) return { success: false };
+
+    await logActivity({
+        action: 'DELETE',
+        entity: 'SOCIAL_LINK',
+        entityId: id
+    });
+
+    revalidatePath('/admin/social-links');
+    return { success: true };
 }

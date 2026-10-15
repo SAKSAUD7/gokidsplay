@@ -2,13 +2,12 @@ import React from 'react';
 import { getPageSections } from '@/app/actions/page-sections';
 import { getPartyPackages } from '@/app/actions/party-packages';
 import { getGalleryItems } from '@/app/actions/gallery';
-import { HeroEditor } from '@/components/admin/cms/home/HeroEditor';
-import { TermsEditor } from '@/components/admin/cms/parties/TermsEditor';
 import { PartyAvailabilityEditor } from '@/components/admin/cms/parties/PartyAvailabilityEditor';
 import { PartyCarouselEditor } from '@/components/admin/cms/parties/PartyCarouselEditor';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
 import Link from 'next/link';
 import { Package, Settings } from 'lucide-react';
+import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 export default async function PartiesAdminPage() {
     // Fetch party data in parallel
@@ -36,7 +35,7 @@ export default async function PartiesAdminPage() {
             <div className="grid gap-8">
                 {/* Hero Section Editor - Dedicated for Party Booking Page */}
                 <section>
-                    <HeroEditor section={heroSection} pageSlug="party-booking" />
+                    <PageTextLink pageKey="party-booking" />
                 </section>
 
                 {/* Party Carousel Editor */}
@@ -50,9 +49,6 @@ export default async function PartiesAdminPage() {
                 </section>
 
                 {/* Terms Section Editor */}
-                <section>
-                    <TermsEditor section={termsSection} pageSlug="party-booking" />
-                </section>
 
                 {/* Party Packages Link */}
                 <section>

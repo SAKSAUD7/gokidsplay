@@ -1,85 +1,69 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[bookings]', r.status, url); return null; }
-        return r.json();
-    } catch(e) { console.error('[bookings] error:', e); return null; }
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
+
+function transformBooking(b: any) {
+    if (!b) return null;
+    return {
+        ...b,
+        bookingStatus: b.booking_status,
+        waiverStatus: b.waiver_status,
+        paymentStatus: b.payment_status,
+        createdAt: b.created_at,
+        updatedAt: b.updated_at,
+        voucherCode: b.voucher_code,
+        discountAmount: b.discount_amount,
+        // Map fields that might be missing or different in party bookings
+        qrCode: b.qr_code,
+        duration: b.duration || 120,
+        spectators: b.spectators || 0,
+        customer: b.customer_details ? transformCustomer(b.customer_details) : null,
+        waivers: b.waivers?.map(transformWaiver) || [],
+        transactions: b.transactions || []
+    };
 }
 
-function getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
+function transformCustomer(c: any) {
+    if (!c) return null;
+    return {
+        ...c,
+        createdAt: c.created_at,
+        updatedAt: c.updated_at,
+        _count: c._count || { bookings: 0 }
+    };
 }
 
-export async function getBookings(params?: { page?: number; status?: string; search?: string }) {
-    let url = `${BASE}/bookings/bookings/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.status) qs.set('status', params.status);
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: { 'Authorization': `Bearer ${getToken()}` } });
-    if (!data) return { results: [], count: 0 };
-    return data;
+function transformWaiver(w: any) {
+    if (!w) return null;
+    return {
+        ...w,
+        signedAt: w.signed_at,
+        fileUrl: w.file_url,
+        emergencyContact: w.emergency_contact,
+        booking: w.booking_details ? transformBooking(w.booking_details) : null
+    };
 }
 
-export async function getBooking(id: number | string) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
+export async function getTicket(uuid: string) {
+    // Try fetching from regular bookings
+    let res = await fetch(`${API_URL}/bookings/bookings/ticket/${uuid}/`, {
+        cache: "no-store",
     });
-}
 
-export async function updateBookingStatus(id: number, status: string, notes?: string) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-        body: JSON.stringify({ booking_status: status, ...(notes ? { notes } : {}) }),
+    if (res.ok) {
+        const data = await res.json();
+        return transformBooking(data);
+    }
+
+    // If not found, try fetching from party bookings
+    res = await fetch(`${API_URL}/bookings/party-bookings/ticket/${uuid}/`, {
+        cache: "no-store",
     });
-}
 
-export async function getPartyBookings(params?: { page?: number; status?: string }) {
-    let url = `${BASE}/bookings/party-bookings/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.status) qs.set('status', params.status);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: { 'Authorization': `Bearer ${getToken()}` } });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
+    if (res.ok) {
+        const data = await res.json();
+        return transformBooking(data);
+    }
 
-export async function getPartyBooking(id: number | string) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-    });
-}
-
-export async function getDashboardStats() {
-    return sf(`${BASE}/bookings/dashboard-stats/`, {
-        headers: { 'Authorization': `Bearer ${getToken()}` },
-    });
-}
-
-export async function getCustomers(params?: { page?: number; search?: string }) {
-    let url = `${BASE}/bookings/customers/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: { 'Authorization': `Bearer ${getToken()}` } });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getTicket(bookingId: string) {
-    return sf(`${BASE}/bookings/bookings/${bookingId}/ticket/`);
-}
-
-export async function getBookingByReference(ref: string) {
-    return sf(`${BASE}/bookings/bookings/by-reference/${ref}/`);
+    return null;
 }

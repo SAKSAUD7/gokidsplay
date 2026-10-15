@@ -14,6 +14,7 @@ import { Stat, GalleryItem, Activity } from "../../../lib/api/types";
 import dynamic from "next/dynamic";
 import { getMediaUrl } from "@/lib/media-utils";
 import { InstallAppSection } from "../../../components/InstallAppSection";
+import { listItems } from "@/lib/cms/page-registry";
 
 const InstagramReels = dynamic(() => import("./InstagramReels"), { 
     ssr: false, 
@@ -35,32 +36,36 @@ interface HomeContentProps {
 
     settings?: any;
     activities: Activity[];
-    hero?: {
-        title: string;
-        subtitle: string;
-        image: string;
-    };
-    about?: {
-        title: string;
-        content: string;
-        image: string;
-    };
+    /** Resolved "home" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
 }
 
-export default function HomeContent({ stats, gallery, banners, reels, settings, activities, hero, about }: HomeContentProps) {
-    const aboutText = about?.content || settings?.aboutText || "Go Kids Play Coventry is the ultimate family entertainment venue – packed with Soft Play, Laser Arena, Go Karts and an Inflatable Park. The perfect adventure for kids of all ages.";
-    const aboutTitle = about?.title || "Coventry's Ultimate Kids Play Centre";
-    const aboutImage = about?.image || "/images/gokidsplay/unnamed (4).webp";
-    const phone = "07349110865";
+// Colour themes cycled across the event teaser cards (content comes from the CMS)
+const EVENT_CARD_THEMES = [
+    { color: "from-orange-500/20 to-orange-700/10", border: "border-orange-500/30", text: "text-orange-400" },
+    { color: "from-green-500/20 to-green-700/10", border: "border-green-500/30", text: "text-green-400" },
+    { color: "from-yellow-400/20 to-yellow-600/10", border: "border-yellow-400/30", text: "text-yellow-300" },
+    { color: "from-pink-500/20 to-pink-700/10", border: "border-pink-500/30", text: "text-pink-400" },
+];
+
+export default function HomeContent({ stats, gallery, banners, reels, settings, activities, content }: HomeContentProps) {
+    const { hero, about, attractions, gallery: galleryText, events, cta } = content;
+    const phone = cta?.phone || "07349110865";
+    // Each line is "<emoji> <label>"; a line without a leading emoji gets a default one
+    const eventCards = listItems(events?.cards).map((line, i) => {
+        const [first, ...rest] = line.split(" ");
+        const hasEmoji = rest.length > 0 && !/^[\p{L}\p{N}]/u.test(first);
+        return {
+            emoji: hasEmoji ? first : "🎉",
+            label: hasEmoji ? rest.join(" ") : line,
+            ...EVENT_CARD_THEMES[i % EVENT_CARD_THEMES.length],
+        };
+    });
 
     return (
         <main className="bg-background text-white">
             {/* Hero Section */}
-            <AnimatedHero
-                title={hero?.title}
-                subtitle={hero?.subtitle}
-                backgroundImage={hero?.image}
-            />
+            {hero && <AnimatedHero content={hero} />}
 
             {/* Timing Cards — right below hero */}
             <TimingCardsClient />
@@ -103,28 +108,29 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
             </section>
 
             {/* About Section */}
+            {about && (
             <section className="relative py-12 md:py-20 px-4 bg-background">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <ScrollReveal animation="slideLeft">
                             <div>
                                 <span className="inline-block py-1 px-3 rounded-full bg-secondary text-black font-bold text-sm mb-6 tracking-wider uppercase">
-                                    About Us
+                                    {about.badge}
                                 </span>
                                 <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-black mb-6">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-                                        {aboutTitle}
+                                        {about.title}
                                     </span>
                                 </h2>
                                 <p className="text-xl text-white/80 mb-6 leading-relaxed">
-                                    {aboutText}
+                                    {about.content}
                                 </p>
                                 <p className="text-xl text-white/80 leading-relaxed mb-8">
-                                    Located in Coventry, Go Kids Play is the perfect destination for birthday parties, family days out, and school holiday fun. Our activities are designed to challenge, excite, and entertain kids of all ages.
+                                    {about.content2}
                                 </p>
-                                <Link href="/about">
+                                <Link href={about.button_link || "/about"}>
                                     <BouncyButton size="lg" variant="outline" className="text-white border-white" as="div">
-                                        Read Our Story <ArrowRight className="w-5 h-5 ml-2" />
+                                        {about.button_text} <ArrowRight className="w-5 h-5 ml-2" />
                                     </BouncyButton>
                                 </Link>
                             </div>
@@ -133,7 +139,7 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                         <ScrollReveal animation="slideRight">
                             <div className="relative rounded-3xl overflow-hidden aspect-video lg:aspect-square">
                                 <Image
-                                    src={getMediaUrl(aboutImage)}
+                                    src={getMediaUrl(about.image) || "/images/gokidsplay/unnamed (4).webp"}
                                     alt="Kids enjoying the park"
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 50vw"
@@ -146,8 +152,10 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                 </div>
                 <SectionDivider position="bottom" variant="curve" color="fill-background" />
             </section>
+            )}
 
             {/* Featured Attractions */}
+            {attractions && (
             <section className="relative py-12 md:py-20 px-4 bg-background">
                 <div className="max-w-7xl mx-auto">
                     {/* Activities Carousel */}
@@ -165,26 +173,28 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                     </div>
 
                     <div className="text-center mt-12">
-                        <Link href="/attractions">
+                        <Link href={attractions.button_link || "/attractions"}>
                             <BouncyButton size="lg" variant="primary" as="div">
-                                View All Attractions <ArrowRight className="w-5 h-5" />
+                                {attractions.button_text} <ArrowRight className="w-5 h-5" />
                             </BouncyButton>
                         </Link>
                     </div>
                 </div>
             </section>
+            )}
 
             {/* Photo Gallery Section */}
+            {galleryText && (
             <section className="relative pt-12 md:pt-20 pb-16 md:pb-32 px-4 bg-background-light">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="slideUp" className="text-center mb-16">
                         <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
-                                See The Action
+                                {galleryText.title}
                             </span>
                         </h2>
                         <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto">
-                            Real moments, real fun! Check out what awaits you at Go Kids Play.
+                            {galleryText.subtitle}
                         </p>
                     </ScrollReveal>
 
@@ -221,10 +231,10 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background" />
             </section>
-
-
+            )}
 
             {/* ✨ Special Events Section */}
+            {events && (
             <section className="relative py-16 md:py-28 px-4 bg-background overflow-hidden">
                 {/* Decorative background blobs */}
                 <div className="absolute -top-32 -right-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
@@ -233,28 +243,23 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                 <div className="max-w-7xl mx-auto relative z-10">
                     <ScrollReveal animation="slideUp" className="text-center mb-14">
                         <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-accent/20 text-accent font-bold text-sm mb-5 tracking-wider uppercase border border-accent/30">
-                            <CalendarHeart className="w-4 h-4" /> Special Events
+                            <CalendarHeart className="w-4 h-4" /> {events.badge}
                         </span>
                         <h2 className="text-4xl md:text-5xl lg:text-7xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-secondary">
-                                Unforgettable Events
+                                {events.title}
                             </span>
                         </h2>
                         <p className="text-base md:text-xl text-white/70 max-w-2xl mx-auto">
-                            From Halloween frenzies to Christmas magic — book your spot at our exclusive seasonal events and themed parties.
+                            {events.subtitle}
                         </p>
                     </ScrollReveal>
 
                     {/* Event type cards */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-                        {[
-                            { emoji: "🎃", label: "Halloween Party", color: "from-orange-500/20 to-orange-700/10", border: "border-orange-500/30", text: "text-orange-400" },
-                            { emoji: "🎄", label: "Christmas Party", color: "from-green-500/20 to-green-700/10", border: "border-green-500/30", text: "text-green-400" },
-                            { emoji: "🐣", label: "Easter Fun", color: "from-yellow-400/20 to-yellow-600/10", border: "border-yellow-400/30", text: "text-yellow-300" },
-                            { emoji: "🎂", label: "Birthday Special", color: "from-pink-500/20 to-pink-700/10", border: "border-pink-500/30", text: "text-pink-400" },
-                        ].map((event, i) => (
-                            <ScrollReveal key={event.label} animation="fade" delay={i * 0.1}>
-                                <Link href="/events">
+                        {eventCards.map((event, i) => (
+                            <ScrollReveal key={`${event.label}-${i}`} animation="fade" delay={i * 0.1}>
+                                <Link href={events.button_link || "/events"}>
                                     <motion.div
                                         whileHover={{ scale: 1.05, y: -6 }}
                                         transition={{ type: "spring", stiffness: 300 }}
@@ -269,14 +274,14 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                     </div>
 
                     <ScrollReveal animation="scale" className="text-center">
-                        <Link href="/events">
+                        <Link href={events.button_link || "/events"}>
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.97 }}
                                 className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary to-accent text-white font-bold text-lg rounded-full shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all duration-300"
                             >
                                 <Sparkles className="w-5 h-5" />
-                                Browse All Events
+                                {events.button_text}
                                 <ArrowRight className="w-5 h-5" />
                             </motion.button>
                         </Link>
@@ -284,38 +289,40 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background-light" />
             </section>
+            )}
 
             {/* Instagram Reels Section */}
             <InstagramReels reels={reels} />
 
 
             {/* CTA Section */}
+            {cta && (
             <section className="relative py-16 md:py-32 px-4 bg-background-light">
                 <div className="max-w-4xl mx-auto text-center">
                     <ScrollReveal animation="scale">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-8xl font-display font-black mb-6 leading-tight">
-                            Ready to
+                            {cta.title}
                             <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
-                                GO KIDS PLAY!
+                                {cta.title_highlight}
                             </span>
                         </h2>
                         <p className="text-base md:text-xl text-white/70 mb-10 max-w-2xl mx-auto">
-                            Soft Play · Laser Arena · Go Karts · Inflatable Park · Birthday Parties — all under one roof in Coventry. Book online in minutes.
+                            {cta.subtitle}
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap">
-                            <Link href="/pricing">
+                            <Link href={cta.button1_link || "/pricing"}>
                                 <BouncyButton size="lg" variant="accent" as="div">
-                                    Book Tickets Now
+                                    {cta.button1_text}
                                 </BouncyButton>
                             </Link>
-                            <Link href="/parties">
+                            <Link href={cta.button2_link || "/parties"}>
                                 <BouncyButton size="lg" variant="secondary" as="div">
-                                    Plan a Party
+                                    {cta.button2_text}
                                 </BouncyButton>
                             </Link>
                             <div className="w-full sm:w-auto text-center sm:text-left">
-                                <p className="text-sm text-white/60 mb-1">Questions?</p>
+                                <p className="text-sm text-white/60 mb-1">{cta.phone_label}</p>
                                 <a
                                     href={`tel:${phone.replace(/\s/g, '')}`}
                                     className="text-xl font-bold text-white hover:text-primary transition-colors"
@@ -327,6 +334,7 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                     </ScrollReveal>
                 </div>
             </section>
+            )}
         </main>
     );
 }

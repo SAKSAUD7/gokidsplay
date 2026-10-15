@@ -6,6 +6,8 @@ import { Heart, Shield, Users, Zap, Target, Award, Sparkles, Calendar, HelpCircl
 import Link from "next/link";
 import Image from "next/image";
 import { TimingCardsClient } from "@/components/TimingCardsClient";
+import { getMediaUrl } from "@/lib/media-utils";
+import { paragraphs } from "@/lib/cms/page-registry";
 
 interface AboutContentProps {
     values: any[];
@@ -13,45 +15,38 @@ interface AboutContentProps {
     timeline: any[];
     faqs: any[];
     reels: any[];
-    hero?: {
-        title: string;
-        subtitle: string;
-        image: string;
-    };
-    story?: {
-        title: string;
-        content: string; // May need parsing if its rich text
-        image: string;
-    };
+    /** Resolved "about" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
 }
 
-export default function AboutContent({ values, stats, timeline, faqs, reels, hero, story }: AboutContentProps) {
-    const heroTitle = hero?.title || "Coventry's Best Indoor Play Centre";
-    const heroSubtitle = hero?.subtitle || "Soft Play, Laser Arena, Go Karts, Inflatable Park — all under one roof. Fun for all ages at Go Kids Play Coventry.";
+export default function AboutContent({ values, stats, timeline, faqs, reels, content }: AboutContentProps) {
+    const { hero, story, journey, values: valuesText, reviews, faq, cta } = content;
 
     return (
         <main className="min-h-screen bg-background text-white">
             {/* Hero */}
+            {hero && (
             <section className="relative pt-32 pb-20 px-4 bg-gradient-to-b from-background-dark to-background">
                 <div className="max-w-7xl mx-auto text-center">
                     <ScrollReveal animation="fade">
                         <span className="inline-block py-1 px-3 rounded-full bg-secondary text-black font-bold text-sm mb-6 tracking-wider uppercase">
-                            About Us
+                            {hero.badge}
                         </span>
                     </ScrollReveal>
                     <ScrollReveal animation="slideUp" delay={0.2}>
                         <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-7xl font-display font-black mb-6 leading-tight">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                {heroTitle}
+                                {hero.title}
                             </span>
                         </h1>
                         <p className="text-xl md:text-2xl text-white/70 max-w-3xl mx-auto">
-                            {heroSubtitle}
+                            {hero.subtitle}
                         </p>
                     </ScrollReveal>
                 </div>
                 <SectionDivider position="bottom" variant="curve" color="fill-background" />
             </section>
+            )}
 
             {/* Timing Cards — below hero */}
             <TimingCardsClient />
@@ -105,6 +100,7 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
             </section>
 
             {/* Our Story */}
+            {story && (
             <section className="relative py-20 px-4 bg-background-light">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -112,19 +108,13 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                             <div>
                                 <h2 className="text-5xl md:text-6xl font-display font-black mb-6">
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
-                                        {story?.title || "Our Story"}
+                                        {story.title}
                                     </span>
                                 </h2>
                                 <div className="text-xl text-white/80 mb-6 leading-relaxed space-y-4">
-                                    {story?.content ? (
-                                        <div dangerouslySetInnerHTML={{ __html: story.content }} />
-                                    ) : (
-                                        <>
-                                            <p>Go Kids Play was founded with a simple mission: to create a safe, fun, and exciting space where children and families can enjoy incredible activities together in Coventry.</p>
-                                            <p>Based at 310 Kingfield Road, Coventry, we've created the area's premier indoor play and party centre with Soft Play, Laser Arena, Go Karts, and an Inflatable Park — all under one roof.</p>
-                                            <p>Whether you're looking for a fun family day out, a birthday party venue, or a school holiday adventure, Go Kids Play is your destination for unforgettable memories in Coventry.</p>
-                                        </>
-                                    )}
+                                    {paragraphs(story.content).map((para, i) => (
+                                        <p key={i}>{para}</p>
+                                    ))}
                                 </div>
                             </div>
                         </ScrollReveal>
@@ -132,8 +122,8 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                         <ScrollReveal animation="slideRight">
                             <div className="relative rounded-3xl overflow-hidden aspect-square">
                                 <Image
-                                    src={story?.image || "/images/gokidsplay/unnamed (11).webp"}
-                                    alt="Kids having fun at Go Kids Play Leicester"
+                                    src={getMediaUrl(story.image) || "/images/gokidsplay/unnamed (11).webp"}
+                                    alt="Kids having fun at Go Kids Play Coventry"
                                     fill
                                     className="object-cover rounded-3xl"
                                     onError={(e) => {
@@ -148,14 +138,16 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background" />
             </section>
+            )}
 
             {/* Our Journey (Timeline) */}
+            {journey && (
             <section className="py-20 px-4 bg-background">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="fade" className="text-center mb-16">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">
-                                Our Journey
+                                {journey.title}
                             </span>
                         </h2>
                     </ScrollReveal>
@@ -206,20 +198,22 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                     </div>
                 </div>
             </section>
+            )}
 
             {/* Values */}
+            {valuesText && values.length > 0 && (
             <section className="py-20 px-4 bg-background-light">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="fade" className="text-center mb-16">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-primary">
-                                Our Values
+                                {valuesText.title}
                             </span>
                         </h2>
                     </ScrollReveal>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {values.length > 0 ? values.map((value, index) => (
+                        {values.map((value, index) => (
                             <ScrollReveal key={value.id || index} animation="slideUp" delay={index * 0.1}>
                                 <motion.div
                                     whileHover={{ scale: 1.05, y: -5 }}
@@ -237,24 +231,24 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                                     </p>
                                 </motion.div>
                             </ScrollReveal>
-                        )) : (
-                            <div className="col-span-full text-center text-white/60">Values loading...</div>
-                        )}
+                        ))}
                     </div>
                 </div>
             </section>
+            )}
 
             {/* People Reviews Section */}
+            {reviews && (
             <section className="relative py-20 px-4 bg-background">
                 <div className="max-w-7xl mx-auto">
                     <ScrollReveal animation="fade" className="text-center mb-16">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-4">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
-                                People Reviews on Go Kids Play
+                                {reviews.title}
                             </span>
                         </h2>
                         <p className="text-xl text-white/70 max-w-2xl mx-auto mb-8">
-                            Check out these amazing reviews from our visitors!
+                            {reviews.subtitle}
                         </p>
                     </ScrollReveal>
 
@@ -267,7 +261,7 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                                         className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[9/16]"
                                     >
                                         <Image
-                                            src={item.thumbnail_url || item.img || "/images/instagram/reel-1.jpg"}
+                                            src={getMediaUrl(item.thumbnail_url || item.img) || "/images/instagram/reel-1.jpg"}
                                             alt="Instagram Reel"
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-60"
@@ -276,82 +270,85 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, her
                                             <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                                 <Play className="w-8 h-8 text-white fill-white ml-1" />
                                             </div>
-                                            <h3 className="text-2xl font-display font-bold text-white mb-2">Watch Review</h3>
+                                            <h3 className="text-2xl font-display font-bold text-white mb-2">{reviews.card_title}</h3>
                                             <div className="flex items-center text-white/80 text-sm">
                                                 <Instagram className="w-4 h-4 mr-2" />
-                                                <span>View on Instagram</span>
+                                                <span>{reviews.card_link_text}</span>
                                             </div>
                                         </div>
                                     </motion.div>
                                 </a>
                             </ScrollReveal>
                         )) : (
-                            <div className="text-center w-full text-white/60">Check out our Instagram for reviews!</div>
+                            <div className="text-center w-full text-white/60">{reviews.empty_text}</div>
                         )}
                     </div>
                 </div>
             </section>
+            )}
 
             {/* FAQ Section */}
+            {faq && faqs.length > 0 && (
             <section className="py-20 px-4 bg-background-light">
                 <div className="max-w-4xl mx-auto">
                     <ScrollReveal animation="fade" className="text-center mb-16">
                         <h2 className="text-5xl md:text-6xl font-display font-black mb-4">
-                            <span className="text-white">Frequently Asked Questions</span>
+                            <span className="text-white">{faq.title}</span>
                         </h2>
-                        <p className="text-xl text-white/70">Got questions? We've got answers!</p>
+                        <p className="text-xl text-white/70">{faq.subtitle}</p>
                     </ScrollReveal>
 
                     <div className="space-y-6">
-                        {faqs.length > 0 ? faqs.map((faq, index) => (
-                            <ScrollReveal key={faq.id || index} animation="slideUp" delay={index * 0.1}>
+                        {faqs.map((item, index) => (
+                            <ScrollReveal key={item.id || index} animation="slideUp" delay={index * 0.1}>
                                 <div className="bg-surface-800/50 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-primary/50 transition-colors">
                                     <h3 className="text-xl font-bold text-white mb-3 flex items-start">
                                         <HelpCircle className="w-6 h-6 text-primary mr-3 shrink-0 mt-1" />
-                                        {faq.question || faq.q}
+                                        {item.question || item.q}
                                     </h3>
                                     <p className="text-white/70 ml-9 leading-relaxed">
-                                        {faq.answer || faq.a}
+                                        {item.answer || item.a}
                                     </p>
                                 </div>
                             </ScrollReveal>
-                        )) : (
-                            <div className="text-center text-white/60">FAQs compiling...</div>
-                        )}
+                        ))}
                     </div>
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background" />
             </section>
+            )}
 
             {/* CTA */}
+            {cta && (
             <section className="relative py-32 px-4 pb-32 md:pb-40 bg-background">
                 <div className="max-w-4xl mx-auto text-center">
                     <ScrollReveal animation="scale">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-6">
-                            Join the
+                            {cta.title}
                             <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-primary to-secondary">
-                                Adventure!
+                                {cta.title_highlight}
                             </span>
                         </h2>
                         <p className="text-xl text-white/70 mb-10">
-                            Come and experience Go Kids Play Coventry — the ultimate indoor play centre for the whole family!
+                            {cta.subtitle}
                         </p>
                         <div className="flex flex-col md:flex-row gap-4 justify-center">
-                            <Link href="/book">
+                            <Link href={cta.button1_link || "/book"}>
                                 <BouncyButton size="lg" variant="accent">
-                                    Book Tickets
+                                    {cta.button1_text}
                                 </BouncyButton>
                             </Link>
-                            <Link href="/contact">
+                            <Link href={cta.button2_link || "/contact"}>
                                 <BouncyButton size="lg" variant="outline" className="text-white border-white">
-                                    Contact Us
+                                    {cta.button2_text}
                                 </BouncyButton>
                             </Link>
                         </div>
                     </ScrollReveal>
                 </div>
             </section>
+            )}
         </main>
     );
 }

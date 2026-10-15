@@ -76,6 +76,14 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
                                 src={logoUrl}
                                 alt="Go Kids Play"
                                 className="h-16 w-auto drop-shadow-neon-blue"
+                                onError={(e) => {
+                                    // Fall back to the bundled logo (once) if the CMS logo file is missing
+                                    const img = e.currentTarget;
+                                    if (img.dataset.fallback !== '1') {
+                                        img.dataset.fallback = '1';
+                                        img.src = '/gokidsplay-logo.png';
+                                    }
+                                }}
                             />
                         </Link>
                         <p className="text-white/70 mb-6 max-w-sm">
@@ -176,16 +184,24 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
 
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-white/60 text-sm">
-                        © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
-                    </p>
+                    <div className="text-white/60 text-sm flex flex-wrap items-center justify-center gap-x-2">
+                        <span>© {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</span>
+                        <span className="text-white/30" aria-hidden="true">|</span>
+                        <a
+                            href="/admin/login"
+                            rel="nofollow"
+                            className="inline-flex items-center hover:text-primary transition-colors duration-200"
+                        >
+                            Admin Portal
+                        </a>
+                    </div>
                     <p className="text-white/60 text-sm flex items-center gap-1">
                         Made with <Heart className="w-4 h-4 text-accent fill-accent" /> &mdash; by{" "}
                         <a
                             href="https://saud-portfolio-eight.vercel.app/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-accent font-semibold hover:text-primary transition-colors duration-200 underline underline-offset-2"
+                            className="inline-flex items-center text-accent font-semibold hover:text-primary transition-colors duration-200 underline underline-offset-2"
                         >
                             saud.co
                         </a>

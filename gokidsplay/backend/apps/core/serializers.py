@@ -53,7 +53,9 @@ class LogoSerializer(serializers.ModelSerializer):
                 url = obj.image.url
             # Always force HTTPS in production (Azure terminates SSL at the load balancer,
             # so request.scheme may be 'http' internally even though the public URL is https)
-            if url and url.startswith('http://'):
+            # Local development has no TLS, so leave localhost URLs as http.
+            is_local = '://localhost' in url or '://127.0.0.1' in url
+            if url and url.startswith('http://') and not is_local:
                 url = 'https://' + url[7:]
             return url
         return None

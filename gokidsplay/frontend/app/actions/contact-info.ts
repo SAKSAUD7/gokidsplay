@@ -1,34 +1,52 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿'use server';
 
-async function sf(url: string, init: RequestInit = {}) {
+import { revalidatePath } from 'next/cache';
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
+
+const ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1'}/cms/contact-info/`;
+
+export async function getContactInfos() {
     try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[contact-info]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[contact-info] error:', e); return null; }
+        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
+    } catch (error) {
+        return [];
+    }
 }
 
-export async function getContactInfo() {
-    const data = await sf(`${BASE}/cms/contact-info/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function updateContactInfo(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/contact-info/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function getContactInfo(id: string) {
+    try {
+        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createContactInfo(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/contact-info/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+    try {
+        const result = await postAPI(ENDPOINT, data);
+        revalidatePath('/admin/cms/contact-info');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: 'Failed to create contact info' };
+    }
+}
+
+export async function updateContactInfo(id: string, data: any) {
+    try {
+        const result = await putAPI(`${ENDPOINT}${id}/`, data);
+        revalidatePath('/admin/cms/contact-info');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: 'Failed to update contact info' };
+    }
+}
+
+export async function deleteContactInfo(id: string) {
+    try {
+        await deleteAPI(`${ENDPOINT}${id}/`);
+        revalidatePath('/admin/cms/contact-info');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: 'Failed to delete contact info' };
+    }
 }

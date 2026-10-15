@@ -22,8 +22,8 @@ class VoucherViewSet(viewsets.ModelViewSet):
     serializer_class = VoucherSerializer
     
     def get_permissions(self):
-        # Allow public access for list and validate
-        if self.action in ['list', 'validate']:
+        # Only single-code validation is public — listing would expose every voucher code
+        if self.action == 'validate':
             return [permissions.AllowAny()]
         return [IsSuperAdminOnly()]
     
@@ -123,6 +123,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
         return Response({
             'valid': True,
             'voucher': {
+                'id': voucher.id,
                 'code': voucher.code,
                 'discount_type': voucher.discount_type,
                 'discount_value': float(voucher.discount_value),

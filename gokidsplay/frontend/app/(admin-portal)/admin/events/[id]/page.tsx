@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
-    ArrowLeft, Edit2, Users, Calendar, Clock, Pound, CheckCircle,
+    ArrowLeft, Edit2, Users, Calendar, Clock, PoundSterling, CheckCircle,
     XCircle, Globe, RefreshCw, Eye, EyeOff, Copy, Trash2, AlertCircle,
     TrendingUp
 } from "lucide-react";

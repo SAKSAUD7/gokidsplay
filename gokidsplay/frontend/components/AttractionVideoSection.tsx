@@ -75,21 +75,9 @@ export default function AttractionVideoSection({ videoData }: AttractionVideoSec
         };
     }, [isYouTube]);
 
-    // If no video, show placeholder with Dark Theme styling
+    // No video uploaded yet — render nothing rather than an admin placeholder on the public site
     if (!videoData || !videoData.video) {
-        return (
-            <section className="w-full py-12 relative z-10">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-sm mx-auto aspect-[9/16] border-2 border-dashed border-white/20 rounded-3xl flex flex-col items-center justify-center text-white/40 bg-white/5 backdrop-blur-sm">
-                        <svg className="w-12 h-12 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <h3 className="text-lg font-bold mb-2 text-white/80">Vertical Video</h3>
-                        <p className="text-sm text-center px-4">Upload a video via the Admin Portal</p>
-                    </div>
-                </div>
-            </section>
-        );
+        return null;
     }
 
     return (

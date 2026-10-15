@@ -46,7 +46,7 @@ export default async function AdminDashboard() {
     const marketingStats = await getMarketingStats();
 
     // Calculate max revenue for chart scaling
-    const maxRevenue = Math.max(...stats.monthlyRevenue.map((d: any) => d.total), 1000);
+    const maxRevenue = Math.max(...(stats?.monthlyRevenue ?? []).map((d: any) => d.total), 1000);
 
     return (
         <div className="p-8">

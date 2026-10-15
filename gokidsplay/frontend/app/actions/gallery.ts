@@ -1,44 +1,115 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[gallery]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[gallery] error:', e); return null; }
+import { fetchAPI } from "../lib/server-api";
+import { requirePermission } from "../lib/admin-auth";
+import { logActivity } from "../lib/audit-log";
+import { revalidatePath } from "next/cache";
+import { transformCmsItem } from "../lib/transformers";
+
+export async function getGalleryItems(): Promise<any[]> {
+    // Public access allowed
+    const res = await fetchAPI("/cms/gallery/");
+    if (!res || !res.ok) return [];
+    const data = await res.json();
+    return data.map(transformCmsItem);
 }
 
-export async function getGalleryItems() {
-    const data = await sf(`${BASE}/cms/gallery/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
+export async function getGalleryItem(id: string) {
+    // Public access allowed
+    const res = await fetchAPI(`/cms/gallery/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformCmsItem(data);
 }
 
-export async function createGalleryItem(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/gallery/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
+export async function createGalleryItem(data: {
+    title?: string;
+    imageUrl: string;
+    category?: string;
+    active: boolean;
+    order: number;
+}) {
+    await requirePermission('cms', 'write');
+
+    const payload = {
+        title: data.title,
+        image_url: data.imageUrl,
+        category: data.category,
+        active: data.active,
+        order: data.order
+    };
+
+    const res = await fetchAPI("/cms/gallery/", {
+        method: "POST",
+        body: JSON.stringify(payload)
     });
+
+    if (!res || !res.ok) return { success: false };
+
+    const item = await res.json();
+
+    await logActivity({
+        action: 'CREATE',
+        entity: 'GALLERY_ITEM',
+        entityId: item.id.toString(),
+        details: { after: item }
+    });
+
+    revalidatePath('/admin/gallery');
+    revalidatePath('/admin/cms/home');
+    revalidatePath('/admin/cms/parties');
+    revalidatePath('/');
+    return { success: true, item: transformCmsItem(item) };
 }
 
-export async function updateGalleryItem(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/gallery/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
+export async function updateGalleryItem(id: string, data: any) {
+    await requirePermission('cms', 'write');
+
+    const payload: any = { ...data };
+    if (data.imageUrl) {
+        payload.image_url = data.imageUrl;
+        delete payload.imageUrl;
+    }
+
+    const res = await fetchAPI(`/cms/gallery/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
     });
+
+    if (!res || !res.ok) return { success: false };
+
+    await logActivity({
+        action: 'UPDATE',
+        entity: 'GALLERY_ITEM',
+        entityId: id,
+        details: { after: data }
+    });
+
+    revalidatePath('/admin/gallery');
+    revalidatePath('/admin/cms/home');
+    revalidatePath('/admin/cms/parties');
+    revalidatePath('/');
+    return { success: true };
 }
 
-export async function deleteGalleryItem(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/gallery/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
+export async function deleteGalleryItem(id: string) {
+    await requirePermission('cms', 'delete');
+
+    const res = await fetchAPI(`/cms/gallery/${id}/`, {
+        method: "DELETE"
     });
-    return r.ok;
+
+    if (!res || !res.ok) return { success: false };
+
+    await logActivity({
+        action: 'DELETE',
+        entity: 'GALLERY_ITEM',
+        entityId: id
+    });
+
+    revalidatePath('/admin/gallery');
+    revalidatePath('/admin/cms/home');
+    revalidatePath('/admin/cms/parties');
+    revalidatePath('/');
+    return { success: true };
 }

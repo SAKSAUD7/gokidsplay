@@ -1,32 +1,39 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
+import { fetchAPI } from "../lib/server-api";
+
+export async function getBookingInformation(bookingType?: 'SESSION' | 'PARTY') {
     try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[booking-information]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[booking-information] error:', e); return null; }
-}
+        const url = bookingType
+            ? `/cms/booking-information/?booking_type=${bookingType}`
+            : '/cms/booking-information/';
 
-export async function getBookingInformation(type?: string) {
-    const url = type
-        ? `${BASE}/cms/booking-information/?booking_type=${type}`
-        : `${BASE}/cms/booking-information/`;
-    const data = await sf(url);
-    if (!data) return type ? null : [];
-    if (type) {
-        const list = Array.isArray(data) ? data : (data.results || []);
-        return list.find((b: any) => b.booking_type === type) || null;
+        const res = await fetchAPI(url);
+        if (!res || !res.ok) return null;
+
+        const data = await res.json();
+
+        // If filtering by type, return first match
+        if (bookingType && Array.isArray(data) && data.length > 0) {
+            return data[0];
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Failed to fetch booking information:', error);
+        return null;
     }
-    return Array.isArray(data) ? data : (data.results || []);
 }
 
-export async function updateBookingInformation(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/booking-information/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function getAllBookingInformation() {
+    try {
+        const res = await fetchAPI('/cms/booking-information/');
+        if (!res || !res.ok) return [];
+
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.error('Failed to fetch all booking information:', error);
+        return [];
+    }
 }

@@ -1,3 +1,10 @@
+// Origin of the Django API (e.g. https://api.gokidsplay.co.uk) — allowed in the CSP below
+// so client-side API calls and backend-hosted media are never blocked.
+const apiOrigin = (() => {
+    try { return new URL(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1').origin; }
+    catch { return 'http://localhost:9000'; }
+})();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone', // Self-contained deployment
@@ -108,11 +115,11 @@ const nextConfig = {
                             "default-src 'self'",
                             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com",
                             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-                            "img-src 'self' data: blob: https: http://localhost:9000 http://127.0.0.1:9000",
+                            `img-src 'self' data: blob: https: http://localhost:9000 http://127.0.0.1:9000 ${apiOrigin}`,
                             "font-src 'self' https://fonts.gstatic.com data:",
-                            "connect-src 'self' http://localhost:9000 http://127.0.0.1:9000 https://*.azurewebsites.net https://www.google-analytics.com https://*.blob.core.windows.net",
-                            "frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com",
-                            "media-src 'self' https://*.blob.core.windows.net http://localhost:9000",
+                            `connect-src 'self' http://localhost:9000 http://127.0.0.1:9000 ${apiOrigin} https://*.azurewebsites.net https://www.google-analytics.com https://*.blob.core.windows.net`,
+                            "frame-src 'self' https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.instagram.com",
+                            `media-src 'self' blob: https://*.blob.core.windows.net https://*.azurewebsites.net http://localhost:9000 http://127.0.0.1:9000 ${apiOrigin}`,
                             "object-src 'none'",
                             "base-uri 'self'",
                             "form-action 'self'",
@@ -127,6 +134,15 @@ const nextConfig = {
     // ── 301 Permanent Redirects for SEO ───────────────────────────
     async redirects() {
         return [
+            // Old admin page editors → unified Pages editor (lib/cms/page-registry.ts)
+            ...[
+                ['about', 'about'], ['contact', 'contact'], ['facilities', 'facilities'],
+                ['privacy', 'legal-privacy'], ['waiver-terms', 'legal-terms'], ['guidelines', 'guidelines'],
+            ].map(([from, to]) => ({
+                source: `/admin/cms/${from}`,
+                destination: `/admin/cms/pages/${to}`,
+                permanent: false,
+            })),
             {
                 source: '/information/our-prices',
                 destination: '/pricing',

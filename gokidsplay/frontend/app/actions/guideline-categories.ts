@@ -1,44 +1,55 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿'use server';
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[guideline-categories]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[guideline-categories] error:', e); return null; }
-}
+import { revalidatePath } from 'next/cache';
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
+
+const ENDPOINT = API_ENDPOINTS.cms.guideline_categories;
 
 export async function getGuidelineCategories() {
-    const data = await sf(`${BASE}/cms/guideline-categories/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data.filter((g: any) => g.active !== false) : (data.results || []);
+    try {
+        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
+    } catch (error) {
+        return [];
+    }
 }
 
-export async function updateGuidelineCategory(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/guideline-categories/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function getGuidelineCategory(id: string) {
+    try {
+        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createGuidelineCategory(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/guideline-categories/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+    try {
+        const result = await postAPI(ENDPOINT, data);
+        revalidatePath('/admin/cms/guidelines');
+        revalidatePath('/guidelines');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to create guideline category' };
+    }
 }
 
-export async function deleteGuidelineCategory(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/guideline-categories/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function updateGuidelineCategory(id: string, data: any) {
+    try {
+        const result = await putAPI(`${ENDPOINT}${id}/`, data);
+        revalidatePath('/admin/cms/guidelines');
+        revalidatePath('/guidelines');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to update guideline category' };
+    }
+}
+
+export async function deleteGuidelineCategory(id: string) {
+    try {
+        await deleteAPI(`${ENDPOINT}${id}/`);
+        revalidatePath('/admin/cms/guidelines');
+        revalidatePath('/guidelines');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to delete guideline category' };
+    }
 }

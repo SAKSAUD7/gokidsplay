@@ -23,7 +23,7 @@ export function PartyCarouselEditor({ items: initialItems }: PartyCarouselEditor
 
         try {
             // Import server action dynamically
-            const { uploadImage } = await import('@/app/actions/upload-image');
+            const { uploadMediaFile: uploadImage } = await import('@/lib/cms/upload-client');
 
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];

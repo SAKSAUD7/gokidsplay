@@ -51,6 +51,15 @@ class FaqViewSet(BaseCmsViewSet):
     ordering_fields = ['order']
     ordering = ['order']
 
+class TestimonialViewSet(BaseCmsViewSet):
+    from .models import Testimonial as _Testimonial
+    queryset = _Testimonial.objects.all()
+    from .serializers import TestimonialSerializer as _TestimonialSerializer
+    serializer_class = _TestimonialSerializer
+    filterset_fields = ['active']
+    ordering_fields = ['order', 'created_at']
+    ordering = ['order', '-created_at']
+
 class SocialLinkViewSet(BaseCmsViewSet):
     queryset = SocialLink.objects.all()
     serializer_class = SocialLinkSerializer
@@ -181,7 +190,8 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'create']:
+        # Visitors may submit the contact form; reading messages (customer PII) is staff-only
+        if self.action == 'create':
             return [permissions.AllowAny()]
         return [IsStaffUser()]  # Allow managers to manage messages
     

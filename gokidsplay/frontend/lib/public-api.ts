@@ -164,3 +164,27 @@ export async function getPublicTimingCards() {
     const cards = await fetchFromAPI('/cms/timing-cards/');
     return cards.filter((c: any) => c.active);
 }
+
+/**
+ * Resolved editable content for one page (see lib/cms/page-registry.ts).
+ * Includes hidden sections (as null) so pages can respect the admin's
+ * "Show this section" switch. Tagged so admin saves refresh it instantly.
+ */
+export async function getPublicPageContent(page: string) {
+    const { resolveSections } = await import('./cms/page-registry');
+    let rows: any[] = [];
+    try {
+        const response = await fetch(`${API_URL}/cms/page-sections/?page=${encodeURIComponent(page)}`, {
+            next: { revalidate: 60, tags: ['page-sections'] },
+        } as any);
+        if (response.ok) rows = await response.json();
+    } catch (error) {
+        console.error(`Failed to fetch page content for ${page}:`, error);
+    }
+    return resolveSections(page, Array.isArray(rows) ? rows : []);
+}
+
+export async function getPublicTestimonials() {
+    const reviews = await fetchFromAPI('/cms/testimonials/');
+    return Array.isArray(reviews) ? reviews.filter((r: any) => r.active) : [];
+}

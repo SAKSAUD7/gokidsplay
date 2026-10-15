@@ -1,125 +1,106 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[marketing]', r.status, url); return null; }
-        return r.json();
-    } catch(e) { console.error('[marketing] error:', e); return null; }
-}
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from "@/lib/api";
+import { revalidatePath } from "next/cache";
 
-function getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
-}
+// Campaigns
 
-function authHeaders() {
-    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` };
-}
-
-// ── CAMPAIGNS ────────────────────────────────────────────────────────────
-export async function getCampaigns(params?: { page?: number }) {
-    let url = `${BASE}/marketing/campaigns/`;
-    if (params?.page) url += `?page=${params.page}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getCampaign(id: number | string) {
-    return sf(`${BASE}/marketing/campaigns/${id}/`, { headers: authHeaders() });
+export async function getCampaigns() {
+    return await fetchAPI<any[]>(API_ENDPOINTS.marketing.campaigns);
 }
 
 export async function createCampaign(data: any) {
-    return sf(`${BASE}/marketing/campaigns/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
+    await postAPI(API_ENDPOINTS.marketing.campaigns, data);
+    revalidatePath('/admin/marketing');
 }
 
-export async function updateCampaign(id: number | string, data: any) {
-    return sf(`${BASE}/marketing/campaigns/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
+export async function updateCampaign(id: number, data: any) {
+    await putAPI(`${API_ENDPOINTS.marketing.campaigns}${id}/`, data);
+    revalidatePath('/admin/marketing');
 }
 
-export async function deleteCampaign(id: number | string) {
-    const r = await fetch(`${BASE}/marketing/campaigns/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function deleteCampaign(id: number) {
+    await deleteAPI(`${API_ENDPOINTS.marketing.campaigns}${id}/`);
+    revalidatePath('/admin/marketing');
 }
 
-export async function sendCampaign(id: number | string) {
-    return sf(`${BASE}/marketing/campaigns/${id}/send/`, {
-        method: 'POST',
-        headers: authHeaders(),
-    });
+export async function sendCampaign(id: number) {
+    await postAPI(`${API_ENDPOINTS.marketing.campaigns}${id}/send/`, {});
+    revalidatePath('/admin/marketing');
 }
 
-// ── EMAIL TEMPLATES ───────────────────────────────────────────────────────
-export async function getTemplates(params?: { page?: number }) {
-    let url = `${BASE}/marketing/templates/`;
-    if (params?.page) url += `?page=${params.page}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
+// Templates
+
+export async function getTemplates() {
+    return await fetchAPI<any[]>(API_ENDPOINTS.marketing.templates);
 }
 
-// Alias used by some components
-export const getEmailTemplates = getTemplates;
-
-export async function getTemplate(id: number | string) {
-    return sf(`${BASE}/marketing/templates/${id}/`, { headers: authHeaders() });
+export async function getTemplate(id: number) {
+    return await fetchAPI<any>(`${API_ENDPOINTS.marketing.templates}${id}/`);
 }
 
 export async function createTemplate(data: any) {
-    return sf(`${BASE}/marketing/templates/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
+    await postAPI(API_ENDPOINTS.marketing.templates, data);
+    revalidatePath('/admin/marketing/templates');
 }
 
-export async function updateTemplate(id: number | string, data: any) {
-    return sf(`${BASE}/marketing/templates/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
+export async function updateTemplate(id: number, data: any) {
+    await putAPI(`${API_ENDPOINTS.marketing.templates}${id}/`, data);
+    revalidatePath('/admin/marketing/templates');
 }
 
-export async function deleteTemplate(id: number | string) {
-    const r = await fetch(`${BASE}/marketing/templates/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function deleteTemplate(id: number) {
+    await deleteAPI(`${API_ENDPOINTS.marketing.templates}${id}/`);
+    revalidatePath('/admin/marketing/templates');
 }
 
-// ── UNSUBSCRIBES ─────────────────────────────────────────────────────────
-export async function getUnsubscribes() {
-    const data = await sf(`${BASE}/marketing/unsubscribes/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
+// Dashboard Stats
+
+export interface MarketingStats {
+    total_campaigns: number;
+    active_campaigns: number;
+    sent_campaigns: number;
+    total_emails_sent: number;
+    avg_open_rate: number;
+    avg_click_rate: number;
+    subscriber_count: number;
+    unsubscribe_count: number;
+    unsubscribe_rate: number;
+    recent_campaigns: {
+        id: number;
+        title: string;
+        sent_at: string;
+        sent_count: number;
+        open_rate: number;
+        click_rate: number;
+    }[];
+    monthly_growth: {
+        month: string;
+        count: number;
+    }[];
 }
 
-// ── STATS ────────────────────────────────────────────────────────────────
-export async function getMarketingStats() {
-    return sf(`${BASE}/marketing/stats/`, { headers: authHeaders() });
+export async function getMarketingStats(): Promise<MarketingStats> {
+    try {
+        const data = await fetchAPI<MarketingStats>(`${API_ENDPOINTS.marketing.campaigns}dashboard_stats/`);
+        return data;
+    } catch (error) {
+        console.error('Error fetching marketing stats:', error);
+        // Return empty stats instead of null so UI still renders
+        return {
+            total_campaigns: 0,
+            active_campaigns: 0,
+            sent_campaigns: 0,
+            total_emails_sent: 0,
+            avg_open_rate: 0,
+            avg_click_rate: 0,
+            subscriber_count: 0,
+            unsubscribe_count: 0,
+            unsubscribe_rate: 0,
+            recent_campaigns: [],
+            monthly_growth: [],
+        };
+    }
 }
 
-// ── SUBSCRIBERS ──────────────────────────────────────────────────────────
-export async function getSubscribers(params?: { page?: number }) {
-    let url = `${BASE}/marketing/subscribers/`;
-    if (params?.page) url += `?page=${params.page}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
+

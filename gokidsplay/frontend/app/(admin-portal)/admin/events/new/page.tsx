@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Calendar, Clock, Users, Pound, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Calendar, Clock, Users, PoundSterling, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";

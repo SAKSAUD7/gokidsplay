@@ -1,3 +1,4 @@
+from django.apps import apps
 from rest_framework import serializers
 from .models import (
     Banner, Activity, Faq, SocialLink, GalleryItem,
@@ -21,6 +22,17 @@ class BannerSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
+        fields = '__all__'
+
+class TestimonialSerializer(serializers.ModelSerializer):
+    # CharFields so uploaded media paths (/media/uploads/...) are accepted
+    image_url = serializers.CharField(max_length=500, required=False, allow_blank=True, allow_null=True)
+    video_url = serializers.CharField(max_length=500, required=False, allow_blank=True, allow_null=True)
+    thumbnail_url = serializers.CharField(max_length=500, required=False, allow_blank=True, allow_null=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5, required=False)
+
+    class Meta:
+        model = apps.get_model('cms', 'Testimonial')
         fields = '__all__'
 
 class FaqSerializer(serializers.ModelSerializer):

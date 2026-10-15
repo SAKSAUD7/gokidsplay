@@ -37,11 +37,17 @@ export function TimingCardsClient() {
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     setSchedule(data.map((item: any) => {
-                        const dow = DAY_NAME_TO_DOW[item.day_label] ?? -1;
+                        // Labels may combine days ("Thursday & Friday") — match every day named
+                        const dows = Object.entries(DAY_NAME_TO_DOW)
+                            .filter(([name]) => (item.day_label || '').includes(name))
+                            .map(([, d]) => d);
+                        const dow = dows.length === 1 ? dows[0] : -1;
                         const closed = !item.open_time || item.open_time.toLowerCase() === "closed";
                         return {
                             dow,
+                            dows,
                             label: item.day_label,
+                            id: item.id,
                             open: closed ? null : item.open_time,
                             close: closed ? null : item.close_time,
                         };
@@ -86,7 +92,7 @@ export function TimingCardsClient() {
     const isTodayClosed = adminOverride === 'closed';
 
     const cards = schedule.map(day => {
-        const isToday  = day.dow === todayDow;
+        const isToday  = day.dows.includes(todayDow);
         const isMonday = day.dow === 1;
 
         let open  = day.open;
@@ -149,7 +155,7 @@ export function TimingCardsClient() {
 
                             return (
                                 <div
-                                    key={card.dow}
+                                    key={`${card.label}-${card.id ?? ''}`}
                                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border ${cardBorder} backdrop-blur-sm shrink-0 transition-all`}
                                 >
                                     <span className={`text-xs whitespace-nowrap ${labelClass}`}>

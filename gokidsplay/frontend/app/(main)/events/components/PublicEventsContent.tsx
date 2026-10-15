@@ -38,7 +38,15 @@ interface Event {
     status: string;
 }
 
-export default function PublicEventsContent({ events }: { events: Event[] }) {
+export default function PublicEventsContent({
+    events,
+    content,
+}: {
+    events: Event[];
+    /** Resolved "events" page content — see lib/cms/page-registry.ts */
+    content: Record<string, Record<string, string> | null>;
+}) {
+    const { hero, empty } = content;
     const [typeFilter, setTypeFilter] = useState("");
     const [search, setSearch] = useState("");
 
@@ -67,13 +75,13 @@ export default function PublicEventsContent({ events }: { events: Event[] }) {
                 <div style={{ position: "absolute", bottom: "10%", right: "20%", width: 220, height: 220, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,0.15), transparent 70%)", pointerEvents: "none" }} />
 
                 <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.4rem 1rem", borderRadius: 99, border: "1px solid rgba(139,92,246,0.4)", background: "rgba(139,92,246,0.1)", marginBottom: "1.25rem", fontSize: "0.8rem", color: "#A78BFA" }}>
-                    <Sparkles size={13} /> Special Events & Parties
+                    <Sparkles size={13} /> {hero?.badge ?? "Special Events & Parties"}
                 </div>
                 <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, margin: "0 0 1rem", background: "linear-gradient(135deg, #fff 30%, #A78BFA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                    Go Kids Play Events
+                    {hero?.title ?? "Go Kids Play Events"}
                 </h1>
                 <p style={{ fontSize: "1.15rem", color: "#9CA3AF", maxWidth: 600, margin: "0 auto 2.5rem", lineHeight: 1.7 }}>
-                    From Birthday parties to Halloween nights — create unforgettable memories at Go Kids Play Coventry.
+                    {hero?.subtitle ?? "From Birthday parties to Halloween nights — create unforgettable memories at Go Kids Play Coventry."}
                 </p>
 
                 {/* Search */}
@@ -104,8 +112,8 @@ export default function PublicEventsContent({ events }: { events: Event[] }) {
                 {upcoming.length === 0 && past.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "5rem 1rem", color: "#4B5563" }}>
                         <div style={{ fontSize: 64, marginBottom: "1rem" }}>🎉</div>
-                        <h2 style={{ color: "#9CA3AF", fontWeight: 600, margin: "0 0 0.5rem" }}>No events found</h2>
-                        <p style={{ margin: 0, fontSize: "0.9rem" }}>Check back soon for upcoming events!</p>
+                        <h2 style={{ color: "#9CA3AF", fontWeight: 600, margin: "0 0 0.5rem" }}>{empty?.title ?? "No events found"}</h2>
+                        <p style={{ margin: 0, fontSize: "0.9rem" }}>{empty?.subtitle ?? "Check back soon for upcoming events!"}</p>
                     </div>
                 ) : (
                     <>
@@ -115,7 +123,7 @@ export default function PublicEventsContent({ events }: { events: Event[] }) {
                                     🗓️ Upcoming Events
                                     <span style={{ padding: "0.15rem 0.6rem", borderRadius: 99, background: "rgba(139,92,246,0.2)", color: "#A78BFA", fontSize: "0.75rem" }}>{upcoming.length}</span>
                                 </h2>
-                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(340px, 100%), 1fr))", gap: "1.25rem", marginBottom: "2.5rem" }}>
                                     {upcoming.map(ev => <EventCard key={ev.id} event={ev} />)}
                                 </div>
                             </>
@@ -123,7 +131,7 @@ export default function PublicEventsContent({ events }: { events: Event[] }) {
                         {past.length > 0 && (
                             <>
                                 <h2 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#6B7280", margin: "0 0 1rem" }}>Past Events</h2>
-                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem", opacity: 0.6 }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(320px, 100%), 1fr))", gap: "1rem", opacity: 0.6 }}>
                                     {past.map(ev => <EventCard key={ev.id} event={ev} />)}
                                 </div>
                             </>

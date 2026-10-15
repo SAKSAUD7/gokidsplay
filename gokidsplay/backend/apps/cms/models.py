@@ -71,9 +71,15 @@ class Testimonial(models.Model):
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='TEXT')
     video_url = models.URLField(null=True, blank=True)
     thumbnail_url = models.URLField(null=True, blank=True)
+    platform = models.CharField(max_length=50, blank=True, default='Google', help_text="Where the review was left (Google, Facebook, …)")
+    review_date = models.CharField(max_length=50, blank=True, default='', help_text="Shown as written, e.g. 'August 2026'")
+    order = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
 
     def __str__(self):
         return self.name
@@ -256,6 +262,7 @@ class PageSection(models.Model):
     video_url = models.URLField(null=True, blank=True)
     cta_text = models.CharField(max_length=100, null=True, blank=True, help_text="Call-to-action button text")
     cta_link = models.URLField(null=True, blank=True, help_text="Call-to-action button link")
+    extra = models.JSONField(default=dict, blank=True, help_text="Additional named fields for this section (badges, extra buttons, list items)")
     order = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -665,12 +672,8 @@ class AttractionVideoSection(models.Model):
         return f"Video: {title_display} - {active_status}"
     
     def get_video_url(self):
-        """Returns YouTube URL if set, otherwise returns uploaded video URL"""
-        if self.youtube_url:
-            return self.youtube_url
-        elif self.video:
-            return self.video.url
-        return None
+        """Returns the video URL (YouTube/Vimeo link or uploaded file path), or None."""
+        return self.video or None
 
 class PricingCarouselImage(models.Model):
     """

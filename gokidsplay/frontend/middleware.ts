@@ -56,6 +56,8 @@ export function middleware(request: NextRequest) {
     // 5b. Redirect apex (non-www) domain → www
     const isApexDomain =
         !lowercaseHost.startsWith('www.') &&
+        !lowercaseHost.startsWith('localhost') &&
+        !lowercaseHost.startsWith('127.0.0.1') &&
         (lowercaseHost.includes('gokidsplay.uk') ||
             lowercaseHost.includes('gokidsplay.co.uk') ||
             lowercaseHost === targetHost.replace(/^www\./i, ''));

@@ -92,7 +92,15 @@ interface FacilityItem {
     image_url?: string;
 }
 
-export default function FacilitiesContent({ facilities }: { facilities: FacilityItem[] }) {
+export default function FacilitiesContent({
+    facilities,
+    content,
+}: {
+    facilities: FacilityItem[];
+    /** Resolved "facilities" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
+}) {
+    const { hero, cta } = content;
     // Use CMS data if available and non-empty, otherwise use beautiful defaults
     const items = facilities && facilities.length > 0
         ? facilities.map((f, i) => ({
@@ -107,6 +115,7 @@ export default function FacilitiesContent({ facilities }: { facilities: Facility
     return (
         <main className="min-h-screen bg-background text-white">
             {/* Hero Section */}
+            {hero && (
             <section className="relative pt-40 pb-20 px-4 overflow-hidden">
                 {/* Background blobs */}
                 <div className="absolute -top-20 -left-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
@@ -119,7 +128,7 @@ export default function FacilitiesContent({ facilities }: { facilities: Facility
                         transition={{ duration: 0.6 }}
                         className="inline-flex items-center gap-2 py-1.5 px-5 rounded-full bg-secondary/20 border border-secondary/40 text-secondary font-bold text-sm mb-6 tracking-wider uppercase"
                     >
-                        On-Site Amenities
+                        {hero.badge}
                     </motion.div>
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
@@ -127,7 +136,7 @@ export default function FacilitiesContent({ facilities }: { facilities: Facility
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent leading-tight"
                     >
-                        Our Facilities
+                        {hero.title}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -135,10 +144,11 @@ export default function FacilitiesContent({ facilities }: { facilities: Facility
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto"
                     >
-                        Everything you need for a comfortable, safe, and unforgettable visit at Go Kids Play Coventry.
+                        {hero.subtitle}
                     </motion.p>
                 </div>
             </section>
+            )}
 
             {/* Facilities Grid */}
             <section className="pb-20 px-4">
@@ -174,35 +184,37 @@ export default function FacilitiesContent({ facilities }: { facilities: Facility
             </section>
 
             {/* CTA Banner */}
+            {cta && (
             <section className="pb-20 px-4">
                 <div className="max-w-4xl mx-auto">
                     <ScrollReveal animation="scale">
                         <div className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border border-primary/20 rounded-3xl p-8 md:p-12 text-center">
-                            <div className="text-5xl mb-4">🎉</div>
+                            {cta.emoji && <div className="text-5xl mb-4">{cta.emoji}</div>}
                             <h2 className="text-2xl md:text-3xl font-black text-white mb-4">
-                                Planning a Visit or Party?
+                                {cta.title}
                             </h2>
                             <p className="text-white/70 mb-8 max-w-xl mx-auto">
-                                Book your session online or enquire about our premium birthday party packages — all designed to create unforgettable memories.
+                                {cta.subtitle}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Link
-                                    href="/book"
+                                    href={cta.button1_link || "/book"}
                                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary to-secondary text-black font-black rounded-full text-lg hover:shadow-lg hover:shadow-primary/30 hover:scale-105 transition-all duration-200"
                                 >
-                                    🎟️ Book Tickets
+                                    {cta.button1_text}
                                 </Link>
                                 <Link
-                                    href="/parties"
+                                    href={cta.button2_link || "/parties"}
                                     className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 border border-white/20 text-white font-bold rounded-full text-lg hover:bg-white/20 hover:border-white/40 transition-all duration-200"
                                 >
-                                    🎂 Plan a Party
+                                    {cta.button2_text}
                                 </Link>
                             </div>
                         </div>
                     </ScrollReveal>
                 </div>
             </section>
+            )}
         </main>
     );
 }

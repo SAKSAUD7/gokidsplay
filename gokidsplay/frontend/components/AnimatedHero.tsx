@@ -5,29 +5,46 @@ import Link from "next/link";
 import Image from "next/image";
 import { getMediaUrl } from "@/lib/media-utils";
 
+import { isVideoEmbed, toEmbedUrl } from "@/lib/media-utils";
+
+/** Fields come from the home page "hero" section (lib/cms/page-registry.ts). */
 interface AnimatedHeroProps {
-    title?: string;
-    subtitle?: string;
-    backgroundImage?: string;
+    content: Record<string, string>;
 }
 
-export function AnimatedHero({
-    title = "The Ultimate Kids Play Experience in Coventry",
-    subtitle = "Soft Play · Laser Arena · Go Karts · Inflatable Park · Birthday Parties — all under one roof!",
-    backgroundImage = "/images/gokidsplay/unnamed.webp"
-}: AnimatedHeroProps) {
+export function AnimatedHero({ content: c }: AnimatedHeroProps) {
+    const backgroundImage = c.image || "/images/gokidsplay/unnamed.webp";
+    const video = c.video;
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src={getMediaUrl(backgroundImage)}
+                    src={getMediaUrl(backgroundImage) || "/images/gokidsplay/unnamed.webp"}
                     alt="Go Kids Play Coventry — Indoor Play Centre"
                     fill
                     priority
                     className="object-cover"
                 />
+                {video && (isVideoEmbed(video) ? (
+                    <iframe
+                        src={toEmbedUrl(video, { background: true })}
+                        title="Go Kids Play"
+                        allow="autoplay; encrypted-media"
+                        className="absolute top-1/2 left-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                    />
+                ) : (
+                    <video
+                        src={getMediaUrl(video)}
+                        poster={getMediaUrl(backgroundImage)}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover"
+                    />
+                ))}
                 <div className="absolute inset-0 bg-black/50" />
             </div>
 
@@ -41,7 +58,7 @@ export function AnimatedHero({
                     className="inline-block mb-6"
                 >
                     <div className="bg-yellow-400 text-black font-black text-sm md:text-base px-6 py-2 rounded-full uppercase tracking-wider">
-                        Soft Play · Laser Arena · Go Karts · Inflatable Park
+                        {c.badge}
                     </div>
                 </motion.div>
 
@@ -53,7 +70,7 @@ export function AnimatedHero({
                     className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4 leading-tight"
                 >
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-cyan-400 to-pink-500">
-                        {title}
+                        {c.title}
                     </span>
                 </motion.h1>
 
@@ -64,7 +81,7 @@ export function AnimatedHero({
                     transition={{ duration: 0.6, delay: 0.4 }}
                     className="text-white text-base sm:text-lg md:text-xl lg:text-2xl mb-6 max-w-3xl mx-auto leading-relaxed px-2"
                 >
-                    {subtitle}
+                    {c.subtitle}
                 </motion.p>
 
                 {/* Go Kids Play Coventry Location — opens Google Maps */}
@@ -75,7 +92,7 @@ export function AnimatedHero({
                     className="mb-8 max-w-2xl mx-auto"
                 >
                     <a
-                        href="https://www.google.com/maps/search/Go+Kids+Play+Coventry"
+                        href={c.location_link || "https://www.google.com/maps/search/Go+Kids+Play+Coventry"}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block bg-cyan-600/90 border-2 border-cyan-400 rounded-2xl px-6 py-4 shadow-lg shadow-cyan-600/40 hover:bg-cyan-500/90 hover:scale-105 transition-all duration-200 cursor-pointer group"
@@ -87,7 +104,7 @@ export function AnimatedHero({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <p className="text-white font-black text-lg md:text-xl tracking-wide">
-                                📍 Go Kids Play · Coventry
+                                {c.location_text}
                             </p>
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-white/70 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -105,22 +122,22 @@ export function AnimatedHero({
                     className="flex flex-col sm:flex-row gap-3 justify-center items-center w-full sm:w-auto px-4"
                 >
                     <Link
-                        href="/book"
+                        href={c.button1_link || "/book"}
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white font-bold text-base sm:text-lg rounded-full shadow-lg shadow-pink-500/50 hover:shadow-pink-500/70 hover:scale-105 transition-all"
                     >
-                        Book Tickets Now
+                        {c.button1_text}
                     </Link>
                     <Link
-                        href="/party-booking"
+                        href={c.button2_link || "/party-booking"}
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-600 text-white font-bold text-base sm:text-lg rounded-full shadow-lg shadow-violet-500/50 hover:shadow-violet-500/70 hover:scale-105 transition-all"
                     >
-                        🎂 Plan a Party
+                        {c.button2_text}
                     </Link>
                     <Link
-                        href="/attractions"
+                        href={c.button3_link || "/attractions"}
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 bg-transparent border-2 border-white text-white font-bold text-base sm:text-lg rounded-full hover:bg-white/10 transition-all"
                     >
-                        View Attractions
+                        {c.button3_text}
                     </Link>
                 </motion.div>
             </div>

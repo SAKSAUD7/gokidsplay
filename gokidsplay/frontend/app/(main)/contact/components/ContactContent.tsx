@@ -5,22 +5,20 @@ import Link from "next/link";
 import { ScrollReveal, SectionDivider, BouncyButton } from "@repo/ui";
 import { motion } from "framer-motion";
 import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from "lucide-react";
+import { siteConfig } from "@/lib/config";
+import { getMediaUrl } from "@/lib/media-utils";
 
 interface ContactContentProps {
+    /** Site settings from getSettings() (camelCase) — phone, email, address, map link */
     settings?: any;
-    hero?: {
-        title: string;
-        subtitle: string;
-        image: string;
-    };
-    form?: {
-        title: string;
-        subtitle?: string;
-    };
-    defaultConfig?: any;
+    /** Opening hours rows (TimingCard): day_label, open_time, close_time */
+    hours: Array<{ id: number; day_label: string; open_time: string; close_time: string; note?: string }>;
+    /** Resolved "contact" page content — see lib/cms/page-registry.ts. Hidden sections are null. */
+    content: Record<string, Record<string, string> | null>;
 }
 
-export default function ContactContent({ settings, hero, form, defaultConfig }: ContactContentProps) {
+export default function ContactContent({ settings, hours, content }: ContactContentProps) {
+    const { hero, contact_form: form, map, hours: hoursText, cta } = content;
     // ... existing state ...
     const [formData, setFormData] = useState({
         name: "",
@@ -59,12 +57,11 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
         }
     };
 
-    const phone = settings?.contact_phone || "07349 110865";
-    // ... existing consts ...
-    const email = settings?.contact_email || "info@gokidsplay.co.uk";
-    const address = settings?.address || "Ramdoot House, First Floor - 2/3 Navigation Street, Leicester, LE1 3UR";
-    const mapUrl = settings?.map_url || "https://maps.app.goo.gl/VLrQ2vmrHBuAmgkQ6";
-    const openingHours = typeof settings?.opening_hours === 'string' ? settings.opening_hours : "Tue–Fri 2PM–10PM | Sat 12PM–11PM | Sun 12PM–10PM";
+    // Contact details are managed in Admin → Settings; fall back to the Go Kids Play defaults
+    const phone = settings?.contactPhone || siteConfig.contact.phone;
+    const email = settings?.contactEmail || siteConfig.contact.email;
+    const address = settings?.address || siteConfig.contact.address;
+    const mapUrl = settings?.mapUrl || siteConfig.contact.mapUrl;
 
     const contactInfo = [
         // ... existing contactInfo array ...
@@ -72,7 +69,7 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
             icon: <Phone className="w-6 h-6" />,
             title: "Call Us",
             value: phone,
-            href: `tel:${phone}`,
+            href: `tel:${phone.replace(/\s/g, "")}`,
             color: "primary",
         },
         {
@@ -91,21 +88,17 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
         },
     ];
 
-    const heroTitle = hero?.title || "Contact Us";
-    const heroSubtitle = hero?.subtitle || "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible!";
-    const heroImage = hero?.image || "/images/uploads/img-7.jpg";
-
-    const formTitle = form?.title || "Send us a Message";
-    const formSubtitle = form?.subtitle;
+    const heroImage = getMediaUrl(hero?.image) || "/images/uploads/img-7.jpg";
 
     return (
         <main className="min-h-screen bg-background text-white pt-24">
             {/* Header */}
+            {hero && (
             <section className="relative py-16 md:py-32 px-4 overflow-hidden">
                 <div className="absolute inset-0">
                     <img
                         src={heroImage}
-                        alt="Contact Us"
+                        alt={hero.title}
                         className="w-full h-full object-cover opacity-30"
                         onError={(e) => {
                             e.currentTarget.src = "/hero-background.jpg";
@@ -117,22 +110,23 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
                     <ScrollReveal animation="fade">
                         <span className="inline-block py-1 px-3 rounded-full bg-primary text-black font-bold text-sm mb-6 tracking-wider uppercase">
                             <MessageCircle className="w-4 h-4 inline mr-1" />
-                            Get in Touch
+                            {hero.badge}
                         </span>
                     </ScrollReveal>
                     <ScrollReveal animation="slideUp" delay={0.2}>
                         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-6 leading-tight">
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                {heroTitle}
+                                {hero.title}
                             </span>
                         </h1>
                         <p className="text-base md:text-xl lg:text-2xl text-white/70 max-w-3xl mx-auto">
-                            {heroSubtitle}
+                            {hero.subtitle}
                         </p>
                     </ScrollReveal>
                 </div>
                 <SectionDivider position="bottom" variant="wave" color="fill-background" />
             </section>
+            )}
 
             {/* Contact Info Cards */}
             <section className="py-12 md:py-20 px-4 bg-background">
@@ -163,10 +157,10 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
                         <ScrollReveal animation="slideLeft">
                             <div id="contactForm" className="bg-surface-800/50 backdrop-blur-md p-8 rounded-3xl border border-primary/30">
                                 <h2 className="text-3xl font-display font-black mb-6 text-primary">
-                                    {formTitle}
+                                    {form?.title || "Send us a Message"}
                                 </h2>
-                                {formSubtitle && (
-                                    <p className="text-white/70 mb-8">{formSubtitle}</p>
+                                {form?.subtitle && (
+                                    <p className="text-white/70 mb-8">{form.subtitle}</p>
                                 )}
 
                                 {submittedTicketId ? (
@@ -174,7 +168,7 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
                                         <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                             <Send className="w-8 h-8 text-emerald-400" />
                                         </div>
-                                        <h3 className="text-2xl font-bold text-white mb-2">Message Sent Successfully!</h3>
+                                        <h3 className="text-2xl font-bold text-white mb-2">{form?.success_title || "Message Sent Successfully!"}</h3>
                                         <p className="text-white/70 mb-6">
                                             Thank you for reaching out. We have received your message and will get back to you as soon as possible.
                                         </p>
@@ -272,56 +266,66 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
                                 <div className="bg-surface-800/50 backdrop-blur-md p-6 md:p-8 rounded-3xl border border-accent/30 h-48 md:h-64 flex items-center justify-center">
                                     <div className="text-center">
                                         <MapPin className="w-12 h-12 text-accent mx-auto mb-3" />
-                                        <p className="text-white/70">Find us easily</p>
+                                        <p className="text-white/70">{map?.title || "Find us easily"}</p>
                                         <a
                                             href={mapUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-accent hover:text-accent-light underline mt-2 inline-block"
                                         >
-                                            View on Google Maps
+                                            {map?.link_text || "View on Google Maps"}
                                         </a>
                                     </div>
                                 </div>
                             </ScrollReveal>
 
-                            {/* Operating Hours */}
+                            {/* Operating Hours — same source as the hours bar (Opening Hours in the CMS) */}
+                            {hoursText && hours.length > 0 && (
                             <ScrollReveal animation="slideRight" delay={0.2}>
                                 <div className="bg-surface-800/50 backdrop-blur-md p-8 rounded-3xl border border-secondary/30">
                                     <div className="flex items-center gap-3 mb-6">
                                         <Clock className="w-6 h-6 text-secondary" />
                                         <h3 className="text-2xl font-display font-black text-secondary">
-                                            Operating Hours
+                                            {hoursText.title}
                                         </h3>
                                     </div>
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center pb-4 border-b border-white/10 last:border-0">
-                                            <span className="text-white/80 font-semibold">Every Day</span>
-                                            <span className="text-secondary font-bold">{openingHours}</span>
-                                        </div>
+                                        {hours.map((row) => {
+                                            const closed = !row.open_time || row.open_time.toLowerCase() === "closed";
+                                            return (
+                                                <div key={row.id} className="flex justify-between items-center gap-4 pb-4 border-b border-white/10 last:border-0">
+                                                    <span className="text-white/80 font-semibold">{row.day_label}</span>
+                                                    <span className="text-secondary font-bold text-right">
+                                                        {closed ? "Closed" : `${row.open_time} – ${row.close_time}`}
+                                                    </span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </ScrollReveal>
+                            )}
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* CTA */}
+            {cta && (
             <section className="relative py-16 md:py-32 px-4 pb-32 md:pb-40 bg-background-light">
                 <div className="max-w-4xl mx-auto text-center">
                     <ScrollReveal animation="scale">
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-display font-black mb-6">
-                            Ready to Visit?
+                            {cta.title}
                         </h2>
                         <p className="text-base md:text-xl text-white/70 mb-10">
-                            Book your tickets online and skip the queue!
+                            {cta.subtitle}
                         </p>
                         <div className="flex justify-center">
-                            <Link href="/book">
+                            <Link href={cta.button_link || "/book"}>
                                 <div className="w-full">
                                     <BouncyButton size="lg" variant="accent">
-                                        Book Now
+                                        {cta.button_text}
                                     </BouncyButton>
                                 </div>
                             </Link>
@@ -329,6 +333,7 @@ export default function ContactContent({ settings, hero, form, defaultConfig }: 
                     </ScrollReveal>
                 </div>
             </section>
+            )}
         </main>
     );
 }

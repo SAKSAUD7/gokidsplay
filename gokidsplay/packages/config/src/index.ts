@@ -1,18 +1,18 @@
 export const siteConfig = {
-    name: "Ninja Inflatable Park",
-    description: "India's Biggest Inflatable Park - Bounce, Slide, and Conquer!",
-    url: "https://ninjainflatablepark.com",
-    ogImage: "https://ninjainflatablepark.com/og.jpg",
+    name: "Go Kids Play",
+    description: "Coventry's most exciting indoor play and Party Centre. Laser Arena, Go Karts, Soft Play, Inflatable Park & more!",
+    url: "https://www.gokidsplay.co.uk",
+    ogImage: "https://www.gokidsplay.co.uk/og.jpg",
     links: {
-        twitter: "https://instagram.com/ninjainflatablepark", // Placeholder if no twitter
-        instagram: "https://instagram.com/ninjainflatablepark",
-        facebook: "https://facebook.com/ninjainflatablepark",
+        twitter: "https://www.instagram.com/gokidsplay/",
+        instagram: "https://www.instagram.com/gokidsplay/",
+        facebook: "https://www.facebook.com/gokidsplay",
     },
     contact: {
         phone: "07349110865",
-        email: "info@ninjainflatablepark.com",
-        address: "No. 35/11, Hennur Bagalur Main Road, Chagalatti Village, Jala Hobli, Karnataka 562149",
-        mapUrl: "https://maps.google.com/?q=Ninja+Inflatable+Park+Bangalore",
+        email: "info@gokidsplay.co.uk",
+        address: "310 Kingfield Road, Coventry, CV1 4LD",
+        mapUrl: "https://maps.google.com/?q=310+Kingfield+Road,+Coventry,+CV1+4LD",
     },
 };
 

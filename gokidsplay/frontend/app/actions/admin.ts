@@ -1,1023 +1,794 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
+import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { fetchAPI } from "../lib/server-api";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:9000/api/v1';
+
+export async function updateBooking(id: string | number, data: any) {
     try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[admin]', r.status, url); return null; }
-        return r.json();
-    } catch(e) { console.error('[admin] error:', e); return null; }
-}
-
-function getToken() {
-    if (typeof window !== 'undefined') {
-        return localStorage.getItem('admin_token') || '';
-    }
-    return '';
-}
-
-function authHeaders(extra?: Record<string, string>) {
-    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}`, ...extra };
-}
-
-// ── AUTH ──────────────────────────────────────────────────────────────────
-export async function adminLogin(email: string, password: string) {
-    try {
-        const r = await fetch(`${BASE.replace('/api/v1', '')}/api/token/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-            cache: 'no-store',
+        const res = await fetchAPI(`/bookings/bookings/${id}/`, {
+            method: "PATCH",
+            body: JSON.stringify(data),
         });
-        const json = await r.json();
-        if (!r.ok) return { success: false, error: json?.detail || 'Login failed' };
-        return { success: true, access: json.access, refresh: json.refresh };
-    } catch(e: any) {
-        return { success: false, error: e.message || 'Network error' };
+
+        if (!res || !res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            return {
+                success: false,
+                error: errorData.detail || "Failed to update booking",
+            };
+        }
+
+        revalidatePath("/admin/bookings");
+        revalidatePath(`/admin/bookings/${id}`);
+        return { success: true };
+    } catch (error) {
+        console.error("Update booking error:", error);
+        return { success: false, error: "Failed to connect to server" };
     }
 }
 
-export async function verifyToken(token: string) {
+// --- Helper Functions ---
+
+// Transform Django snake_case to camelCase for Booking
+function transformBooking(b: any) {
+    if (!b) return null;
+    const customer = b.customer_details ? transformCustomer(b.customer_details) : null;
+    return {
+        ...b,
+        bookingStatus: b.booking_status || b.status,
+        waiverStatus: b.waiver_status,
+        paymentStatus: b.payment_status,
+        createdAt: b.created_at,
+        updatedAt: b.updated_at,
+        voucherCode: b.voucher_code,
+        discountAmount: b.discount_amount,
+        // Party booking specific fields
+        packageName: b.package_name,
+        birthdayChildName: b.birthday_child_name,
+        birthdayChildAge: b.birthday_child_age,
+        waiverSigned: b.waiver_signed,
+        waiverSignedAt: b.waiver_signed_at,
+        waiverIpAddress: b.waiver_ip_address,
+        // Add flat customer properties for easy access
+        customerName: b.name || customer?.name || null,
+        customerEmail: customer?.email || b.email || null,
+        customerPhone: customer?.phone || b.phone || null,
+        customer: customer,
+        waivers: b.waivers?.map(transformWaiver) || [],
+        transactions: b.transactions || [],
+        // Default values for missing fields
+        duration: b.duration || 120, // Default 2 hours for party bookings
+        spectators: b.spectators || 0,
+    };
+}
+
+function transformCustomer(c: any) {
+    if (!c) return null;
+    return {
+        ...c,
+        createdAt: c.created_at,
+        updatedAt: c.updated_at,
+        _count: c._count || { bookings: 0 }
+    };
+}
+
+function transformWaiver(w: any) {
+    if (!w) return null;
+    return {
+        ...w,
+        signedAt: w.signed_at,
+        fileUrl: w.file_url,
+        emergencyContact: w.emergency_contact,
+        minors: w.minors || [],  // Preserve minors field
+        adults: w.adults || [],  // Preserve adults field
+        isPrimarySigner: w.is_primary_signer,
+        participantType: w.participant_type,
+        isVerified: w.is_verified,
+        // If details object exists, use it; otherwise fallback to the ID (or null)
+        booking: w.booking_details ? transformBooking(w.booking_details) : (w.booking || null),
+        partyBooking: w.party_booking_details ? transformBooking(w.party_booking_details) : (w.party_booking || null)
+    };
+}
+
+// ... (other functions)
+
+function transformBookingBlock(b: any) {
+    if (!b) return null;
+    return {
+        ...b,
+        startDate: b.start_date,
+        endDate: b.end_date,
+        createdAt: b.created_at,
+        updatedAt: b.updated_at
+    };
+}
+
+// --- Auth Actions ---
+
+export async function loginAdmin(formData: FormData) {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+        return { error: "Email and password are required" };
+    }
+
+    // Use the API_URL environment variable for production
+    // Token endpoint is at /api/token/, not /api/v1/token/
+    const baseUrl = API_URL.replace('/api/v1', '');
+    const targetUrl = `${baseUrl}/api/token/`;
+    console.log('[Login Debug] Target URL:', targetUrl);
+
     try {
-        const r = await fetch(`${BASE.replace('/api/v1', '')}/api/token/verify/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token }),
-            cache: 'no-store',
+        const res = await fetch(targetUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            // Send both email and username (mapped to email) to cover all backend config bases
+            body: JSON.stringify({ email, username: email, password }),
+            cache: 'no-store', // Disable caching
         });
-        return r.ok;
-    } catch { return false; }
-}
 
-export async function refreshToken(refresh: string) {
-    try {
-        const r = await fetch(`${BASE.replace('/api/v1', '')}/api/token/refresh/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh }),
-            cache: 'no-store',
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('[Login Debug] Failed response:', res.status, errorText);
+            return { error: `Login failed: ${res.status} ${res.statusText}` };
+        }
+
+        const data = await res.json();
+        const token = data.access;
+        const refreshToken = data.refresh;
+
+        // Get the cookies instance
+        const cookieStore = cookies();
+
+        // Set the access token cookie (used for all API requests)
+        cookieStore.set("admin_token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 60 * 60 * 8, // 8 hours (matches new JWT lifetime)
+            path: "/",
+            sameSite: "lax"
         });
-        const json = await r.json();
-        if (!r.ok) return null;
-        return json.access;
-    } catch { return null; }
+
+        // Set the refresh token cookie (used to silently renew the access token)
+        if (refreshToken) {
+            cookieStore.set("admin_refresh_token", refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                maxAge: 60 * 60 * 24 * 30, // 30 days
+                path: "/",
+                sameSite: "lax"
+            });
+        }
+
+        console.log('[Login Debug] Cookie set successfully, redirecting to /admin');
+
+    } catch (error: any) {
+        console.error("Login error:", error);
+        return { error: `Connection error: ${error.message}` };
+    }
+
+    // Redirect AFTER cookie is set
+    redirect("/admin");
 }
 
-export async function getAdminProfile() {
-    return sf(`${BASE}/core/users/me/`, { headers: authHeaders() });
+export async function logoutAdmin() {
+    cookies().delete("admin_token");
+    cookies().delete("admin_refresh_token");
+    redirect("/admin/login");
 }
 
-// ── BOOKINGS ─────────────────────────────────────────────────────────────
-export async function getAllBookings(params?: { page?: number; status?: string; search?: string; type?: string }) {
-    let url = `${BASE}/bookings/bookings/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.status) qs.set('status', params.status);
-    if (params?.search) qs.set('search', params.search);
-    if (params?.type) qs.set('type', params.type);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getSessionBookings(params?: { page?: number; date?: string; status?: string; search?: string }) {
-    let url = `${BASE}/bookings/bookings/`;
-    const qs = new URLSearchParams();
-    qs.set('type', 'SESSION');
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.date) qs.set('date', params.date);
-    if (params?.status) qs.set('booking_status', params.status);
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getBookingById(id: number | string) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, { headers: authHeaders() });
-}
-
-export async function updateBookingStatus(id: number | string, status: string, notes?: string) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ booking_status: status, ...(notes ? { notes } : {}) }),
-    });
-}
-
-export async function updatePartyBookingStatus(id: number | string, status: string) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ booking_status: status }),
-    });
-}
-
-export async function toggleBookingArrival(id: number | string, arrived: boolean) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ arrived }),
-    });
-}
-
-export async function getPartyBookings(params?: { page?: number; status?: string; search?: string }) {
-    let url = `${BASE}/bookings/party-bookings/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.status) qs.set('status', params.status);
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getPartyBookingById(id: number | string) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/`, { headers: authHeaders() });
-}
+// --- Dashboard Actions ---
 
 export async function getDashboardStats() {
-    return sf(`${BASE}/bookings/dashboard-stats/`, { headers: authHeaders() });
-}
-
-export async function getCustomers(params?: { page?: number; search?: string }) {
-    let url = `${BASE}/bookings/customers/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-// ── BOOKING BLOCKS ────────────────────────────────────────────────────────
-export async function getBookingBlocks() {
-    const data = await sf(`${BASE}/bookings/booking-blocks/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createBookingBlock(data: any) {
-    return sf(`${BASE}/bookings/booking-blocks/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateBookingBlock(id: number | string, data: any) {
-    return sf(`${BASE}/bookings/booking-blocks/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteBookingBlock(id: number | string) {
-    const r = await fetch(`${BASE}/bookings/booking-blocks/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── LOGS ──────────────────────────────────────────────────────────────────
-export async function getAuditLogs(params?: { page?: number; action?: string; search?: string }) {
-    let url = `${BASE}/core/logs/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.action) qs.set('action', params.action);
-    if (params?.search) qs.set('search', params.search);
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getLogStats() {
-    return sf(`${BASE}/core/logs/stats/`, { headers: authHeaders() });
-}
-
-// ── BANNERS ───────────────────────────────────────────────────────────────
-export async function getBanners() {
-    const data = await sf(`${BASE}/cms/banners/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getBanner(id: number | string) {
-    return sf(`${BASE}/cms/banners/${id}/`, { headers: authHeaders() });
-}
-
-export async function createBanner(data: any) {
-    return sf(`${BASE}/cms/banners/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateBanner(id: number | string, data: any) {
-    return sf(`${BASE}/cms/banners/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteBanner(id: number | string) {
-    const r = await fetch(`${BASE}/cms/banners/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── CONTACT MESSAGES ──────────────────────────────────────────────────────
-export async function getContactMessages(params?: { page?: number; is_read?: boolean }) {
-    let url = `${BASE}/cms/contact-messages/`;
-    const qs = new URLSearchParams();
-    if (params?.page) qs.set('page', String(params.page));
-    if (params?.is_read !== undefined) qs.set('is_read', String(params.is_read));
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function getContactMessage(id: number | string) {
-    return sf(`${BASE}/cms/contact-messages/${id}/`, { headers: authHeaders() });
-}
-
-export async function markMessageAsRead(id: number | string) {
-    return sf(`${BASE}/cms/contact-messages/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ is_read: true }),
-    });
-}
-
-export async function markMessageAsUnread(id: number | string) {
-    return sf(`${BASE}/cms/contact-messages/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ is_read: false }),
-    });
-}
-
-export async function deleteContactMessage(id: number | string) {
-    const r = await fetch(`${BASE}/cms/contact-messages/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── CONTACT INFO ──────────────────────────────────────────────────────────
-export async function getContactInfos() {
-    const data = await sf(`${BASE}/cms/contact-info/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getContactInfo(id: number | string) {
-    return sf(`${BASE}/cms/contact-info/${id}/`, { headers: authHeaders() });
-}
-
-export async function createContactInfo(data: any) {
-    return sf(`${BASE}/cms/contact-info/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateContactInfo(id: number | string, data: any) {
-    return sf(`${BASE}/cms/contact-info/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteContactInfo(id: number | string) {
-    const r = await fetch(`${BASE}/cms/contact-info/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── FACILITY ITEMS ────────────────────────────────────────────────────────
-export async function getFacilityItems() {
-    const data = await sf(`${BASE}/cms/facility-items/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getFacilityItem(id: number | string) {
-    return sf(`${BASE}/cms/facility-items/${id}/`, { headers: authHeaders() });
-}
-
-export async function createFacilityItem(data: any) {
-    return sf(`${BASE}/cms/facility-items/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateFacilityItem(id: number | string, data: any) {
-    return sf(`${BASE}/cms/facility-items/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteFacilityItem(id: number | string) {
-    const r = await fetch(`${BASE}/cms/facility-items/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── FAQS ──────────────────────────────────────────────────────────────────
-export async function getFaqs() {
-    const data = await sf(`${BASE}/cms/faqs/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getFaq(id: number | string) {
-    return sf(`${BASE}/cms/faqs/${id}/`, { headers: authHeaders() });
-}
-
-export async function createFaq(data: any) {
-    return sf(`${BASE}/cms/faqs/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateFaq(id: number | string, data: any) {
-    return sf(`${BASE}/cms/faqs/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteFaq(id: number | string) {
-    const r = await fetch(`${BASE}/cms/faqs/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── GALLERY ───────────────────────────────────────────────────────────────
-export async function getGalleryItems() {
-    const data = await sf(`${BASE}/cms/gallery/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getGalleryItem(id: number | string) {
-    return sf(`${BASE}/cms/gallery/${id}/`, { headers: authHeaders() });
-}
-
-export async function createGalleryItem(data: any) {
-    return sf(`${BASE}/cms/gallery/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateGalleryItem(id: number | string, data: any) {
-    return sf(`${BASE}/cms/gallery/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteGalleryItem(id: number | string) {
-    const r = await fetch(`${BASE}/cms/gallery/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── GROUP BENEFITS ────────────────────────────────────────────────────────
-export async function getGroupBenefits() {
-    const data = await sf(`${BASE}/cms/group-benefits/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getGroupBenefit(id: number | string) {
-    return sf(`${BASE}/cms/group-benefits/${id}/`, { headers: authHeaders() });
-}
-
-export async function createGroupBenefit(data: any) {
-    return sf(`${BASE}/cms/group-benefits/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateGroupBenefit(id: number | string, data: any) {
-    return sf(`${BASE}/cms/group-benefits/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteGroupBenefit(id: number | string) {
-    const r = await fetch(`${BASE}/cms/group-benefits/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── GROUP PACKAGES ────────────────────────────────────────────────────────
-export async function getGroupPackages() {
-    const data = await sf(`${BASE}/cms/group-packages/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getGroupPackage(id: number | string) {
-    return sf(`${BASE}/cms/group-packages/${id}/`, { headers: authHeaders() });
-}
-
-export async function createGroupPackage(data: any) {
-    return sf(`${BASE}/cms/group-packages/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateGroupPackage(id: number | string, data: any) {
-    return sf(`${BASE}/cms/group-packages/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteGroupPackage(id: number | string) {
-    const r = await fetch(`${BASE}/cms/group-packages/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── ACTIVITIES ────────────────────────────────────────────────────────────
-export async function getActivities() {
-    const data = await sf(`${BASE}/cms/activities/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getActivity(id: number | string) {
-    return sf(`${BASE}/cms/activities/${id}/`, { headers: authHeaders() });
-}
-
-export async function createActivity(data: any) {
-    return sf(`${BASE}/cms/activities/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateActivity(id: number | string, data: any) {
-    return sf(`${BASE}/cms/activities/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteActivity(id: number | string) {
-    const r = await fetch(`${BASE}/cms/activities/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── PAGE SECTIONS ─────────────────────────────────────────────────────────
-export async function getPageSections(page?: string) {
-    const url = page
-        ? `${BASE}/cms/page-sections/?page=${page}`
-        : `${BASE}/cms/page-sections/`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createPageSection(data: any) {
-    return sf(`${BASE}/cms/page-sections/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updatePageSection(id: number | string, data: any) {
-    return sf(`${BASE}/cms/page-sections/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deletePageSection(id: number | string) {
-    const r = await fetch(`${BASE}/cms/page-sections/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── STAT CARDS ────────────────────────────────────────────────────────────
-export async function getStatCards(page?: string) {
-    const url = page
-        ? `${BASE}/cms/stat-cards/?page=${page}`
-        : `${BASE}/cms/stat-cards/`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createStatCard(data: any) {
-    return sf(`${BASE}/cms/stat-cards/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateStatCard(id: number | string, data: any) {
-    return sf(`${BASE}/cms/stat-cards/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteStatCard(id: number | string) {
-    const r = await fetch(`${BASE}/cms/stat-cards/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── TIMELINE ITEMS ────────────────────────────────────────────────────────
-export async function getTimelineItems() {
-    const data = await sf(`${BASE}/cms/timeline-items/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createTimelineItem(data: any) {
-    return sf(`${BASE}/cms/timeline-items/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateTimelineItem(id: number | string, data: any) {
-    return sf(`${BASE}/cms/timeline-items/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteTimelineItem(id: number | string) {
-    const r = await fetch(`${BASE}/cms/timeline-items/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── VALUE ITEMS ───────────────────────────────────────────────────────────
-export async function getValueItems() {
-    const data = await sf(`${BASE}/cms/value-items/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createValueItem(data: any) {
-    return sf(`${BASE}/cms/value-items/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateValueItem(id: number | string, data: any) {
-    return sf(`${BASE}/cms/value-items/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── SETTINGS ──────────────────────────────────────────────────────────────
-export async function getSettings() {
-    const data = await sf(`${BASE}/core/settings/`, { headers: authHeaders() });
-    if (!data) return null;
-    const list = Array.isArray(data) ? data : (data.results || []);
-    return list.length > 0 ? list[0] : null;
-}
-
-export async function updateSettings(id: number | string, data: any) {
-    return sf(`${BASE}/core/settings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── ATTRACTION VIDEO ──────────────────────────────────────────────────────
-export async function getAttractionVideo(slug: string) {
-    const data = await sf(`${BASE}/cms/attraction-videos/?slug=${slug}`, { headers: authHeaders() });
-    if (!data) return null;
-    const list = Array.isArray(data) ? data : (data.results || []);
-    return list.find((v: any) => v.slug === slug) || null;
-}
-
-export async function getAttractionVideos() {
-    const data = await sf(`${BASE}/cms/attraction-videos/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-// ── loginAdmin alias ──────────────────────────────────────────────────────
-export const loginAdmin = adminLogin;
-
-// ── DELETE BOOKINGS ───────────────────────────────────────────────────────
-export async function deleteBooking(id: number | string) {
-    const r = await fetch(`${BASE}/bookings/bookings/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-export async function deletePartyBooking(id: number | string) {
-    const r = await fetch(`${BASE}/bookings/party-bookings/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── UPDATE BOOKING DETAILS ────────────────────────────────────────────────
-export async function updateBookingDetails(id: number | string, data: any) {
-    return sf(`${BASE}/bookings/bookings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── CUSTOMERS ─────────────────────────────────────────────────────────────
-export async function getCustomerById(id: number | string) {
-    return sf(`${BASE}/bookings/customers/${id}/`, { headers: authHeaders() });
-}
-
-export async function getCustomerEmails(customerId: number | string) {
-    const data = await sf(`${BASE}/bookings/customers/${customerId}/emails/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function updateCustomerDetails(id: number | string, data: any) {
-    return sf(`${BASE}/bookings/customers/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── WAIVERS ───────────────────────────────────────────────────────────────
-export async function getWaivers(params?: { booking_id?: number | string; page?: number }) {
-    let url = `${BASE}/bookings/waivers/`;
-    const qs = new URLSearchParams();
-    if (params?.booking_id) qs.set('booking_id', String(params.booking_id));
-    if (params?.page) qs.set('page', String(params.page));
-    const query = qs.toString();
-    if (query) url += `?${query}`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return { results: [], count: 0 };
-    return data;
-}
-
-export async function verifyWaiver(id: number | string) {
-    return sf(`${BASE}/bookings/waivers/${id}/verify/`, {
-        method: 'POST',
-        headers: authHeaders(),
-    });
-}
-
-export async function toggleWaiverVerification(id: number | string, verified: boolean) {
-    return sf(`${BASE}/bookings/waivers/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ verified }),
-    });
-}
-
-export async function updateWaiverMinors(id: number | string, minors: any[]) {
-    return sf(`${BASE}/bookings/waivers/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify({ minors }),
-    });
-}
-
-// ── PARTY BOOKING HISTORY/RESTORE ────────────────────────────────────────
-export async function getPartyBookingHistory(id: number | string) {
-    const data = await sf(`${BASE}/bookings/party-bookings/${id}/history/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function restorePartyBooking(id: number | string) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/restore/`, {
-        method: 'POST',
-        headers: authHeaders(),
-    });
-}
-
-export async function reschedulePartyBooking(id: number | string, data: { date: string; time?: string }) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/reschedule/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function resendPartyBookingEmail(id: number | string) {
-    return sf(`${BASE}/bookings/party-bookings/${id}/resend-email/`, {
-        method: 'POST',
-        headers: authHeaders(),
-    });
-}
-
-// ── SESSION BOOKING HISTORY/RESTORE ──────────────────────────────────────
-export async function getSessionBookingHistory(id: number | string) {
-    const data = await sf(`${BASE}/bookings/bookings/${id}/history/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function restoreSessionBooking(id: number | string) {
-    return sf(`${BASE}/bookings/bookings/${id}/restore/`, {
-        method: 'POST',
-        headers: authHeaders(),
-    });
-}
-
-// ── SETTINGS/PASSWORD ─────────────────────────────────────────────────────
-export async function updatePassword(data: { current_password: string; new_password: string }) {
-    return sf(`${BASE}/core/users/change-password/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── GUIDELINE CATEGORIES ──────────────────────────────────────────────────
-export async function getGuidelineCategories() {
-    const data = await sf(`${BASE}/cms/guideline-categories/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createGuidelineCategory(data: any) {
-    return sf(`${BASE}/cms/guideline-categories/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateGuidelineCategory(id: number | string, data: any) {
-    return sf(`${BASE}/cms/guideline-categories/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteGuidelineCategory(id: number | string) {
-    const r = await fetch(`${BASE}/cms/guideline-categories/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── TIMING CARDS ──────────────────────────────────────────────────────────
-export async function getTimingCards() {
-    const data = await sf(`${BASE}/cms/timing-cards/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-// ── SOCIAL LINKS ──────────────────────────────────────────────────────────
-export async function getSocialLinks() {
-    const data = await sf(`${BASE}/cms/social-links/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createSocialLink(data: any) {
-    return sf(`${BASE}/cms/social-links/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updateSocialLink(id: number | string, data: any) {
-    return sf(`${BASE}/cms/social-links/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deleteSocialLink(id: number | string) {
-    const r = await fetch(`${BASE}/cms/social-links/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── MENU SECTIONS ─────────────────────────────────────────────────────────
-export async function getMenuSections() {
-    const data = await sf(`${BASE}/cms/menu-sections/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-// ── PARTY PACKAGES ────────────────────────────────────────────────────────
-export async function getPartyPackages() {
-    const data = await sf(`${BASE}/cms/party-packages/`, { headers: authHeaders() });
-    if (!data) return [];
-    const list = Array.isArray(data) ? data : (data.results || []);
-    return list.filter((p: any) => p.active !== false);
-}
-
-export async function deletePartyPackage(id: number | string) {
-    const r = await fetch(`${BASE}/cms/party-packages/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-export async function createPartyPackage(data: any) {
-    return sf(`${BASE}/cms/party-packages/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updatePartyPackage(id: number | string, data: any) {
-    return sf(`${BASE}/cms/party-packages/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── PRICING PLANS ─────────────────────────────────────────────────────────
-export async function getPricingPlans() {
-    const data = await sf(`${BASE}/cms/pricing-plans/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function createPricingPlan(data: any) {
-    return sf(`${BASE}/cms/pricing-plans/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function updatePricingPlan(id: number | string, data: any) {
-    return sf(`${BASE}/cms/pricing-plans/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-export async function deletePricingPlan(id: number | string) {
-    const r = await fetch(`${BASE}/cms/pricing-plans/${id}/`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-        cache: 'no-store',
-    });
-    return r.ok;
-}
-
-// ── INSTAGRAM REELS ───────────────────────────────────────────────────────
-export async function getInstagramReels() {
-    const data = await sf(`${BASE}/cms/instagram-reels/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-// ── LEGAL DOCUMENTS ───────────────────────────────────────────────────────
-export async function getLegalDocuments() {
-    const data = await sf(`${BASE}/cms/legal-documents/`, { headers: authHeaders() });
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
-}
-
-export async function getLegalDocument(slug: string) {
-    const data = await sf(`${BASE}/cms/legal-documents/?slug=${slug}`, { headers: authHeaders() });
-    if (!data) return null;
-    const list = Array.isArray(data) ? data : (data.results || []);
-    return list.find((d: any) => d.slug === slug) || null;
-}
-
-export async function updateLegalDocument(id: number | string, data: any) {
-    return sf(`${BASE}/cms/legal-documents/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
-    });
-}
-
-// ── BOOKING INFORMATION ───────────────────────────────────────────────────
-export async function getBookingInformation(type?: string) {
-    const url = type
-        ? `${BASE}/cms/booking-information/?booking_type=${type}`
-        : `${BASE}/cms/booking-information/`;
-    const data = await sf(url, { headers: authHeaders() });
-    if (!data) return type ? null : [];
-    if (type) {
-        const list = Array.isArray(data) ? data : (data.results || []);
-        return list.find((b: any) => b.booking_type === type) || null;
+    try {
+        const res = await fetchAPI("/core/dashboard/stats/");
+        if (!res || !res.ok) {
+            console.error("[getDashboardStats] Failed to fetch stats, returning defaults");
+            return getDefaultDashboardStats();
+        }
+        return await res.json();
+    } catch (error) {
+        console.error("[getDashboardStats] Error:", error);
+        return getDefaultDashboardStats();
     }
-    return Array.isArray(data) ? data : (data.results || []);
 }
 
-// ── TICKET ────────────────────────────────────────────────────────────────
-export async function getTicket(id: string) {
-    return sf(`${BASE}/bookings/bookings/${id}/ticket/`);
+function getDefaultDashboardStats() {
+    return {
+        totalBookings: 0,
+        avgBookingValue: 0,
+        unreadMessages: 0,
+        latestMessagePreview: "",
+        waiverCompletionRate: 0,
+        pendingWaivers: 0,
+        todayBookings: 0,
+        weekRevenue: 0,
+        monthRevenue: 0,
+        totalRevenue: 0,
+        recentBookings: [],
+        monthlyRevenue: [],
+        bookingsByStatus: {},
+        topActivities: [],
+    };
 }
+
+export async function getAllBookings(filter?: { type?: string; status?: string; search?: string }): Promise<any[]> {
+    try {
+        // Fetch both session and party bookings in parallel
+        const [sessionBookings, partyBookings] = await Promise.all([
+            getBookings(filter),
+            getPartyBookings(filter)
+        ]);
+
+        // Combine and sort by created_at
+        const allBookings = [...sessionBookings, ...partyBookings].sort((a, b) => {
+            const dateA = new Date(a.created_at || a.createdAt || 0).getTime();
+            const dateB = new Date(b.created_at || b.createdAt || 0).getTime();
+            return dateB - dateA;
+        });
+
+        console.log('[getAllBookings] Session:', sessionBookings.length, 'Party:', partyBookings.length, 'Total:', allBookings.length);
+        return allBookings;
+    } catch (error) {
+        console.error('Error fetching all bookings:', error);
+        return [];
+    }
+}
+
+// --- Booking Actions ---
+
+export async function getBookings(filter?: { status?: string; date?: string; search?: string }): Promise<any[]> {
+    const params = new URLSearchParams();
+    params.append("ordering", "-created_at");
+    if (filter?.status) params.append("booking_status", filter.status);
+    if (filter?.date) params.append("date", filter.date);
+    if (filter?.search) params.append("search", filter.search);
+
+    const res = await fetchAPI(`/bookings/bookings/?${params.toString()}`);
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    return data.map(transformBooking);
+}
+
+export async function getPartyBookings(filter?: { status?: string; date?: string; search?: string }): Promise<any[]> {
+    const params = new URLSearchParams();
+    params.append("ordering", "-created_at");
+    if (filter?.status) params.append("status", filter.status);
+    if (filter?.date) params.append("date", filter.date);
+    if (filter?.search) params.append("search", filter.search);
+
+    const res = await fetchAPI(`/bookings/party-bookings/?${params.toString()}`);
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    return data.map(transformBooking);
+}
+
+export async function getPartyBookingById(id: string) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformBooking(data);
+}
+
+export async function updatePartyBookingStatus(id: string, status: string) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ booking_status: status })
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/party-bookings");
+        revalidatePath(`/admin/party-bookings/${id}`);
+    }
+}
+
+export async function reschedulePartyBooking(id: string, newDate: string, newTime: string) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/reschedule/`, {
+        method: "POST",
+        body: JSON.stringify({ new_date: newDate, new_time: newTime })
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/party-bookings");
+        revalidatePath(`/admin/party-bookings/${id}`);
+        const data = await res.json();
+        return { success: true, message: data.message, admin_fee_charged: data.admin_fee_charged };
+    }
+
+    const errorData = await res?.json().catch(() => ({}));
+    return { success: false, error: errorData?.error || errorData?.detail || "Failed to reschedule booking" };
+}
+
+export async function deletePartyBooking(id: string) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/`, {
+        method: "DELETE"
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/party-bookings");
+    }
+
+    return res?.ok;
+}
+
+export async function resendPartyBookingEmail(id: string) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/resend_confirmation_email/`, {
+        method: "POST"
+    });
+
+    if (res && res.ok) {
+        const data = await res.json();
+        return { success: true, message: data.message };
+    }
+
+    return { success: false, message: "Failed to send email" };
+}
+
+export async function updatePartyBooking(id: string, data: any) {
+    const res = await fetchAPI(`/bookings/party-bookings/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data)
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/party-bookings");
+        revalidatePath(`/admin/party-bookings/${id}`);
+        return { success: true };
+    }
+
+    // Try to get error message if available
+    const errorData = await res?.json().catch(() => ({}));
+    return { success: false, error: errorData.detail || "Failed to update booking" };
+}
+
+export async function getSessionBookings(filter?: { status?: string; date?: string; search?: string }): Promise<any[]> {
+    const params = new URLSearchParams();
+    params.append("type", "SESSION");
+    params.append("ordering", "-created_at"); // Ensure latest first
+    if (filter?.status) params.append("status", filter.status);
+    if (filter?.date) params.append("date", filter.date);
+    if (filter?.search) params.append("search", filter.search);
+
+    console.log('[DEBUG] getSessionBookings - Request URL:', `/bookings/bookings/?${params.toString()}`);
+
+    const res = await fetchAPI(`/bookings/bookings/?${params.toString()}`);
+
+    console.log('[DEBUG] getSessionBookings - Response status:', res?.status);
+    console.log('[DEBUG] getSessionBookings - Response ok:', res?.ok);
+
+    if (!res || !res.ok) {
+        const errorText = await res.text().catch(() => 'Unknown error');
+        console.error('[DEBUG] getSessionBookings - Error:', errorText);
+        throw new Error(`API returned ${res?.status}: ${errorText}`);
+    }
+
+    const data = await res.json();
+    console.log('[DEBUG] getSessionBookings - Response data:', data);
+    console.log('[DEBUG] getSessionBookings - Data length:', data?.length);
+
+    return data.map(transformBooking);
+}
+
+export async function updateBookingStatus(id: string, status: string) {
+    const res = await fetchAPI(`/bookings/bookings/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ booking_status: status })
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/bookings");
+        revalidatePath(`/admin/bookings/${id}`);
+    }
+}
+
+export async function deleteBooking(id: string) {
+    const res = await fetchAPI(`/bookings/bookings/${id}/`, {
+        method: "DELETE"
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/bookings");
+    }
+
+    return res?.ok;
+}
+
+export async function updateBookingDetails(id: string, data: { date?: string; time?: string; guests?: number; amount?: number }) {
+    const res = await fetchAPI(`/bookings/bookings/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data)
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/bookings");
+        revalidatePath(`/admin/bookings/${id}`);
+    }
+}
+
+export async function getBookingById(id: string) {
+    const res = await fetchAPI(`/bookings/bookings/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformBooking(data);
+}
+
+// --- Waiver Actions ---
+
+export async function verifyWaiver(id: string) {
+    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_verified: true })
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/waivers");
+        return { success: true };
+    }
+    return { success: false };
+}
+
+export async function toggleWaiverVerification(id: string, isVerified: boolean) {
+    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ is_verified: isVerified })
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/waivers");
+        return { success: true };
+    }
+
+    // Log error details
+    let errorMessage = "Failed to update status";
+    if (res) {
+        const errorText = await res.text();
+        console.error(`toggleWaiverVerification failed: ${res.status} ${res.statusText}`, errorText);
+        errorMessage = `Error: ${res.status} ${res.statusText}`;
+    } else {
+        console.error("toggleWaiverVerification failed: No response");
+    }
+
+    return { success: false, error: errorMessage };
+}
+
+export async function updateWaiverMinors(id: string, minors: any[]) {
+    const payload = { minors };
+    console.log('updateWaiverMinors - Sending payload:', JSON.stringify(payload, null, 2));
+    console.log('updateWaiverMinors - Endpoint:', `/bookings/waivers/${id}/`);
+
+    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
+    });
+
+    console.log('updateWaiverMinors - Response status:', res?.status);
+    console.log('updateWaiverMinors - Response ok:', res?.ok);
+
+    if (res && res.ok) {
+        revalidatePath("/admin/waivers");
+        revalidatePath(`/admin/waivers/${id}`);
+        return { success: true };
+    }
+
+    // Log error details and get the actual error message
+    let errorMessage = "Failed to update minors";
+    if (res) {
+        try {
+            const errorData = await res.json();
+            console.error(`updateWaiverMinors failed: ${res.status} ${res.statusText}`, errorData);
+            errorMessage = errorData.minors ? errorData.minors[0] : (errorData.detail || `Error: ${res.status} ${res.statusText}`);
+        } catch (e) {
+            const errorText = await res.text();
+            console.error(`updateWaiverMinors failed: ${res.status} ${res.statusText}`, errorText);
+            errorMessage = `Error: ${res.status} ${res.statusText}`;
+        }
+    }
+
+    return { success: false, error: errorMessage };
+}
+
+export async function getWaivers(search?: string, bookingId?: string, partyBookingId?: string, isVerified?: boolean): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (bookingId) params.append("booking_id", bookingId);
+    if (partyBookingId) params.append("party_booking_id", partyBookingId);
+    if (isVerified !== undefined) params.append("is_verified", isVerified.toString());
+
+    const res = await fetchAPI(`/bookings/waivers/?${params.toString()}`);
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    
+    // Handle paginated response ({count, results}) or legacy flat array
+    const results = Array.isArray(data) ? data : (data.results ?? []);
+    
+    return results.map(transformWaiver);
+}
+
+// --- Customer Actions ---
+
+export async function updateCustomerDetails(id: string, data: { name?: string; email?: string; phone?: string }) {
+    const res = await fetchAPI(`/bookings/customers/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(data)
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/customers");
+    }
+}
+
+export async function getCustomers(search?: string): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+
+    const res = await fetchAPI(`/bookings/customers/?${params.toString()}`);
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    return data.map(transformCustomer);
+}
+
+export async function getCustomerById(id: string) {
+    const res = await fetchAPI(`/bookings/customers/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformCustomer(data);
+}
+
+export async function getCustomerEmails(id: string) {
+    const res = await fetchAPI(`/bookings/customers/${id}/emails/`);
+    if (!res || !res.ok) return [];
+    return await res.json();
+}
+
+export async function getWaiverById(id: string) {
+    const res = await fetchAPI(`/bookings/waivers/${id}/`);
+    if (!res || !res.ok) return null;
+    const data = await res.json();
+    return transformWaiver(data);
+}
+
+// --- Booking Block Actions ---
+
+export async function getBookingBlocks(): Promise<any[]> {
+    const res = await fetchAPI("/bookings/booking-blocks/");
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    return data.map(transformBookingBlock);
+}
+
+export async function createBookingBlock(data: { startDate: Date; endDate: Date; reason: string; type: string; recurring: boolean }) {
+    const payload = {
+        start_date: data.startDate,
+        end_date: data.endDate,
+        reason: data.reason,
+        type: data.type,
+        recurring: data.recurring
+    };
+
+    const res = await fetchAPI("/bookings/booking-blocks/", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/booking-blocks");
+        return { success: true };
+    }
+
+    if (!res || !res.ok) {
+        let errorMessage;
+        const contentType = res?.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            try {
+                const error = await res.json();
+                errorMessage = error.detail || "Failed to create booking block";
+            } catch (e) {
+                errorMessage = "Failed to parse error response";
+            }
+        } else {
+            const text = await res?.text();
+            errorMessage = `Request failed (${res?.status}): ${text ? text.slice(0, 200) : 'Unknown error'}...`;
+            console.error('[createBookingBlock] Non-JSON error:', text);
+        }
+        throw new Error(errorMessage);
+    }
+}
+
+export async function updateBookingBlock(id: string, data: { startDate: Date; endDate: Date; reason: string; type: string; recurring: boolean }) {
+    const payload = {
+        start_date: data.startDate,
+        end_date: data.endDate,
+        reason: data.reason,
+        type: data.type,
+        recurring: data.recurring
+    };
+
+    const res = await fetchAPI(`/bookings/booking-blocks/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/booking-blocks");
+        return { success: true };
+    }
+
+    if (!res || !res.ok) {
+        let errorMessage;
+        const contentType = res?.headers.get("content-type");
+
+        if (contentType && contentType.includes("application/json")) {
+            try {
+                const error = await res.json();
+                errorMessage = error.detail || "Failed to update booking block";
+            } catch (e) {
+                errorMessage = "Failed to parse error response";
+            }
+        } else {
+            const text = await res?.text();
+            errorMessage = `Request failed (${res?.status}): ${text ? text.slice(0, 200) : 'Unknown error'}...`;
+            console.error('[updateBookingBlock] Non-JSON error:', text);
+        }
+        throw new Error(errorMessage);
+    }
+}
+
+export async function deleteBookingBlock(id: string) {
+    const res = await fetchAPI(`/bookings/booking-blocks/${id}/`, {
+        method: "DELETE"
+    });
+
+    if (res && res.ok) {
+        revalidatePath("/admin/booking-blocks");
+    }
+}
+
+// --- Arrival Status Actions ---
+
+export async function toggleBookingArrival(
+    bookingId: string | number,
+    type: 'session' | 'party',
+    setArrived: boolean
+) {
+    const endpoint = type === 'session'
+        ? `/bookings/bookings/${bookingId}/${setArrived ? 'mark_arrived' : 'mark_not_arrived'}/`
+        : `/bookings/party-bookings/${bookingId}/${setArrived ? 'mark_arrived' : 'mark_not_arrived'}/`;
+
+    try {
+        const res = await fetchAPI(endpoint, { method: "POST" });
+
+        if (res && res.ok) {
+            // Revalidate relevant pages
+            revalidatePath("/admin/bookings");
+            revalidatePath("/admin/party-bookings");
+            revalidatePath(`/admin/${type}-bookings/${bookingId}`); // View page
+            return { success: true };
+        }
+
+        return { success: false, error: "API request failed" };
+    } catch (error) {
+        console.error("Error toggling arrival:", error);
+        return { success: false, error: String(error) };
+    }
+}
+
+// --- Booking History Actions ---
+
+export async function getSessionBookingHistory(): Promise<any[]> {
+    const res = await fetchAPI("/bookings/session-booking-history/");
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    // Transform snake_case to camelCase
+    return data.map((h: any) => ({
+        ...h,
+        canRestore: h.can_restore,
+        restoredAt: h.restored_at,
+        restoredBy: h.restored_by,
+        restoredByName: h.restored_by_name,
+        restoredBookingId: h.restored_booking_id,
+        originalBookingId: h.original_booking_id,
+        paymentTransactionId: h.payment_transaction_id,
+        paymentAmount: h.payment_amount,
+        failureReason: h.failure_reason,
+        createdAt: h.created_at,
+        updatedAt: h.updated_at,
+        voucherCode: h.voucher_code,
+        discountAmount: h.discount_amount,
+    }));
+}
+
+export async function getPartyBookingHistory(): Promise<any[]> {
+    const res = await fetchAPI("/bookings/party-booking-history/");
+    if (!res || !res.ok) return [];
+
+    const data = await res.json();
+    // Transform snake_case to camelCase
+    return data.map((h: any) => ({
+        ...h,
+        canRestore: h.can_restore,
+        restoredAt: h.restored_at,
+        restoredBy: h.restored_by,
+        restoredByName: h.restored_by_name,
+        restoredBookingId: h.restored_booking_id,
+        originalBookingId: h.original_booking_id,
+        paymentTransactionId: h.payment_transaction_id,
+        paymentAmount: h.payment_amount,
+        failureReason: h.failure_reason,
+        packageName: h.package_name,
+        birthdayChildName: h.birthday_child_name,
+        birthdayChildAge: h.birthday_child_age,
+        createdAt: h.created_at,
+        updatedAt: h.updated_at,
+    }));
+}
+
+export async function restoreSessionBooking(historyId: number) {
+    const res = await fetchAPI(`/bookings/session-booking-history/${historyId}/restore/`, {
+        method: "POST"
+    });
+
+    if (!res) {
+        return { success: false, error: "Network error" };
+    }
+
+    const data = await res.json();
+
+    if (res.ok) {
+        // Revalidate relevant paths
+        revalidatePath("/admin/session-bookings/history");
+        revalidatePath("/admin/bookings");
+        revalidatePath("/admin/all-bookings");
+        return {
+            success: true,
+            bookingId: data.booking_id,
+            message: data.message
+        };
+    }
+
+    return {
+        success: false,
+        error: data.error || "Failed to restore booking"
+    };
+}
+
+export async function restorePartyBooking(historyId: number) {
+    const res = await fetchAPI(`/bookings/party-booking-history/${historyId}/restore/`, {
+        method: "POST"
+    });
+
+    if (!res) {
+        return { success: false, error: "Network error" };
+    }
+
+    const data = await res.json();
+
+    if (res.ok) {
+        // Revalidate relevant paths
+        revalidatePath("/admin/party-bookings/history");
+        revalidatePath("/admin/party-bookings");
+        revalidatePath("/admin/all-bookings");
+        return {
+            success: true,
+            bookingId: data.booking_id,
+            message: data.message
+        };
+    }
+
+    return {
+        success: false,
+        error: data.error || "Failed to restore party booking"
+    };
+}
+

@@ -6,7 +6,7 @@ import {
     getPublicBanners,
     getPublicActivities,
     getPublicGallery,
-    getPublicPageSections,
+    getPublicPageContent,
     getPublicInstagramReels,
     getPublicStatCards,
     getGlobalSettings
@@ -24,7 +24,7 @@ export default async function Home() {
         banners,
         activities,
         gallery,
-        sections,
+        content,
         reels,
         statCards,
         settings
@@ -32,15 +32,11 @@ export default async function Home() {
         getPublicBanners(),
         getPublicActivities(),
         getPublicGallery(),
-        getPublicPageSections('home'),
+        getPublicPageContent('home'),
         getPublicInstagramReels(),
         getPublicStatCards('home'),
         getGlobalSettings()
     ]);
-
-    // Extract page sections
-    const heroSection = sections.find((s: any) => s.section_key === 'hero');
-    const aboutSection = sections.find((s: any) => s.section_key === 'about');
 
     // Transform stats
     const stats = statCards.length > 0 ? statCards.map((s: any) => ({
@@ -66,19 +62,6 @@ export default async function Home() {
             desc: g.category || ''
         }));
 
-    // Prepare data for HomeContent
-    const heroData = heroSection ? {
-        title: heroSection.title,
-        subtitle: heroSection.content,
-        image: heroSection.image_url
-    } : undefined;
-
-    const aboutData = aboutSection ? {
-        title: aboutSection.title,
-        content: aboutSection.content,
-        image: aboutSection.image_url
-    } : undefined;
-
     return (
         <HomeContent
                 stats={stats}
@@ -87,8 +70,7 @@ export default async function Home() {
                 reels={reels.filter((r: any) => r.active)}
                 settings={settings}
                 activities={activities.filter((a: any) => a.active)}
-                hero={heroData}
-                about={aboutData}
+                content={content}
             />
     );
 }

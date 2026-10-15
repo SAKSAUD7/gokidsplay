@@ -30,9 +30,9 @@ class User(AbstractUser):
         return self.email
 
 class GlobalSettings(models.Model):
-    park_name = models.CharField(max_length=255, default="Ninja Inflatable Park")
-    contact_phone = models.CharField(max_length=50, default="+91 98454 71611")
-    contact_email = models.EmailField(default="info@ninjapark.com")
+    park_name = models.CharField(max_length=255, default="Go Kids Play")
+    contact_phone = models.CharField(max_length=50, default="07349110865")
+    contact_email = models.EmailField(default="info@gokidsplay.co.uk")
     address = models.TextField(null=True, blank=True)
     map_url = models.URLField(null=True, blank=True)
     opening_hours = models.JSONField(default=dict, blank=True)
@@ -42,8 +42,8 @@ class GlobalSettings(models.Model):
     hero_subtitle = models.CharField(max_length=255, null=True, blank=True)
     gst_number = models.CharField(max_length=50, null=True, blank=True)
     session_duration = models.IntegerField(default=60) # minutes
-    adult_price = models.DecimalField(max_digits=10, decimal_places=2, default=899.00)
-    child_price = models.DecimalField(max_digits=10, decimal_places=2, default=500.00)
+    adult_price = models.DecimalField(max_digits=10, decimal_places=2, default=4.95)
+    child_price = models.DecimalField(max_digits=10, decimal_places=2, default=12.95)
     
     # Feature Toggles
     online_booking_enabled = models.BooleanField(default=True)

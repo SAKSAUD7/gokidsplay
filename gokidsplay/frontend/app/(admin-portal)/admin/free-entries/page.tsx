@@ -5,6 +5,8 @@ import { getFreeEntries } from "@/app/actions/cms";
 import { Mail, Phone, Calendar, CheckCircle, XCircle, Clock, Plus, Ticket, FileText } from "lucide-react";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/admin/Button";
+import { FreeEntryActions } from "../components/FreeEntryActions";
+import { CreateFreeEntryModal } from "../components/CreateFreeEntryModal";
 
 function StatCard({ label, value, color, icon }: { label: string; value: string | number; color: string; icon: React.ReactNode }) {
     return (

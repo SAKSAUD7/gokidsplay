@@ -2,7 +2,7 @@ import React from 'react';
 import type { Metadata } from "next";
 import { getMetadata } from "@/seo/seo.config";
 import AboutContent from "./components/AboutContent";
-import { getPageSections } from "../../actions/page-sections";
+import { getPublicPageContent } from "@/lib/public-api";
 import { getStatCards } from "../../actions/stat-cards";
 import { getTimelineItems } from "../../actions/timeline-items";
 import { getValueItems } from "../../actions/value-items";
@@ -16,35 +16,20 @@ export const metadata: Metadata = getMetadata(
 
 export default async function AboutPage() {
     const [
-        pageSections,
+        content,
         stats,
         timeline,
         values,
         faqs,
         reels
     ] = await Promise.all([
-        getPageSections('about'),
+        getPublicPageContent('about'),
         getStatCards('about'),
         getTimelineItems(),
         getValueItems(),
         getFaqs(),
         getInstagramReels()
-    ]) as [any[], any[], any[], any[], any[], any[]];
-
-    const heroSection = pageSections.find((s: any) => s.section_key === 'hero');
-    const storySection = pageSections.find((s: any) => s.section_key === 'story');
-
-    const hero = heroSection ? {
-        title: heroSection.title,
-        subtitle: heroSection.content,
-        image: heroSection.image_url
-    } : undefined;
-
-    const story = storySection ? {
-        title: storySection.title,
-        content: storySection.content,
-        image: storySection.image_url
-    } : undefined;
+    ]) as [Awaited<ReturnType<typeof getPublicPageContent>>, any[], any[], any[], any[], any[]];
 
     // Filter active items if they have an active flag
     const activeValues = values.filter((v: any) => !v.hasOwnProperty('active') || v.active);
@@ -58,8 +43,7 @@ export default async function AboutPage() {
                 timeline={activeTimeline}
                 faqs={activeFaqs}
                 reels={reels.filter((r: any) => r.active)}
-                hero={hero}
-                story={story}
+                content={content}
             />
     );
 }

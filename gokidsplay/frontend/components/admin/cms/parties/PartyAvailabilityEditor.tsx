@@ -29,11 +29,11 @@ export function PartyAvailabilityEditor() {
 
         setSaving(true);
         try {
-            const result = await updateSettings(settings);
+            const result = await updateSettings(settings.id, settings);
             if (result.success) {
                 toast.success('Party availability updated!');
             } else {
-                toast.error(result.error || 'Failed to update');
+                toast.error((result as { error?: string }).error || 'Failed to update');
             }
         } catch (error) {
             toast.error('Failed to save changes');

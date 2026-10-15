@@ -1,44 +1,55 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿'use server';
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[timing-cards]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[timing-cards] error:', e); return null; }
-}
+import { revalidatePath } from 'next/cache';
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
+
+const ENDPOINT = API_ENDPOINTS.cms.timing_cards;
 
 export async function getTimingCards() {
-    const data = await sf(`${BASE}/cms/timing-cards/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data.filter((t: any) => t.active !== false) : (data.results || []);
+    try {
+        return await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
+    } catch (error) {
+        return [];
+    }
+}
+
+export async function getTimingCard(id: string) {
+    try {
+        return await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
+    } catch (error) {
+        return null;
+    }
 }
 
 export async function createTimingCard(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/timing-cards/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+    try {
+        const result = await postAPI(ENDPOINT, data);
+        revalidatePath('/admin/cms/timing-cards');
+        revalidatePath('/');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to create timing card' };
+    }
 }
 
-export async function updateTimingCard(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/timing-cards/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function updateTimingCard(id: string, data: any) {
+    try {
+        const result = await putAPI(`${ENDPOINT}${id}/`, data);
+        revalidatePath('/admin/cms/timing-cards');
+        revalidatePath('/');
+        return { success: true, item: result };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to update timing card' };
+    }
 }
 
-export async function deleteTimingCard(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/timing-cards/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function deleteTimingCard(id: string) {
+    try {
+        await deleteAPI(`${ENDPOINT}${id}/`);
+        revalidatePath('/admin/cms/timing-cards');
+        revalidatePath('/');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Failed to delete timing card' };
+    }
 }

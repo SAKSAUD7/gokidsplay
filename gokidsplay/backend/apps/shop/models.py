@@ -5,7 +5,8 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.IntegerField(default=0)
-    # image_url = models.URLField(null=True, blank=True)  # Temporarily disabled due to DRF bug
+    # CharField (not URLField) so uploaded media paths like /media/uploads/x.jpg are accepted
+    image_url = models.CharField(max_length=500, blank=True, default='')
     category = models.CharField(max_length=100, null=True, blank=True)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -44,6 +45,7 @@ class MembershipPlan(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration_days = models.IntegerField(default=30, help_text="Duration of membership in days")
+    image_url = models.CharField(max_length=500, blank=True, default='')
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

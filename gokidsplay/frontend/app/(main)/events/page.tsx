@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { getMetadata } from "@/seo/seo.config";
 import PublicEventsContent from "./components/PublicEventsContent";
+import { getPublicPageContent } from "@/lib/public-api";
 
 export const metadata: Metadata = getMetadata(
     "Events & Special Parties | Go Kids Play Coventry",
@@ -23,6 +24,6 @@ async function fetchPublicEvents() {
 }
 
 export default async function EventsPage() {
-    const events = await fetchPublicEvents();
-    return <PublicEventsContent events={events} />;
+    const [events, content] = await Promise.all([fetchPublicEvents(), getPublicPageContent("events")]);
+    return <PublicEventsContent events={events} content={content} />;
 }

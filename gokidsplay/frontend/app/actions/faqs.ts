@@ -1,44 +1,39 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+﻿'use server';
 
-async function sf(url: string, init: RequestInit = {}) {
+import { revalidatePath } from 'next/cache';
+import { fetchAPI, postAPI, putAPI, deleteAPI, API_ENDPOINTS } from '@/lib/api';
+
+const ENDPOINT = API_ENDPOINTS.cms.faqs;
+
+export async function getFaqs(): Promise<any[]> {
     try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[faqs]', r.status); return null; }
-        return r.json();
-    } catch(e) { console.error('[faqs] error:', e); return null; }
+        const data = await fetchAPI(ENDPOINT, { next: { revalidate: 60 } });
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        return [];
+    }
 }
 
-export async function getFaqs() {
-    const data = await sf(`${BASE}/cms/faqs/`);
-    if (!data) return [];
-    return Array.isArray(data) ? data : (data.results || []);
+export async function getFaq(id: string): Promise<any> {
+    try {
+        const data = await fetchAPI(`${ENDPOINT}${id}/`, { next: { revalidate: 60 } });
+        return data;
+    } catch (error) {
+        return null;
+    }
 }
 
-export async function createFaq(data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/faqs/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function createFaq(data: any): Promise<void> {
+    await postAPI(ENDPOINT, data);
+    revalidatePath('/admin/faqs');
 }
 
-export async function updateFaq(id: number, data: any) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    return sf(`${BASE}/cms/faqs/${id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(data),
-    });
+export async function updateFaq(id: string, data: any): Promise<void> {
+    await putAPI(`${ENDPOINT}${id}/`, data);
+    revalidatePath('/admin/faqs');
 }
 
-export async function deleteFaq(id: number) {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : '';
-    const r = await fetch(`${BASE}/cms/faqs/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
-        cache: 'no-store',
-    });
-    return r.ok;
+export async function deleteFaq(id: string): Promise<void> {
+    await deleteAPI(`${ENDPOINT}${id}/`);
+    revalidatePath('/admin/faqs');
 }

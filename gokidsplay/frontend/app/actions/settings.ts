@@ -1,41 +1,185 @@
-'use server';
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
+"use server";
 
-async function sf(url: string, init: RequestInit = {}) {
-    try {
-        const r = await fetch(url, { ...init, cache: 'no-store' });
-        if (!r.ok) { console.error('[settings]', r.status, url); return null; }
-        return r.json();
-    } catch(e) { console.error('[settings] error:', e); return null; }
-}
-
-function getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
-}
-
-function authHeaders() {
-    return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` };
-}
+import { fetchAPI } from "../lib/server-api";
+import { requirePermission, getAdminSession } from "../lib/admin-auth";
+import { logActivity } from "../lib/audit-log";
+import { revalidatePath } from "next/cache";
 
 export async function getSettings() {
-    const data = await sf(`${BASE}/core/settings/`);
-    if (!data) return null;
-    const list = Array.isArray(data) ? data : (data.results || []);
-    return list.length > 0 ? list[0] : null;
+    // Public function - no auth required (used in public layout)
+    try {
+        const res = await fetchAPI("/core/settings/");
+        if (!res || !res.ok) return null;
+        const data = await res.json();
+        // Assuming settings is a singleton, get first item
+        const raw = data[0];
+        if (!raw) return null;
+
+        return {
+            id: raw.id,
+            parkName: raw.park_name,
+            contactPhone: raw.contact_phone,
+            contactEmail: raw.contact_email,
+            address: raw.address,
+            mapUrl: raw.map_url,
+            openingHours: raw.opening_hours,
+            marqueeText: raw.marquee_text,
+            aboutText: raw.about_text,
+            heroTitle: raw.hero_title,
+            heroSubtitle: raw.hero_subtitle,
+            gstNumber: raw.gst_number,
+            sessionDuration: raw.session_duration,
+            adultPrice: parseFloat(raw.adult_price),
+            childPrice: parseFloat(raw.child_price),
+            onlineBookingEnabled: raw.online_booking_enabled,
+            partyBookingsEnabled: raw.party_bookings_enabled,
+            maintenanceMode: raw.maintenance_mode,
+            waiverRequired: raw.waiver_required,
+            partyAvailability: raw.party_availability,
+        };
+    } catch (error) {
+        console.error('Failed to fetch settings:', error);
+        return null;
+    }
 }
 
-export async function updateSettings(id: number | string, data: any) {
-    return sf(`${BASE}/core/settings/${id}/`, {
-        method: 'PATCH',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
+export async function updateSettings(id: string, data: any) {
+    await requirePermission('settings', 'write');
+
+    // Transform camelCase to snake_case for specific fields
+    const payload: any = { ...data };
+    if (data.parkName !== undefined) {
+        payload.park_name = data.parkName;
+        delete payload.parkName;
+    }
+    if (data.contactPhone !== undefined) {
+        payload.contact_phone = data.contactPhone;
+        delete payload.contactPhone;
+    }
+    if (data.contactEmail !== undefined) {
+        payload.contact_email = data.contactEmail;
+        delete payload.contactEmail;
+    }
+    if (data.mapUrl !== undefined) {
+        payload.map_url = data.mapUrl;
+        delete payload.mapUrl;
+    }
+    if (data.openingHours) {
+        payload.opening_hours = data.openingHours;
+        delete payload.openingHours;
+    }
+    if (data.marqueeText) {
+        payload.marquee_text = data.marqueeText;
+        delete payload.marqueeText;
+    }
+    if (data.aboutText) {
+        payload.about_text = data.aboutText;
+        delete payload.aboutText;
+    }
+    if (data.heroTitle) {
+        payload.hero_title = data.heroTitle;
+        delete payload.heroTitle;
+    }
+    if (data.heroSubtitle) {
+        payload.hero_subtitle = data.heroSubtitle;
+        delete payload.heroSubtitle;
+    }
+    if (data.gstNumber !== undefined) {
+        payload.gst_number = data.gstNumber;
+        delete payload.gstNumber;
+    }
+    if (data.sessionDuration) {
+        payload.session_duration = data.sessionDuration;
+        delete payload.sessionDuration;
+    }
+    if (data.adultPrice) {
+        payload.adult_price = data.adultPrice;
+        delete payload.adultPrice;
+    }
+    if (data.childPrice) {
+        payload.child_price = data.childPrice;
+        delete payload.childPrice;
+    }
+    if (data.onlineBookingEnabled !== undefined) {
+        payload.online_booking_enabled = data.onlineBookingEnabled;
+        delete payload.onlineBookingEnabled;
+    }
+    if (data.partyBookingsEnabled !== undefined) {
+        payload.party_bookings_enabled = data.partyBookingsEnabled;
+        delete payload.partyBookingsEnabled;
+    }
+    if (data.maintenanceMode !== undefined) {
+        payload.maintenance_mode = data.maintenanceMode;
+        delete payload.maintenanceMode;
+    }
+    if (data.waiverRequired !== undefined) {
+        payload.waiver_required = data.waiverRequired;
+        delete payload.waiverRequired;
+    }
+
+    const res = await fetchAPI(`/core/settings/${id}/`, {
+        method: "PATCH",
+        body: JSON.stringify(payload)
     });
+
+    if (!res || !res.ok) return { success: false };
+
+    await logActivity({
+        action: 'UPDATE',
+        entity: 'SETTINGS',
+        entityId: id,
+        details: { changes: Object.keys(data) }
+    });
+
+    revalidatePath('/admin/settings');
+    revalidatePath('/');
+    return { success: true };
 }
 
-export async function updatePassword(data: { current_password: string; new_password: string }) {
-    return sf(`${BASE}/accounts/change-password/`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(data),
+export async function updatePassword(currentPass: string, newPass: string) {
+    const session = await getAdminSession();
+
+    if (!session || !session.id) {
+        return { success: false, error: "Your session has expired — please log in again" };
+    }
+
+    if (!newPass || newPass.length < 8) {
+        return { success: false, error: "New password must be at least 8 characters" };
+    }
+
+    // Verify the current password before changing it, so an unattended
+    // logged-in browser cannot be used to take over the account
+    const apiRoot = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:9000/api/v1").replace('localhost', '127.0.0.1').replace(/\/api\/v1\/?$/, '');
+    const check = await fetch(`${apiRoot}/api/token/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session.email, password: currentPass }),
+        cache: "no-store",
     });
+    if (!check.ok) {
+        return { success: false, error: "Current password is incorrect" };
+    }
+
+    const res = await fetchAPI(`/core/users/${session.id}/`, {
+        method: "PATCH",
+        body: JSON.stringify({ password: newPass })
+    });
+
+    if (!res || !res.ok) {
+        // Try to get error message
+        try {
+            const err = await res.json();
+            console.error("Password update failed:", err);
+        } catch (e) { }
+        return { success: false, error: "Failed to update password" };
+    }
+
+    await logActivity({
+        action: 'UPDATE',
+        entity: 'USER',
+        entityId: session.id,
+        details: { field: "password_change" }
+    });
+
+    return { success: true };
 }

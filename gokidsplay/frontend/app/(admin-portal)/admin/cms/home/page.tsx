@@ -1,11 +1,10 @@
 import { getPageSections } from '@/app/actions/page-sections';
 import { getGalleryItems } from '@/app/actions/gallery';
 import { getInstagramReels } from '@/app/actions/instagram-reels';
-import { HeroEditor } from '@/components/admin/cms/home/HeroEditor';
-import { AboutEditor } from '@/components/admin/cms/home/AboutEditor';
 import { GalleryManager } from '@/components/admin/cms/home/GalleryManager';
 import { ReelsManager } from '@/components/admin/cms/home/ReelsManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
+import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 export default async function HomeAdminPage() {
     // Fetch all data in parallel
@@ -32,11 +31,7 @@ export default async function HomeAdminPage() {
 
             <div className="grid gap-8">
                 <section>
-                    <HeroEditor section={heroSection} pageSlug="home" />
-                </section>
-
-                <section>
-                    <AboutEditor section={aboutSection} pageSlug="home" />
+                    <PageTextLink pageKey="home" />
                 </section>
 
                 <section>

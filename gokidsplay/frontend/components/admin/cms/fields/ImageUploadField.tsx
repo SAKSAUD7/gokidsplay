@@ -21,13 +21,13 @@ export function ImageUploadField({ field, value, onChange, error, idPrefix }: Im
     const [uploadProgress, setUploadProgress] = useState(0);
 
     // File validation constants
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
     const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
     const validateFile = (file: File): string | null => {
         // Check file size
         if (file.size > MAX_FILE_SIZE) {
-            return `File size must be less than 5MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
+            return `File size must be less than 15MB. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`;
         }
 
         // Check file type
@@ -67,9 +67,13 @@ export function ImageUploadField({ field, value, onChange, error, idPrefix }: Im
 
             console.log('[ImageUploadField] Starting upload:', file.name);
 
-            // Use server action that can read httpOnly cookie
-            const { uploadImage } = await import('@/app/actions/upload-image');
-            const result = await uploadImage(formData);
+            // Route handler forwards the httpOnly admin cookie to Django; unlike a
+            // server action it has no 1MB request-body limit
+            const res = await fetch('/api/cms/video-upload', { method: 'POST', body: formData });
+            const data = await res.json().catch(() => ({}));
+            const result = res.ok && data.url
+                ? { success: true, url: data.url as string, error: undefined }
+                : { success: false, url: undefined, error: (data.error as string) || `Upload failed (${res.status})` };
 
             clearInterval(progressInterval);
             setUploadProgress(100);
@@ -169,7 +173,7 @@ export function ImageUploadField({ field, value, onChange, error, idPrefix }: Im
                     </div>
 
                     <p className="text-xs text-slate-500">
-                        Supported: JPG, PNG, WEBP • Max size: 5MB
+                        Supported: JPG, PNG, WEBP • Max size: 15MB
                     </p>
                 </div>
             </div>

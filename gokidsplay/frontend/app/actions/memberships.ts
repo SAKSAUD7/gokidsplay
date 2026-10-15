@@ -1,4 +1,5 @@
 'use server';
+import { cookies } from 'next/headers';
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1';
 
 async function sf(url: string, init: RequestInit = {}) {
@@ -10,7 +11,7 @@ async function sf(url: string, init: RequestInit = {}) {
 }
 
 function getToken() {
-    return typeof window !== 'undefined' ? localStorage.getItem('admin_token') || '' : '';
+    return cookies().get('admin_token')?.value || '';
 }
 
 export async function getMembershipPlans() {

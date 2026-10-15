@@ -2,12 +2,12 @@ import React from 'react';
 import { getPageSections } from '@/app/actions/page-sections';
 import { getActivities } from '@/app/actions/activities';
 import { getFacilityItems } from '@/app/actions/facility-items';
-import { HeroEditor } from '@/components/admin/cms/home/HeroEditor';
 import { AttractionsManager } from '@/components/admin/cms/attractions/AttractionsManager';
 import { FacilitiesManager } from '@/components/admin/cms/attractions/FacilitiesManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
 import { getAttractionVideo } from '@/app/actions/attraction-video';
 import { AttractionVideoManager } from '@/components/admin/cms/attractions/AttractionVideoManager';
+import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 export default async function AttractionsAdminPage() {
     // Fetch all data in parallel
@@ -32,7 +32,7 @@ export default async function AttractionsAdminPage() {
             <div className="grid gap-8">
                 {/* Hero Section Editor */}
                 <section>
-                    <HeroEditor section={heroSection} pageSlug="attractions" />
+                    <PageTextLink pageKey="attractions" />
                 </section>
 
                 {/* Attraction Video Manager */}
