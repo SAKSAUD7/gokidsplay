@@ -102,3 +102,14 @@ AZURE_SECRETS.md
 # Files uploaded through the admin portal (keep the folder, not the uploads)
 backend/media/uploads/*
 !backend/media/uploads/.gitkeep
+
+# Database dumps, logs and debug output can contain customer data or password
+# hashes — never commit them
+*database_export*.json
+data_export.json
+sample_booking_data.json
+azure_seed_data.json
+*_db_fixture.json
+spinpin_data.json
+webapp_logs*.zip
+debug_*output*.txt
