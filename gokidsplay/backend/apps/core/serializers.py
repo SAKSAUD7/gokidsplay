@@ -45,6 +45,10 @@ class LogoSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
     
     def get_image_url(self, obj):
+        # A name like "/gokidsplay-logo.png" is the website's own built-in file, not an
+        # upload; returning None lets the site use its built-in logo instead of a 404.
+        if obj.image and str(obj.image.name).startswith('/'):
+            return None
         if obj.image:
             request = self.context.get('request')
             if request:
