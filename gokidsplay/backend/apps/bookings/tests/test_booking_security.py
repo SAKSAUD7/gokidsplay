@@ -206,3 +206,25 @@ class TestPrivateData:
     def test_voucher_codes_are_not_listed_publicly(self):
         Voucher.objects.create(code='SECRET', discount_type='FLAT', discount_value=Decimal('5'), is_active=True)
         assert APIClient().get('/api/v1/shop/vouchers/').status_code == 401
+
+
+# ── Site-wide hardening ──────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+class TestHardening:
+    def test_maintenance_endpoints_are_gone(self):
+        # These used to reset the admin password / run seed scripts for anyone
+        for url in ('/api/v1/reset-admin/', '/api/v1/seed-db/', '/api/v1/fix-logo/'):
+            assert APIClient().get(url).status_code == 404, url
+
+    def test_cors_only_for_allowed_origins(self):
+        client = APIClient()
+        evil = client.get('/api/v1/cms/pricing-plans/', HTTP_ORIGIN='https://evil.example.com')
+        assert 'Access-Control-Allow-Origin' not in evil
+        ours = client.get('/api/v1/cms/pricing-plans/', HTTP_ORIGIN='https://www.gokidsplay.co.uk')
+        assert ours['Access-Control-Allow-Origin'] == 'https://www.gokidsplay.co.uk'
+
+    def test_health_check_reports_database(self):
+        response = APIClient().get('/api/health/')
+        assert response.status_code == 200
+        assert response.json()['database'] == 'ok'

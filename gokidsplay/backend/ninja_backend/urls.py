@@ -3,7 +3,6 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
-import subprocess
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
@@ -18,134 +17,24 @@ class EmailTokenObtainPairView(TokenObtainPairView):
 
 
 def health_check(request):
-    """Root health check endpoint so the backend root doesn't return 404."""
-    return JsonResponse({
-        "status": "online",
-        "service": "Go Kids Play Backend API",
-        "version": "1.0",
-        "api_docs": "/api/docs/",
-        "admin": "/admin/",
-    })
-
-
-def seed_database(request):
+    """Health check for the root URL and load balancer probes (also checks the database)."""
+    from django.db import connection
     try:
-        command = "python populate_gokidsplay_content.py && python full_seed.py && python cms_seed_gokidsplay.py"
-        subprocess.Popen(command, shell=True, cwd=settings.BASE_DIR)
-        return JsonResponse({"status": "All 3 Seed scripts started in background!"})
-    except Exception as e:
-        return JsonResponse({"status": "Error", "message": str(e)})
-
-
-def reset_admin_password(request):
-    """Temporary endpoint: resets admin password and creates logo. Remove after use."""
-    results = {}
-    try:
-        # 1. Reset / create admin user
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        NEW_PASSWORD = "GoKidsPlay2026!"
-        ADMIN_EMAIL = "admin@gokidsplay.co.uk"
-        try:
-            user = User.objects.get(email=ADMIN_EMAIL)
-            user.set_password(NEW_PASSWORD)
-            user.is_staff = True
-            user.is_superuser = True
-            user.is_active = True
-            user.role = 'ADMIN'
-            user.save()
-            results['admin'] = f"Password for {ADMIN_EMAIL} reset to: {NEW_PASSWORD}"
-        except User.DoesNotExist:
-            # Custom User model needs username + name as REQUIRED_FIELDS
-            user = User(
-                email=ADMIN_EMAIL,
-                username='admin',
-                name='Go Kids Play Admin',
-                role='ADMIN',
-                is_staff=True,
-                is_superuser=True,
-                is_active=True,
-            )
-            user.set_password(NEW_PASSWORD)
-            user.save()
-            results['admin'] = f"Admin created. Email: {ADMIN_EMAIL}, Password: {NEW_PASSWORD}"
-
-        # 2. Create logo from frontend's public folder if none exists
-        try:
-            from apps.core.models import Logo
-            if not Logo.objects.filter(is_active=True).exists():
-                import urllib.request
-                from django.core.files import File
-                logo_url = "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/logo_transparent.png"
-                tmp_path = "/tmp/gokidsplay_logo.png"
-                try:
-                    urllib.request.urlretrieve(logo_url, tmp_path)
-                    logo = Logo(name="Go Kids Play Logo", is_active=True)
-                    with open(tmp_path, 'rb') as f:
-                        logo.image.save("logo_transparent.png", File(f), save=True)
-                    results['logo'] = "Logo created from frontend public folder"
-                except Exception as logo_err:
-                    results['logo'] = f"Auto-download failed: {str(logo_err)} — upload manually via Django Admin at /admin/"
-            else:
-                results['logo'] = "Active logo already exists — no changes made"
-        except Exception as e:
-            results['logo'] = f"Logo error: {str(e)}"
-
-        return JsonResponse({"status": "success", "results": results})
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)})
-
-
-def fix_logo(request):
-    """Endpoint to set the correct circular Go Kids Play logo as active."""
-    try:
-        from apps.core.models import Logo
-        import os
-
-        # Deactivate all existing logos
-        Logo.objects.all().update(is_active=False)
-
-        # We'll use a permanent logo that is checked into the git repository
-        # This prevents the 404 error caused by Azure App Service wiping uploaded files on deploy
-        logo_image_path = "logos/Go Kids Play-logo.png"
-        
-        # Ensure the logo file actually exists in the persistent MEDIA_ROOT
-        import shutil
-        from django.conf import settings
-        from pathlib import Path
-        
-        target_dir = Path(settings.MEDIA_ROOT) / 'logos'
-        target_dir.mkdir(parents=True, exist_ok=True)
-        target_path = target_dir / 'Go Kids Play-logo.png'
-        
-        # Source path is where git put it (relative to BASE_DIR)
-        source_path = settings.BASE_DIR / 'media' / 'logos' / 'Go Kids Play-logo.png'
-        
-        if source_path.exists() and not target_path.exists():
-            shutil.copy2(source_path, target_path)
-
-        # We can just create a new logo that references this path
-        # django-storages will correctly resolve it to Azure Blob storage or local serve
-        logo = Logo(name="Go Kids Play Logo", is_active=True)
-        logo.image.name = logo_image_path
-        logo.save()
-
-        return JsonResponse({
-            "status": "success",
-            "message": "Go Kids Play logo successfully set as active.",
-            "logo_id": logo.id,
-            "image": str(logo.image)
-        })
-    except Exception as e:
-        import traceback
-        return JsonResponse({"status": "error", "message": str(e), "traceback": traceback.format_exc()})
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        database = "ok"
+    except Exception:
+        database = "unavailable"
+    return JsonResponse(
+        {"status": "online" if database == "ok" else "degraded", "service": "Go Kids Play Backend API",
+         "database": database},
+        status=200 if database == "ok" else 503,
+    )
 
 
 urlpatterns = [
     path('', health_check),                         # Root health check
-    path('api/v1/seed-db/', seed_database),
-    path('api/v1/reset-admin/', reset_admin_password),
-    path('api/v1/fix-logo/', fix_logo),
+    path('api/health/', health_check),              # Load balancer health probe
     path('admin/', admin.site.urls),
 
     # API V1
@@ -161,12 +50,15 @@ urlpatterns = [
     # Auth
     path('api/token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    # Documentation
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+
+# API documentation lists every endpoint, so it is only served in local development
+if settings.DEBUG:
+    urlpatterns += [
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    ]
 
 import os
 from ninja_backend.serve_media import serve_media_proxy

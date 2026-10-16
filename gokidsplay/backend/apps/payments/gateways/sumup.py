@@ -1,9 +1,8 @@
 """
 SumUp Payment Gateway Integration for Go Kids Play.
 
-Dual-Merchant Setup:
-  - Roller Skating & Arcade → Go Kids Play Ltd account (SUMUP_SKATING_*)
-  - Ten Pin Bowling         → Twinkle Town Ltd account (SUMUP_BOWLING_*)
+All payments go to the one Go Kids Play merchant account
+(SUMUP_API_KEY / SUMUP_MERCHANT_CODE in .env).
 
 Uses SumUp Checkout API (hosted redirect flow):
   1. Call /checkouts to create a checkout → get checkout_id
@@ -29,56 +28,25 @@ logger = logging.getLogger(__name__)
 
 SUMUP_API_BASE = "https://api.sumup.com/v0.1"
 
-# Activities routed to Twinkle Town Ltd (bowling account)
-BOWLING_ACTIVITIES = {"ten-pin-bowling", "bowling"}
-
-# Activities routed to Go Kids Play Ltd (skating account)
-SKATING_ACTIVITIES = {"roller-skating", "skating", "arcade"}
+ACCOUNT_NAME = "Go Kids Play Ltd"
 
 
-def _get_merchant_credentials(activity: Optional[str]) -> Dict[str, str]:
+def _get_merchant_credentials(activity: Optional[str] = None) -> Dict[str, str]:
     """
-    Return the correct SumUp credentials based on the booking activity.
-
-    Routing logic:
-      - ten-pin-bowling  → Twinkle Town Ltd (SUMUP_BOWLING_*)
-      - roller-skating   → Go Kids Play Ltd     (SUMUP_SKATING_*)
-      - arcade           → Go Kids Play Ltd     (SUMUP_SKATING_*)
-      - unknown/None     → Go Kids Play Ltd     (SUMUP_SKATING_*) as default
+    Return the SumUp credentials. Go Kids Play has a single merchant account, so
+    every booking (session, party, any activity) is paid into it. The activity
+    argument is kept for callers that still pass it.
     """
-    activity_lower = (activity or "").lower().strip()
-
-    if activity_lower in BOWLING_ACTIVITIES:
-        api_key       = getattr(settings, "SUMUP_BOWLING_API_KEY", "")
-        merchant_code = getattr(settings, "SUMUP_BOWLING_MERCHANT_CODE", "M7EN4CMZ")
-        account_name  = "Twinkle Town Ltd"
-    else:
-        # Skating, Arcade, or default
-        api_key       = getattr(settings, "SUMUP_SKATING_API_KEY", "")
-        merchant_code = getattr(settings, "SUMUP_SKATING_MERCHANT_CODE", "")
-        account_name  = "Go Kids Play Ltd"
-
-    # Final fallback to legacy single-key settings
-    if not api_key:
-        api_key = getattr(settings, "SUMUP_API_KEY", "")
-    if not merchant_code:
-        merchant_code = getattr(settings, "SUMUP_MERCHANT_CODE", "")
-
     return {
-        "api_key":      api_key,
-        "merchant_code": merchant_code,
-        "account_name": account_name,
+        "api_key":       getattr(settings, "SUMUP_API_KEY", ""),
+        "merchant_code": getattr(settings, "SUMUP_MERCHANT_CODE", ""),
+        "account_name":  ACCOUNT_NAME,
     }
 
 
 class SumUpGateway(BasePaymentGateway):
     """
-    SumUp Checkout API gateway with dual-merchant support.
-
-    The correct merchant credentials are selected automatically based on the
-    booking's activity field:
-      - roller-skating / arcade → Go Kids Play Ltd
-      - ten-pin-bowling         → Twinkle Town Ltd
+    SumUp Checkout API gateway (single Go Kids Play merchant account).
     """
 
     def __init__(self):
@@ -112,13 +80,13 @@ class SumUpGateway(BasePaymentGateway):
 
     def create_order(self, booking, amount: Decimal | None = None) -> Dict[str, Any]:
         """
-        Create a SumUp checkout using the correct merchant account for this booking.
+        Create a SumUp checkout for this booking.
 
         Returns dict with:
           - order_id:     the checkout_id from SumUp
           - checkout_url: URL to redirect customer to
           - provider:     'sumup'
-          - merchant:     which account was used ('Go Kids Play Ltd' or 'Twinkle Town Ltd')
+          - merchant:     the merchant account name
           - amount, currency
         """
         from apps.bookings.models import PartyBooking
@@ -136,12 +104,12 @@ class SumUpGateway(BasePaymentGateway):
         if not api_key:
             raise Exception(
                 f"SumUp API key not configured for {account_name}. "
-                f"Please set SUMUP_SKATING_API_KEY / SUMUP_BOWLING_API_KEY in .env"
+                f"Please set SUMUP_API_KEY in .env"
             )
         if not merchant_code:
             raise Exception(
                 f"SumUp Merchant Code not configured for {account_name}. "
-                f"Please set SUMUP_SKATING_MERCHANT_CODE / SUMUP_BOWLING_MERCHANT_CODE in .env"
+                f"Please set SUMUP_MERCHANT_CODE in .env"
             )
 
         logger.info(
@@ -402,22 +370,5 @@ class SumUpGateway(BasePaymentGateway):
     # ── Internal helpers ──────────────────────────────────────────────────────
 
     def _get_api_key_for_checkout(self, checkout_id: str) -> str:
-        """
-        Look up which merchant API key to use for a checkout verification/refund
-        by checking the stored Payment's provider_response._activity field.
-        Falls back to Go Kids Play Ltd (skating) keys if not determinable.
-        """
-        try:
-            payment = Payment.objects.get(order_id=checkout_id)  # type: ignore[attr-defined]
-            stored  = payment.provider_response or {}
-            activity = stored.get("_activity", "")
-            creds   = _get_merchant_credentials(activity)
-            return creds["api_key"]
-        except Payment.DoesNotExist:  # type: ignore[attr-defined]
-            pass
-
-        # Default: Go Kids Play Ltd
-        return (
-            getattr(settings, "SUMUP_SKATING_API_KEY", "")
-            or getattr(settings, "SUMUP_API_KEY", "")
-        )
+        """API key used to verify or refund a checkout (single merchant account)."""
+        return _get_merchant_credentials()["api_key"]

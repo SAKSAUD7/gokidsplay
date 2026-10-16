@@ -36,12 +36,19 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-fallback')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_bool('DEBUG', False)  # SAFETY: defaults to False; set DEBUG=True in local .env
 
-# VPS/Local/Azure: Allow all hosts or specific Azure domains
-ALLOWED_HOSTS = ['*']
+# Hosts this API answers for. The defaults cover local development, the live
+# domain and Azure App Service; add more with ALLOWED_HOSTS=host1,host2 in .env.
+ALLOWED_HOSTS = [
+    'localhost', '127.0.0.1',
+    'gokidsplay.co.uk', 'www.gokidsplay.co.uk', 'api.gokidsplay.co.uk',
+    '.azurewebsites.net',
+] + get_env_list('ALLOWED_HOSTS', '')
+if os.getenv('WEBSITE_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['WEBSITE_HOSTNAME'])
+if DEBUG:
+    ALLOWED_HOSTS = ['*']  # local development (e.g. testing from a phone on the LAN)
 
-# CORS settings for django-cors-headers (belt)
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS settings for django-cors-headers (the allowed origins are set further down)
 CORS_ALLOW_HEADERS = [
     'accept', 'accept-encoding', 'authorization',
     'content-type', 'dnt', 'origin', 'user-agent',
@@ -246,7 +253,7 @@ SIMPLE_JWT = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Go Kids Play API',
-    'DESCRIPTION': 'API for Go Kids Play - Bowling, Roller Skating & Arcade in Leicester',
+    'DESCRIPTION': 'API for Go Kids Play - indoor play centre in Coventry',
     'VERSION': '1.0.0',
 }
 
@@ -263,6 +270,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 # Extend with any environment-provided origins
 CORS_ALLOWED_ORIGINS.extend(get_env_list('FRONTEND_URLS', ''))
+CORS_ALLOWED_ORIGINS.extend(get_env_list('CORS_ALLOWED_ORIGINS', ''))
 
 CSRF_TRUSTED_ORIGINS = [
     "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
@@ -334,7 +342,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@gokidsplay.co.uk')
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # Go Kids Play sender name
-EMAIL_SENDER_NAME = os.getenv('EMAIL_SENDER_NAME', 'Go Kids Play Leicester')
+EMAIL_SENDER_NAME = os.getenv('EMAIL_SENDER_NAME', 'Go Kids Play')
 
 # Email retry
 EMAIL_MAX_RETRIES = int(os.getenv('EMAIL_MAX_RETRIES', '3'))
@@ -368,34 +376,23 @@ LOGGING = {
 # PAYMENT GATEWAY CONFIGURATION
 # ====================================================
 
-# Payment Mode: 'mock' (default, pay at venue) or 'sumup' (live online payments)
+# Payment Mode: 'sumup' (live online payments, the default) or 'mock' (local
+# development / pay at venue). Local .env files set PAYMENT_MODE=mock.
 PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
 
-# ── SumUp: Roller Skating & Arcade ─────────────────────────────────────
-# Account: Go Kids Play Ltd
-# Used for activity: roller-skating, arcade (and any unknown activity)
-SUMUP_SKATING_API_KEY      = os.getenv('SUMUP_SKATING_API_KEY', '')
-SUMUP_SKATING_MERCHANT_CODE = os.getenv('SUMUP_SKATING_MERCHANT_CODE', '')
-
-# ── SumUp: Ten Pin Bowling ──────────────────────────────────────────────
-# Account: Twinkle Town Ltd (Merchant Code: M7EN4CMZ)
-# Used for activity: ten-pin-bowling
-SUMUP_BOWLING_API_KEY      = os.getenv('SUMUP_BOWLING_API_KEY', '')
-SUMUP_BOWLING_MERCHANT_CODE = os.getenv('SUMUP_BOWLING_MERCHANT_CODE', 'M7EN4CMZ')
-
-# Return URL after payment (same for both merchants)
-SUMUP_RETURN_URL = os.getenv('SUMUP_RETURN_URL', 'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net/book/success')
-
-# ── Frontend URL (used for redirect URLs, webhooks, etc.) ──────────────────
-# Set FRONTEND_URL env var in Azure to your custom domain once live
+# ── Frontend URL (used for email links and payment return URLs) ─────────────
+# Set FRONTEND_URL to https://www.gokidsplay.co.uk when the new site goes live.
 FRONTEND_URL = os.getenv(
     'FRONTEND_URL',
     'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net'
 )
 
-# Legacy single-key fallback (kept for backward compatibility)
-SUMUP_API_KEY      = os.getenv('SUMUP_API_KEY', SUMUP_SKATING_API_KEY)
-SUMUP_MERCHANT_CODE = os.getenv('SUMUP_MERCHANT_CODE', SUMUP_SKATING_MERCHANT_CODE)
+# ── SumUp (one Go Kids Play merchant account) ───────────────────────────────
+SUMUP_API_KEY       = os.getenv('SUMUP_API_KEY', '') or os.getenv('SUMUP_SKATING_API_KEY', '')
+SUMUP_MERCHANT_CODE = os.getenv('SUMUP_MERCHANT_CODE', '') or os.getenv('SUMUP_SKATING_MERCHANT_CODE', '')
+
+# Where SumUp sends the customer after paying; defaults to FRONTEND_URL/book/success
+SUMUP_RETURN_URL = os.getenv('SUMUP_RETURN_URL', '')
 
 # Legacy Razorpay (no longer used — kept for migration safety)
 RAZORPAY_KEY_ID    = os.getenv('RAZORPAY_KEY_ID', '')
