@@ -120,6 +120,20 @@ export async function getPublicPartyPackages() {
     return packages.filter((p: any) => p.active);
 }
 
+/** Session booking settings (opening hours, session rules, online booking fee). */
+export async function getPublicSessionSettings(): Promise<Record<string, any> | null> {
+    const data = await fetchFromAPI('/cms/session-booking-config/1/');
+    return data && !Array.isArray(data) ? data : null;
+}
+
+/** Live-site wording for the online booking fee, or null when there is no fee. */
+export function onlineFeeNote(settings: Record<string, any> | null): string | null {
+    const raw = settings?.online_booking_fee;
+    const fee = raw === undefined || raw === null ? 2 : parseFloat(raw);
+    if (!Number.isFinite(fee) || fee <= 0) return null;
+    return `If you book tickets online, there will be a £${fee.toFixed(2).replace(/\.00$/, "")} booking fee. You can buy tickets directly at the centre by paying cash to avoid this fee.`;
+}
+
 export async function getPublicPricingPlans() {
     const plans = await fetchFromAPI('/cms/pricing-plans/');
     return plans.filter((p: any) => p.active);

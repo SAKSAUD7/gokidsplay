@@ -137,6 +137,29 @@ class SessionBookingConfigSerializer(serializers.ModelSerializer):
         model = SessionBookingConfig
         fields = '__all__'
 
+    @staticmethod
+    def _check_hours(value, label):
+        """value must be null or {"open": "HH:MM", "close": "HH:MM"} with open before close."""
+        import re
+        if value is None:
+            return None
+        if not isinstance(value, dict) or not all(
+                isinstance(value.get(k), str) and re.fullmatch(r'([01]\d|2[0-3]):[0-5]\d', value.get(k) or '')
+                for k in ('open', 'close')):
+            raise serializers.ValidationError(f'{label}: use {{"open": "HH:MM", "close": "HH:MM"}} or leave closed.')
+        if value['open'] >= value['close']:
+            raise serializers.ValidationError(f'{label}: opening time must be before closing time.')
+        return {'open': value['open'], 'close': value['close']}
+
+    def validate_opening_hours(self, value):
+        days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        if not isinstance(value, dict):
+            raise serializers.ValidationError('Opening hours must list each day of the week.')
+        return {str(i): self._check_hours(value.get(str(i)), days[i]) for i in range(7)}
+
+    def validate_holiday_hours(self, value):
+        return self._check_hours(value, 'Holiday hours')
+
 class PartyBookingConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = PartyBookingConfig

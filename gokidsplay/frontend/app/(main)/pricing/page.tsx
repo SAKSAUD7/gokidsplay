@@ -3,7 +3,7 @@ import { getMetadata } from "@/seo/seo.config";
 import { ScrollReveal, BouncyButton } from "@repo/ui";
 import { Ticket, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { getPublicPageContent, getPublicPricingPlans } from "@/lib/public-api";
+import { getPublicPageContent, getPublicPricingPlans, getPublicSessionSettings, onlineFeeNote } from "@/lib/public-api";
 import { listItems } from "@/lib/cms/page-registry";
 
 export const metadata: Metadata = getMetadata(
@@ -25,7 +25,10 @@ const formatPrice = (price: string | number) => {
 };
 
 export default async function PricingPage() {
-    const [content, plans] = await Promise.all([getPublicPageContent("pricing"), getPublicPricingPlans()]);
+    const [content, plans, sessionSettings] = await Promise.all([
+        getPublicPageContent("pricing"), getPublicPricingPlans(), getPublicSessionSettings(),
+    ]);
+    const feeNote = onlineFeeNote(sessionSettings);
     const { hero, notice, included, cards, footer } = content;
     const pricingTiers = plans
         .filter((p: any) => p.type === "SESSION")
@@ -118,10 +121,11 @@ export default async function PricingPage() {
 
                 {footer && (
                     <>
-                        {footer.note && (
+                        {(footer.note || feeNote) && (
                             <div className="text-center text-sm text-white/50 flex flex-col items-center gap-2">
                                 <AlertCircle className="w-5 h-5 text-white/40" />
-                                <p>{footer.note}</p>
+                                {footer.note && <p>{footer.note}</p>}
+                                {feeNote && <p className="text-yellow-300/80">{feeNote}</p>}
                             </div>
                         )}
 

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { isSchoolHoliday, isHolidayOpen, getOpeningHours, nowInUK, todayInUK } from "@/lib/api/types";
+import { isHolidayOpen, getOpeningHours, getAvailableTimeSlots, formatClock, nowInUK, todayInUK } from "@/lib/api/types";
 import type { BookingBlock } from "@/lib/api/booking-blocks";
 
 interface SmartCalendarProps {
@@ -35,8 +35,10 @@ function getDayType(
         if (dateStr >= start && dateStr <= end) return "blocked";
     }
 
-    // Closed days (Mon–Wed in term time) — same opening hours as the time-slot picker
+    // Closed days (from the CMS opening hours; school & bank holidays open) — and
+    // today once online booking has closed
     if (!getOpeningHours(dateStr)) return "closed";
+    if (dateStr === todayInUK() && getAvailableTimeSlots(dateStr).length === 0) return "closed";
 
     // Weekend
     if (dow === 0 || dow === 6) return "weekend";
@@ -70,7 +72,7 @@ const TYPE_STYLES: Record<string, { cell: string; dot: string; label: string }> 
     "school-holiday": {
         cell: "hover:bg-emerald-500/20 cursor-pointer",
         dot: "bg-emerald-400",
-        label: "Open (10am+)",
+        label: "School / bank holiday — open",
     },
     weekend: {
         cell: "hover:bg-primary/20 cursor-pointer",
@@ -85,7 +87,7 @@ const TYPE_STYLES: Record<string, { cell: string; dot: string; label: string }> 
 };
 
 export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, maxDate }: SmartCalendarProps) {
-    // Always use UK time so the calendar reflects Leicester's current date,
+    // Always use UK time so the calendar reflects Coventry's current date,
     // regardless of where the visitor's device is located.
     const ukNow = nowInUK();
     const [viewYear, setViewYear] = useState(ukNow.getFullYear());
@@ -189,9 +191,9 @@ export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, ma
             <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                 {[
                     { dot: "bg-red-500", label: "Closed" },
-                    { dot: "bg-yellow-400", label: "Thu–Fri (3pm+)" },
-                    { dot: "bg-emerald-400", label: "School holiday (10am+)" },
-                    { dot: "bg-primary", label: "Weekend (12pm+)" },
+                    { dot: "bg-yellow-400", label: "Open" },
+                    { dot: "bg-primary", label: "Weekend" },
+                    { dot: "bg-emerald-400", label: "School / bank holiday" },
                 ].map(l => (
                     <div key={l.label} className="flex items-center gap-1">
                         <span className={`w-1.5 h-1.5 rounded-full ${l.dot}`} />

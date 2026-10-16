@@ -195,8 +195,9 @@ export async function createBooking(formData: any) {
 
         subtotal = parseFloat((subtotal + addOnsTotal).toFixed(2));
         const gst = parseFloat((subtotal * (GST_RATE / 100)).toFixed(2));
-        // Admin bookings skip the online booking fee (£2) — it's for online customer flow only
-        const onlineBookingFee = isAdminBooking ? 0 : 2.00;
+        // Admin bookings skip the online booking fee — it's for the online customer flow only
+        const cmsFee = parseFloat(String((cmsConfig as any).online_booking_fee ?? ""));
+        const onlineBookingFee = isAdminBooking ? 0 : (Number.isFinite(cmsFee) ? cmsFee : 2.00);
         let totalAmount = parseFloat((subtotal + gst + onlineBookingFee).toFixed(2));
         let discountAmount = 0;
         let voucherId = null;

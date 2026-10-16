@@ -65,7 +65,7 @@ def staff_client(db):
 def session_payload(plans, **overrides):
     payload = {
         'name': 'Test Parent', 'email': 'parent@example.com', 'phone': '07700900123',
-        'date': next_saturday().isoformat(), 'time': '14:00', 'duration': 120, 'type': 'SESSION',
+        'date': next_saturday().isoformat(), 'time': '10:00', 'duration': 120, 'type': 'SESSION',
         # 3 children + 1 toddler + 2 non-playing adults
         'tickets': {plans['child'].id: 3, plans['toddler'].id: 1, plans['adult'].id: 2},
     }
@@ -155,6 +155,63 @@ class TestPublicSessionBooking:
     def test_admin_booking_list_works_with_bookings(self, config, plans, staff_client):
         APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
         assert staff_client.get(SESSIONS_URL).status_code == 200
+
+
+# ── Opening hours & session rules (CMS Session Booking Configuration) ────────
+
+@pytest.mark.django_db
+class TestSessionRules:
+    def test_live_site_defaults(self, config):
+        from apps.bookings.opening_hours import session_start_times, weekly_hours
+        saturday = next_saturday()
+        monday = saturday + timedelta(days=2)
+        assert weekly_hours(saturday) == ('10:00', '17:30')
+        assert weekly_hours(monday) is None             # closed except school / bank holidays
+        assert session_start_times(saturday) == ['10:00']  # "2 Hours Anytime"
+
+    def test_arrival_mode_lists_times_that_fit_before_closing(self, config):
+        from apps.bookings.opening_hours import session_start_times
+        config.session_mode = 'ARRIVAL'
+        config.arrival_interval_minutes = 30
+        config.save()
+        times = session_start_times(next_saturday())
+        assert times[0] == '10:00' and times[-1] == '15:30'  # 15:30 + 2h = 17:30 closing
+
+    def test_booking_fee_comes_from_cms(self, config, plans):
+        from apps.bookings.pricing import price_admission
+        config.online_booking_fee = Decimal('1.50')
+        config.save()
+        assert price_admission(tickets={plans['child'].id: 1}).amount == Decimal('14.45')
+
+    def test_public_booking_needs_a_real_session_time(self, config, plans):
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, time='19:00'), format='json')
+        assert response.status_code == 400
+        assert response.data['code'] == 'INVALID_TIME'
+
+    def test_past_dates_are_rejected(self, config, plans):
+        past = (date.today() - timedelta(days=7)).isoformat()
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, date=past), format='json')
+        assert response.status_code == 400
+
+    def test_anytime_capacity_counts_the_whole_day(self, config, plans):
+        config.session_capacity = 5
+        config.save()
+        assert APIClient().post(SESSIONS_URL, session_payload(plans), format='json').status_code == 201  # 4 players
+        response = APIClient().post(SESSIONS_URL, session_payload(plans), format='json')                # 4 more
+        assert response.status_code == 409
+
+    def test_slot_availability_uses_cms_hours(self, config):
+        response = APIClient().get(SESSIONS_URL + 'slot_availability/', {'date': next_saturday().isoformat()})
+        assert response.status_code == 200
+        assert list(response.data['slots']) == ['10:00']
+        assert response.data['slots']['10:00']['slot_end'] == '17:30'
+
+    def test_party_slots_follow_party_config(self):
+        from apps.bookings.availability_service import GKPAvailabilityService
+        from apps.cms.models import PartyBookingConfig
+        PartyBookingConfig.objects.create(available_time_slots=['12:00 PM', '2:30 PM'])
+        slots = GKPAvailabilityService().get_party_slots(next_saturday())
+        assert list(slots) == ['12:00', '14:30']
 
 
 # ── Party bookings ───────────────────────────────────────────────────────────

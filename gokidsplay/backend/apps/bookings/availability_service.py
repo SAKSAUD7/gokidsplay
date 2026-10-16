@@ -24,6 +24,7 @@ The backend is the authoritative source.
 The frontend must NEVER decide whether something is bookable.
 """
 
+import re
 from datetime import date, time, datetime, timedelta
 from typing import Optional
 from django.db.models import Sum, Count, Q
@@ -42,12 +43,29 @@ GKP_ACTIVITIES = {
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Capacity configuration
-# These will eventually come from an AvailabilityConfig DB model.
-# For now, use safe defaults that can be overridden via settings.
+# Session capacity, opening hours and session mode come from the CMS Session
+# Booking Configuration (see apps/bookings/opening_hours.py); these are fallbacks.
 # ─────────────────────────────────────────────────────────────────────────────
-GKP_SESSION_CAPACITY = 150       # Max total visitors per time slot
+GKP_SESSION_CAPACITY = 150       # Fallback max players per session
 GKP_LIMITED_THRESHOLD = 0.75     # Above this percentage → LIMITED
 GKP_PARTY_SLOT_CAPACITY = 30     # Max party guests per party time slot
+DEFAULT_PARTY_SLOTS = ['12:00', '14:00']
+
+
+def session_capacity() -> int:
+    from .opening_hours import session_config
+    return session_config().session_capacity or GKP_SESSION_CAPACITY
+
+
+def _to_24h(value) -> str:
+    """Normalise "2:00 PM" / "14:00" to "14:00" ("" when unreadable)."""
+    m = re.match(r'^\s*(\d{1,2}):(\d{2})\s*(AM|PM)?\s*$', str(value), re.I)
+    if not m:
+        return ''
+    hour = int(m.group(1))
+    if m.group(3):
+        hour = hour % 12 + (12 if m.group(3).upper() == 'PM' else 0)
+    return f"{hour:02d}:{m.group(2)}"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -212,15 +230,13 @@ class GKPAvailabilityService:
         if date_status['blocks_normal_bookings']:
             return {}
 
-        # Determine standard slots for day of week
-        weekday = check_date.weekday()  # 0=Mon, 5=Sat, 6=Sun
-        is_weekend = weekday in (5, 6)
-
-        standard_slots = (
-            ['10:00', '12:00', '14:00', '16:00', '18:00', '20:00']
-            if is_weekend
-            else ['15:00', '17:00', '19:00']
-        )
+        # Start times from the CMS opening hours (one per day in Anytime mode)
+        from .opening_hours import hours_for_booking_day, is_anytime, session_config, session_minutes, session_start_times
+        config = session_config()
+        standard_slots = session_start_times(check_date, config)
+        anytime = is_anytime(config)
+        day_hours = hours_for_booking_day(check_date, config)
+        capacity = config.session_capacity or GKP_SESSION_CAPACITY
 
         # Load all active bookings for the date
         bookings = Booking.objects.filter(
@@ -229,10 +245,10 @@ class GKPAvailabilityService:
             booking_status='CANCELLED'
         ).values('time', 'activity', 'adults', 'kids')
 
-        # Aggregate headcounts per slot
+        # Aggregate headcounts per slot (the whole day counts as one session in Anytime mode)
         slot_headcounts = {}
         for b in bookings:
-            slot = str(b['time'])[:5]
+            slot = standard_slots[0] if (anytime and standard_slots) else str(b['time'])[:5]
             if slot not in slot_headcounts:
                 slot_headcounts[slot] = 0
             slot_headcounts[slot] += (b['adults'] or 0) + (b['kids'] or 0)
@@ -240,8 +256,8 @@ class GKPAvailabilityService:
         result = {}
         for slot_str in standard_slots:
             booked = slot_headcounts.get(slot_str, 0)
-            remaining = max(0, GKP_SESSION_CAPACITY - booked)
-            fill_ratio = booked / GKP_SESSION_CAPACITY if GKP_SESSION_CAPACITY > 0 else 0
+            remaining = max(0, capacity - booked)
+            fill_ratio = booked / capacity if capacity > 0 else 0
 
             if fill_ratio >= 1.0:
                 slot_status = STATUS_FULL
@@ -250,16 +266,18 @@ class GKPAvailabilityService:
             else:
                 slot_status = STATUS_AVAILABLE
 
-            # Calculate end time (2 hours duration)
-            h, m = map(int, slot_str.split(':'))
-            end_h = (h + 2) % 24
-            slot_end = f"{end_h:02d}:{m:02d}"
+            # Anytime: open until closing; otherwise one session length after arrival
+            if anytime and day_hours:
+                slot_end = day_hours[1]
+            else:
+                start = datetime.strptime(slot_str, '%H:%M')
+                slot_end = (start + timedelta(minutes=session_minutes(config))).strftime('%H:%M')
 
             result[slot_str] = {
                 'slot_start': slot_str,
                 'slot_end': slot_end,
                 'booking_type': 'SESSION',
-                'total_capacity': GKP_SESSION_CAPACITY,
+                'total_capacity': capacity,
                 'booked_count': booked,
                 'remaining_capacity': remaining,
                 'status': slot_status,
@@ -313,8 +331,11 @@ class GKPAvailabilityService:
         if date_status['blocks_party_bookings']:
             return {}
 
-        # Standard party time slots
-        party_slots = ['12:00', '14:30', '17:00']
+        # Party start times from the CMS Party Booking Configuration
+        from apps.cms.models import PartyBookingConfig
+        party_config = PartyBookingConfig.objects.filter(active=True).order_by('id').first()
+        configured = [_to_24h(t) for t in (party_config.available_time_slots if party_config else []) or []]
+        party_slots = [t for t in configured if t] or DEFAULT_PARTY_SLOTS
 
         # Load active party bookings for this date
         party_bookings = PartyBooking.objects.filter(
@@ -395,35 +416,38 @@ class GKPAvailabilityService:
                 'spots_free': 0,
                 'spots_needed': headcount,
                 'current_count': 0,
-                'max_capacity': GKP_SESSION_CAPACITY,
+                'max_capacity': session_capacity(),
                 'reason': date_status['closure_reason'] or 'This date is not available for bookings.',
                 'code': 'DATE_BLOCKED',
             }
 
-        # ── Count current slot occupancy with select_for_update for race safety ──
+        # ── Count current occupancy with select_for_update for race safety ──
+        # (the whole day in Anytime mode, otherwise the chosen arrival time)
+        from .opening_hours import is_anytime
         slot_prefix = str(slot_time)[:5]
-        bookings_in_slot = Booking.objects.select_for_update().filter(
-            date=check_date,
-            time__startswith=slot_prefix,
-        ).exclude(booking_status='CANCELLED').values('adults', 'kids')
+        capacity = session_capacity()
+        occupancy = Booking.objects.select_for_update().filter(date=check_date)
+        if not is_anytime():
+            occupancy = occupancy.filter(time__startswith=slot_prefix)
+        bookings_in_slot = occupancy.exclude(booking_status='CANCELLED').values('adults', 'kids')
 
         current_headcount = sum(
             (b['adults'] or 0) + (b['kids'] or 0)
             for b in bookings_in_slot
         )
 
-        spots_free = max(0, GKP_SESSION_CAPACITY - current_headcount)
+        spots_free = max(0, capacity - current_headcount)
 
-        if current_headcount + headcount > GKP_SESSION_CAPACITY:
+        if current_headcount + headcount > capacity:
             return {
                 'allowed': False,
                 'spots_free': spots_free,
                 'spots_needed': headcount,
                 'current_count': current_headcount,
-                'max_capacity': GKP_SESSION_CAPACITY,
+                'max_capacity': capacity,
                 'reason': (
-                    f'Not enough capacity for the {slot_prefix} slot. '
-                    f'{spots_free} spot(s) available, {headcount} requested.'
+                    f'Not enough space left for this session. '
+                    f'{spots_free} place(s) available, {headcount} requested.'
                 ),
                 'code': 'CAPACITY_EXCEEDED',
             }
@@ -433,7 +457,7 @@ class GKPAvailabilityService:
             'spots_free': spots_free,
             'spots_needed': headcount,
             'current_count': current_headcount,
-            'max_capacity': GKP_SESSION_CAPACITY,
+            'max_capacity': capacity,
             'reason': None,
             'code': None,
         }
@@ -497,7 +521,7 @@ class GKPAvailabilityService:
             'closure_reason': date_status['closure_reason'],
             'blocks_normal_bookings': date_status['blocks_normal_bookings'],
             'blocks_party_bookings': date_status['blocks_party_bookings'],
-            'session_capacity': GKP_SESSION_CAPACITY,
+            'session_capacity': session_capacity(),
             'slots': session_slots,
             'party_slots': party_slots,
             'activities': list(GKP_ACTIVITIES.keys()),
@@ -515,10 +539,10 @@ class GKPAvailabilityService:
 
         is_open = date_status['status'] in (DATE_STATUS_OPEN, DATE_STATUS_OPEN_OVERRIDE)
 
-        # Simple check: is today within normal operating days?
-        # GKP typical hours: Thu-Sun (weekday=3,4,5,6)
-        weekday = today.weekday()
-        normal_operating_day = weekday in (3, 4, 5, 6)  # Thu, Fri, Sat, Sun
+        # Normal operating day = open in the CMS weekly hours (holiday openings are
+        # added by admins as OPEN_TODAY overrides, or shown by the website calendar)
+        from .opening_hours import weekly_hours
+        normal_operating_day = weekly_hours(today) is not None or date_status['status'] == DATE_STATUS_OPEN_OVERRIDE
 
         return {
             'date': str(today),

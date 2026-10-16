@@ -206,6 +206,18 @@ class BookingViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST
                     )
 
+                # ── Public bookings must use a real session start for that day ──
+                # (opening hours / session mode from the CMS; staff may book anything)
+                if not is_staff:
+                    from django.utils import timezone as dj_timezone
+                    from .opening_hours import session_start_times
+                    if req_date < dj_timezone.localdate():
+                        return Response({'detail': 'Please choose a date in the future.', 'code': 'PAST_DATE'},
+                                        status=status.HTTP_400_BAD_REQUEST)
+                    if req_time not in session_start_times(req_date):
+                        return Response({'detail': 'Please choose one of the available session times.',
+                                         'code': 'INVALID_TIME'}, status=status.HTTP_400_BAD_REQUEST)
+
                 # ── Go Kids Play capacity check (select_for_update for race safety) ──
                 svc = GKPAvailabilityService()
                 capacity_result = svc.check_session_capacity(req_date, req_time, req_headcount)

@@ -477,6 +477,24 @@ class FreeEntry(models.Model):
 
 
 
+def default_weekly_opening_hours():
+    """Go Kids Play hours: Wednesday to Sunday 10:00-17:30; Monday & Tuesday closed (except holidays)."""
+    day = {"open": "10:00", "close": "17:30"}
+    return {"0": dict(day), "1": None, "2": None, "3": dict(day), "4": dict(day), "5": dict(day), "6": dict(day)}
+
+
+def default_holiday_hours():
+    return {"open": "10:00", "close": "17:30"}
+
+
+DEFAULT_BOOKING_NOTICE = (
+    "Session time 2 hours only.\n"
+    "Please visit for any 2 hours between 10am - 5.30pm.\n"
+    "We close at 5.30pm.\n"
+    "Laser, climbing trees and go-kart activities close at 5pm."
+)
+
+
 class SessionBookingConfig(models.Model):
     """Configuration for session booking wizard - makes all pricing and labels editable from CMS"""
     
@@ -499,9 +517,9 @@ class SessionBookingConfig(models.Model):
     gst_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, help_text="VAT percentage (0 for no VAT)")
     
     # Duration Configuration
-    duration_minutes = models.IntegerField(default=60, help_text="Session duration in minutes")
-    duration_label = models.CharField(max_length=100, default="60 Minutes", help_text="Display label for duration")
-    duration_description = models.CharField(max_length=200, default="Standard Session", help_text="Duration description")
+    duration_minutes = models.IntegerField(default=120, help_text="Session duration in minutes")
+    duration_label = models.CharField(max_length=100, default="2 Hours", help_text="Display label for duration")
+    duration_description = models.CharField(max_length=200, default="Play session is for 2 hours only", help_text="Duration description")
 
     # Add-on Pricing (per item, GBP)
     skate_hire_price = models.DecimalField(max_digits=10, decimal_places=2, default=2.95, help_text="Skate hire price per pair")
@@ -510,6 +528,36 @@ class SessionBookingConfig(models.Model):
     token_pack_20_price = models.DecimalField(max_digits=10, decimal_places=2, default=5.00, help_text="Arcade token pack (20 tokens)")
     token_pack_50_price = models.DecimalField(max_digits=10, decimal_places=2, default=10.00, help_text="Arcade token pack (50 tokens)")
     parking_price = models.DecimalField(max_digits=10, decimal_places=2, default=3.00, help_text="Parking price per car")
+
+    # ── Opening hours & session rules (used by the booking calendar and wizard) ──
+    SESSION_MODE_ANYTIME = 'ANYTIME'
+    SESSION_MODE_ARRIVAL = 'ARRIVAL'
+    SESSION_MODE_CHOICES = [
+        (SESSION_MODE_ANYTIME, 'Anytime during opening hours (one ticket for the day)'),
+        (SESSION_MODE_ARRIVAL, 'Customer picks an arrival time'),
+    ]
+    online_booking_fee = models.DecimalField(
+        max_digits=10, decimal_places=2, default=2.00,
+        help_text="Fee added to online bookings (paying cash at the centre avoids it)")
+    opening_hours = models.JSONField(
+        default=default_weekly_opening_hours, blank=True,
+        help_text='Weekly hours keyed by day number (0=Sunday … 6=Saturday): {"open": "10:00", "close": "17:30"} '
+                  'or null when closed')
+    holiday_hours = models.JSONField(
+        default=default_holiday_hours, null=True, blank=True,
+        help_text='Hours on school & bank holidays (any day of the week), e.g. {"open": "10:00", "close": "17:30"}; '
+                  'null keeps holidays on the normal weekly hours')
+    session_mode = models.CharField(
+        max_length=10, choices=SESSION_MODE_CHOICES, default=SESSION_MODE_ANYTIME,
+        help_text="Anytime: visit for any session-length period during opening hours. "
+                  "Arrival: the customer chooses an arrival time.")
+    arrival_interval_minutes = models.PositiveIntegerField(
+        default=30, help_text="Gap between arrival times when customers pick an arrival time")
+    session_capacity = models.PositiveIntegerField(
+        default=150, help_text="Maximum players per session (per day in Anytime mode, per arrival time otherwise)")
+    booking_notice = models.TextField(
+        blank=True, default=DEFAULT_BOOKING_NOTICE,
+        help_text="Important notice shown when choosing a date and time (one point per line)")
 
     # Meta
     active = models.BooleanField(default=True)

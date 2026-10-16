@@ -12,7 +12,7 @@ import { PartyBookingPDF } from "../../../components/PartyBookingPDF";
 import { fetchBookingBlocks, isDateBlocked, BookingBlock } from "@/lib/api/booking-blocks";
 import { PageSection } from "@/lib/cms/types";
 import { SmartCalendar } from "@/components/SmartCalendar";
-import { isSchoolHoliday, isHolidayOpen, getAvailableTimeSlots } from "@/lib/api/types";
+import { isSchoolHoliday, isHolidayOpen, getPartyStartTimes } from "@/lib/api/types";
 import { useAccount } from "@/state/account/AccountContext";
 
 interface PartyBookingWizardProps {
@@ -558,7 +558,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                                 if (!formData.date) return [];
                                                 // Same opening hours as session bookings; a party lasts 2 hours,
                                                 // so the last start time leaves a full party before closing.
-                                                const openSlots = getAvailableTimeSlots(formData.date);
+                                                const openSlots = getPartyStartTimes(formData.date);
                                                 // Admin-configured party start times may be "2:00 PM" or "14:00" — normalise to 24h
                                                 const to24h = (t: string) => {
                                                     const m = String(t).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/i);

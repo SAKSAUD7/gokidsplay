@@ -24,36 +24,9 @@ const sectionSchema = z.object({
     subtitle: z.string().optional(),
 });
 
-const pricingSchema = z.object({
-    adult_price: z.number().min(0, "Price must be positive"),
-    adult_label: z.string().min(1, "Label is required"),
-    adult_description: z.string().min(1, "Description is required"),
-    kid_price: z.number().min(0, "Price must be positive"),
-    kid_label: z.string().min(1, "Label is required"),
-    kid_description: z.string().min(1, "Description is required"),
-    spectator_price: z.number().min(0, "Price must be positive"),
-    spectator_label: z.string().min(1, "Label is required"),
-    spectator_description: z.string().min(1, "Description is required"),
-    gst_rate: z.number().min(0).max(100, "VAT rate must be between 0-100%"),
-    duration_label: z.string().min(1, "Label is required"),
-    duration_description: z.string().min(1, "Description is required"),
-    // Add-on pricing
-    skate_hire_price: z.number().min(0).optional(),
-    shoe_hire_price: z.number().min(0).optional(),
-    locker_hire_price: z.number().min(0).optional(),
-    token_pack_20_price: z.number().min(0).optional(),
-    token_pack_50_price: z.number().min(0).optional(),
-    parking_price: z.number().min(0).optional(),
-    // Opening hours (for reference display — actual slot logic uses these values)
-    weekday_open_time: z.string().optional(),        // e.g. "14:00" (term-time weekdays)
-    school_holiday_open_time: z.string().optional(), // e.g. "10:00" (school holiday weekdays)
-    saturday_open_time: z.string().optional(),       // e.g. "12:00"
-    sunday_open_time: z.string().optional(),         // e.g. "12:00"
-    close_time: z.string().optional(),               // e.g. "22:00"
-});
+
 
 type SectionFormData = z.infer<typeof sectionSchema>;
-type PricingFormData = z.infer<typeof pricingSchema>;
 
 export default function SessionBookingEditor() {
     const [sections, setSections] = useState<PageSection[]>([]);
@@ -151,15 +124,15 @@ export default function SessionBookingEditor() {
         }
     };
 
-    const handlePricingSave = async (data: PricingFormData) => {
+    const handlePricingSave = async (data: any) => {
         setSavingPricing(true);
         try {
             await cmsPatch('/cms/session-booking-config/1/', data);
             await loadPricingConfig();
-            toast.success('Pricing configuration updated successfully');
+            toast.success('Hours & session settings saved');
         } catch (error) {
             console.error('Failed to save pricing', error);
-            toast.error('Failed to save pricing configuration');
+            toast.error('Could not save - check the hours and try again');
         } finally {
             setSavingPricing(false);
         }
@@ -213,284 +186,173 @@ export default function SessionBookingEditor() {
     );
 }
 
-function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, isSaving: boolean, onSave: (data: PricingFormData) => void }) {
-    const { register, handleSubmit, formState: { errors } } = useForm<PricingFormData>({
-        resolver: zodResolver(pricingSchema),
-        defaultValues: {
-            adult_price: parseFloat(initialData?.adult_price) || 9.95,
-            adult_label: initialData?.adult_label || "Adults & Kids 7+ Years",
-            adult_description: initialData?.adult_description || "£9.95 per person per session",
-            kid_price: parseFloat(initialData?.kid_price) || 9.95,
-            kid_label: initialData?.kid_label || "Young Kids (1–6 Years)",
-            kid_description: initialData?.kid_description || "£9.95 per person per session",
-            spectator_price: parseFloat(initialData?.spectator_price) || 2.95,
-            spectator_label: initialData?.spectator_label || "Spectators (4+)",
-            spectator_description: initialData?.spectator_description || "£2.95 per person",
-            gst_rate: parseFloat(initialData?.gst_rate) || 0,
-            duration_label: initialData?.duration_label || "60 Minutes",
-            duration_description: initialData?.duration_description || "Standard Session",
-            // Add-ons
-            skate_hire_price: parseFloat(initialData?.skate_hire_price) || 2.95,
-            shoe_hire_price: parseFloat(initialData?.shoe_hire_price) || 1.50,
-            locker_hire_price: parseFloat(initialData?.locker_hire_price) || 2.00,
-            token_pack_20_price: parseFloat(initialData?.token_pack_20_price) || 5.00,
-            token_pack_50_price: parseFloat(initialData?.token_pack_50_price) || 10.00,
-            parking_price: parseFloat(initialData?.parking_price) || 3.00,
-            // Opening hours
-            weekday_open_time: initialData?.weekday_open_time || "14:00",
-            school_holiday_open_time: initialData?.school_holiday_open_time || "10:00",
-            saturday_open_time: initialData?.saturday_open_time || "12:00",
-            sunday_open_time: initialData?.sunday_open_time || "12:00",
-            close_time: initialData?.close_time || "22:00",
-        }
+const WEEK = [
+    { key: "1", label: "Monday" }, { key: "2", label: "Tuesday" }, { key: "3", label: "Wednesday" },
+    { key: "4", label: "Thursday" }, { key: "5", label: "Friday" }, { key: "6", label: "Saturday" }, { key: "0", label: "Sunday" },
+];
+
+type Hours = { open: string; close: string } | null;
+
+/** Opening hours, session rules and fees (CMS Session Booking Configuration). */
+function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, isSaving: boolean, onSave: (data: any) => void }) {
+    const num = (v: any, fallback: number) => { const n = parseFloat(v); return Number.isFinite(n) ? n : fallback; };
+    const [weekly, setWeekly] = useState<Record<string, Hours>>(() => {
+        const src = initialData?.opening_hours || {};
+        return Object.fromEntries(WEEK.map(d => [d.key, src[d.key] ?? null]));
     });
+    const [holiday, setHoliday] = useState<Hours>(initialData?.holiday_hours ?? null);
+    const [mode, setMode] = useState<string>(initialData?.session_mode || "ANYTIME");
+    const [durationMinutes, setDurationMinutes] = useState(num(initialData?.duration_minutes, 120));
+    const [durationLabel, setDurationLabel] = useState(initialData?.duration_label || "2 Hours");
+    const [interval, setIntervalMinutes] = useState(num(initialData?.arrival_interval_minutes, 30));
+    const [capacity, setCapacity] = useState(num(initialData?.session_capacity, 150));
+    const [fee, setFee] = useState(num(initialData?.online_booking_fee, 2));
+    const [vat, setVat] = useState(num(initialData?.gst_rate, 0));
+    const [parking, setParking] = useState(num(initialData?.parking_price, 3));
+    const [notice, setNotice] = useState(initialData?.booking_notice || "");
+    const [error, setError] = useState("");
+
+    const setDay = (key: string, value: Hours) => setWeekly(w => ({ ...w, [key]: value }));
+    const input = "px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm";
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setError("");
+        for (const d of WEEK) {
+            const h = weekly[d.key];
+            if (h && (!h.open || !h.close || h.open >= h.close)) { setError(`${d.label}: opening time must be before closing time.`); return; }
+        }
+        if (holiday && (!holiday.open || !holiday.close || holiday.open >= holiday.close)) { setError("Holiday hours: opening time must be before closing time."); return; }
+        onSave({
+            opening_hours: weekly,
+            holiday_hours: holiday,
+            session_mode: mode,
+            duration_minutes: durationMinutes,
+            duration_label: durationLabel,
+            arrival_interval_minutes: interval,
+            session_capacity: capacity,
+            online_booking_fee: fee,
+            gst_rate: vat,
+            parking_price: parking,
+            booking_notice: notice,
+        });
+    };
 
     return (
-        <form onSubmit={handleSubmit(onSave)} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-blue-50 flex justify-between items-center">
+        <form onSubmit={submit} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-blue-50">
                 <h3 className="font-bold text-slate-900 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-emerald-600" />
-                    Pricing & Categories Configuration
+                    Opening Hours, Session & Fees
                 </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                    Ticket prices (Under 12 months, Under 24 months, 24 months and above, Non-playing adult) are set in{" "}
+                    <a href="/admin/cms/pricing" className="text-emerald-700 font-semibold underline">Pricing Plans</a>.
+                    Everything here is used by the booking calendar, the wizard and the checkout total.
+                </p>
             </div>
 
             <div className="p-6 space-y-8">
-                {/* Adult Configuration */}
-                <div className="border-l-4 border-blue-500 pl-4">
-                    <h4 className="font-semibold text-slate-800 mb-4">Adult Category</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
-                            <input
-                                {...register('adult_label')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. Go Kids Play Warrior (7+ Years)"
-                            />
-                            {errors.adult_label && <p className="text-red-500 text-xs mt-1">{errors.adult_label.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (£)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                {...register('adult_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            />
-                            {errors.adult_price && <p className="text-red-500 text-xs mt-1">{errors.adult_price.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                            <input
-                                {...register('adult_description')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. £9.95 per person"
-                            />
-                            {errors.adult_description && <p className="text-red-500 text-xs mt-1">{errors.adult_description.message}</p>}
-                        </div>
+                {/* Weekly opening hours */}
+                <div>
+                    <h4 className="font-semibold text-slate-800 mb-1">Weekly opening hours</h4>
+                    <p className="text-xs text-slate-500 mb-3">Closed days still open on school &amp; bank holidays (Coventry council calendar) using the holiday hours below.</p>
+                    <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg">
+                        {WEEK.map(d => {
+                            const h = weekly[d.key];
+                            return (
+                                <div key={d.key} className="flex flex-wrap items-center gap-3 px-4 py-2.5">
+                                    <span className="w-28 text-sm font-medium text-slate-700">{d.label}</span>
+                                    <label className="flex items-center gap-2 text-sm text-slate-600">
+                                        <input type="checkbox" checked={!!h}
+                                            onChange={e => setDay(d.key, e.target.checked ? { open: "10:00", close: "17:30" } : null)} />
+                                        Open
+                                    </label>
+                                    {h ? (
+                                        <>
+                                            <input type="time" value={h.open} onChange={e => setDay(d.key, { ...h, open: e.target.value })} className={input} aria-label={`${d.label} opening time`} />
+                                            <span className="text-slate-400">to</span>
+                                            <input type="time" value={h.close} onChange={e => setDay(d.key, { ...h, close: e.target.value })} className={input} aria-label={`${d.label} closing time`} />
+                                        </>
+                                    ) : (
+                                        <span className="text-sm text-slate-400">Closed (except school &amp; bank holidays)</span>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
-                {/* Kid Configuration */}
-                <div className="border-l-4 border-purple-500 pl-4">
-                    <h4 className="font-semibold text-slate-800 mb-4">Kid Category</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
-                            <input
-                                {...register('kid_label')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. Little Go Kids Plays (1-7 Years)"
-                            />
-                            {errors.kid_label && <p className="text-red-500 text-xs mt-1">{errors.kid_label.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (£)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                {...register('kid_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            />
-                            {errors.kid_price && <p className="text-red-500 text-xs mt-1">{errors.kid_price.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                            <input
-                                {...register('kid_description')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. £9.95 per person"
-                            />
-                            {errors.kid_description && <p className="text-red-500 text-xs mt-1">{errors.kid_description.message}</p>}
-                        </div>
-                    </div>
+                {/* Holiday hours */}
+                <div className="flex flex-wrap items-center gap-3">
+                    <span className="w-56 text-sm font-semibold text-slate-800">School &amp; bank holiday hours</span>
+                    <label className="flex items-center gap-2 text-sm text-slate-600">
+                        <input type="checkbox" checked={!!holiday} onChange={e => setHoliday(e.target.checked ? { open: "10:00", close: "17:30" } : null)} />
+                        Own hours
+                    </label>
+                    {holiday ? (
+                        <>
+                            <input type="time" value={holiday.open} onChange={e => setHoliday({ ...holiday, open: e.target.value })} className={input} aria-label="Holiday opening time" />
+                            <span className="text-slate-400">to</span>
+                            <input type="time" value={holiday.close} onChange={e => setHoliday({ ...holiday, close: e.target.value })} className={input} aria-label="Holiday closing time" />
+                        </>
+                    ) : <span className="text-sm text-slate-400">Same as the weekly hours</span>}
                 </div>
 
-                {/* Spectator Configuration */}
-                <div className="border-l-4 border-amber-500 pl-4">
-                    <h4 className="font-semibold text-slate-800 mb-4">Spectator Category</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
-                            <input
-                                {...register('spectator_label')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. Spectators"
-                            />
-                            {errors.spectator_label && <p className="text-red-500 text-xs mt-1">{errors.spectator_label.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (£)</label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                {...register('spectator_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            />
-                            {errors.spectator_price && <p className="text-red-500 text-xs mt-1">{errors.spectator_price.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                            <input
-                                {...register('spectator_description')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. £2.95 per person"
-                            />
-                            {errors.spectator_description && <p className="text-red-500 text-xs mt-1">{errors.spectator_description.message}</p>}
-                        </div>
-                    </div>
-                </div>
-
-                {/* GST & Duration */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-200">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">VAT Rate (%) — UK prices are VAT-inclusive, set to 0</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register('gst_rate', { valueAsNumber: true })}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            placeholder="0 = no tax (UK standard)"
-                        />
-                        {errors.gst_rate && <p className="text-red-500 text-xs mt-1">{errors.gst_rate.message}</p>}
+                {/* Session rules */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                    <div className="md:col-span-3">
+                        <label className="block text-sm font-medium text-slate-700 mb-1">How customers book a session</label>
+                        <select value={mode} onChange={e => setMode(e.target.value)} className={`${input} w-full`}>
+                            <option value="ANYTIME">Anytime: one ticket for any session-length visit while open (like the current site)</option>
+                            <option value="ARRIVAL">Arrival time: customers choose when they arrive</option>
+                        </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Duration Label</label>
-                        <input
-                            {...register('duration_label')}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            placeholder="e.g. 60 Minutes"
-                        />
-                        {errors.duration_label && <p className="text-red-500 text-xs mt-1">{errors.duration_label.message}</p>}
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Session length (minutes)</label>
+                        <input type="number" min={15} step={15} value={durationMinutes} onChange={e => setDurationMinutes(parseInt(e.target.value) || 120)} className={`${input} w-full`} />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Duration Description</label>
-                        <input
-                            {...register('duration_description')}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                            placeholder="e.g. Standard Session"
-                        />
-                        {errors.duration_description && <p className="text-red-500 text-xs mt-1">{errors.duration_description.message}</p>}
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Session label</label>
+                        <input value={durationLabel} onChange={e => setDurationLabel(e.target.value)} className={`${input} w-full`} placeholder="2 Hours" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">
+                            {mode === "ANYTIME" ? "Max players per day" : "Max players per arrival time"}
+                        </label>
+                        <input type="number" min={1} value={capacity} onChange={e => setCapacity(parseInt(e.target.value) || 1)} className={`${input} w-full`} />
+                    </div>
+                    {mode === "ARRIVAL" && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Minutes between arrival times</label>
+                            <input type="number" min={5} step={5} value={interval} onChange={e => setIntervalMinutes(parseInt(e.target.value) || 30)} className={`${input} w-full`} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Fees */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Online booking fee (£)</label>
+                        <input type="number" min={0} step="0.01" value={fee} onChange={e => setFee(parseFloat(e.target.value) || 0)} className={`${input} w-full`} />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Parking add-on (£)</label>
+                        <input type="number" min={0} step="0.01" value={parking} onChange={e => setParking(parseFloat(e.target.value) || 0)} className={`${input} w-full`} />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Extra VAT (%): UK prices include VAT, keep 0</label>
+                        <input type="number" min={0} max={100} step="0.01" value={vat} onChange={e => setVat(parseFloat(e.target.value) || 0)} className={`${input} w-full`} />
                     </div>
                 </div>
 
-                {/* Add-on Pricing */}
+                {/* Notice */}
                 <div className="pt-4 border-t border-slate-200">
-                    <h4 className="font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                        <span>🎿</span> Add-on Pricing (per item)
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="border-l-4 border-pink-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🛼 Skate Hire (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('skate_hire_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="2.95"
-                            />
-                        </div>
-                        <div className="border-l-4 border-blue-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🎳 Shoe Hire (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('shoe_hire_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="1.50"
-                            />
-                        </div>
-                        <div className="border-l-4 border-slate-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🔒 Locker Hire (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('locker_hire_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="2.00"
-                            />
-                        </div>
-                        <div className="border-l-4 border-purple-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🕹️ Token Pack 20 (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('token_pack_20_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="5.00"
-                            />
-                        </div>
-                        <div className="border-l-4 border-violet-500 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🕹️ Token Pack 50 (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('token_pack_50_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="10.00"
-                            />
-                        </div>
-                        <div className="border-l-4 border-green-500 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🚗 Parking (£)</label>
-                            <input
-                                type="number" step="0.01"
-                                {...register('parking_price', { valueAsNumber: true })}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                placeholder="3.00"
-                            />
-                        </div>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-3">These prices appear in the booking wizard add-ons step and are saved to the CMS config.</p>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Important notice (one point per line, shown when choosing the date)</label>
+                    <textarea rows={5} value={notice} onChange={e => setNotice(e.target.value)} className={`${input} w-full`} />
                 </div>
 
-                {/* Opening Hours Configuration */}
-                <div className="pt-4 border-t border-slate-200">
-                    <h4 className="font-semibold text-slate-800 mb-1 flex items-center gap-2">
-                        <span>🕐</span> Opening Hours (used in booking wizard time slots)
-                    </h4>
-                    <p className="text-xs text-slate-400 mb-4">These control which time slots appear on each day type. <strong>Monday is always closed.</strong></p>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        <div className="border-l-4 border-yellow-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🗓️ Weekday Open (term-time)</label>
-                            <input type="time" {...register('weekday_open_time')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" />
-                        </div>
-                        <div className="border-l-4 border-emerald-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🎒 School Holiday Open</label>
-                            <input type="time" {...register('school_holiday_open_time')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" />
-                        </div>
-                        <div className="border-l-4 border-blue-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🟣 Saturday Open</label>
-                            <input type="time" {...register('saturday_open_time')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" />
-                        </div>
-                        <div className="border-l-4 border-indigo-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🔵 Sunday Open</label>
-                            <input type="time" {...register('sunday_open_time')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" />
-                        </div>
-                        <div className="border-l-4 border-red-400 pl-4">
-                            <label className="block text-sm font-medium text-slate-700 mb-1">🔴 Close Time (all days)</label>
-                            <input type="time" {...register('close_time')}
-                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" />
-                        </div>
-                    </div>
-                </div>
+                {error && <p className="text-red-600 text-sm">{error}</p>}
             </div>
 
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
@@ -500,7 +362,7 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                     className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-all text-sm font-medium disabled:opacity-50 shadow-sm"
                 >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save Pricing Configuration
+                    Save Hours &amp; Session Settings
                 </button>
             </div>
         </form>

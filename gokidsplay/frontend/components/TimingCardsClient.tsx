@@ -6,14 +6,14 @@
  * Priority order for today's status:
  *  1. Admin OPEN_TODAY / CLOSED_TODAY block from booking calendar (fetched async)
  *  2. Hard-coded school holiday / public holiday list (instant, no fetch needed)
- *  3. Default weekday rules (Mon = CLOSED, others = CMS hours)
+ *  3. The CMS timing cards (e.g. "Wednesday to Sunday 10:00-17:30", "Monday & Tuesday Closed")
  *
  * The strip renders immediately using priority 2+3 so it never goes blank.
  * If an admin block overrides it, the strip updates silently once loaded.
  */
 
 import { Clock } from "lucide-react";
-import { isHolidayOpen, todayInUK, nowInUK } from "@/lib/api/types";
+import { isHolidayOpen, todayInUK, nowInUK, getOpeningHours, formatClock } from "@/lib/api/types";
 import { useEffect, useState } from "react";
 
 const DAY_NAME_TO_DOW: Record<string, number> = {
@@ -37,10 +37,20 @@ export function TimingCardsClient() {
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     setSchedule(data.map((item: any) => {
-                        // Labels may combine days ("Thursday & Friday") — match every day named
-                        const dows = Object.entries(DAY_NAME_TO_DOW)
-                            .filter(([name]) => (item.day_label || '').includes(name))
+                        // Labels may combine days ("Monday & Tuesday") or give a range
+                        // ("Wednesday to Sunday") — match every day they cover
+                        const label: string = item.day_label || '';
+                        const range = label.match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*(?:to|–|-)\s*(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/);
+                        let dows = Object.entries(DAY_NAME_TO_DOW)
+                            .filter(([name]) => label.includes(name))
                             .map(([, d]) => d);
+                        if (range) {
+                            dows = [];
+                            for (let d = DAY_NAME_TO_DOW[range[1]]; ; d = (d + 1) % 7) {
+                                dows.push(d);
+                                if (d === DAY_NAME_TO_DOW[range[2]]) break;
+                            }
+                        }
                         const dow = dows.length === 1 ? dows[0] : -1;
                         const closed = !item.open_time || item.open_time.toLowerCase() === "closed";
                         return {
@@ -92,8 +102,9 @@ export function TimingCardsClient() {
     const isTodayClosed = adminOverride === 'closed';
 
     const cards = schedule.map(day => {
-        const isToday  = day.dows.includes(todayDow);
-        const isMonday = day.dow === 1;
+        // A "School & Bank Holidays" card is today's card on a holiday
+        const isHolidayCard = /holiday/i.test(day.label || '') && day.dows.length === 0;
+        const isToday = isHolidayCard ? isBankOrSchoolHoliday : day.dows.includes(todayDow);
 
         let open  = day.open;
         let close = day.close;
@@ -103,22 +114,21 @@ export function TimingCardsClient() {
         if (isToday) {
             if (isTodayClosed) {
                 open = null; close = null;
-            } else if (isTodayOpen && (!open || isMonday)) {
-                // Override: open today via holiday or admin block
-                open  = "12:00";
-                close = "22:00";
+            } else if (isTodayOpen && !open) {
+                // A normally closed day that opens today (holiday or admin "open today")
+                const hours = getOpeningHours(today) ?? { open: "10:00", close: "17:30" };
+                open  = hours.open;
+                close = hours.close;
                 holidayBadge   = isBankOrSchoolHoliday && adminOverride !== 'open';
                 adminOpenBadge = adminOverride === 'open';
-            } else if (isMonday && !isTodayOpen) {
-                open = null; close = null;
             }
-        } else if (isMonday) {
-            // Non-today Mondays always show as closed
-            open = null; close = null;
         }
 
         return { ...day, open, close, isToday, holidayBadge, adminOpenBadge };
     });
+
+    // "17:30" -> "5.30pm"; anything else (e.g. "Late") is shown as typed
+    const show = (t: string) => (/^\d{1,2}:\d{2}$/.test(t) ? formatClock(t.padStart(5, "0")) : t);
 
     return (
         <div className="relative z-20 w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-y border-white/10 py-3 px-3">
@@ -172,7 +182,7 @@ export function TimingCardsClient() {
                                     </span>
 
                                     <span className={`text-xs px-1.5 py-0.5 rounded whitespace-nowrap ${badgeClass}`}>
-                                        {isClosed ? "CLOSED" : `${card.open} – ${card.close}`}
+                                        {isClosed ? "CLOSED" : `${show(card.open)} – ${show(card.close)}`}
                                     </span>
                                 </div>
                             );

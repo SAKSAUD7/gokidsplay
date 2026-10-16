@@ -18,6 +18,7 @@ import {
 
 interface BookingDetails {
     ticketLines?: Array<{ label: string; qty: number; subtotal: number }>; // admission tickets by type
+    timeLabel?: string; // ready-made session time text (e.g. "Any 2 hours, 10am – 5.30pm")
     duration?: string | number; // session length in minutes
     date: string;
     time: string;
@@ -237,7 +238,7 @@ export function PaymentStep({
                         </thead>
                         <tbody>
                             <Row label="Session Date"    value={formatDate(d.date)} />
-                            <Row label="Session Time"    value={formatTime(d.time, Number(d.duration) || 60)} />
+                            <Row label="Session Time"    value={d.timeLabel || formatTime(d.time, Number(d.duration) || 60)} />
                             <Row label="Activity"        value={actLabel} />
 
                             {bookingType === "party" ? (

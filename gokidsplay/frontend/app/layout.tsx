@@ -67,18 +67,12 @@ export default function RootLayout({
                                     "currenciesAccepted": "GBP",
                                     "paymentAccepted": "Cash, Credit Card",
                                     "openingHoursSpecification": [
-                                        // Same term-time hours as the booking calendar (WEEKLY_OPENING_HOURS)
+                                        // Same default hours as the booking calendar (DEFAULT_SESSION_RULES)
                                         {
                                             "@type": "OpeningHoursSpecification",
-                                            "dayOfWeek": ["Thursday", "Friday"],
-                                            "opens": "15:00",
-                                            "closes": "20:00"
-                                        },
-                                        {
-                                            "@type": "OpeningHoursSpecification",
-                                            "dayOfWeek": ["Saturday", "Sunday"],
-                                            "opens": "12:00",
-                                            "closes": "20:00"
+                                            "dayOfWeek": ["Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                                            "opens": "10:00",
+                                            "closes": "17:30"
                                         }
                                     ],
                                     "hasMap": "https://maps.google.com/?q=Go+Kids+Play+Coventry",

@@ -270,61 +270,131 @@ export function isValidBookingDate(date: string): boolean {
     }
 }
 
-// Get available time slots for Go Kids Play opening hours:
-//
-// EVERY DAY EXCEPT SAT:  12:00 / 14:00 – 22:00 (10 pm)
-// SATURDAY:   12:00 – 23:00 (11 pm)
-// MONDAY:     CLOSED — except school holidays & public holidays (OPEN)
-//
-// ROLLER SKATING — 60-min slot intervals (multiple sessions on rink simultaneously)
-// TEN PIN BOWLING — 90-min slot intervals (lane turnover time)
-/**
- * Go Kids Play opening hours (24h clock) — must match "Opening Hours" in the CMS.
- * School & bank holidays use HOLIDAY_HOURS on any day of the week.
- */
-export const SESSION_LENGTH_HOURS = 2;
-export const WEEKLY_OPENING_HOURS: Record<number, { open: number; close: number } | null> = {
-    0: { open: 12, close: 20 }, // Sunday
-    1: null,                    // Monday — closed (except holidays)
-    2: null,                    // Tuesday — closed (except holidays)
-    3: null,                    // Wednesday — closed (except holidays)
-    4: { open: 15, close: 20 }, // Thursday
-    5: { open: 15, close: 20 }, // Friday
-    6: { open: 12, close: 20 }, // Saturday
+// ─── Opening hours & session rules ──────────────────────────────────────────
+// Editable in the admin portal (Website Content → Session Booking). The booking
+// wizard loads them with applySessionRules(); until then these defaults — the
+// same hours as the live site — are used. The Coventry school / bank holiday
+// calendar above decides when the holiday hours apply (including Mon & Tue).
+
+/** Opening and closing time as 24-hour "HH:MM". */
+export interface DayHours { open: string; close: string }
+
+export interface SessionRules {
+    /** Weekly hours keyed by day number (0 = Sunday … 6 = Saturday); null = closed */
+    opening_hours: Record<string, DayHours | null>;
+    /** Hours on school & bank holidays; null = use the weekly hours */
+    holiday_hours: DayHours | null;
+    /** ANYTIME: visit for any session-length period; ARRIVAL: choose an arrival time */
+    session_mode: "ANYTIME" | "ARRIVAL";
+    arrival_interval_minutes: number;
+    duration_minutes: number;
+}
+
+const LIVE_SITE_DAY: DayHours = { open: "10:00", close: "17:30" };
+
+export const DEFAULT_SESSION_RULES: SessionRules = {
+    opening_hours: { "0": LIVE_SITE_DAY, "1": null, "2": null, "3": LIVE_SITE_DAY, "4": LIVE_SITE_DAY, "5": LIVE_SITE_DAY, "6": LIVE_SITE_DAY },
+    holiday_hours: LIVE_SITE_DAY,
+    session_mode: "ANYTIME",
+    arrival_interval_minutes: 30,
+    duration_minutes: 120,
 };
-export const HOLIDAY_HOURS = { open: 10, close: 20 };
+
+let sessionRules: SessionRules = DEFAULT_SESSION_RULES;
+
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+function readHours(value: any): DayHours | null {
+    if (value && HHMM.test(value.open) && HHMM.test(value.close) && value.open < value.close) {
+        return { open: value.open, close: value.close };
+    }
+    return null;
+}
+
+/** Use the opening hours / session rules from the CMS Session Booking Configuration. */
+export function applySessionRules(config: any): void {
+    if (!config || typeof config !== "object") return;
+    const weekly: Record<string, DayHours | null> = { ...DEFAULT_SESSION_RULES.opening_hours };
+    if (config.opening_hours && typeof config.opening_hours === "object") {
+        for (let d = 0; d < 7; d++) weekly[String(d)] = readHours(config.opening_hours[String(d)]);
+    }
+    sessionRules = {
+        opening_hours: weekly,
+        holiday_hours: config.holiday_hours === undefined ? DEFAULT_SESSION_RULES.holiday_hours : readHours(config.holiday_hours),
+        session_mode: config.session_mode === "ARRIVAL" ? "ARRIVAL" : "ANYTIME",
+        arrival_interval_minutes: Math.max(5, Number(config.arrival_interval_minutes) || DEFAULT_SESSION_RULES.arrival_interval_minutes),
+        duration_minutes: Math.max(15, Number(config.duration_minutes) || DEFAULT_SESSION_RULES.duration_minutes),
+    };
+}
+
+export function getSessionRules(): SessionRules {
+    return sessionRules;
+}
+
+/** Kept for older callers: session length in hours. */
+export const SESSION_LENGTH_HOURS = DEFAULT_SESSION_RULES.duration_minutes / 60;
+
+const toMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + (m || 0); };
+const fromMinutes = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+
+/** "17:30" → "5.30pm", "10:00" → "10am" (the style used on the Go Kids Play site). */
+export function formatClock(t: string): string {
+    const [h, m] = t.split(":").map(Number);
+    const suffix = h >= 12 ? "pm" : "am";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return m ? `${h12}.${String(m).padStart(2, "0")}${suffix}` : `${h12}${suffix}`;
+}
 
 /** Opening hours for a date (YYYY-MM-DD), or null when closed. */
-export function getOpeningHours(date: string): { open: number; close: number } | null {
-    if (isHolidayOpen(date)) return HOLIDAY_HOURS;
-    return WEEKLY_OPENING_HOURS[new Date(date + 'T12:00:00').getDay()] ?? null;
+export function getOpeningHours(date: string): DayHours | null {
+    if (!date) return null;
+    const weekly = sessionRules.opening_hours[String(new Date(date + "T12:00:00").getDay())] ?? null;
+    if (isHolidayOpen(date)) return sessionRules.holiday_hours ?? weekly ?? LIVE_SITE_DAY;
+    return weekly;
+}
+
+/** Minutes past midnight right now in the UK. */
+function ukMinutesNow(): number {
+    const now = nowInUK();
+    return now.getHours() * 60 + now.getMinutes();
 }
 
 /**
- * Bookable session start times for a date: hourly from opening time, with the
- * last start leaving a full session before closing.
+ * Bookable session start times for a date.
+ * Anytime mode: one entry (the opening time) meaning "any 2 hours while we're open";
+ * bookable today until an hour before closing.
+ * Arrival mode: every arrival interval that leaves a full session before closing;
+ * today only times that haven't started yet.
  */
 export function getAvailableTimeSlots(date: string, _activity?: string): string[] {
     const hours = getOpeningHours(date);
     if (!hours) return [];
+    const open = toMinutes(hours.open);
+    const close = toMinutes(hours.close);
+    const isToday = date === todayInUK();
+    const now = ukMinutesNow();
 
-    const allSlots: string[] = [];
-    for (let h = hours.open; h + SESSION_LENGTH_HOURS <= hours.close; h++) {
-        allSlots.push(`${String(h).padStart(2, '0')}:00`);
+    if (sessionRules.session_mode === "ANYTIME") {
+        if (isToday && now >= close - 60) return [];
+        return [hours.open];
     }
 
-    // For today's date, only show slots that are at least 2 hours from now (UK time)
-    const ukNow = nowInUK();
-    const ukTodayStr = todayInUK();
-    if (date === ukTodayStr) {
-        const currentHour = ukNow.getHours();
-        const currentMinute = ukNow.getMinutes();
-        // Require at least 2 full hours ahead; if we're mid-hour, round up to 3h
-        const minSlotHour = currentMinute > 0 ? currentHour + 3 : currentHour + 2;
-        return allSlots.filter(slot => {
-            const [slotHour, slotMin] = slot.split(':').map(Number);
-            return slotHour * 60 + slotMin >= minSlotHour * 60;
-        });
+    const slots: string[] = [];
+    for (let t = open; t + sessionRules.duration_minutes <= close; t += sessionRules.arrival_interval_minutes) {
+        if (!isToday || t > now) slots.push(fromMinutes(t));
     }
-    return allSlots;
+    return slots;
+}
+
+/** Party start times: on the hour, leaving a full party (default 2 hours) before closing. */
+export function getPartyStartTimes(date: string, partyMinutes = 120): string[] {
+    const hours = getOpeningHours(date);
+    if (!hours) return [];
+    const close = toMinutes(hours.close);
+    const isToday = date === todayInUK();
+    const now = ukMinutesNow();
+    const slots: string[] = [];
+    for (let t = Math.ceil(toMinutes(hours.open) / 60) * 60; t + partyMinutes <= close; t += 60) {
+        if (!isToday || t > now) slots.push(fromMinutes(t));
+    }
+    return slots;
 }

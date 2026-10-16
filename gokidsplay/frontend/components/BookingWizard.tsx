@@ -22,7 +22,7 @@ import {
 
 import { motion, AnimatePresence } from "framer-motion";
 
-import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningHours, isTimeInPast, isSchoolHoliday, isPublicHoliday, isHolidayOpen } from "../lib/api/types";
+import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningHours, isSchoolHoliday, isPublicHoliday, isHolidayOpen, applySessionRules, getSessionRules, formatClock } from "../lib/api/types";
 
 import { useToast } from "./ToastProvider";
 
@@ -303,6 +303,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                 const data = await res.json();
 
+                // Opening hours & session rules for the calendar and time step
+                applySessionRules(data);
+
                 setConfig(data);
 
             } catch {
@@ -351,12 +354,14 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
             }
 
-            // Set duration to 120 mins
             const slots = getAvailableTimeSlots(formData.date);
 
             setAvailableSlots(slots);
 
-            if (formData.time && !slots.includes(formData.time)) {
+            if (getSessionRules().session_mode === "ANYTIME" && slots.length === 1) {
+                // One ticket for the day — "any 2 hours" while we're open
+                if (formData.time !== slots[0]) setValue("time", slots[0], { shouldValidate: true });
+            } else if (formData.time && !slots.includes(formData.time)) {
 
                 setValue("time", "", { shouldValidate: true });
 
@@ -364,23 +369,33 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         }
 
-    }, [formData.date, bookingBlocks, selectedActivity]);
+    }, [formData.date, bookingBlocks, selectedActivity, config]);
 
     // Fetch real-time slot occupancy whenever date changes
     useEffect(() => {
         if (!formData.date) { setSlotAvailability({}); return; }
         setAvailabilityLoading(true);
         fetch(`/api/bookings/slot-availability?date=${formData.date}`, { cache: 'no-store' })
-            .then(r => r.ok ? r.json() : {})
-            .then(data => setSlotAvailability(data || {}))
+            .then((r): Promise<any> => r.ok ? r.json() : Promise.resolve({}))
+            .then(data => setSlotAvailability((data && data.slots) || {}))
             .catch(() => setSlotAvailability({}))
             .finally(() => setAvailabilityLoading(false));
     }, [formData.date]);
 
     // Helper: get slot status for the currently selected activity
     const getSlotStatus = (data: any) => {
-        if (!selectedActivity) return 'available';
-        return data.activity_availability?.[selectedActivity] || data.status || 'available';
+        const status = String(data?.activity_availability?.[selectedActivity || ''] || data?.status || 'available').toLowerCase();
+        return status === 'limited' ? 'busy' : status;  // AVAILABLE / LIMITED / FULL from the API
+    };
+
+    // How the chosen session time is described ("Any 2 hours, 10am – 5.30pm" in Anytime mode)
+    const describeSessionTime = (date: string, time: string) => {
+        const rules = getSessionRules();
+        const hours = date ? getOpeningHours(date) : null;
+        if (rules.session_mode === "ANYTIME" && hours) {
+            return `Any ${rules.duration_minutes / 60} hours, ${formatClock(hours.open)} – ${formatClock(hours.close)}`;
+        }
+        return time ? formatClock(time) : "";
     };
 
     // Helper: next available slot after a given time
@@ -485,7 +500,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
         const subtotal = ticketLines.reduce((sum, line) => sum + line.subtotal, 0) + addOnTotal;
 
         const gst = subtotal * (prices.gstRate / 100);
-        const onlineBookingFee = 2.00;
+        const onlineBookingFee = config?.online_booking_fee != null ? parseFloat(config.online_booking_fee) : 2.00;
 
         return { subtotal, gst, onlineBookingFee, total: subtotal + gst + onlineBookingFee };
     };
@@ -633,9 +648,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         try {
 
-            if (isTimeInPast(data.date, data.time)) {
+            if (!getAvailableTimeSlots(data.date).includes(data.time)) {
 
-                showToast("error", "Selected time has passed. Please go back and choose a future time.");
+                showToast("error", "That session is no longer available. Please go back and choose another date or time.");
 
                 return;
 
@@ -742,7 +757,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                         <div><span className="block text-xs text-white/50 uppercase font-bold mb-1">Time</span>
 
-                            <span className="font-bold text-white">{formData.time}</span></div>
+                            <span className="font-bold text-white">{describeSessionTime(formData.date, formData.time)}</span></div>
 
                         <div><span className="block text-xs text-white/50 uppercase font-bold mb-1">Guests</span>
 
@@ -1045,7 +1060,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                         </h2>
 
-                                        <p className="text-white/60">Choose your date and session time</p>
+                                        <p className="text-white/60">{getSessionRules().session_mode === "ANYTIME" ? "Choose the day of your visit" : "Choose your date and arrival time"}</p>
 
                                     </div>
 
@@ -1103,7 +1118,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             const isHoliday = isHolidayOpen(formData.date);
 
-                                            // Weekdays open early at 12 PM during holidays (and Monday isn't closed)
+                                            // School / bank holiday on a weekday (we open Mon & Tue too)
                                             if (dow >= 1 && dow <= 5 && isHoliday) {
 
                                                 return (
@@ -1112,24 +1127,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                         <School className="w-4 h-4 mt-0.5 flex-shrink-0" />
 
-                                                        <span><strong>Holiday!</strong> We're open from <strong>{getOpeningHours(formData.date)?.open ?? 10}:00</strong> today 🎉 Perfect for families!</span>
+                                                        <span><strong>Holiday!</strong> We're open <strong>{formatClock(getOpeningHours(formData.date)?.open ?? "10:00")} – {formatClock(getOpeningHours(formData.date)?.close ?? "17:30")}</strong> 🎉 Perfect for families!</span>
 
                                                     </div>
-
-                                                );
-
-                                            }
-
-                                            // Monday normally closed
-                                            if (dow === 1) {
-
-                                                return (
-
-                                                    <p className="text-red-400 text-xs mt-2 flex items-center gap-1">
-
-                                                        <AlertCircle className="w-3 h-3" /> We are closed on Mondays — please pick another date.
-
-                                                    </p>
 
                                                 );
 
@@ -1149,7 +1149,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <p className="text-white/50 text-xs mt-2 flex items-center gap-1">
 
-                                                    <Clock className="w-3 h-3" /> Open {dayName}: {dayHours.open}:00 – {dayHours.close}:00 on this day
+                                                    <Clock className="w-3 h-3" /> Open {dayName}: {formatClock(dayHours.open)} – {formatClock(dayHours.close)}
 
                                                 </p>
 
@@ -1159,9 +1159,58 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
 
 
-                                        {/* Time Slots */}
+                                        {/* Anytime session: one ticket for any 2 hours while we're open */}
 
-                                        {availableSlots.length > 0 && (
+                                        {formData.date && getSessionRules().session_mode === "ANYTIME" && availableSlots.length === 1 && (() => {
+                                            const status = getSlotStatus(slotAvailability[availableSlots[0]] || {});
+                                            const remaining = slotAvailability[availableSlots[0]]?.remaining_capacity;
+                                            return (
+                                                <div>
+                                                    <label className="block text-white/80 text-sm font-bold mb-3 uppercase tracking-wide">
+                                                        <Clock className="inline w-4 h-4 mr-1.5" /> Session
+                                                    </label>
+                                                    <div className={`flex items-center justify-between gap-3 p-4 rounded-2xl border-2 ${status === 'full' ? 'border-red-500/40 bg-red-900/10' : 'border-primary bg-primary/10'}`}>
+                                                        <div className="flex items-center gap-3">
+                                                            <Check className={`w-5 h-5 ${status === 'full' ? 'text-red-400' : 'text-primary'}`} />
+                                                            <div>
+                                                                <div className="font-bold text-white">{getSessionRules().duration_minutes / 60} Hours Anytime</div>
+                                                                <div className="text-white/60 text-sm">{describeSessionTime(formData.date, availableSlots[0])}</div>
+                                                            </div>
+                                                        </div>
+                                                        <span className={`text-xs font-bold ${status === 'full' ? 'text-red-400' : status === 'busy' ? 'text-yellow-300' : 'text-green-400'}`}>
+                                                            {status === 'full' ? 'Sold out' : status === 'busy' && remaining != null ? `${remaining} places left` : 'Available'}
+                                                        </span>
+                                                    </div>
+                                                    {status === 'full' && (
+                                                        <p className="text-red-400 text-sm mt-2">This day is fully booked. Please choose a different date.</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })()}
+
+                                        {formData.date && availableSlots.length === 0 && getOpeningHours(formData.date) && (
+                                            <p className="text-red-400 text-sm flex items-center gap-1.5">
+                                                <AlertCircle className="w-4 h-4" /> Online booking for today has closed — please choose another date.
+                                            </p>
+                                        )}
+
+                                        {/* Important notice (Website Content → Session Booking) */}
+                                        {formData.date && config?.booking_notice && (
+                                            <div className="p-4 rounded-xl border border-yellow-400/30 bg-yellow-400/10">
+                                                <p className="text-yellow-300 text-xs font-bold uppercase tracking-wider mb-2">Important Notice</p>
+                                                <ul className="space-y-1">
+                                                    {String(config.booking_notice).split("\n").map((line: string) => line.trim()).filter(Boolean).map((line: string) => (
+                                                        <li key={line} className="text-white/80 text-sm flex items-start gap-2">
+                                                            <span className="text-yellow-300 mt-0.5">•</span> {line}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+
+                                        {/* Arrival times (when the CMS is set to "customer picks an arrival time") */}
+
+                                        {getSessionRules().session_mode === "ARRIVAL" && availableSlots.length > 0 && (
 
                                             <div>
 
@@ -1178,8 +1227,8 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 {/* AM / PM slot groups */}
                                                 {(() => {
-                                                    const amSlots = availableSlots.filter(s => parseInt(s.split(':')[0]) < 17);
-                                                    const pmSlots = availableSlots.filter(s => parseInt(s.split(':')[0]) >= 17);
+                                                    const amSlots = availableSlots.filter(s => parseInt(s.split(':')[0]) < 12);
+                                                    const pmSlots = availableSlots.filter(s => parseInt(s.split(':')[0]) >= 12);
 
                                                     const renderSlot = (slot: string, accentClass: 'primary' | 'secondary') => {
                                                         const [h, m] = slot.split(':').map(Number);
@@ -1230,7 +1279,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                         <div className="space-y-4">
                                                             {amSlots.length > 0 && (
                                                                 <div>
-                                                                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-2 pl-1">Afternoon</p>
+                                                                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-2 pl-1">Morning</p>
                                                                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                                                                         {amSlots.map(slot => renderSlot(slot, 'primary'))}
                                                                     </div>
@@ -1238,7 +1287,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                             )}
                                                             {pmSlots.length > 0 && (
                                                                 <div>
-                                                                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-2 pl-1">Evening</p>
+                                                                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-2 pl-1">Afternoon</p>
                                                                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                                                                         {pmSlots.map(slot => renderSlot(slot, 'secondary'))}
                                                                     </div>
@@ -1766,7 +1815,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                         <div className="text-white/50 text-xs mb-1">Time</div>
 
-                                                        <div className="text-white font-bold">{formData.time}</div>
+                                                        <div className="text-white font-bold">{describeSessionTime(formData.date, formData.time)}</div>
 
                                                     </div>
 
@@ -2026,6 +2075,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                         bookingDetails={{
                                             date: formData.date,
                                             time: formData.time,
+                                            timeLabel: describeSessionTime(formData.date, formData.time),
                                             duration: formData.duration,
                                             ticketLines: ticketLines.map(line => ({ label: line.plan.name, qty: line.qty, subtotal: line.subtotal })),
                                             name: formData.name,

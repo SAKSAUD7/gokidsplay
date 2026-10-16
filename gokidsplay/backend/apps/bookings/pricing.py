@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 TWO_PLACES = Decimal('0.01')
 
 # Flat fee added to online customer bookings (staff/admin bookings are exempt)
-ONLINE_BOOKING_FEE = Decimal('2.00')
+ONLINE_BOOKING_FEE = Decimal('2.00')  # fallback; the CMS Session Booking Configuration sets the fee
 
 ADD_ON_META = {
     'parking': {'label': 'Parking', 'emoji': '\U0001F697', 'config_field': 'parking_price', 'default': Decimal('3.00')},
@@ -22,6 +22,12 @@ ADD_ON_META = {
 
 def _money(value) -> Decimal:
     return Decimal(str(value)).quantize(TWO_PLACES, rounding=ROUND_HALF_UP)
+
+
+def online_booking_fee(config) -> Decimal:
+    """Online booking fee from the CMS (paying cash at the centre avoids it)."""
+    fee = getattr(config, 'online_booking_fee', None)
+    return _money(fee) if fee is not None else ONLINE_BOOKING_FEE
 
 
 @dataclass
@@ -94,7 +100,7 @@ def price_session_booking(
 
     subtotal = _money(subtotal)
     vat = _money(subtotal * vat_rate / Decimal('100'))
-    booking_fee = ONLINE_BOOKING_FEE if include_online_fee else Decimal('0.00')
+    booking_fee = online_booking_fee(config) if include_online_fee else Decimal('0.00')
     total = _money(subtotal + vat + booking_fee)
 
     price = SessionPrice(subtotal=subtotal, vat=vat, booking_fee=booking_fee,
@@ -208,7 +214,7 @@ def price_admission(
 
     price.subtotal = _money(subtotal)
     price.vat = _money(price.subtotal * vat_rate / Decimal('100'))
-    price.booking_fee = ONLINE_BOOKING_FEE if include_online_fee else Decimal('0.00')
+    price.booking_fee = online_booking_fee(config) if include_online_fee else Decimal('0.00')
     total = _money(price.subtotal + price.vat + price.booking_fee)
     price.amount = total
 

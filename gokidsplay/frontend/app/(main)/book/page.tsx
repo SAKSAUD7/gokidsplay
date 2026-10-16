@@ -3,15 +3,17 @@ import { createBooking } from "../../actions/createBooking";
 import { getPageSections } from "../../actions/page-sections";
 import { getBookingInformation } from "../../actions/booking-information";
 import { getMetadata } from "@/seo/seo.config";
+import { getPublicSessionSettings, onlineFeeNote } from "@/lib/public-api";
 
 export const metadata = getMetadata(
     "Book a Play Session",
-    "Book your play session at Go Kids Play Coventry online. Soft play, laser arena, go karts, inflatable park & more. Open weekends and school holidays. Easy, fast online booking."
+    "Book your 2-hour play session at Go Kids Play Coventry online. Soft play, laser arena, go karts, inflatable park & more. Open Wednesday to Sunday and school & bank holidays."
 );
 
 export default async function BookingPage() {
     const cmsContent = await getPageSections('booking-session');
     const sessionInfo = await getBookingInformation('SESSION');
+    const feeNote = onlineFeeNote(await getPublicSessionSettings());
 
     return (
         <main className="bg-background min-h-screen pt-24 pb-16 px-4">
@@ -56,6 +58,13 @@ export default async function BookingPage() {
                             <div className="mb-6 text-white/80 whitespace-pre-line">
                                 {sessionInfo.content}
                             </div>
+                        )}
+
+                        {/* Online booking fee (amount from Website Content → Session Booking) */}
+                        {feeNote && (
+                            <p className="mb-6 text-sm text-yellow-300/90 bg-yellow-400/10 border border-yellow-400/20 rounded-lg px-4 py-3">
+                                {feeNote}
+                            </p>
                         )}
 
                         {/* Special Sessions */}
