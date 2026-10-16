@@ -58,7 +58,7 @@ export default function NewVoucherPage() {
                             type="text"
                             required
                             placeholder="e.g. SUMMER2024"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none uppercase text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none uppercase text-slate-900"
                         />
                     </div>
 
@@ -66,7 +66,7 @@ export default function NewVoucherPage() {
                         <label className="block text-sm font-bold text-slate-700 mb-2">Discount Type</label>
                         <select
                             name="discountType"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                         >
                             <option value="PERCENTAGE">Percentage (%)</option>
                             <option value="FLAT">Flat Amount (£)</option>
@@ -82,7 +82,7 @@ export default function NewVoucherPage() {
                             min="0"
                             step="0.01"
                             placeholder="e.g. 20"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                         />
                     </div>
 
@@ -93,7 +93,7 @@ export default function NewVoucherPage() {
                             type="number"
                             min="0"
                             placeholder="e.g. 1000"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                         />
                     </div>
 
@@ -104,7 +104,7 @@ export default function NewVoucherPage() {
                             type="number"
                             min="1"
                             placeholder="e.g. 100"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                         />
                     </div>
 
@@ -116,7 +116,7 @@ export default function NewVoucherPage() {
                             min="0"
                             placeholder="e.g. 3"
                             defaultValue="0"
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                         />
                         <p className="text-xs text-slate-500 mt-1">Set to 0 to disable time restriction</p>
                     </div>
@@ -127,7 +127,7 @@ export default function NewVoucherPage() {
                             name="description"
                             rows={3}
                             placeholder="Internal note about this voucher..."
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none resize-none text-slate-900"
+                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none text-slate-900"
                         />
                     </div>
                 </div>
@@ -136,7 +136,7 @@ export default function NewVoucherPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-neon-blue hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
                     >
                         {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                         Create Voucher

@@ -988,7 +988,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className={`mt-5 flex items-center gap-2 text-sm font-bold ${act.accentColor}`}>
 
-                                                    {Number.isFinite(cheapestPlayingPrice) ? `From \u00a3${cheapestPlayingPrice.toFixed(2)} per child \u2014 ` : ""}Choose date & time <ChevronRight className="w-4 h-4" />
+                                                    {Number.isFinite(cheapestPlayingPrice) ? `From \u00a3${cheapestPlayingPrice.toFixed(2)} per child \u2014 ` : ""}{getSessionRules().session_mode === "ANYTIME" ? "Choose your day" : "Choose date & time"} <ChevronRight className="w-4 h-4" />
 
                                                 </div>
 

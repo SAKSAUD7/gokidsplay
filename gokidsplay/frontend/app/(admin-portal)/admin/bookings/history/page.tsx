@@ -106,7 +106,7 @@ export default function BookingHistoryPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-blue"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
         );
     }
@@ -144,14 +144,14 @@ export default function BookingHistoryPage() {
                         placeholder="Search by name, email or booking ID..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900 placeholder:text-slate-400"
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900 placeholder:text-slate-400"
                     />
                 </div>
                 <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-neon-blue"
+                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-blue-600"
                     >
                         <option value="all">All Statuses</option>
                         <option value="completed">Completed</option>
@@ -160,7 +160,7 @@ export default function BookingHistoryPage() {
                     <select
                         value={timeFilter}
                         onChange={(e) => setTimeFilter(e.target.value)}
-                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-neon-blue"
+                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-blue-600"
                     >
                         <option value="all">All Time</option>
                         <option value="30">Last 30 Days</option>

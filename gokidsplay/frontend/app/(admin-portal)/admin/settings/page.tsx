@@ -28,7 +28,7 @@ export default function SettingsPage() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="h-8 w-8 animate-spin text-neon-blue" />
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             </div>
         );
     }
@@ -85,7 +85,7 @@ function SettingsTab({ active, onClick, icon, label }: { active: boolean; onClic
         <button
             onClick={onClick}
             className={`flex items-center gap-3 px-4 py-4 text-sm font-medium transition-colors text-left border-l-4 ${active
-                ? "bg-slate-50 text-neon-blue border-neon-blue"
+                ? "bg-slate-50 text-blue-600 border-blue-600"
                 : "text-slate-600 border-transparent hover:bg-slate-50 hover:text-slate-900"
                 }`}
         >
@@ -168,8 +168,8 @@ function MediaSettings() {
                 <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                     <h3 className="font-medium text-slate-900">Quick Links</h3>
                     <div className="mt-2 flex gap-4">
-                        <a href="/admin/banners" className="text-neon-blue hover:underline">Manage Banners &rarr;</a>
-                        <a href="/admin/activities" className="text-neon-blue hover:underline">Manage Activities &rarr;</a>
+                        <a href="/admin/banners" className="text-blue-600 hover:underline">Manage Banners &rarr;</a>
+                        <a href="/admin/activities" className="text-blue-600 hover:underline">Manage Activities &rarr;</a>
                     </div>
                 </div>
             </div>
@@ -289,7 +289,7 @@ function InputGroup({ label, name, type = "text", defaultValue, placeholder }: {
                 type={type}
                 defaultValue={defaultValue}
                 placeholder={placeholder}
-                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none transition-all text-slate-900"
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-all text-slate-900"
             />
         </div>
     );
@@ -304,7 +304,7 @@ function ToggleItem({ title, description, enabled, danger, onChange }: { title: 
             </div>
             <button
                 onClick={() => onChange(!enabled)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-neon-blue focus:ring-offset-2 ${enabled ? (danger ? 'bg-red-500' : 'bg-green-500') : 'bg-slate-200'}`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 ${enabled ? (danger ? 'bg-red-500' : 'bg-green-500') : 'bg-slate-200'}`}
             >
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
             </button>

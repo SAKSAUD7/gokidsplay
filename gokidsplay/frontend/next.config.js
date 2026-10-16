@@ -10,6 +10,9 @@ const nextConfig = {
     output: 'standalone', // Self-contained deployment
     // Lets a production build be checked locally without touching the dev server's .next folder
     distDir: process.env.NEXT_DIST_DIR || '.next',
+    // NEXT_BUILD_CPUS=2 limits build workers on machines short of memory (each worker
+    // takes ~1GB; too many and page-data collection times out and restarts)
+    ...(process.env.NEXT_BUILD_CPUS ? { experimental: { cpus: Number(process.env.NEXT_BUILD_CPUS) } } : {}),
     typescript: {
         // The project type-checks cleanly (npx tsc --noEmit), so builds fail on new type errors
         ignoreBuildErrors: false,

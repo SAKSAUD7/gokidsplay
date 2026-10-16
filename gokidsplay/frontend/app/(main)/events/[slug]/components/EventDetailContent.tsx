@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Calendar, Clock, Users, CheckCircle, ChevronRight, ArrowLeft, Minus, Plus, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { getMediaUrl } from "@/lib/media-utils";
+import { todayInUK } from "@/lib/api/types";
 
 interface Event {
     id: number;
@@ -51,14 +53,14 @@ export default function EventDetailContent({ event }: { event: Event }) {
 
     const childPrice   = parseFloat(event.price_per_child) || 0;
     const adultPrice   = parseFloat(event.price_per_adult) || 0;
-    const depositAmount = parseFloat(event.deposit_amount) || 0;
     const subtotal     = (numChildren * childPrice) + (numAdults * adultPrice);
-    const depositDue   = depositAmount > 0 ? depositAmount : subtotal;
     const totalAttendees = numChildren + numAdults;
-    const isPast       = new Date(event.date) < new Date();
+    const isPast       = event.date < todayInUK();  // events on today's date are still bookable
 
     async function submitBooking() {
-        if (!name || !email) { toast.error("Name and email are required"); return; }
+        if (!name.trim() || !email.trim() || phone.replace(/\D/g, "").length < 7) {
+            toast.error("Please enter your name, email and phone number"); return;
+        }
         if (!agreed && event.terms_and_conditions) { toast.error("Please agree to the terms"); return; }
         if (totalAttendees > event.available_spots) { toast.error(`Only ${event.available_spots} spots available`); return; }
         setSubmitting(true);
@@ -98,7 +100,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
                 <div style={{ maxWidth: 520, width: "100%", textAlign: "center" }}>
                     <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(16,185,129,0.15)", border: "2px solid #10B981", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 1.5rem", fontSize: 36 }}>✅</div>
                     <h1 style={{ fontSize: "1.75rem", fontWeight: 800, color: "#fff", margin: "0 0 0.5rem" }}>You're booked! {event.emoji}</h1>
-                    <p style={{ color: "#9CA3AF", margin: "0 0 2rem", lineHeight: 1.6 }}>Your spot at <strong style={{ color: "#fff" }}>{event.title}</strong> is reserved.<br />We've saved your booking reference.</p>
+                    <p style={{ color: "#9CA3AF", margin: "0 0 2rem", lineHeight: 1.6 }}>Your places at <strong style={{ color: "#fff" }}>{event.title}</strong> are reserved.<br />{event.is_free || subtotal === 0 ? "Just show your booking reference when you arrive." : "Please pay at the venue when you arrive (cash or card) and show your booking reference."}</p>
 
                     <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: "1.5rem", marginBottom: "2rem", textAlign: "left" }}>
                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
@@ -108,7 +110,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
                                 { label: "Date", value: new Date(event.date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }) },
                                 { label: "Time", value: event.start_time?.slice(0,5) },
                                 { label: "Attendees", value: `${numChildren} child${numChildren !== 1 ? "ren" : ""}, ${numAdults} adult${numAdults !== 1 ? "s" : ""}` },
-                                { label: event.is_free ? "Total" : "Deposit Due", value: event.is_free ? "FREE" : `£${depositDue.toFixed(2)}` },
+                                { label: event.is_free || subtotal === 0 ? "Total" : "To pay at the venue", value: event.is_free || subtotal === 0 ? "FREE" : `£${subtotal.toFixed(2)}` },
                             ].map(row => (
                                 <div key={row.label}>
                                     <div style={{ fontSize: "0.7rem", color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.05em" }}>{row.label}</div>
@@ -140,7 +142,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
             <div style={{
                 height: 320,
                 background: event.cover_image
-                    ? `linear-gradient(to bottom, rgba(8,8,18,0.2), rgba(8,8,18,0.9)), url(${event.cover_image}) center/cover`
+                    ? `linear-gradient(to bottom, rgba(8,8,18,0.2), rgba(8,8,18,0.9)), url(${getMediaUrl(event.cover_image)}) center/cover`
                     : `linear-gradient(135deg, ${event.accent_color}33, #080812)`,
                 display: "flex", flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-end",
                 padding: "2rem 2rem",
@@ -283,12 +285,10 @@ export default function EventDetailContent({ event }: { event: Event }) {
                                             <span style={{ color: "#9CA3AF", fontSize: "0.85rem" }}>Subtotal</span>
                                             <span style={{ color: "#fff", fontWeight: 600 }}>£{subtotal.toFixed(2)}</span>
                                         </div>
-                                        {depositAmount > 0 && depositAmount < subtotal && (
-                                            <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                                <span style={{ color: "#9CA3AF", fontSize: "0.85rem" }}>Deposit now</span>
-                                                <span style={{ color: event.accent_color, fontWeight: 700 }}>£{depositDue.toFixed(2)}</span>
-                                            </div>
-                                        )}
+                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                            <span style={{ color: "#9CA3AF", fontSize: "0.85rem" }}>Pay online now</span>
+                                            <span style={{ color: event.accent_color, fontWeight: 700 }}>£0.00</span>
+                                        </div>
                                     </div>
                                 )}
 
@@ -300,7 +300,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
                                 </button>
 
                                 <p style={{ textAlign: "center", margin: "0.75rem 0 0", fontSize: "0.72rem", color: "#4B5563" }}>
-                                    {event.available_spots} spots remaining · No payment taken yet
+                                    {event.available_spots} places left · Reserve now, pay at the venue
                                 </p>
                             </>
                         ) : step === "contact" ? (
@@ -319,7 +319,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
                                         <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" style={inputStyle} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "0.75rem", color: "#9CA3AF", display: "block", marginBottom: "0.35rem" }}>Phone (optional)</label>
+                                        <label style={{ fontSize: "0.75rem", color: "#9CA3AF", display: "block", marginBottom: "0.35rem" }}>Phone Number *</label>
                                         <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+44..." style={inputStyle} />
                                     </div>
                                     <div>
@@ -336,7 +336,7 @@ export default function EventDetailContent({ event }: { event: Event }) {
                                 <button
                                     onClick={submitBooking} disabled={submitting}
                                     style={{ width: "100%", padding: "0.9rem", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${event.accent_color}, ${event.accent_color}cc)`, color: "#fff", fontWeight: 700, fontSize: "1rem", cursor: submitting ? "wait" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
-                                    <CheckCircle size={16} /> {submitting ? "Booking…" : "Confirm Booking"}
+                                    <CheckCircle size={16} /> {submitting ? "Reserving…" : "Confirm Reservation"}
                                 </button>
                                 <p style={{ textAlign: "center", margin: "0.75rem 0 0", fontSize: "0.72rem", color: "#4B5563" }}>Booking for {totalAttendees} attendee{totalAttendees !== 1 ? "s" : ""} · {event.is_free ? "Free" : `£${subtotal.toFixed(2)}`}</p>
                             </>

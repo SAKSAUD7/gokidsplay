@@ -48,7 +48,7 @@ export default function CustomerEditModal({ customer, onClose }: CustomerEditMod
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                             required
                         />
                     </div>
@@ -59,7 +59,7 @@ export default function CustomerEditModal({ customer, onClose }: CustomerEditMod
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                             required
                         />
                     </div>
@@ -70,7 +70,7 @@ export default function CustomerEditModal({ customer, onClose }: CustomerEditMod
                             type="tel"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                             required
                         />
                     </div>
@@ -86,7 +86,7 @@ export default function CustomerEditModal({ customer, onClose }: CustomerEditMod
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2 text-white bg-neon-blue hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50"
+                            className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50"
                             disabled={isLoading}
                         >
                             {isLoading ? "Saving..." : "Save Changes"}

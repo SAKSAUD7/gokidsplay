@@ -21,7 +21,7 @@ export default function CustomersTable({ customers }: CustomersTableProps) {
                         onClick={() => setEditingCustomer(customer)}
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-neon-blue font-bold text-lg">
+                            <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-lg">
                                 {customer.name.charAt(0)}
                             </div>
                             <button
@@ -29,7 +29,7 @@ export default function CustomersTable({ customers }: CustomersTableProps) {
                                     e.stopPropagation();
                                     setEditingCustomer(customer);
                                 }}
-                                className="text-gray-400 hover:text-neon-blue transition-colors p-2 hover:bg-blue-50 rounded-lg"
+                                className="text-gray-400 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-lg"
                             >
                                 <Edit2 size={18} />
                             </button>

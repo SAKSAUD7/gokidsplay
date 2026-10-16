@@ -231,6 +231,8 @@ REST_FRAMEWORK = {
         'anon_write': '30/minute',  # booking, login, register, contact
         'user': '300/minute',       # authenticated customers and staff
     },
+    # Never trust a client-sent X-Forwarded-For directly (see TRUSTED_PROXY_COUNT)
+    'NUM_PROXIES': 0,
     # ── Filtering ─────────────────────────────────────────────────────────
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -298,6 +300,11 @@ CORS_ALLOW_ALL_ORIGINS = False
 # which causes Mixed Content errors in the browser.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+# How many proxies in front of Django add an X-Forwarded-For entry. Azure App
+# Service has one front end; local development has none. Used to find the
+# visitor's real IP for rate limiting (apps/core/throttling.py).
+TRUSTED_PROXY_COUNT = int(os.getenv('TRUSTED_PROXY_COUNT', '1' if 'WEBSITE_SITE_NAME' in os.environ else '0'))
 
 
 # ====================================================

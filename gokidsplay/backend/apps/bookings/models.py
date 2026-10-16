@@ -476,7 +476,8 @@ class SpecialEvent(models.Model):
     is_free = models.BooleanField(default=False, help_text="If true, event is free (no payment required)")
 
     # Visuals
-    cover_image = models.URLField(blank=True, null=True)
+    # Full URL or an uploaded file path such as /media/uploads/cover.jpg
+    cover_image = models.CharField(max_length=500, blank=True, null=True)
     gallery_images = models.JSONField(default=list, blank=True)
     accent_color = models.CharField(max_length=20, default='#8B5CF6', help_text="Brand colour for the event page")
     emoji = models.CharField(max_length=10, default='🎉')
@@ -523,7 +524,8 @@ class SpecialEvent(models.Model):
 
     @property
     def confirmed_booking_count(self):
-        return self.event_bookings.filter(status__in=['CONFIRMED', 'COMPLETED']).aggregate(
+        """Places taken by reservations that still hold a place (payment is taken at the venue)."""
+        return self.event_bookings.exclude(status__in=EventBooking.RELEASED_STATUSES).aggregate(
             total=models.Sum('num_children') + models.Sum('num_adults')
         )['total'] or 0
 
@@ -548,6 +550,9 @@ class EventBooking(models.Model):
     A customer booking for a SpecialEvent.
     Handles deposit/full payment, capacity tracking, and confirmation.
     """
+    # Reservations with these statuses no longer hold a place at the event
+    RELEASED_STATUSES = ('CANCELLED', 'REFUNDED')
+
     STATUS_CHOICES = [
         ('PENDING', 'Pending Payment'),
         ('CONFIRMED', 'Confirmed'),
@@ -636,4 +641,59 @@ class EventBooking(models.Model):
             self.booking_reference = ref
         # Recalculate balance
         self.balance_due = max(0, self.subtotal - self.amount_paid)
+        super().save(*args, **kwargs)
+
+
+class EventRequest(models.Model):
+    """
+    A customer's request for Go Kids Play to organise an event for them
+    (sent from the "Request an Event" form on the public events page).
+    """
+    STATUS_CHOICES = [
+        ('NEW', 'New'),
+        ('CONTACTED', 'Contacted'),
+        ('QUOTED', 'Quote sent'),
+        ('CONFIRMED', 'Confirmed'),
+        ('DECLINED', 'Declined'),
+        ('CANCELLED', 'Cancelled by customer'),
+    ]
+
+    reference = models.CharField(max_length=20, unique=True, blank=True)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=50)
+    event_type = models.CharField(max_length=30, choices=SpecialEvent.EVENT_TYPE_CHOICES, default='CUSTOM')
+    preferred_date = models.DateField()
+    alternative_date = models.DateField(null=True, blank=True)
+    preferred_time = models.CharField(max_length=50, blank=True, help_text="e.g. Morning, Afternoon or 14:00")
+    num_children = models.PositiveIntegerField(default=0)
+    num_adults = models.PositiveIntegerField(default=0)
+    budget = models.CharField(max_length=100, blank=True)
+    details = models.TextField(help_text="What the customer would like")
+
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='NEW')
+    admin_notes = models.TextField(blank=True)
+    event = models.ForeignKey(SpecialEvent, on_delete=models.SET_NULL, null=True, blank=True,
+                              related_name='requests', help_text="Event created for this request")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [models.Index(fields=['status', '-created_at'])]
+        verbose_name = 'Event Request'
+        verbose_name_plural = 'Event Requests'
+
+    def __str__(self):
+        return f"EventRequest {self.reference} — {self.name} ({self.get_event_type_display()})"
+
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            import random
+            import string
+            ref = 'ER' + ''.join(random.choices(string.digits, k=6))
+            while EventRequest.objects.filter(reference=ref).exists():
+                ref = 'ER' + ''.join(random.choices(string.digits, k=6))
+            self.reference = ref
         super().save(*args, **kwargs)

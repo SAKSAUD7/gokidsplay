@@ -12,7 +12,7 @@ export default async function VouchersPage() {
                     <h1 className="text-3xl font-bold text-slate-900">Vouchers</h1>
                     <p className="text-slate-500 mt-1">Manage discount codes and promotions</p>
                 </div>
-                <Link href="/admin/vouchers/new" className="bg-neon-blue hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors">
+                <Link href="/admin/vouchers/new" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors">
                     <Plus size={20} />
                     Create Voucher
                 </Link>
@@ -61,7 +61,7 @@ export default async function VouchersPage() {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right flex justify-end gap-2">
-                                        <Link href={`/admin/vouchers/${voucher.id}`} className="p-2 text-slate-400 hover:text-neon-blue transition-colors">
+                                        <Link href={`/admin/vouchers/${voucher.id}`} className="p-2 text-slate-400 hover:text-blue-600 transition-colors">
                                             <Edit size={18} />
                                         </Link>
                                         <form action={async () => {

@@ -58,6 +58,7 @@ const navigation: NavGroup[] = [
         name: "Special Events 🎈",
         items: [
             { name: "All Events", href: "/admin/events", icon: "Sparkles", permission: { entity: 'parties', action: 'read' } },
+            { name: "Reservations & Requests", href: "/admin/events/reservations", icon: "ClipboardList", permission: { entity: 'parties', action: 'read' } },
             { name: "Create Event", href: "/admin/events/new", icon: "Plus", permission: { entity: 'parties', action: 'write' } },
         ]
     },

@@ -165,7 +165,7 @@ export function InvitationTemplateForm({ initialId }: InvitationTemplateFormProp
                         <label className="block text-sm font-medium text-slate-700 mb-1">Template Name</label>
                         <input
                             {...form.register("name")}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue/20 focus:border-neon-blue text-slate-900"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
                             placeholder="e.g. Superhero Theme"
                         />
                         {form.formState.errors.name && (
@@ -193,7 +193,7 @@ export function InvitationTemplateForm({ initialId }: InvitationTemplateFormProp
                         <label className="block text-sm font-medium text-slate-700 mb-1">Default Title</label>
                         <input
                             {...form.register("default_title")}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue/20 focus:border-neon-blue text-slate-900"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900"
                             placeholder="You're Invited!"
                         />
                     </div>
@@ -202,7 +202,7 @@ export function InvitationTemplateForm({ initialId }: InvitationTemplateFormProp
                         <label className="block text-sm font-medium text-slate-700 mb-1">Default Message</label>
                         <textarea
                             {...form.register("default_message")}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue/20 focus:border-neon-blue text-slate-900 min-h-[100px]"
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-900 min-h-[100px]"
                             placeholder="Come celebrate..."
                         />
                     </div>
@@ -212,7 +212,7 @@ export function InvitationTemplateForm({ initialId }: InvitationTemplateFormProp
                             <input
                                 type="checkbox"
                                 {...form.register("is_active")}
-                                className="w-4 h-4 rounded border-slate-300 text-neon-blue focus:ring-neon-blue"
+                                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
                             />
                             <span className="text-sm font-medium text-slate-700">Active (Visible to customers)</span>
                         </label>
@@ -236,7 +236,7 @@ export function InvitationTemplateForm({ initialId }: InvitationTemplateFormProp
                         disabled={isSubmitting || success}
                         className={`flex items-center gap-2 px-6 py-2 rounded-lg transition-all text-sm font-bold disabled:opacity-50 ${success
                             ? "bg-green-500 text-white hover:bg-green-600"
-                            : "bg-neon-blue text-white hover:bg-blue-600"
+                            : "bg-blue-600 text-white hover:bg-blue-600"
                             }`}
                     >
                         {isSubmitting ? (

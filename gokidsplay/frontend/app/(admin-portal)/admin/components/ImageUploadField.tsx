@@ -43,7 +43,7 @@ export default function ImageUploadField({ value, onChange, label = "Image", err
         <div className="space-y-2">
             <label className="block text-sm font-medium text-slate-700">{label}</label>
 
-            <div className={`border-2 border-dashed rounded-xl p-4 transition-colors ${error ? 'border-red-300 bg-red-50' : 'border-slate-300 hover:border-neon-blue bg-slate-50'
+            <div className={`border-2 border-dashed rounded-xl p-4 transition-colors ${error ? 'border-red-300 bg-red-50' : 'border-slate-300 hover:border-blue-600 bg-slate-50'
                 }`}>
                 {preview ? (
                     <div className="relative aspect-video rounded-lg overflow-hidden bg-white shadow-sm group">
@@ -65,7 +65,7 @@ export default function ImageUploadField({ value, onChange, label = "Image", err
                 ) : (
                     <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex flex-col items-center justify-center gap-2 py-8 cursor-pointer hover:text-neon-blue text-slate-400 transition-colors"
+                        className="flex flex-col items-center justify-center gap-2 py-8 cursor-pointer hover:text-blue-600 text-slate-400 transition-colors"
                     >
                         <Upload size={32} />
                         <span className="text-sm font-medium">Click to upload image</span>

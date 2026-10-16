@@ -9,9 +9,9 @@ from .views import (
     PublicBookingBlockViewSet, PublicSiteAlertViewSet
 )
 from .events_views import (
-    SpecialEventViewSet, EventBookingViewSet,
+    SpecialEventViewSet, EventBookingViewSet, EventRequestViewSet,
     public_events_list, public_event_detail,
-    create_event_booking, event_booking_confirmation,
+    create_event_booking, create_event_request, event_booking_confirmation,
 )
 from .calendar_views import calendar_bookings, date_availability, today_status
 from .customer_auth import (
@@ -38,6 +38,7 @@ router.register(r'site-alerts', PublicSiteAlertViewSet, basename='site-alerts')
 # ── Special Events (Section 7) ─────────────────────────────────────────────────
 router.register(r'events', SpecialEventViewSet, basename='special-events')
 router.register(r'event-bookings', EventBookingViewSet, basename='event-bookings')
+router.register(r'event-requests', EventRequestViewSet, basename='event-requests')
 
 urlpatterns = [
     # ── Customer Account Auth ─────────────────────────────────────────────────
@@ -72,6 +73,7 @@ urlpatterns = [
     path('public/events/', public_events_list, name='public-events-list'),
     # book/ must come before <slug>/, otherwise "book" is treated as an event slug
     path('public/events/book/', create_event_booking, name='create-event-booking'),
+    path('public/events/request/', create_event_request, name='create-event-request'),
     path('public/events/<slug:slug>/', public_event_detail, name='public-event-detail'),
     path('public/events/booking/<uuid:booking_uuid>/', event_booking_confirmation, name='event-booking-confirmation'),
 

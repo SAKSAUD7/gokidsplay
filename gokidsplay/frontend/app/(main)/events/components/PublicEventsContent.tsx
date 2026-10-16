@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Clock, Users, ChevronRight, Sparkles, Search } from "lucide-react";
+import { Calendar, Clock, ChevronRight, Sparkles, Search, PartyPopper } from "lucide-react";
+import { getMediaUrl } from "@/lib/media-utils";
+import { todayInUK } from "@/lib/api/types";
+import { RequestEventModal } from "./RequestEventModal";
 
 const TYPE_FILTERS = [
     { value: "", label: "All Events" },
@@ -49,6 +52,8 @@ export default function PublicEventsContent({
     const { hero, empty } = content;
     const [typeFilter, setTypeFilter] = useState("");
     const [search, setSearch] = useState("");
+    const [requestOpen, setRequestOpen] = useState(false);
+    const today = todayInUK();
 
     const filtered = events.filter(e => {
         if (typeFilter && e.event_type !== typeFilter) return false;
@@ -56,8 +61,9 @@ export default function PublicEventsContent({
         return true;
     });
 
-    const upcoming = filtered.filter(e => new Date(e.date) >= new Date());
-    const past     = filtered.filter(e => new Date(e.date) < new Date());
+    // Compare dates as YYYY-MM-DD in UK time so events on today's date still count as upcoming
+    const upcoming = filtered.filter(e => e.date >= today);
+    const past     = filtered.filter(e => e.date < today);
 
     return (
         <main style={{ minHeight: "100vh", background: "#080812", color: "#fff", fontFamily: "Inter, sans-serif" }}>
@@ -93,6 +99,12 @@ export default function PublicEventsContent({
                         style={{ width: "100%", padding: "0.8rem 1rem 0.8rem 2.75rem", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.07)", color: "#fff", fontSize: "0.95rem", boxSizing: "border-box", backdropFilter: "blur(10px)", outline: "none" }}
                     />
                 </div>
+
+                <button onClick={() => setRequestOpen(true)}
+                    className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold shadow-lg shadow-pink-500/30 hover:scale-105 transition-transform">
+                    <PartyPopper className="w-5 h-5" /> Request an Event
+                </button>
+                <p style={{ color: "#6B7280", fontSize: "0.8rem", marginTop: "0.6rem" }}>Want us to organise something special? Tell us and we&apos;ll plan it with you.</p>
             </div>
 
             {/* Type filters */}
@@ -138,13 +150,27 @@ export default function PublicEventsContent({
                         )}
                     </>
                 )}
+
+                {/* Can't find the right event? */}
+                <div className="mt-12 rounded-3xl border border-white/10 bg-gradient-to-r from-pink-500/10 to-purple-600/10 p-8 text-center">
+                    <h2 className="text-2xl font-black text-white">Planning something special?</h2>
+                    <p className="text-white/60 mt-2 max-w-xl mx-auto">Birthdays, school trips, holiday parties or a private event, tell us what you&apos;d like and our team will organise it.</p>
+                    <button onClick={() => setRequestOpen(true)}
+                        className="mt-5 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold hover:scale-105 transition-transform">
+                        <PartyPopper className="w-5 h-5" /> Request an Event
+                    </button>
+                </div>
             </div>
+
+            <RequestEventModal open={requestOpen} onClose={() => setRequestOpen(false)} />
         </main>
     );
 }
 
 function EventCard({ event }: { event: Event }) {
-    const isPast = new Date(event.date) < new Date();
+    const isPast = event.date < todayInUK();
+    const childPrice = parseFloat(event.price_per_child) || 0;
+    const adultPrice = parseFloat(event.price_per_adult) || 0;
     return (
         <Link href={`/events/${event.slug}`} style={{ textDecoration: "none" }}>
             <div style={{
@@ -156,7 +182,7 @@ function EventCard({ event }: { event: Event }) {
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = ""; }}
             >
                 {/* Cover */}
-                <div style={{ height: 180, background: event.cover_image ? `url(${event.cover_image}) center/cover` : `linear-gradient(135deg, ${event.accent_color}44, ${event.accent_color}11)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                <div style={{ height: 180, background: event.cover_image ? `url(${getMediaUrl(event.cover_image)}) center/cover` : `linear-gradient(135deg, ${event.accent_color}44, ${event.accent_color}11)`, display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
                     {!event.cover_image && <span style={{ fontSize: 64, opacity: 0.8 }}>{event.emoji}</span>}
                     <div style={{ position: "absolute", top: 12, right: 12 }}>
                         {event.is_sold_out || isPast ? (
@@ -165,7 +191,7 @@ function EventCard({ event }: { event: Event }) {
                             </span>
                         ) : (
                             <span style={{ padding: "0.25rem 0.75rem", borderRadius: 99, background: "rgba(16,185,129,0.2)", color: "#10B981", fontSize: "0.72rem", fontWeight: 700, backdropFilter: "blur(4px)", border: "1px solid rgba(16,185,129,0.3)" }}>
-                                {event.available_spots} spots left
+                                {event.available_spots} places left
                             </span>
                         )}
                     </div>
@@ -189,11 +215,11 @@ function EventCard({ event }: { event: Event }) {
 
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <span style={{ fontSize: "0.9rem", color: "#fff", fontWeight: 700 }}>
-                            {event.is_free ? <span style={{ color: "#10B981" }}>Free Entry</span>
-                                : `From £${Math.min(parseFloat(event.price_per_child), parseFloat(event.price_per_adult)).toFixed(2)}`}
+                            {event.is_free || (childPrice === 0 && adultPrice === 0) ? <span style={{ color: "#10B981" }}>Free Entry</span>
+                                : childPrice > 0 ? `£${childPrice.toFixed(2)} per child` : `£${adultPrice.toFixed(2)} per adult`}
                         </span>
                         <span style={{ display: "flex", alignItems: "center", gap: 4, color: event.accent_color, fontSize: "0.82rem", fontWeight: 600 }}>
-                            Book Now <ChevronRight size={14} />
+                            Reserve <ChevronRight size={14} />
                         </span>
                     </div>
                 </div>

@@ -14,7 +14,7 @@ export function DateFilter({ value, onChange }: DateFilterProps) {
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-neon-blue"
+                className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:border-blue-600"
             >
                 <option value="all">All Dates</option>
                 <option value="today">Today</option>

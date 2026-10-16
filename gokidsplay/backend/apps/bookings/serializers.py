@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Customer, Booking, Transaction, BookingBlock, PartyBooking, SessionBookingHistory, PartyBookingHistory, BookingAuditLog, SpecialEvent, EventBooking
+from .models import Customer, Booking, Transaction, BookingBlock, PartyBooking, SessionBookingHistory, PartyBookingHistory, BookingAuditLog, SpecialEvent, EventBooking, EventRequest
 # from apps.shop.serializers import VoucherSerializer
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -297,3 +297,21 @@ class EventBookingSerializer(serializers.ModelSerializer):
 
     def get_payment_status_display(self, obj):
         return obj.get_payment_status_display()
+
+
+class EventRequestSerializer(serializers.ModelSerializer):
+    """Requests from customers asking Go Kids Play to organise an event."""
+    event_type_display = serializers.CharField(source='get_event_type_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    event_title = serializers.CharField(source='event.title', read_only=True, default=None)
+
+    class Meta:
+        model = EventRequest
+        fields = [
+            'id', 'reference', 'name', 'email', 'phone',
+            'event_type', 'event_type_display', 'preferred_date', 'alternative_date', 'preferred_time',
+            'num_children', 'num_adults', 'budget', 'details',
+            'status', 'status_display', 'admin_notes', 'event', 'event_title',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['id', 'reference', 'created_at', 'updated_at']

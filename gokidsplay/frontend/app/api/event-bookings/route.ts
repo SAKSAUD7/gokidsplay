@@ -48,17 +48,22 @@ export async function POST(request: NextRequest) {
             body,
             cache: 'no-store',
         });
-        if (!res.ok) {
-            const txt = await res.text();
-            return NextResponse.json({ error: `Backend error ${res.status}`, detail: txt }, { status: res.status });
-        }
-        return NextResponse.json(await res.json());
+        // Pass the API's own message through (e.g. "Only 5 places available")
+        const text = await res.text();
+        let data: any;
+        try { data = JSON.parse(text); } catch { data = { error: 'Sorry, something went wrong. Please try again.' }; }
+        return NextResponse.json(data, { status: res.status });
     }
 
     const token = cookies().get('admin_token')?.value;
     if (!token) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
 
     if (id && action) {
+        // Only the reservation actions the API offers
+        const ACTIONS = ['mark-paid', 'mark-unpaid', 'confirm', 'cancel', 'reinstate', 'mark-arrived', 'mark-no-show'];
+        if (!/^\d+$/.test(id) || !ACTIONS.includes(action)) {
+            return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+        }
         const body = await request.text();
         const res = await fetch(`${API_URL}/bookings/event-bookings/${id}/${action}/`, {
             method: 'POST',
@@ -66,8 +71,10 @@ export async function POST(request: NextRequest) {
             body,
             cache: 'no-store',
         });
-        if (!res.ok) return NextResponse.json({ error: `Backend error ${res.status}` }, { status: res.status });
-        return NextResponse.json(await res.json());
+        const text = await res.text();
+        let data: any;
+        try { data = JSON.parse(text); } catch { data = { error: `Backend error ${res.status}` }; }
+        return NextResponse.json(data, { status: res.status });
     }
 
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });

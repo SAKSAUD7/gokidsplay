@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import EventDetailContent from "./components/EventDetailContent";
+import { getMediaUrl } from "@/lib/media-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
         openGraph: {
             title: `${event.emoji} ${event.title} | Go Kids Play`,
             description: event.short_description || "",
-            images: event.cover_image ? [{ url: event.cover_image }] : [],
+            images: event.cover_image ? [{ url: getMediaUrl(event.cover_image) }] : [],
         },
     };
 }
@@ -43,7 +44,7 @@ function eventJsonLd(event: any, slug: string) {
         endDate: `${event.date}T${time(event.end_time)}`,
         eventStatus: "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-        image: event.cover_image ? [event.cover_image] : undefined,
+        image: event.cover_image ? [getMediaUrl(event.cover_image)] : undefined,
         location: {
             "@type": "Place",
             name: "Go Kids Play",

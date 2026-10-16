@@ -281,7 +281,72 @@ class TestEventBooking:
         event = self.make_event()
         response = APIClient().post('/api/v1/bookings/public/events/book/', {
             'event_id': event.id, 'num_children': -5, 'num_adults': 6,
-            'name': 'A', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
+            'name': 'Alex Parent', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
+        assert response.status_code == 400
+
+    def book(self, event, **overrides):
+        payload = {'event_id': event.id, 'num_children': 2, 'num_adults': 1,
+                   'name': 'Event Parent', 'email': 'event@example.com', 'phone': '07700900123'}
+        payload.update(overrides)
+        return APIClient().post('/api/v1/bookings/public/events/book/', payload, format='json')
+
+    def test_reservations_take_places_and_cancelling_frees_them(self, staff_client):
+        from apps.bookings.models import EventBooking
+        event = self.make_event()  # capacity 20
+        assert self.book(event, num_children=15, num_adults=0).status_code == 201
+        booking = EventBooking.objects.get()
+        assert (booking.status, booking.payment_status) == ('CONFIRMED', 'PENDING')  # pay at the venue
+        event.refresh_from_db()
+        assert event.available_spots == 5
+        assert self.book(event, num_children=6, num_adults=0).status_code == 400  # would overbook
+        assert staff_client.post(f'/api/v1/bookings/event-bookings/{booking.id}/cancel/').status_code == 200
+        assert event.available_spots == 20
+
+    def test_admin_marks_payment_taken_at_venue(self, staff_client):
+        from apps.bookings.models import EventBooking
+        event = self.make_event()
+        self.book(event)
+        booking = EventBooking.objects.get()
+        response = staff_client.post(f'/api/v1/bookings/event-bookings/{booking.id}/mark-paid/')
+        assert response.status_code == 200
+        booking.refresh_from_db()
+        assert (booking.payment_status, booking.amount_paid, booking.balance_due) == ('FULLY_PAID', Decimal('25.00'), Decimal('0'))
+
+    def test_past_events_cannot_be_booked(self):
+        event = self.make_event()
+        event.date = date.today() - timedelta(days=1)
+        event.save()
+        assert self.book(event).status_code == 400
+
+    def test_contact_details_are_required(self):
+        assert self.book(self.make_event(), email='not-an-email').status_code == 400
+
+    def test_reservations_are_not_public(self):
+        assert APIClient().get('/api/v1/bookings/event-bookings/').status_code == 401
+
+    def test_event_request_is_saved_for_admins(self, staff_client):
+        from apps.bookings.models import EventRequest
+        response = APIClient().post('/api/v1/bookings/public/events/request/', {
+            'name': 'Request Parent', 'email': 'request@example.com', 'phone': '07700900123',
+            'event_type': 'BIRTHDAY', 'preferred_date': next_saturday().isoformat(),
+            'num_children': 12, 'num_adults': 6, 'details': 'Superhero themed party for my son',
+        }, format='json')
+        assert response.status_code == 201, response.data
+        req = EventRequest.objects.get()
+        assert req.status == 'NEW' and req.reference.startswith('ER')
+        assert APIClient().get('/api/v1/bookings/event-requests/').status_code == 401
+        listing = staff_client.get('/api/v1/bookings/event-requests/')
+        assert listing.status_code == 200 and listing.data[0]['reference'] == req.reference
+        update = staff_client.patch(f'/api/v1/bookings/event-requests/{req.id}/',
+                                    {'status': 'CONTACTED', 'admin_notes': 'Called, sending a quote'}, format='json')
+        assert update.status_code == 200 and update.data['status'] == 'CONTACTED'
+
+    def test_event_request_validation(self):
+        response = APIClient().post('/api/v1/bookings/public/events/request/', {
+            'name': 'A Parent', 'email': 'a@example.com', 'phone': '07700900123',
+            'preferred_date': (date.today() - timedelta(days=3)).isoformat(),
+            'num_children': 5, 'details': 'A party please',
+        }, format='json')
         assert response.status_code == 400
 
     def test_event_price_is_calculated_on_server(self):
@@ -289,7 +354,7 @@ class TestEventBooking:
         event = self.make_event()
         response = APIClient().post('/api/v1/bookings/public/events/book/', {
             'event_id': event.id, 'num_children': 2, 'num_adults': 1, 'subtotal': '0.01',
-            'name': 'A', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
+            'name': 'Alex Parent', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
         assert response.status_code in (200, 201), response.data
         assert EventBooking.objects.get().subtotal == Decimal('25.00')
 
@@ -379,3 +444,15 @@ class TestHardening:
         response = APIClient().get('/api/health/')
         assert response.status_code == 200
         assert response.json()['database'] == 'ok'
+
+
+def test_rate_limit_ip_cannot_be_spoofed(settings):
+    from django.test import RequestFactory
+    from apps.core.throttling import client_ip
+    factory = RequestFactory()
+    spoofed = factory.get('/', HTTP_X_FORWARDED_FOR='1.2.3.4', REMOTE_ADDR='10.0.0.5')
+    settings.TRUSTED_PROXY_COUNT = 0
+    assert client_ip(spoofed) == '10.0.0.5'          # no proxy: header ignored
+    settings.TRUSTED_PROXY_COUNT = 1
+    behind_azure = factory.get('/', HTTP_X_FORWARDED_FOR='1.2.3.4, 81.2.69.160:53122', REMOTE_ADDR='10.0.0.5')
+    assert client_ip(behind_azure) == '81.2.69.160'  # entry added by Azure, port removed

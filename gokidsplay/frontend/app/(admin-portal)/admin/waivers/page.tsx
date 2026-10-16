@@ -153,7 +153,7 @@ export default function AdminWaivers() {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neon-blue"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
         );
     }
@@ -175,7 +175,7 @@ export default function AdminWaivers() {
                     </button>
                     <button
                         onClick={handleKioskMode}
-                        className="flex items-center gap-2 px-4 py-2 bg-neon-blue text-slate-900 rounded-lg hover:bg-blue-400 transition-colors font-bold text-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-slate-900 rounded-lg hover:bg-blue-400 transition-colors font-bold text-sm"
                     >
                         <FileSignature size={16} />
                         Kiosk Mode
@@ -218,14 +218,14 @@ export default function AdminWaivers() {
                         placeholder="Search by signer name or email..."
                         value={searchTerm}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-neon-blue focus:border-transparent outline-none text-slate-900"
+                        className="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-slate-900"
                     />
                 </div>
                 <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                     <select
                         value={typeFilter}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTypeFilter(e.target.value)}
-                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm outline-none focus:border-neon-blue"
+                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm outline-none focus:border-blue-600"
                     >
                         <option value="ALL">All Types</option>
                         <option value="ADULT">Adults Only</option>
@@ -234,7 +234,7 @@ export default function AdminWaivers() {
                     <select
                         value={bookingTypeFilter}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setBookingTypeFilter(e.target.value)}
-                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm outline-none focus:border-neon-blue"
+                        className="px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm outline-none focus:border-blue-600"
                     >
                         <option value="ALL">All Bookings</option>
                         <option value="SESSION">Session Bookings</option>

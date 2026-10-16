@@ -74,14 +74,14 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                                         <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => setEditingBooking(booking)}
-                                                className="p-2 text-gray-400 hover:text-neon-blue hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="Edit Booking"
                                             >
                                                 <Edit2 size={18} />
                                             </button>
                                             <Link
                                                 href={`/admin/bookings/${booking.id}`}
-                                                className="p-2 text-gray-400 hover:text-neon-blue hover:bg-blue-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                 title="View Details"
                                             >
                                                 <Eye size={18} />

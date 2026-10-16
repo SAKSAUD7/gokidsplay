@@ -39,7 +39,7 @@ function WaiverForm() {
     return (
         <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-neon-blue px-8 py-6">
+                <div className="bg-blue-600 px-8 py-6">
                     <h1 className="text-2xl font-bold text-slate-900">Digital Liability Waiver</h1>
                     <p className="text-slate-800 mt-1">Go Kids Play</p>
                 </div>
@@ -126,7 +126,7 @@ function WaiverForm() {
 
                     <button
                         type="submit"
-                        className="w-full bg-neon-blue text-slate-900 font-bold py-4 rounded-xl hover:bg-blue-400 transition-colors shadow-lg shadow-blue-500/20"
+                        className="w-full bg-blue-600 text-slate-900 font-bold py-4 rounded-xl hover:bg-blue-400 transition-colors shadow-lg shadow-blue-500/20"
                     >
                         SUBMIT WAIVER
                     </button>

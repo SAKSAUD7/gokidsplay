@@ -59,10 +59,10 @@
           {% if not is_free %}
           <tr style="border-top:2px solid {{ accent_color|default:'#8B5CF6' }};background:#f5f3ff;">
             <td style="padding:16px 20px;font-size:15px;color:#1a1a2e;font-weight:700;">
-              {% if deposit_amount and deposit_amount < subtotal %}Deposit Due{% else %}Total{% endif %}
+              To pay at the venue<br><span style="font-size:12px;font-weight:400;color:#6b7280;">Cash or card on the day</span>
             </td>
             <td style="padding:16px 20px;font-size:20px;color:#7c3aed;font-weight:800;text-align:right;">
-              £{% if deposit_amount and deposit_amount < subtotal %}{{ deposit_amount }}{% else %}{{ subtotal }}{% endif %}
+              £{{ subtotal|floatformat:2 }}
             </td>
           </tr>
           {% else %}

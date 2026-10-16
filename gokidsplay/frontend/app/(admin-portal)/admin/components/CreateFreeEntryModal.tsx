@@ -68,7 +68,7 @@ export function CreateFreeEntryModal({ onClose, onSuccess }: CreateFreeEntryModa
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-neon-blue focus:ring-1 focus:ring-neon-blue focus:outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all"
                             placeholder="Enter full name"
                             required
                         />
@@ -83,7 +83,7 @@ export function CreateFreeEntryModal({ onClose, onSuccess }: CreateFreeEntryModa
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-neon-blue focus:ring-1 focus:ring-neon-blue focus:outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all"
                             placeholder="customer@example.com"
                             required
                         />
@@ -98,7 +98,7 @@ export function CreateFreeEntryModal({ onClose, onSuccess }: CreateFreeEntryModa
                             type="tel"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-neon-blue focus:ring-1 focus:ring-neon-blue focus:outline-none transition-all"
+                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all"
                             placeholder="1234567890"
                         />
                     </div>
@@ -112,7 +112,7 @@ export function CreateFreeEntryModal({ onClose, onSuccess }: CreateFreeEntryModa
                             value={formData.reason}
                             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                             rows={4}
-                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-neon-blue focus:ring-1 focus:ring-neon-blue focus:outline-none transition-all resize-none"
+                            className="w-full px-4 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none transition-all resize-none"
                             placeholder="E.g., Birthday celebration, competition winner..."
                             required
                         />
@@ -133,7 +133,7 @@ export function CreateFreeEntryModal({ onClose, onSuccess }: CreateFreeEntryModa
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 px-4 py-2.5 bg-neon-blue text-slate-900 rounded-lg hover:bg-blue-400 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                            className="flex-1 px-4 py-2.5 bg-blue-600 text-slate-900 rounded-lg hover:bg-blue-400 transition-colors font-bold disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                             disabled={loading}
                         >
                             {loading ? (

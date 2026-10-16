@@ -56,7 +56,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className="p-2 text-slate-400 hover:text-neon-blue hover:bg-slate-100 rounded-lg transition-colors"
+                className="p-2 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-colors"
                 title="Edit Booking"
             >
                 <Edit size={18} />
@@ -79,7 +79,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
                                     type="date"
                                     value={formData.date}
                                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                                     required
                                 />
                             </div>
@@ -90,7 +90,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
                                     type="time"
                                     value={formData.time}
                                     onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                                     required
                                 />
                             </div>
@@ -102,7 +102,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
                                         type="number"
                                         value={formData.guests}
                                         onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) })}
-                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                                         min="1"
                                         required
                                     />
@@ -113,7 +113,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
                                         type="number"
                                         value={formData.amount}
                                         onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue outline-none text-slate-900"
+                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none text-slate-900"
                                         min="0"
                                         step="0.01"
                                         required
@@ -182,7 +182,7 @@ export default function BookingEditModal({ booking, onClose }: BookingEditModalP
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 px-4 py-2 text-white bg-neon-blue hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50"
+                                    className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-600 rounded-lg transition-colors disabled:opacity-50"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? "Saving..." : "Save Changes"}
