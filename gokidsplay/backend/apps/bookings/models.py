@@ -90,6 +90,7 @@ class Booking(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='SESSION')
     activity = models.CharField(max_length=100, null=True, blank=True, help_text="Activity type: roller-skating, ten-pin-bowling, arcade")
     add_ons = models.JSONField(null=True, blank=True, help_text="Selected add-ons: [{id, label, qty, price_each, subtotal}]")
+    tickets = models.JSONField(null=True, blank=True, help_text="Admission tickets: [{plan_id, label, qty, price_each, subtotal, playing}]")
     parking_plates = models.JSONField(null=True, blank=True, help_text="Car registration plates for pre-booked parking: ['LE21 ABC', ...]")
     qr_code = models.CharField(max_length=255, unique=True, null=True, blank=True)
     booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Unique booking number (SP-YYYYMMDD-XXXX)")

@@ -290,6 +290,7 @@ class PricingPlan(models.Model):
     description = models.TextField(null=True, blank=True)
     features = models.JSONField(default=list, help_text="List of features/inclusions")
     popular = models.BooleanField(default=False)
+    is_spectator = models.BooleanField(default=False, help_text="Non-playing ticket (e.g. non-playing adult) — not counted towards play capacity")
     variant = models.CharField(max_length=20, default="primary", help_text="Color variant: primary, secondary, accent")
     active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)

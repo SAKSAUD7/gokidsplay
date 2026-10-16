@@ -28,14 +28,14 @@ export default async function BookingPage() {
                     </div>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black mb-4">
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-primary to-blue-400">
-                            Book Your Activity
+                            Book Your Play Session
                         </span>
                     </h1>
                     <p className="text-lg text-white/70">
-                        Choose from{" "}
+                        One 2-hour ticket for{" "}
                         <strong className="text-pink-400">Soft Play</strong>,{" "}
                         <strong className="text-blue-400">Laser Arena</strong>,{" "}
-                        <strong className="text-orange-400">Go Karts</strong> or{" "}
+                        <strong className="text-orange-400">Go Karts</strong> and{" "}
                         <strong className="text-purple-400">Inflatable Park</strong>{" "}
                         at Go Kids Play Coventry
                     </p>

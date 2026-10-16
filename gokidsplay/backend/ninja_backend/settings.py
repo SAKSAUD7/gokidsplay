@@ -212,15 +212,17 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     # ── Rate Limiting (no extra package needed — built into DRF) ──────────
-    # Public endpoints: max 10 requests/minute per IP
-    # Authenticated staff: max 200 requests/minute
+    # Public reads (site content) are generous, public writes (bookings,
+    # logins, contact form) are strict — see apps/core/throttling.py
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
+        'apps.core.throttling.AnonReadThrottle',
+        'apps.core.throttling.AnonWriteThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '60/minute',   # 60 req/min for public (booking form, slot availability)
-        'user': '300/minute',  # 300 req/min for authenticated admin staff
+        'anon_read': '600/minute',  # page content, slot availability
+        'anon_write': '30/minute',  # booking, login, register, contact
+        'user': '300/minute',       # authenticated customers and staff
     },
     # ── Filtering ─────────────────────────────────────────────────────────
     'DEFAULT_FILTER_BACKENDS': [

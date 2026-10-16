@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 interface BookingDetails {
+    ticketLines?: Array<{ label: string; qty: number; subtotal: number }>; // admission tickets by type
     duration?: string | number; // session length in minutes
     date: string;
     time: string;
@@ -58,6 +59,7 @@ interface PaymentStepProps {
 const MERCHANT_LABELS: Record<string, string> = {};
 
 const ACTIVITY_LABELS: Record<string, string> = {
+    "all-access":      "All-Access Play Session",
     "soft-play":       "Mega Soft Play",
     "laser-arena":     "Laser Arena",
     "go-karts":        "Go Karts",
@@ -148,15 +150,19 @@ export function PaymentStep({
     const ticketsKids      = kids   * kidPrice;
     const ticketsSpecs     = spectators * specPrice;
     
-    const totalTickets     = ticketsAdults + ticketsKids + ticketsSpecs;
+    // Admission tickets by type (all-access session) take precedence over the legacy headcount pricing
+    const ticketLines      = d.ticketLines && d.ticketLines.length > 0 ? d.ticketLines : null;
+    const totalTickets     = ticketLines
+        ? ticketLines.reduce((sum, line) => sum + line.subtotal, 0)
+        : ticketsAdults + ticketsKids + ticketsSpecs;
     
     // For party bookings, recalculate based on base package
     const partyBasePrice   = d.partyBasePrice ?? 250.00;
     const partyExtraKids   = d.partyExtraKids ?? Math.max(0, kids - 10);
     // Party wizard passes accompanying adults as `adults`
     const partyExtraSpecs  = d.partyExtraSpectators ?? Math.max(0, (bookingType === "party" ? adults : spectators) - 10);
-    const partyExtraKidsCost = partyExtraKids * (d.partyExtraKidPrice ?? 19.95);
-    const partyExtraSpecsCost = partyExtraSpecs * (d.partyExtraSpectatorPrice ?? 2.95);
+    const partyExtraKidsCost = partyExtraKids * (d.partyExtraKidPrice ?? 20.00);
+    const partyExtraSpecsCost = partyExtraSpecs * (d.partyExtraSpectatorPrice ?? 4.95);
     
     const skateTotal       = skateQty  * skatePrice;
     const shoeTotal        = shoeQty   * shoePrice;
@@ -241,17 +247,22 @@ export function PaymentStep({
                                     {adults > 0 && <Row label="Accompanying adults" value={`${adults} (up to 10 included)`} />}
                                     
                                     <Row label="Party Base Package Price" value={fmt(partyBasePrice)} />
-                                    {partyExtraKids > 0 && <Row label={`Extra Kids Price (${partyExtraKids} × ${fmt(d.partyExtraKidPrice ?? 19.95)})`} value={fmt(partyExtraKidsCost)} />}
-                                    {partyExtraSpecs > 0 && <Row label={`Extra Spectators Price (${partyExtraSpecs} × ${fmt(d.partyExtraSpectatorPrice ?? 2.95)})`} value={fmt(partyExtraSpecsCost)} />}
+                                    {partyExtraKids > 0 && <Row label={`Extra Kids Price (${partyExtraKids} × ${fmt(d.partyExtraKidPrice ?? 20.00)})`} value={fmt(partyExtraKidsCost)} />}
+                                    {partyExtraSpecs > 0 && <Row label={`Extra Spectators Price (${partyExtraSpecs} × ${fmt(d.partyExtraSpectatorPrice ?? 4.95)})`} value={fmt(partyExtraSpecsCost)} />}
                                 </>
                             ) : (
                                 <>
-                                    <Row
-                                        label="Visitors"
-                                        value={String(adults + kids)}
-                                    />
-                                    {spectators > 0 && (
-                                        <Row label="Non-playing adults" value={String(spectators)} />
+                                    {ticketLines ? (
+                                        ticketLines.map((line) => (
+                                            <Row key={line.label} label={`${line.label} × ${line.qty}`} value={fmt(line.subtotal)} />
+                                        ))
+                                    ) : (
+                                        <>
+                                            <Row label="Visitors" value={String(adults + kids)} />
+                                            {spectators > 0 && (
+                                                <Row label="Non-playing adults" value={String(spectators)} />
+                                            )}
+                                        </>
                                     )}
 
                                     {/* Add-ons */}
@@ -261,8 +272,8 @@ export function PaymentStep({
                                     {parkingQty > 0 && <Row label="Parking Spaces"     value={String(parkingQty)} />}
 
                                     {/* Pricing breakdown */}
-                                    <Row label="Visitor Tickets" value={fmt(ticketsAdults + ticketsKids)} />
-                                    {spectators > 0 && <Row label="Non-playing adult tickets" value={fmt(ticketsSpecs)} />}
+                                    {!ticketLines && <Row label="Visitor Tickets" value={fmt(ticketsAdults + ticketsKids)} />}
+                                    {!ticketLines && spectators > 0 && <Row label="Non-playing adult tickets" value={fmt(ticketsSpecs)} />}
                                     {skateQty  > 0 && <Row label="Total Skate Hire Price"  value={fmt(skateTotal)} />}
                                     {shoeQty   > 0 && <Row label="Total Shoe Hire Price"   value={fmt(shoeTotal)} />}
                                     {lockerQty > 0 && <Row label="Total Locker Hire Price" value={fmt(lockerTotal)} />}

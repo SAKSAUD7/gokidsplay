@@ -81,21 +81,26 @@ const nextConfig = {
 
     // ── HTTP Headers ──────────────────────────────────────────────
     async headers() {
+        // Long-lived caching only in production: dev chunk names (e.g. webpack.js) are not
+        // content-hashed, so caching them makes browsers run stale code after every change.
+        const isProd = process.env.NODE_ENV === 'production';
         return [
-            {
-                // Cache static assets aggressively
-                source: '/_next/static/:path*',
-                headers: [
-                    { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-                ],
-            },
-            {
-                // Cache public images for 7 days
-                source: '/images/:path*',
-                headers: [
-                    { key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' },
-                ],
-            },
+            ...(isProd ? [
+                {
+                    // Hashed build assets never change
+                    source: '/_next/static/:path*',
+                    headers: [
+                        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+                    ],
+                },
+                {
+                    // Cache public images for 7 days
+                    source: '/images/:path*',
+                    headers: [
+                        { key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' },
+                    ],
+                },
+            ] : []),
             {
                 // Security headers for all pages
                 source: '/(.*)',

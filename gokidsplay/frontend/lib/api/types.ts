@@ -33,8 +33,9 @@ export function todayInUK(): string {
     ].join('-');
 }
 
-// ─── Leicester City Council School Holiday Dates 2025–2027 ──────────────────
-// Source: Leicester City Council 2026-27 official calendar
+// ─── Coventry City Council School Holiday Dates ─────────────────────────────
+// Source: Coventry City Council "School term dates 2026-2027" (coventry.gov.uk/termdates),
+// saved in the repo as 24_0866_NH_School_term_dates_calendar_2026_2027_*.pdf
 // Yellow dates = school holidays (Go Kids Play is OPEN on these, including Mondays)
 const SCHOOL_HOLIDAY_RANGES: Array<[string, string]> = [
     // 2025
@@ -46,17 +47,17 @@ const SCHOOL_HOLIDAY_RANGES: Array<[string, string]> = [
     ["2026-02-16", "2026-02-20"], // Spring half-term
     ["2026-03-30", "2026-04-10"], // Easter holidays
     ["2026-05-25", "2026-05-29"], // Summer half-term
-    // 2026-27 council year (from official LCC 2026-27 calendar)
-    ["2026-07-22", "2026-08-21"], // Summer holiday 2026 ends Aug 21
-    ["2026-10-19", "2026-10-23"], // Autumn half-term (Oct 19 - 23)
+    // 2026-27 school year (Coventry City Council calendar)
+    ["2026-07-22", "2026-09-01"], // Summer holiday 2026 (to Aug 31) + Sep 1 LA training day
+    ["2026-10-26", "2026-10-30"], // Autumn half-term (Oct 26 - 30)
     ["2026-12-21", "2027-01-01"], // Christmas & New Year (Dec 21 - Jan 1)
     ["2027-02-15", "2027-02-19"], // Spring half-term (Feb 15 - 19)
-    ["2027-03-22", "2027-04-02"], // Easter holidays (Mar 22 - Apr 2)
-    ["2027-05-31", "2027-06-04"], // Summer half-term
-    ["2027-07-12", "2027-08-20"], // Summer holiday 2027 (Starts July 12)
+    ["2027-03-29", "2027-04-09"], // Easter holidays (Mar 29 - Apr 9; Good Friday Mar 26 is a bank holiday)
+    ["2027-05-31", "2027-06-04"], // Summer half-term (May 31 bank holiday + Jun 1 - 4)
+    ["2027-07-22", "2027-08-31"], // Summer holiday 2027 (Jul 22 - Aug 31)
 ];
 
-// ─── UK Public Holidays (Red dates on LCC calendar) ──────────────────────────
+// ─── UK Public Holidays (bank holidays on the council calendar) ──────────────
 // Go Kids Play is OPEN on public holidays (including Mondays)
 const UK_PUBLIC_HOLIDAYS: string[] = [
     // 2025-26

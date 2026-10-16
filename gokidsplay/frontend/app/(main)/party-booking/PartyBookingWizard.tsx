@@ -245,8 +245,8 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     const calculateTotal = () => {
         // Go Kids Play UK Party Pricing: £250 base package for up to 10 kids and 10 spectators
         const basePackagePrice = 250.00;
-        const extraParticipantPrice = 19.95;
-        const extraSpectatorPrice = 2.95;
+        const extraParticipantPrice = 20.00;
+        const extraSpectatorPrice = 4.95;
         const includedParticipants = 10;
         const includedSpectators = 10;
         const depositPercentage = 50; // 50% deposit
@@ -699,14 +699,14 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                         </div>
                                         {formData.participants > 10 && (
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-white/70">Extra Guests ({formData.participants - 10} × £19.95)</span>
-                                                <span className="text-white font-bold">£{((formData.participants - 10) * 19.95).toFixed(2)}</span>
+                                                <span className="text-white/70">Extra Guests ({formData.participants - 10} × £20.00)</span>
+                                                <span className="text-white font-bold">£{((formData.participants - 10) * 20.00).toFixed(2)}</span>
                                             </div>
                                         )}
                                         {formData.spectators > 10 && (
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-white/70">Extra Spectators ({formData.spectators - 10} × £2.95)</span>
-                                                <span className="text-white font-bold">£{((formData.spectators - 10) * 2.95).toFixed(2)}</span>
+                                                <span className="text-white/70">Extra Spectators ({formData.spectators - 10} × £4.95)</span>
+                                                <span className="text-white font-bold">£{((formData.spectators - 10) * 4.95).toFixed(2)}</span>
                                             </div>
                                         )}
                                         <div className="flex justify-between text-sm text-white/50">
@@ -838,8 +838,8 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                 phone: formData.phone,
                                 adults: formData.spectators,
                                 kids: formData.participants,
-                                adultPrice: 2.95,
-                                kidPrice: 19.95,
+                                adultPrice: 4.95,
+                                kidPrice: 20.00,
                                 onlineBookingFee: 0,
                                 discount: 0,
                                 totalPaid: paymentOption === "deposit" ? costs.deposit : costs.total,

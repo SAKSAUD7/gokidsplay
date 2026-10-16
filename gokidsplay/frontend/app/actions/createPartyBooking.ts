@@ -31,8 +31,8 @@ export async function createPartyBooking(formData: any) {
 
         // Go Kids Play UK Party Pricing: £250 base package for up to 10 kids and 10 spectators
         const basePackagePrice = 250.00;
-        const extraParticipantPrice = 19.95;
-        const extraSpectatorPrice = 2.95;
+        const extraParticipantPrice = 20.00;
+        const extraSpectatorPrice = 4.95;
         const includedParticipants = 10;
         const includedSpectators = 10;
         const depositPercentage = 0.50; // 50% deposit

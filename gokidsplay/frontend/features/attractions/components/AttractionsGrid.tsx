@@ -311,7 +311,7 @@ export const AttractionsGrid = ({ activities }: AttractionsGridProps) => {
                                         {/* Price badge top-right */}
                                         <div className="absolute top-4 right-4 z-30 px-2.5 py-1 rounded-full bg-black/70 border border-white/20 text-white text-xs font-bold backdrop-blur-sm flex items-center gap-1">
                                             <Tag className="w-3 h-3" />
-                                            {meta.price}
+                                            Included with entry
                                         </div>
 
                                         {/* Title on image */}
@@ -340,10 +340,10 @@ export const AttractionsGrid = ({ activities }: AttractionsGridProps) => {
 
                                         {/* Book Now Button */}
                                         <Link
-                                            href={meta.slug ? `/book?activity=${meta.slug}` : "/book"}
+                                            href="/book"
                                             className={`mt-auto block w-full py-3.5 px-4 bg-gradient-to-r ${meta.gradient} text-white font-bold text-center rounded-xl hover:shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2`}
                                         >
-                                            Book {activity.name} <ArrowRight className="w-4 h-4" />
+                                            Book Tickets — all activities <ArrowRight className="w-4 h-4" />
                                         </Link>
                                     </div>
 

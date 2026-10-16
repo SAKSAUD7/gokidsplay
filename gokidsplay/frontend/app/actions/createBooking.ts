@@ -141,10 +141,27 @@ export async function createBooking(formData: any) {
         const SPEC_PRICE = cmsConfig.spectator_price ? parseFloat(cmsConfig.spectator_price) : 2.95;
         const GST_RATE = cmsConfig.gst_rate ? parseFloat(cmsConfig.gst_rate) : 0;
 
-        let subtotal =
-            (data.adults * ADULT_PRICE) +
-            (data.kids * KID_PRICE) +
-            (data.spectators * SPEC_PRICE);
+        // All-access admission: ticket types are the Session Pricing Plans (the API re-prices
+        // public bookings from the same plans). Admin manual bookings still use headcounts.
+        const ticketQty: Record<string, number> = (formData.tickets && typeof formData.tickets === "object") ? formData.tickets : {};
+        const hasTickets = Object.values(ticketQty).some((q) => Number(q) > 0);
+        if (!isAdminBooking && !hasTickets) {
+            return { success: false, error: "Please choose at least one ticket." };
+        }
+        let subtotal = 0;
+        if (hasTickets) {
+            const plansRes = await fetch(`${API_URL}/cms/pricing-plans/`, { cache: "no-store" });
+            const plans: any[] = plansRes.ok ? await plansRes.json() : [];
+            for (const plan of plans) {
+                const qty = Number(ticketQty[plan.id] || 0);
+                if (qty > 0 && plan.type === "SESSION" && plan.active !== false) subtotal += qty * parseFloat(plan.price);
+            }
+        } else {
+            subtotal =
+                (data.adults * ADULT_PRICE) +
+                (data.kids * KID_PRICE) +
+                (data.spectators * SPEC_PRICE);
+        }
 
         // ── Add-ons — prices also driven by CMS config ─────────────────────
         const ADD_ON_PRICES: Record<string, number> = {
@@ -254,6 +271,7 @@ export async function createBooking(formData: any) {
             type: "SESSION",
             activity: formData.activity || null,
             add_ons: addOnsList.length > 0 ? addOnsList : null,
+            tickets: hasTickets ? ticketQty : undefined,
             parking_plates: (formData.parkingPlates as string[] || []).filter(Boolean),
             customer_id: formData.customerId || null,
         };

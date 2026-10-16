@@ -12,8 +12,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from apps.bookings.models import Booking, PartyBooking
-from apps.bookings.pricing import price_party_booking, price_session_booking
-from apps.cms.models import ContactMessage, SessionBookingConfig
+from apps.bookings.pricing import price_party_booking
+from apps.cms.models import ContactMessage, PricingPlan, SessionBookingConfig
 from apps.shop.models import Voucher
 
 SESSIONS_URL = '/api/v1/bookings/bookings/'
@@ -38,6 +38,21 @@ def config(db):
 
 
 @pytest.fixture
+def plans(db):
+    """The four Go Kids Play admission tickets (same as the live site)."""
+    def make(name, price, order, spectator=False):
+        return PricingPlan.objects.create(
+            name=name, type='SESSION', price=Decimal(price), duration=120, order=order, active=True,
+            is_spectator=spectator, features=[])
+    return {
+        'infant': make('Under 12 months', '1.95', 1),
+        'toddler': make('Under 24 months', '7.95', 2),
+        'child': make('24 months and above', '12.95', 3),
+        'adult': make('Non-playing Adult', '4.95', 4, spectator=True),
+    }
+
+
+@pytest.fixture
 def staff_client(db):
     user = get_user_model().objects.create_user(
         username='staff-test', email='staff-test@example.com', password='x-Test-12345', is_staff=True
@@ -47,11 +62,12 @@ def staff_client(db):
     return client
 
 
-def session_payload(**overrides):
+def session_payload(plans, **overrides):
     payload = {
         'name': 'Test Parent', 'email': 'parent@example.com', 'phone': '07700900123',
-        'date': next_saturday().isoformat(), 'time': '14:00', 'duration': 120,
-        'adults': 2, 'kids': 5, 'spectators': 0, 'type': 'SESSION',
+        'date': next_saturday().isoformat(), 'time': '14:00', 'duration': 120, 'type': 'SESSION',
+        # 3 children + 1 toddler + 2 non-playing adults
+        'tickets': {plans['child'].id: 3, plans['toddler'].id: 1, plans['adult'].id: 2},
     }
     payload.update(overrides)
     return payload
@@ -60,21 +76,25 @@ def session_payload(**overrides):
 # ── Pricing ──────────────────────────────────────────────────────────────────
 
 @pytest.mark.django_db
-class TestSessionPricing:
-    def test_price_matches_booking_wizard_formula(self, config):
-        price = price_session_booking(adults=2, kids=5, spectators=1, add_ons=[{'id': 'parking', 'qty': 1}])
-        # 7 × 9.95 + 1 × 2.95 + parking 3.00 = 75.60, + £2 online fee
-        assert price.subtotal == Decimal('75.60')
-        assert price.amount == Decimal('77.60')
+class TestAdmissionPricing:
+    def test_price_uses_pricing_plans(self, config, plans):
+        from apps.bookings.pricing import price_admission
+        price = price_admission(tickets={plans['child'].id: 3, plans['toddler'].id: 1, plans['adult'].id: 2},
+                                add_ons=[{'id': 'parking', 'qty': 1}])
+        # 3 x 12.95 + 7.95 + 2 x 4.95 + parking 3.00 = 59.70, + 2.00 online fee
+        assert price.subtotal == Decimal('59.70')
+        assert price.amount == Decimal('61.70')
+        assert (price.players, price.spectators) == (4, 2)
 
-    def test_client_add_on_prices_are_ignored(self, config):
-        price = price_session_booking(adults=1, kids=0, spectators=0,
-                                      add_ons=[{'id': 'parking', 'qty': 2, 'price_each': 0}, {'id': 'free-stuff', 'qty': 9}])
-        assert price.subtotal == Decimal('15.95')  # 9.95 + 2 × 3.00, unknown add-on dropped
+    def test_client_prices_and_unknown_tickets_are_ignored(self, config, plans):
+        from apps.bookings.pricing import price_admission
+        price = price_admission(tickets=[{'plan_id': plans['child'].id, 'qty': 1, 'price_each': 0},
+                                         {'plan_id': 99999, 'qty': 5}])
+        assert price.subtotal == Decimal('12.95')
 
-    def test_staff_bookings_have_no_online_fee(self, config):
-        price = price_session_booking(adults=1, kids=0, spectators=0, include_online_fee=False)
-        assert price.amount == Decimal('9.95')
+    def test_at_least_one_playing_ticket_required(self, config, plans):
+        from apps.bookings.pricing import price_admission
+        assert price_admission(tickets={plans['adult'].id: 2}).error
 
 
 @pytest.mark.django_db
@@ -84,47 +104,56 @@ class TestPartyPricing:
 
     def test_extra_guests_and_deposit(self):
         price = price_party_booking(kids=12, adults=12)
-        assert price.amount == Decimal('295.80')   # 250 + 2 × 19.95 + 2 × 2.95
-        assert price.deposit == Decimal('147.90')
+        assert price.amount == Decimal('299.90')  # 250 + 2 x 20.00 + 2 x 4.95
+        assert price.deposit == Decimal('149.95')
 
 
 # ── Public session bookings ──────────────────────────────────────────────────
 
 @pytest.mark.django_db
 class TestPublicSessionBooking:
-    def test_forged_amount_and_payment_status_are_ignored(self, config):
+    def test_forged_amount_and_payment_status_are_ignored(self, config, plans):
         response = APIClient().post(SESSIONS_URL, session_payload(
-            amount='0.01', subtotal='0.01', paid_amount='999', payment_status='PAID'
+            plans, amount='0.01', subtotal='0.01', paid_amount='999', payment_status='PAID', kids=0
         ), format='json')
         assert response.status_code == 201, response.data
         booking = Booking.objects.get(id=response.data['id'])
-        assert booking.amount == Decimal('71.65')     # 7 × 9.95 + £2 fee
+        assert booking.amount == Decimal('58.70')  # 3 x 12.95 + 7.95 + 2 x 4.95 + 2.00 fee
+        assert (booking.kids, booking.spectators) == (4, 2)
+        assert len(booking.tickets) == 3
         assert booking.paid_amount == Decimal('0')
         assert booking.payment_status == 'PENDING'
 
-    def test_invalid_voucher_is_rejected(self, config):
-        response = APIClient().post(SESSIONS_URL, session_payload(voucher_code='NOT-REAL'), format='json')
+    def test_tickets_are_required(self, config, plans):
+        payload = session_payload(plans)
+        payload.pop('tickets')
+        response = APIClient().post(SESSIONS_URL, {**payload, 'adults': 2, 'kids': 5}, format='json')
         assert response.status_code == 400
         assert Booking.objects.count() == 0
 
-    def test_valid_voucher_discounts_and_counts_usage(self, config):
+    def test_invalid_voucher_is_rejected(self, config, plans):
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, voucher_code='NOT-REAL'), format='json')
+        assert response.status_code == 400
+        assert Booking.objects.count() == 0
+
+    def test_valid_voucher_discounts_and_counts_usage(self, config, plans):
         voucher = Voucher.objects.create(code='SAVE10', discount_type='PERCENTAGE', discount_value=Decimal('10'),
                                          is_active=True, usage_limit=5, used_count=0)
-        response = APIClient().post(SESSIONS_URL, session_payload(voucher_code='save10'), format='json')
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, voucher_code='save10'), format='json')
         assert response.status_code == 201, response.data
         booking = Booking.objects.get(id=response.data['id'])
-        assert booking.discount_amount == Decimal('6.97')   # 10% of 69.65 subtotal
-        assert booking.amount == Decimal('64.68')
+        assert booking.discount_amount == Decimal('5.67')  # 10% of 56.70 subtotal, rounded half-up
+        assert booking.amount == Decimal('53.03')
         voucher.refresh_from_db()
         assert voucher.used_count == 1
 
-    def test_staff_can_set_custom_amount(self, config, staff_client):
-        response = staff_client.post(SESSIONS_URL, session_payload(amount='5.00'), format='json')
+    def test_staff_can_set_custom_amount(self, config, plans, staff_client):
+        response = staff_client.post(SESSIONS_URL, session_payload(plans, amount='5.00', adults=1, kids=1), format='json')
         assert response.status_code == 201, response.data
         assert Booking.objects.get(id=response.data['id']).amount == Decimal('5.00')
 
-    def test_admin_booking_list_works_with_bookings(self, config, staff_client):
-        APIClient().post(SESSIONS_URL, session_payload(), format='json')
+    def test_admin_booking_list_works_with_bookings(self, config, plans, staff_client):
+        APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
         assert staff_client.get(SESSIONS_URL).status_code == 200
 
 
@@ -149,8 +178,8 @@ class TestPartyBookingEndpoint:
                                     format='json')
         assert response.status_code == 201, response.data
         party = PartyBooking.objects.get(id=response.data['id'])
-        assert party.amount == Decimal('289.90')
-        assert party.deposit_amount == Decimal('144.95')
+        assert party.amount == Decimal('290.00')  # 250 + 2 x 20.00
+        assert party.deposit_amount == Decimal('145.00')
         assert party.status == 'PENDING'
 
     def test_staff_can_list_party_bookings(self, staff_client):

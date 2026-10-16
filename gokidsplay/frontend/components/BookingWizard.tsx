@@ -46,66 +46,37 @@ interface ActivityAddOn {
     price: number;
 }
 
+/** A Session pricing plan from the CMS — one admission ticket type (priced by age). */
+interface TicketPlan {
+    id: number;
+    name: string;
+    age_group?: string | null;
+    description?: string | null;
+    price: string;
+    is_spectator?: boolean;
+    order?: number;
+}
+
 // --- Activity definitions -----------------------------------------------------
 // NOTE: Arcade is walk-in only (tokens bought at venue). Only Skating + Bowling bookable.
 
+// Go Kids Play sells ONE 2-hour admission that covers every activity; ticket types
+// (by age) come from the Session "Pricing Plans" in the CMS.
 const ACTIVITIES = [
     {
-        id: "soft-play",
-        name: "Mega Soft Play",
-        emoji: "🏰",
-        tagline: "Endless Fun for Little Ones",
-        description: "Explore our massive multi-level soft play structure packed with slides, ball pits, and obstacles.",
-        highlights: ["2-hour session", "Dedicated toddler zone", "Safe & supervised", "Cafe access for parents"],
-        color: "from-pink-500 to-rose-600",
+        id: "all-access",
+        name: "All-Access Play Session",
+        emoji: "\u{1F39F}\uFE0F",
+        tagline: "One ticket \u2014 every activity",
+        description: "Your 2-hour ticket includes Mega Soft Play, Laser Arena, Go Karts, Ninja Inflatable, Tangle Tower and the Sports Pitch.",
+        highlights: ["2-hour play session", "All activities included", "Toddler area for under 5s", "Caf\u00e9 for parents"],
+        color: "from-pink-500 to-purple-600",
         accentColor: "text-pink-400",
         borderColor: "border-pink-500/40",
         bgColor: "bg-pink-500/10",
         addOns: [] as ActivityAddOn[],
-        minAge: { adults: "18+", kids: "0–12 yrs", note: "Under 5s have dedicated zone" },
+        minAge: { adults: "Any", kids: "All ages", note: "Under 5s have a dedicated toddler area" },
     },
-    {
-        id: "laser-arena",
-        name: "Laser Arena",
-        emoji: "🔫",
-        tagline: "Epic Laser Tag Battles",
-        description: "Gear up and step into our state-of-the-art laser arena. Perfect for parties, groups, or competitive fun.",
-        highlights: ["2-hour session", "Multi-level arena", "High-tech equipment", "Various game modes"],
-        color: "from-blue-500 to-indigo-600",
-        accentColor: "text-blue-400",
-        borderColor: "border-blue-500/40",
-        bgColor: "bg-blue-500/10",
-        addOns: [] as ActivityAddOn[],
-        minAge: { adults: "18+", kids: "5+ yrs", note: "Minimum age 5 years" },
-    },
-    {
-        id: "go-karts",
-        name: "Go Karts",
-        emoji: "🏎️",
-        tagline: "Start Your Engines",
-        description: "Race against friends and family on our exciting indoor go-kart track designed specifically for kids.",
-        highlights: ["2-hour session", "Safe electric karts", "Exciting track layout", "Safety briefing included"],
-        color: "from-orange-500 to-amber-600",
-        accentColor: "text-orange-400",
-        borderColor: "border-orange-500/40",
-        bgColor: "bg-orange-500/10",
-        addOns: [] as ActivityAddOn[],
-        minAge: { adults: "18+", kids: "3+ yrs", note: "Height restrictions may apply" },
-    },
-    {
-        id: "inflatable-park",
-        name: "Inflatable Park",
-        emoji: "🎈",
-        tagline: "Bouncing Fun for Everyone",
-        description: "Jump, bounce, and flip in our massive inflatable park featuring slides, assault courses, and bounce zones.",
-        highlights: ["2-hour session", "Giant slides", "Obstacle course", "High-energy fun"],
-        color: "from-purple-500 to-fuchsia-600",
-        accentColor: "text-purple-400",
-        borderColor: "border-purple-500/40",
-        bgColor: "bg-purple-500/10",
-        addOns: [] as ActivityAddOn[],
-        minAge: { adults: "18+", kids: "4+ yrs", note: "Grip socks required" },
-    }
 ]
 
 
@@ -195,6 +166,10 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     const [selectedActivity, setSelectedActivity] = useState<ActivityId | null>(null);
 
+    // Admission ticket types (Session Pricing Plans) and how many of each are selected
+    const [ticketPlans, setTicketPlans] = useState<TicketPlan[]>([]);
+    const [ticketQty, setTicketQty] = useState<Record<number, number>>({});
+
     const [bookingComplete, setBookingComplete] = useState(false);
 
     const [bookingId, setBookingId] = useState<string>("");
@@ -254,7 +229,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
             duration: "90",
 
-            adults: 1,
+            adults: 0,
 
             kids: 0,
 
@@ -421,6 +396,38 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     // --- Pricing (all from CMS config with fallbacks) -------------------------
 
+    // Load the admission ticket types once
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1"}/cms/pricing-plans/`)
+            .then((r) => (r.ok ? r.json() : []))
+            .then((data: any[]) => {
+                const plans = (Array.isArray(data) ? data : [])
+                    .filter((p) => p.type === "SESSION" && p.active !== false)
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+                setTicketPlans(plans);
+            })
+            .catch(() => setTicketPlans([]));
+    }, []);
+
+    // Keep the form's headcount fields in sync with the chosen tickets
+    // (playing tickets count as participants, non-playing adults as spectators)
+    const setTicket = (plan: TicketPlan, qty: number) => {
+        const next = { ...ticketQty, [plan.id]: Math.max(0, Math.min(50, qty)) };
+        setTicketQty(next);
+        const players = ticketPlans.filter((p) => !p.is_spectator).reduce((sum, p) => sum + (next[p.id] || 0), 0);
+        const spectatorsCount = ticketPlans.filter((p) => p.is_spectator).reduce((sum, p) => sum + (next[p.id] || 0), 0);
+        setValue("adults", 0, { shouldValidate: true });
+        setValue("kids", players, { shouldValidate: true });
+        setValue("spectators", spectatorsCount, { shouldValidate: true });
+    };
+
+    const ticketLines = ticketPlans
+        .filter((p) => (ticketQty[p.id] || 0) > 0)
+        .map((p) => ({ plan: p, qty: ticketQty[p.id], subtotal: parseFloat(p.price) * ticketQty[p.id] }));
+    const cheapestPlayingPrice = ticketPlans
+        .filter((p) => !p.is_spectator)
+        .reduce((min, p) => Math.min(min, parseFloat(p.price)), Infinity);
+
     const prices = {
         adult: (config && config.adult_price) ? parseFloat(config.adult_price) : 9.95,
         kid: (config && config.kid_price) ? parseFloat(config.kid_price) : 9.95,
@@ -475,11 +482,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     const calculateTotal = () => {
         // GKP: all sessions are 2-hour sessions — flat per-person pricing, no duration multiplier.
-        const subtotal =
-            (formData.adults * prices.adult) +
-            (formData.kids * prices.kid) +
-            (formData.spectators * prices.spectator) +
-            addOnTotal;
+        const subtotal = ticketLines.reduce((sum, line) => sum + line.subtotal, 0) + addOnTotal;
 
         const gst = subtotal * (prices.gstRate / 100);
         const onlineBookingFee = 2.00;
@@ -638,7 +641,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
             }
 
-            const result = await onSubmit({ ...data, activity: selectedActivity, addOns: selectedAddOns, globalAddOns: selectedGlobalAddOns, parkingPlates, customerId: customer?.id });
+            const result = await onSubmit({ ...data, activity: selectedActivity, tickets: ticketQty, addOns: selectedAddOns, globalAddOns: selectedGlobalAddOns, parkingPlates, customerId: customer?.id });
 
             if (result.success && result.bookingId) {
 
@@ -898,17 +901,17 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                         <h2 className="text-3xl md:text-5xl font-display font-black text-white mb-2">
 
-                                            Choose Your Activity
+                                            Your All-Access Ticket
 
                                         </h2>
 
-                                        <p className="text-white/60 text-lg">What would you like to do at Go Kids Play today?</p>
+                                        <p className="text-white/60 text-lg">One 2-hour ticket covers every activity at Go Kids Play</p>
 
                                     </div>
 
 
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1 gap-4 max-w-xl mx-auto">
 
                                         {ACTIVITIES.map(act => (
 
@@ -970,7 +973,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 <div className={`mt-5 flex items-center gap-2 text-sm font-bold ${act.accentColor}`}>
 
-                                                    From £{prices.adult.toFixed(2)} / person <ChevronRight className="w-4 h-4" />
+                                                    {Number.isFinite(cheapestPlayingPrice) ? `From \u00a3${cheapestPlayingPrice.toFixed(2)} per child \u2014 ` : ""}Choose date & time <ChevronRight className="w-4 h-4" />
 
                                                 </div>
 
@@ -994,17 +997,11 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                         <div className="grid grid-cols-2 gap-3 text-center">
 
-                                            {[
-
-                                                { label: "Adults & Kids (7+)", price: "£9.95", note: "per session" },
-
-                                                { label: "Kids (1–6 yrs)", price: "£9.95", note: "per session" },
-
-                                                { label: "Spectators (4+)", price: "£2.95", note: "per person" },
-
-                                                { label: "Under 4", price: "FREE", note: "no charge" },
-
-                                            ].map(p => (
+                                            {ticketPlans.map(plan => ({
+                                                label: plan.name,
+                                                price: `\u00a3${parseFloat(plan.price).toFixed(2)}`,
+                                                note: plan.is_spectator ? "non-playing" : "2-hour session",
+                                            })).map(p => (
 
                                                 <div key={p.label} className="bg-white/5 rounded-xl p-3">
 
@@ -1329,45 +1326,30 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                     <div className="max-w-2xl mx-auto space-y-5">
 
-                                        {/* Guest pickers */}
+                                        {/* Admission tickets (Session Pricing Plans) */}
 
-                                        {[
+                                        {ticketPlans.length === 0 && (
+                                            <p className="text-center text-white/50 text-sm">Loading ticket types…</p>
+                                        )}
 
-                                            {
-                                                key: "adults" as const,
-                                                label: activity?.minAge.adults === "Any" ? "Adults" : `Adults (${activity?.minAge.adults})`,
-                                                note: `\u00A3${prices.adult.toFixed(2)} per person`,
-                                                emoji: "\u{1F9D1}",
-                                                min: 1,
-                                            },
-                                            {
-                                                key: "kids" as const,
-                                                label: `Kids (${activity?.minAge.kids})`,
-                                                note: `\u00A3${prices.kid.toFixed(2)} per child`,
-                                                emoji: "\u{1F476}",
-                                                min: 0,
-                                            },
-                                            {
-                                                key: "spectators" as const,
-                                                label: "Spectators (Age 4+)",
-                                                note: `\u00A3${prices.spectator.toFixed(2)} each \u2013 watch from viewing area`,
-                                                emoji: "\u{1F440}",
-                                                min: 0,
-                                            },
-
-                                        ].map(g => (
-
-                                            <div key={g.key} className="flex items-center justify-between bg-white/5 rounded-2xl p-5 border border-white/10">
+                                        {ticketPlans.map(plan => {
+                                            const qty = ticketQty[plan.id] || 0;
+                                            const label = plan.name;
+                                            return (
+                                            <div key={plan.id} className="flex items-center justify-between bg-white/5 rounded-2xl p-5 border border-white/10">
 
                                                 <div className="flex items-center gap-4">
 
-                                                    <span className="text-3xl">{g.emoji}</span>
+                                                    <span className="text-3xl">{plan.is_spectator ? "\u{1F440}" : "\u{1F9D2}"}</span>
 
                                                     <div>
 
-                                                        <div className="font-bold text-white">{g.label}</div>
+                                                        <div className="font-bold text-white">{label}</div>
 
-                                                        <div className="text-white/50 text-sm">{g.note}</div>
+                                                        <div className="text-white/50 text-sm">
+                                                            £{parseFloat(plan.price).toFixed(2)} {plan.is_spectator ? "each \u2014 doesn\u2019t play" : "per ticket"}
+                                                            {plan.description ? ` \u00b7 ${plan.description}` : ""}
+                                                        </div>
 
                                                     </div>
 
@@ -1376,27 +1358,19 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                 <div className="flex items-center gap-3">
 
                                                     <button type="button"
-
-                                                        aria-label={`Remove one: ${g.label}`}
-                                                        onClick={() => setValue(g.key, Math.max(g.min, (formData[g.key] || 0) - 1), { shouldValidate: true })}
-
+                                                        aria-label={`Remove one: ${label}`}
+                                                        onClick={() => setTicket(plan, qty - 1)}
                                                         className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all font-bold text-lg">
 
                                                         <Minus className="w-4 h-4" />
 
                                                     </button>
 
-                                                    <span className="text-white font-black text-xl w-6 text-center">
-
-                                                        {formData[g.key] || 0}
-
-                                                    </span>
+                                                    <span className="text-white font-black text-xl w-6 text-center">{qty}</span>
 
                                                     <button type="button"
-
-                                                        aria-label={`Add one: ${g.label}`}
-                                                        onClick={() => setValue(g.key, (formData[g.key] || 0) + 1, { shouldValidate: true })}
-
+                                                        aria-label={`Add one: ${label}`}
+                                                        onClick={() => setTicket(plan, qty + 1)}
                                                         className="w-9 h-9 rounded-full bg-primary/80 hover:bg-primary text-black flex items-center justify-center transition-all">
 
                                                         <Plus className="w-4 h-4" />
@@ -1406,8 +1380,8 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                                 </div>
 
                                             </div>
-
-                                        ))}
+                                            );
+                                        })}
 
 
 
@@ -1830,41 +1804,17 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             <h4 className="text-white/50 text-xs uppercase font-bold tracking-wider mb-3">Price Breakdown</h4>
 
-                                            {formData.adults > 0 && (
+                                            {ticketLines.map(line => (
 
-                                                <div className="flex justify-between text-sm text-white/80">
+                                                <div key={line.plan.id} className="flex justify-between text-sm text-white/80">
 
-                                                    <span>Adults × {formData.adults}</span>
+                                                    <span>{line.plan.name} × {line.qty}</span>
 
-                                                    <span className="font-bold">£{(formData.adults * prices.adult).toFixed(2)}</span>
-
-                                                </div>
-
-                                            )}
-
-                                            {formData.kids > 0 && (
-
-                                                <div className="flex justify-between text-sm text-white/80">
-
-                                                    <span>Kids × {formData.kids}</span>
-
-                                                    <span className="font-bold">£{(formData.kids * prices.kid).toFixed(2)}</span>
+                                                    <span className="font-bold">£{line.subtotal.toFixed(2)}</span>
 
                                                 </div>
 
-                                            )}
-
-                                            {formData.spectators > 0 && (
-
-                                                <div className="flex justify-between text-sm text-white/80">
-
-                                                    <span>Spectators  {formData.spectators}</span>
-
-                                                    <span className="font-bold">£{(formData.spectators * prices.spectator).toFixed(2)}</span>
-
-                                                </div>
-
-                                            )}
+                                            ))}
 
 
 
@@ -2077,6 +2027,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                             date: formData.date,
                                             time: formData.time,
                                             duration: formData.duration,
+                                            ticketLines: ticketLines.map(line => ({ label: line.plan.name, qty: line.qty, subtotal: line.subtotal })),
                                             name: formData.name,
                                             email: formData.email,
                                             phone: formData.phone,

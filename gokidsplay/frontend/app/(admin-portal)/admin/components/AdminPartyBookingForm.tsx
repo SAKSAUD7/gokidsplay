@@ -41,7 +41,7 @@ export function AdminPartyBookingForm({ initialData, isEditing = false }: AdminP
                 booking_status: formData.get("bookingStatus"), // Add status support
             };
 
-            let result;
+            let result: { success: boolean; error?: string; bookingIntId?: number; amount?: number };
             if (isEditing && initialData?.id) {
                 result = await updatePartyBooking(initialData.id, data);
             } else {

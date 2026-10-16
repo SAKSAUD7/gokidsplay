@@ -113,13 +113,124 @@ def price_session_booking(
     return price
 
 
+# ── All-access admission tickets ─────────────────────────────────────────────
+# Go Kids Play sells one 2-hour admission covering every activity, priced by age.
+# The ticket types are the active "Session" Pricing Plans in the CMS (the same
+# plans shown on the Prices page).
+
+@dataclass
+class AdmissionPrice:
+    tickets: List[Dict[str, Any]]
+    players: int        # playing tickets (count towards play capacity)
+    spectators: int     # non-playing tickets
+    subtotal: Decimal
+    vat: Decimal
+    booking_fee: Decimal
+    discount: Decimal
+    amount: Decimal
+    add_ons: List[Dict[str, Any]] = field(default_factory=list)
+    voucher: Any = None
+    voucher_code: Optional[str] = None
+    error: str = ''
+
+
+def _requested_ticket_quantities(raw_tickets) -> Dict[int, int]:
+    """Accept {plan_id: qty} or [{plan_id|id, qty}]; client prices are ignored."""
+    quantities: Dict[int, int] = {}
+    if isinstance(raw_tickets, dict):
+        items = raw_tickets.items()
+    elif isinstance(raw_tickets, list):
+        items = [((t or {}).get('plan_id', (t or {}).get('id')), (t or {}).get('qty')) for t in raw_tickets if isinstance(t, dict)]
+    else:
+        items = []
+    for plan_id, qty in items:
+        try:
+            plan_id, qty = int(plan_id), int(qty or 0)
+        except (TypeError, ValueError):
+            continue
+        if qty > 0:
+            quantities[plan_id] = min(qty, 50)
+    return quantities
+
+
+def price_admission(
+    *,
+    tickets,
+    add_ons=None,
+    voucher_code: Optional[str] = None,
+    booking_datetime: Optional[str] = None,
+    include_online_fee: bool = True,
+) -> AdmissionPrice:
+    from apps.cms.models import PricingPlan, SessionBookingConfig
+    from apps.shop.services import evaluate_voucher
+
+    config = SessionBookingConfig.get_config()
+    vat_rate = Decimal(str(config.gst_rate or 0))
+    quantities = _requested_ticket_quantities(tickets)
+    plans = {p.id: p for p in PricingPlan.objects.filter(id__in=quantities.keys(), type='SESSION', active=True)}
+
+    lines: List[Dict[str, Any]] = []
+    players = spectators = 0
+    subtotal = Decimal('0')
+    for plan_id, qty in quantities.items():
+        plan = plans.get(plan_id)
+        if plan is None:
+            continue  # unknown / inactive ticket type
+        price_each = _money(plan.price)
+        line_total = _money(price_each * qty)
+        subtotal += line_total
+        if plan.is_spectator:
+            spectators += qty
+        else:
+            players += qty
+        lines.append({
+            'plan_id': plan.id,
+            'label': plan.name,
+            'qty': qty,
+            'price_each': float(price_each),
+            'subtotal': float(line_total),
+            'playing': not plan.is_spectator,
+        })
+
+    price = AdmissionPrice(tickets=lines, players=players, spectators=spectators, subtotal=Decimal('0'),
+                           vat=Decimal('0'), booking_fee=Decimal('0'), discount=Decimal('0'), amount=Decimal('0'))
+    if players == 0:
+        price.error = 'Please choose at least one playing ticket.'
+        return price
+
+    for add_on_id, qty in _requested_add_on_quantities(add_ons).items():
+        meta = ADD_ON_META[add_on_id]
+        price_each = _money(getattr(config, meta['config_field'], None) or meta['default'])
+        line_total = _money(price_each * qty)
+        subtotal += line_total
+        price.add_ons.append({'id': add_on_id, 'label': meta['label'], 'emoji': meta['emoji'], 'qty': qty,
+                              'price_each': float(price_each), 'subtotal': float(line_total)})
+
+    price.subtotal = _money(subtotal)
+    price.vat = _money(price.subtotal * vat_rate / Decimal('100'))
+    price.booking_fee = ONLINE_BOOKING_FEE if include_online_fee else Decimal('0.00')
+    total = _money(price.subtotal + price.vat + price.booking_fee)
+    price.amount = total
+
+    if voucher_code and str(voucher_code).strip():
+        result = evaluate_voucher(voucher_code, price.subtotal, booking_datetime)
+        if not result.valid:
+            price.error = result.error
+            return price
+        price.discount = min(result.discount, total)
+        price.amount = _money(total - price.discount)
+        price.voucher = result.voucher
+        price.voucher_code = result.voucher.code
+    return price
+
+
 # ── Party bookings ───────────────────────────────────────────────────────────
 # Mirrors the website's party wizard (frontend/app/actions/createPartyBooking.ts).
 PARTY_BASE_PRICE = Decimal('250.00')       # includes INCLUDED_KIDS kids and INCLUDED_ADULTS adults
 PARTY_INCLUDED_KIDS = 10
 PARTY_INCLUDED_ADULTS = 10
-PARTY_EXTRA_KID_PRICE = Decimal('19.95')
-PARTY_EXTRA_ADULT_PRICE = Decimal('2.95')
+PARTY_EXTRA_KID_PRICE = Decimal('20.00')
+PARTY_EXTRA_ADULT_PRICE = Decimal('4.95')
 PARTY_DEPOSIT_RATE = Decimal('0.50')
 
 

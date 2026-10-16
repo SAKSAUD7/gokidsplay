@@ -252,29 +252,24 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     # Fields a member of the public may set when creating a session booking
     PUBLIC_BOOKING_FIELDS = (
-        'name', 'email', 'phone', 'date', 'time', 'duration', 'adults', 'kids', 'spectators',
+        'name', 'email', 'phone', 'date', 'time', 'duration',
         'activity', 'parking_plates', 'customer',
     )
 
     def _sanitize_public_booking(self, raw):
-        """Build the booking payload for a non-staff request: allowlisted fields + server-side price."""
-        from .pricing import price_session_booking
+        """Build the booking payload for a non-staff request: allowlisted fields + server-side price.
 
-        def as_int(value):
-            try:
-                return max(0, int(value or 0))
-            except (TypeError, ValueError):
-                return 0
+        Public bookings buy all-access admission tickets: `tickets` = {plan_id: qty} (or a list of
+        {plan_id, qty}) referring to the active Session Pricing Plans. Prices always come from the plans.
+        """
+        from .pricing import price_admission
 
         clean = {key: raw.get(key) for key in self.PUBLIC_BOOKING_FIELDS if key in raw}
-        adults, kids, spectators = as_int(raw.get('adults')), as_int(raw.get('kids')), as_int(raw.get('spectators'))
-        clean.update({'adults': adults, 'kids': kids, 'spectators': spectators})
-
         booking_datetime = (
             f"{raw.get('date')}T{str(raw.get('time', ''))[:5]}" if raw.get('date') and raw.get('time') else None
         )
-        price = price_session_booking(
-            adults=adults, kids=kids, spectators=spectators,
+        price = price_admission(
+            tickets=raw.get('tickets'),
             add_ons=raw.get('add_ons'),
             voucher_code=raw.get('voucher_code'),
             booking_datetime=booking_datetime,
@@ -285,6 +280,12 @@ class BookingViewSet(viewsets.ModelViewSet):
 
         status_value = raw.get('booking_status')
         clean.update({
+            # Headcount fields derived from the tickets: playing tickets are counted as kids
+            # (they use the play areas and the session capacity), non-playing adults as spectators
+            'adults': 0,
+            'kids': price.players,
+            'spectators': price.spectators,
+            'tickets': price.tickets,
             'subtotal': str(price.subtotal),
             'discount_amount': str(price.discount),
             'amount': str(price.amount),

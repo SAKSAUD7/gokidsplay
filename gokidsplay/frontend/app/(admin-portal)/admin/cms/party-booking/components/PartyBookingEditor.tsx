@@ -188,11 +188,11 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
         defaultValues: {
             participant_price: parseFloat(initialData?.participant_price) || 1500,
             participant_label: initialData?.participant_label || "Participants",
-            participant_description: initialData?.participant_description || "£2.950 per person",
+            participant_description: initialData?.participant_description || "£20.00 per extra child",
             spectator_price: parseFloat(initialData?.spectator_price) || 100,
             free_spectators: initialData?.free_spectators || 10,
             spectator_label: initialData?.spectator_label || "Spectators",
-            spectator_description: initialData?.spectator_description || "First 10 free, £2.95 each after",
+            spectator_description: initialData?.spectator_description || "First 10 included, £4.95 each after",
             min_participants: initialData?.min_participants || 10,
             gst_rate: parseFloat(initialData?.gst_rate) || 18,
             deposit_percentage: parseFloat(initialData?.deposit_percentage) || 50,
@@ -260,7 +260,7 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
                             <input
                                 {...register('participant_description')}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                placeholder="e.g. £2.950 per person"
+                                placeholder="e.g. £20.00 per extra child"
                             />
                             {errors.participant_description && <p className="text-red-500 text-xs mt-1">{errors.participant_description.message}</p>}
                         </div>

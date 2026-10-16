@@ -88,7 +88,7 @@ export function Navbar({ settings }: { settings?: any }) {
                     <img
                         src={logoUrl}
                         alt="Go Kids Play"
-                        className="h-7 sm:h-8 xl:h-7 2xl:h-9 w-auto max-w-[60vw] object-contain transition-transform duration-300 hover:scale-105"
+                        className="h-6 sm:h-7 2xl:h-8 w-auto max-w-[190px] sm:max-w-[220px] 2xl:max-w-[256px] object-contain transition-transform duration-300 hover:scale-105"
                         style={{ background: 'transparent' }}
                         onError={(e) => {
                             // Fall back to default logo if the fetched URL fails to load
