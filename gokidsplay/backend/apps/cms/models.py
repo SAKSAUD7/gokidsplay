@@ -535,12 +535,19 @@ class SessionBookingConfig(models.Model):
 class PartyBookingConfig(models.Model):
     """Singleton model for party booking wizard configuration"""
     
-    # Pricing
+    # Pricing — the party is charged as: package_price (covers min_participants
+    # children and free_spectators adults) + extra children + extra adults.
+    package_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=250.00,
+        help_text="Party package price in GBP (covers the included children and adults)"
+    )
     participant_price = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2, 
-        default=14.95,
-        help_text="Price per participant in GBP"
+        max_digits=10,
+        decimal_places=2,
+        default=20.00,
+        help_text="Price per extra child above the included number, in GBP"
     )
     participant_label = models.CharField(
         max_length=200, 
@@ -549,19 +556,19 @@ class PartyBookingConfig(models.Model):
     )
     participant_description = models.CharField(
         max_length=500, 
-        default="£14.95 per person",
+        default="£20.00 per extra child",
         help_text="Description shown for participants"
     )
     
     spectator_price = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
-        default=100.00,
-        help_text="Price per extra spectator (after free count)"
+        default=4.95,
+        help_text="Price per extra adult (after the included count), in GBP"
     )
     free_spectators = models.IntegerField(
         default=10,
-        help_text="Number of free spectators included"
+        help_text="Number of adults included in the package price"
     )
     spectator_label = models.CharField(
         max_length=200, 
@@ -570,22 +577,22 @@ class PartyBookingConfig(models.Model):
     )
     spectator_description = models.CharField(
         max_length=500, 
-        default="First 10 free, ₹100 each after",
+        default="First 10 included, £4.95 each after",
         help_text="Description shown for spectators"
     )
     
     # Minimums & Limits
     min_participants = models.IntegerField(
         default=10,
-        help_text="Minimum number of participants required"
+        help_text="Number of children included in the package price (also the minimum)"
     )
     
     # Tax & Deposit
     gst_rate = models.DecimalField(
         max_digits=5, 
         decimal_places=2, 
-        default=18.00,
-        help_text="GST rate in percentage"
+        default=0,
+        help_text="Not applied to party prices (UK prices include VAT)"
     )
     deposit_percentage = models.DecimalField(
         max_digits=5, 

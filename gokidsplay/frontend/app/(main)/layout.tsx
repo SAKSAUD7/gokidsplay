@@ -4,6 +4,7 @@ import { Footer } from "../../components/Footer";
 import { ToastProvider } from "../../components/ToastProvider";
 import { MobileBottomNav } from "../../components/MobileBottomNav";
 import { InstallAppBanner } from "../../components/InstallAppBanner";
+import { CookieConsent } from "../../components/CookieConsent";
 import { getSettings } from "@/app/actions/settings";
 import { getPublicSocialLinks } from "@/lib/public-api";
 import { AccountProvider } from "@/state/account/AccountContext";
@@ -39,6 +40,7 @@ export default async function MainLayout({ children }: { children: React.ReactNo
                     <Footer settings={settings} socialLinks={socialLinks} />
                     <MobileBottomNav />
                     <InstallAppBanner />
+                    <CookieConsent />
                 </div>
             </ToastProvider>
         </AccountProvider>

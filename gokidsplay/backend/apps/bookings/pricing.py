@@ -225,7 +225,7 @@ def price_admission(
 
 
 # ── Party bookings ───────────────────────────────────────────────────────────
-# Mirrors the website's party wizard (frontend/app/actions/createPartyBooking.ts).
+# Prices come from the CMS Party Booking Configuration; these are the fallbacks.
 PARTY_BASE_PRICE = Decimal('250.00')       # includes INCLUDED_KIDS kids and INCLUDED_ADULTS adults
 PARTY_INCLUDED_KIDS = 10
 PARTY_INCLUDED_ADULTS = 10
@@ -245,15 +245,35 @@ class PartyPrice:
     voucher_code: Optional[str] = None
 
 
+def party_rates() -> dict:
+    """Party prices from the CMS Party Booking Configuration (with safe fallbacks)."""
+    from apps.cms.models import PartyBookingConfig
+    config = PartyBookingConfig.objects.filter(active=True).order_by('id').first()
+    if config is None:
+        return {'base': PARTY_BASE_PRICE, 'included_kids': PARTY_INCLUDED_KIDS,
+                'included_adults': PARTY_INCLUDED_ADULTS, 'extra_kid': PARTY_EXTRA_KID_PRICE,
+                'extra_adult': PARTY_EXTRA_ADULT_PRICE, 'deposit_rate': PARTY_DEPOSIT_RATE}
+    return {
+        'base': _money(config.package_price),
+        'included_kids': max(0, int(config.min_participants or 0)),
+        'included_adults': max(0, int(config.free_spectators or 0)),
+        'extra_kid': _money(config.participant_price),
+        'extra_adult': _money(config.spectator_price),
+        'deposit_rate': Decimal(str(config.deposit_percentage or 0)) / Decimal('100'),
+    }
+
+
 def price_party_booking(*, kids: int, adults: int, voucher_code: Optional[str] = None) -> PartyPrice:
     from apps.shop.services import evaluate_voucher
 
-    extra_kids = max(0, kids - PARTY_INCLUDED_KIDS)
-    extra_adults = max(0, adults - PARTY_INCLUDED_ADULTS)
-    subtotal = _money(PARTY_BASE_PRICE + extra_kids * PARTY_EXTRA_KID_PRICE + extra_adults * PARTY_EXTRA_ADULT_PRICE)
+    rates = party_rates()
+    extra_kids = max(0, kids - rates['included_kids'])
+    extra_adults = max(0, adults - rates['included_adults'])
+    subtotal = _money(rates['base'] + extra_kids * rates['extra_kid'] + extra_adults * rates['extra_adult'])
+    deposit_rate = rates['deposit_rate']
 
     price = PartyPrice(subtotal=subtotal, discount=Decimal('0.00'), amount=subtotal,
-                       deposit=_money(subtotal * PARTY_DEPOSIT_RATE))
+                       deposit=_money(subtotal * deposit_rate), package_price=rates['base'])
 
     # Same behaviour as the wizard: an invalid voucher is simply ignored for parties
     if voucher_code and str(voucher_code).strip():
@@ -261,7 +281,7 @@ def price_party_booking(*, kids: int, adults: int, voucher_code: Optional[str] =
         if result.valid:
             price.discount = result.discount
             price.amount = _money(subtotal - result.discount)
-            price.deposit = _money(price.amount * PARTY_DEPOSIT_RATE)
+            price.deposit = _money(price.amount * deposit_rate)
             price.voucher = result.voucher
             price.voucher_code = result.voucher.code
     return price

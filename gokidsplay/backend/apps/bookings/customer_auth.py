@@ -202,6 +202,96 @@ def customer_change_password(request):
     return Response({"message": "Password changed successfully."})
 
 
+# ── Forgotten password ───────────────────────────────────────────────────────
+# The emailed link carries a signed token holding the customer id and a
+# fingerprint of the current password hash, so it expires after an hour and
+# stops working as soon as the password changes (single use).
+RESET_SALT = "customer-password-reset"
+RESET_MAX_AGE_SECONDS = 60 * 60
+RESET_EMAIL_COOLDOWN_SECONDS = 120
+
+
+def _password_fingerprint(token_obj) -> str:
+    return token_obj.password_hash[-16:]
+
+
+def make_password_reset_token(token_obj) -> str:
+    from django.core import signing
+    return signing.dumps({"c": token_obj.customer_id, "f": _password_fingerprint(token_obj)}, salt=RESET_SALT)
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def customer_forgot_password(request):
+    """Email a password reset link. The reply is the same whether or not the account exists."""
+    from django.conf import settings
+    from django.core.cache import cache
+
+    email = (request.data.get("email") or "").strip().lower()
+    if not email or not validate_email(email):
+        return Response({"error": "Please enter a valid email address."}, status=400)
+
+    reply = Response({"message": "If an account exists for that email, we've sent a link to reset your password."})
+
+    # One email per address every couple of minutes (stops inbox flooding)
+    cooldown_key = f"customer-pw-reset:{email}"
+    if cache.get(cooldown_key):
+        return reply
+    cache.set(cooldown_key, True, RESET_EMAIL_COOLDOWN_SECONDS)
+
+    token_obj = CustomerToken.objects.select_related("customer").filter(customer__email=email).first()
+    if token_obj:
+        from apps.emails.services import EmailService
+        site_url = getattr(settings, "FRONTEND_URL", "").rstrip("/")
+        reset_url = f"{site_url}/account/reset-password?token={make_password_reset_token(token_obj)}"
+        EmailService().send_email(
+            email_type="ACCOUNT_PASSWORD_RESET",
+            recipient_email=token_obj.customer.email,
+            recipient_name=token_obj.customer.name,
+            subject="Reset your Go Kids Play password",
+            template_name="emails/account/password_reset.html",
+            context={"customer_name": token_obj.customer.name, "reset_url": reset_url},
+        )
+    return reply
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def customer_reset_password(request):
+    """Set a new password from an emailed reset link, then sign the customer in."""
+    from django.core import signing
+
+    token = request.data.get("token") or ""
+    password = request.data.get("password") or ""
+    if len(password) < 6:
+        return Response({"error": "Password must be at least 6 characters."}, status=400)
+
+    try:
+        payload = signing.loads(token, salt=RESET_SALT, max_age=RESET_MAX_AGE_SECONDS)
+    except signing.SignatureExpired:
+        return Response({"error": "This reset link has expired. Please request a new one."}, status=400)
+    except signing.BadSignature:
+        return Response({"error": "This reset link is not valid. Please request a new one."}, status=400)
+
+    token_obj = CustomerToken.objects.select_related("customer").filter(customer_id=payload.get("c")).first()
+    if not token_obj or _password_fingerprint(token_obj) != payload.get("f"):
+        return Response({"error": "This reset link has already been used. Please request a new one."}, status=400)
+
+    # New password and a fresh login token (signs out any other device)
+    token_obj.password_hash = make_password(password)
+    token_obj.token = secrets.token_urlsafe(40)
+    token_obj.expires_at = timezone.now() + timezone.timedelta(days=30)
+    token_obj.save()
+
+    return Response({
+        "message": "Your password has been reset.",
+        "token": token_obj.token,
+        "customer": customer_to_dict(token_obj.customer),
+    })
+
+
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])

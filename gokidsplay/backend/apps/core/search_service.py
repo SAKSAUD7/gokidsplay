@@ -161,7 +161,7 @@ class GlobalSearchService:
             self.results.append({
                 'type': 'payment',
                 'title': f"Order #{payment.order_id}",
-                'subtitle': f"₹{payment.amount:,.0f} • {customer_name} • {payment.status}",
+                'subtitle': f"£{payment.amount:,.0f} • {customer_name} • {payment.status}",
                 'route': f'/admin/payments/{payment.id}'
             })
     
@@ -176,7 +176,7 @@ class GlobalSearchService:
         
         for voucher in vouchers:
             status = 'Active' if voucher.is_active else 'Inactive'
-            discount = f"{voucher.discount_value}{'%' if voucher.discount_type == 'PERCENTAGE' else '₹'}"
+            discount = f"{voucher.discount_value}{'%' if voucher.discount_type == 'PERCENTAGE' else '£'}"
             
             self.results.append({
                 'type': 'voucher',

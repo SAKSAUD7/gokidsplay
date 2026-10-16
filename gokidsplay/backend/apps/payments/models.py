@@ -118,7 +118,7 @@ class Payment(models.Model):
     
     def __str__(self):
         booking_ref = f"Booking #{self.booking_id}" if self.booking else f"Party #{self.party_booking_id}"
-        return f"Payment {self.order_id} - {booking_ref} - ₹{self.amount}"
+        return f"Payment {self.order_id} - {booking_ref} - £{self.amount}"
     
     def get_booking(self):
         """Get the associated booking (either session or party)"""

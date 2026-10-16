@@ -126,8 +126,8 @@ class PaymentAdmin(admin.ModelAdmin):
     def amount_display(self, obj):
         """Display amount with currency symbol and color"""
         if obj.amount < 0:
-            return format_html('<span style="color: red;">-₹{}</span>', abs(obj.amount))
-        return format_html('₹{}', obj.amount)
+            return format_html('<span style="color: red;">-£{}</span>', abs(obj.amount))
+        return format_html('£{}', obj.amount)
     amount_display.short_description = 'Amount'
     amount_display.admin_order_field = 'amount'
     

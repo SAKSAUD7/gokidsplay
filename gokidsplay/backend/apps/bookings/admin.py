@@ -16,8 +16,8 @@ class PaymentInline(admin.TabularInline):
     def amount_display(self, obj):
         """Display amount with color"""
         if obj.amount < 0:
-            return format_html('<span style="color: red;">-₹{}</span>', abs(obj.amount))
-        return format_html('₹{}', obj.amount)
+            return format_html('<span style="color: red;">-£{}</span>', abs(obj.amount))
+        return format_html('£{}', obj.amount)
     amount_display.short_description = 'Amount'
     
     def status_display(self, obj):
@@ -43,8 +43,8 @@ class PartyPaymentInline(admin.TabularInline):
     def amount_display(self, obj):
         """Display amount with color"""
         if obj.amount < 0:
-            return format_html('<span style="color: red;">-₹{}</span>', abs(obj.amount))
-        return format_html('₹{}', obj.amount)
+            return format_html('<span style="color: red;">-£{}</span>', abs(obj.amount))
+        return format_html('£{}', obj.amount)
     amount_display.short_description = 'Amount'
     
     def status_display(self, obj):

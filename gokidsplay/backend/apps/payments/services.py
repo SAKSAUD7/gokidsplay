@@ -169,7 +169,7 @@ class PaymentService:
         booking = payment.get_booking()
         
         logger.info(f"Payment verified successfully: {order_id} → {payment_id}")
-        logger.info(f"Booking {booking.id} status: {booking.payment_status} (₹{booking.paid_amount}/₹{booking.amount})")
+        logger.info(f"Booking {booking.id} status: {booking.payment_status} (£{booking.paid_amount}/£{booking.amount})")
         
         # Send email notification
         try:
@@ -230,7 +230,7 @@ class PaymentService:
         if payment.is_refund():
             raise ValueError("Cannot refund a refund payment")
         
-        logger.info(f"Processing refund for payment {payment_id}: ₹{amount or payment.amount}")
+        logger.info(f"Processing refund for payment {payment_id}: £{amount or payment.amount}")
         
         # Process refund via gateway
         refund_data = self.gateway.refund(payment, amount)
@@ -239,7 +239,7 @@ class PaymentService:
         booking = payment.get_booking()
         
         logger.info(f"Refund processed: {refund_data.get('refund_id')}")
-        logger.info(f"Booking {booking.id} status after refund: {booking.payment_status} (₹{booking.paid_amount})")
+        logger.info(f"Booking {booking.id} status after refund: {booking.payment_status} (£{booking.paid_amount})")
         
         # Send refund email
         try:

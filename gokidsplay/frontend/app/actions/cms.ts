@@ -53,9 +53,8 @@ export async function createPricingCarouselImage(payload: any) {
 
 export async function getFreeEntries() {
     try {
-        const response = await fetchAPI(API_ENDPOINTS.cms.freeEntries);
-        if (!response.ok) return [];
-        const data = await response.json();
+        // fetchAPI returns the parsed JSON (and throws on an error status)
+        const data = await fetchAPI<any>(API_ENDPOINTS.cms.freeEntries);
         // Depending on DRF pagination, it might return an array or { results: [] }
         if (data && data.results) {
             return data.results;
@@ -85,18 +84,14 @@ export async function updateFreeEntryStatus(id: number, status: string, notes?: 
             payload.notes = notes;
         }
         
-        // Use standard fetchAPI but pass method: PATCH to update only specific fields
-        const response = await fetchAPI(`${API_ENDPOINTS.cms.freeEntries}${id}/`, {
+        // PATCH only the changed fields; fetchAPI throws on an error status
+        const updated = await fetchAPI<any>(`${API_ENDPOINTS.cms.freeEntries}${id}/`, {
             method: "PATCH",
             body: JSON.stringify(payload)
         });
-        
-        if (!response.ok) {
-            throw new Error(`Failed with status: ${response.status}`);
-        }
-        
+
         revalidatePath('/admin/free-entries');
-        return await response.json();
+        return updated;
     } catch (error: any) {
         console.error("Update Free Entry Status Error:", error);
         throw new Error(error.message || "Failed to update free entry status");

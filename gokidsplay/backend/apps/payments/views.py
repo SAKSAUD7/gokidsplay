@@ -41,7 +41,7 @@ def create_payment_order(request):
             "success": true,
             "order_id": "MOCK_ORDER_...",
             "amount": 5000.00,
-            "currency": "INR",
+            "currency": "GBP",
             "provider": "MOCK",
             ...
         }

@@ -65,7 +65,7 @@ export default function AccountLoginPage() {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="text-5xl mb-4">🎳</div>
+                    <div className="text-5xl mb-4">🎈</div>
                     <h1 className="text-3xl font-black text-white mb-2">My Account</h1>
                     <p className="text-white/50">View your bookings and manage your profile</p>
                 </div>
@@ -126,6 +126,11 @@ export default function AccountLoginPage() {
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white">
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </button>
+                                    </div>
+                                    <div className="text-right mt-1.5">
+                                        <Link href="/account/forgot-password" className="text-primary/90 hover:text-primary text-xs font-semibold">
+                                            Forgot password?
+                                        </Link>
                                     </div>
                                 </div>
                                 <button

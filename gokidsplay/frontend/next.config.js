@@ -8,8 +8,11 @@ const apiOrigin = (() => {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone', // Self-contained deployment
+    // Lets a production build be checked locally without touching the dev server's .next folder
+    distDir: process.env.NEXT_DIST_DIR || '.next',
     typescript: {
-        ignoreBuildErrors: true,
+        // The project type-checks cleanly (npx tsc --noEmit), so builds fail on new type errors
+        ignoreBuildErrors: false,
     },
     eslint: {
         ignoreDuringBuilds: true,

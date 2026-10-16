@@ -30,8 +30,51 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
 }
 
+// schema.org Event data so search engines can show the event in results
+function eventJsonLd(event: any, slug: string) {
+    const time = (t?: string) => (t ? String(t).slice(0, 5) : "00:00");
+    const price = parseFloat(event.price_per_child ?? "0") || 0;
+    return {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        name: event.title,
+        description: event.short_description || event.description || undefined,
+        startDate: `${event.date}T${time(event.start_time)}`,
+        endDate: `${event.date}T${time(event.end_time)}`,
+        eventStatus: "https://schema.org/EventScheduled",
+        eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+        image: event.cover_image ? [event.cover_image] : undefined,
+        location: {
+            "@type": "Place",
+            name: "Go Kids Play",
+            address: {
+                "@type": "PostalAddress",
+                streetAddress: "310 Kingfield Road",
+                addressLocality: "Coventry",
+                postalCode: "CV1 4LD",
+                addressCountry: "GB",
+            },
+        },
+        organizer: { "@type": "Organization", name: "Go Kids Play", url: "https://gokidsplay.co.uk" },
+        offers: {
+            "@type": "Offer",
+            url: `https://gokidsplay.co.uk/events/${slug}`,
+            price: price.toFixed(2),
+            priceCurrency: "GBP",
+            availability: event.is_sold_out ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+        },
+    };
+}
+
 export default async function EventDetailPage({ params }: { params: { slug: string } }) {
     const event = await fetchEvent(params.slug);
     if (!event) notFound();
-    return <EventDetailContent event={event} />;
+    // "<" is escaped so admin-entered text can never close the script tag
+    const jsonLd = JSON.stringify(eventJsonLd(event, params.slug)).replace(/</g, "\\u003c");
+    return (
+        <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
+            <EventDetailContent event={event} />
+        </>
+    );
 }

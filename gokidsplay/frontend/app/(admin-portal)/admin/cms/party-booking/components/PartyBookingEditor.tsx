@@ -24,6 +24,7 @@ const sectionSchema = z.object({
 });
 
 const pricingSchema = z.object({
+    package_price: z.number().min(0, "Price must be positive"),
     participant_price: z.number().min(0, "Price must be positive"),
     participant_label: z.string().min(1, "Label is required"),
     participant_description: z.string().min(1, "Description is required"),
@@ -182,20 +183,27 @@ export default function PartyBookingEditor() {
     );
 }
 
+// Keep a saved 0 (e.g. free adults) instead of replacing it with the default
+const numOr = (value: any, fallback: number) => {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n : fallback;
+};
+
 function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots, newTimeSlot, setNewTimeSlot, packageInclusions, setPackageInclusions, newInclusion, setNewInclusion }: any) {
     const { register, handleSubmit, formState: { errors } } = useForm<PricingFormData>({
         resolver: zodResolver(pricingSchema),
         defaultValues: {
-            participant_price: parseFloat(initialData?.participant_price) || 1500,
+            package_price: numOr(initialData?.package_price, 250),
+            participant_price: numOr(initialData?.participant_price, 20),
             participant_label: initialData?.participant_label || "Participants",
             participant_description: initialData?.participant_description || "£20.00 per extra child",
-            spectator_price: parseFloat(initialData?.spectator_price) || 100,
-            free_spectators: initialData?.free_spectators || 10,
+            spectator_price: numOr(initialData?.spectator_price, 4.95),
+            free_spectators: numOr(initialData?.free_spectators, 10),
             spectator_label: initialData?.spectator_label || "Spectators",
             spectator_description: initialData?.spectator_description || "First 10 included, £4.95 each after",
-            min_participants: initialData?.min_participants || 10,
-            gst_rate: parseFloat(initialData?.gst_rate) || 18,
-            deposit_percentage: parseFloat(initialData?.deposit_percentage) || 50,
+            min_participants: numOr(initialData?.min_participants, 10),
+            gst_rate: numOr(initialData?.gst_rate, 0),
+            deposit_percentage: numOr(initialData?.deposit_percentage, 50),
             duration_label: initialData?.duration_label || "75 mins play + 1hr party room",
         }
     });
@@ -234,8 +242,19 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
             <div className="p-6 space-y-8">
                 {/* Participant Configuration */}
                 <div className="border-l-4 border-purple-500 pl-4">
-                    <h4 className="font-semibold text-slate-800 mb-4">Participant Pricing</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <h4 className="font-semibold text-slate-800 mb-1">Package &amp; Children</h4>
+                    <p className="text-xs text-slate-500 mb-4">The package price covers the included children and adults; extra guests are added on top. The booking total is calculated from these numbers.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Package Price (£)</label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                {...register('package_price', { valueAsNumber: true })}
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                            />
+                            {errors.package_price && <p className="text-red-500 text-xs mt-1">{errors.package_price.message}</p>}
+                        </div>
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
                             <input
@@ -246,7 +265,7 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
                             {errors.participant_label && <p className="text-red-500 text-xs mt-1">{errors.participant_label.message}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (£)</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Extra Child Price (£)</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -269,7 +288,7 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
 
                 {/* Spectator Configuration */}
                 <div className="border-l-4 border-pink-500 pl-4">
-                    <h4 className="font-semibold text-slate-800 mb-4">Spectator Pricing</h4>
+                    <h4 className="font-semibold text-slate-800 mb-4">Adults (Spectators)</h4>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Label</label>
@@ -281,7 +300,7 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
                             {errors.spectator_label && <p className="text-red-500 text-xs mt-1">{errors.spectator_label.message}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Free Count</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Adults Included</label>
                             <input
                                 type="number"
                                 {...register('free_spectators', { valueAsNumber: true })}
@@ -290,7 +309,7 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
                             {errors.free_spectators && <p className="text-red-500 text-xs mt-1">{errors.free_spectators.message}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Price (£)</label>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Extra Adult Price (£)</label>
                             <input
                                 type="number"
                                 step="0.01"
@@ -314,23 +333,13 @@ function PricingEditor({ initialData, isSaving, onSave, timeSlots, setTimeSlots,
                 {/* Minimums, Tax & Deposit */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pt-4 border-t border-slate-200">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Min Participants</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Children Included</label>
                         <input
                             type="number"
                             {...register('min_participants', { valueAsNumber: true })}
                             className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                         />
                         {errors.min_participants && <p className="text-red-500 text-xs mt-1">{errors.min_participants.message}</p>}
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">GST Rate (%)</label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            {...register('gst_rate', { valueAsNumber: true })}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                        />
-                        {errors.gst_rate && <p className="text-red-500 text-xs mt-1">{errors.gst_rate.message}</p>}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Deposit (%)</label>

@@ -17,6 +17,7 @@ from .calendar_views import calendar_bookings, date_availability, today_status
 from .customer_auth import (
     customer_register, customer_login, customer_logout,
     customer_me, customer_update_profile, customer_change_password,
+    customer_forgot_password, customer_reset_password,
     customer_my_bookings, customer_booking_detail,
     admin_customer_account, admin_reset_customer_password, admin_revoke_customer_token
 )
@@ -46,6 +47,8 @@ urlpatterns = [
     path('customer-auth/me/', customer_me, name='customer-me'),
     path('customer-auth/profile/', customer_update_profile, name='customer-update-profile'),
     path('customer-auth/change-password/', customer_change_password, name='customer-change-password'),
+    path('customer-auth/forgot-password/', customer_forgot_password, name='customer-forgot-password'),
+    path('customer-auth/reset-password/', customer_reset_password, name='customer-reset-password'),
     path('customer-auth/my-bookings/', customer_my_bookings, name='customer-my-bookings'),
     path('customer-auth/booking/<str:booking_type>/<int:booking_id>/', customer_booking_detail, name='customer-booking-detail'),
     # ── Admin customer account management ─────────────────────────────────────
@@ -67,8 +70,9 @@ urlpatterns = [
     path('party-bookings/ticket/<uuid:uuid>/', PartyBookingViewSet.as_view({'get': 'ticket'}), name='party-booking-ticket'),
     # ── Special Events Public API (Section 7) ──────────────────────────────────
     path('public/events/', public_events_list, name='public-events-list'),
-    path('public/events/<slug:slug>/', public_event_detail, name='public-event-detail'),
+    # book/ must come before <slug>/, otherwise "book" is treated as an event slug
     path('public/events/book/', create_event_booking, name='create-event-booking'),
+    path('public/events/<slug:slug>/', public_event_detail, name='public-event-detail'),
     path('public/events/booking/<uuid:booking_uuid>/', event_booking_confirmation, name='event-booking-confirmation'),
 
     path('', include(router.urls)),

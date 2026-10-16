@@ -208,6 +208,100 @@ class TestPrivateData:
         assert APIClient().get('/api/v1/shop/vouchers/').status_code == 401
 
 
+# ── Special events ───────────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+class TestEventBooking:
+    def make_event(self):
+        from datetime import time
+        from apps.bookings.models import SpecialEvent
+        return SpecialEvent.objects.create(
+            title='Halloween Party', slug='halloween-party', date=next_saturday(),
+            start_time=time(14, 0), end_time=time(16, 0), status='PUBLISHED',
+            total_capacity=20, price_per_child=Decimal('10.00'), price_per_adult=Decimal('5.00'))
+
+    def test_negative_attendees_are_rejected(self):
+        event = self.make_event()
+        response = APIClient().post('/api/v1/bookings/public/events/book/', {
+            'event_id': event.id, 'num_children': -5, 'num_adults': 6,
+            'name': 'A', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
+        assert response.status_code == 400
+
+    def test_event_price_is_calculated_on_server(self):
+        from apps.bookings.models import EventBooking
+        event = self.make_event()
+        response = APIClient().post('/api/v1/bookings/public/events/book/', {
+            'event_id': event.id, 'num_children': 2, 'num_adults': 1, 'subtotal': '0.01',
+            'name': 'A', 'email': 'a@example.com', 'phone': '07700900123'}, format='json')
+        assert response.status_code in (200, 201), response.data
+        assert EventBooking.objects.get().subtotal == Decimal('25.00')
+
+
+# ── Customer password reset ──────────────────────────────────────────────────
+
+@pytest.mark.django_db
+class TestPasswordReset:
+    AUTH = '/api/v1/bookings/customer-auth/'
+
+    def register(self, email):
+        response = APIClient().post(self.AUTH + 'register/', {
+            'name': 'Reset Parent', 'email': email, 'password': 'old-password'}, format='json')
+        assert response.status_code == 201, response.data
+
+    def test_reset_link_changes_password_once(self):
+        from apps.bookings.customer_auth import make_password_reset_token
+        from apps.bookings.models import CustomerToken
+        from apps.emails.models import EmailLog
+        self.register('reset-ok@example.com')
+        client = APIClient()
+        assert client.post(self.AUTH + 'forgot-password/', {'email': 'reset-ok@example.com'}, format='json').status_code == 200
+        assert EmailLog.objects.filter(email_type='ACCOUNT_PASSWORD_RESET', recipient_email='reset-ok@example.com').exists()
+
+        token = make_password_reset_token(CustomerToken.objects.get(customer__email='reset-ok@example.com'))
+        response = client.post(self.AUTH + 'reset-password/', {'token': token, 'password': 'new-password'}, format='json')
+        assert response.status_code == 200, response.data
+        assert response.data['token']
+        login = client.post(self.AUTH + 'login/', {'email': 'reset-ok@example.com', 'password': 'new-password'}, format='json')
+        assert login.status_code == 200
+        # The same link cannot be used again
+        again = client.post(self.AUTH + 'reset-password/', {'token': token, 'password': 'other-password'}, format='json')
+        assert again.status_code == 400
+
+    def test_unknown_email_gets_the_same_reply(self):
+        from apps.emails.models import EmailLog
+        response = APIClient().post(self.AUTH + 'forgot-password/', {'email': 'nobody-here@example.com'}, format='json')
+        assert response.status_code == 200
+        assert not EmailLog.objects.filter(recipient_email='nobody-here@example.com').exists()
+
+    def test_tampered_token_is_rejected(self):
+        response = APIClient().post(self.AUTH + 'reset-password/', {'token': 'abc:def', 'password': 'new-password'},
+                                    format='json')
+        assert response.status_code == 400
+
+
+# ── Customer emails ──────────────────────────────────────────────────────────
+
+@pytest.mark.parametrize('template', [
+    'emails/booking/session_confirmation.html',
+    'emails/booking/party_confirmation.html',
+    'emails/booking/post_visit_thank_you.html',
+    'emails/booking/event_confirmation.html',
+    'emails/birthday_reminder.html',
+    'emails/admin/contact_message.html',
+    'emails/account/password_reset.html',
+])
+def test_emails_are_go_kids_play_branded(template):
+    from django.template.loader import render_to_string
+    html = render_to_string(template, {
+        'site_url': 'https://www.gokidsplay.co.uk', 'customer_name': 'Sam', 'booking_uuid': 'abc',
+        'activity_name': 'All-Access Play Session', 'booking_date': '2026-10-24', 'booking_time': '14:00',
+        'event_title': 'Halloween Party', 'current_year': 2026,
+    })
+    assert 'Go Kids Play' in html
+    for old_brand in ('Spin Pin', 'spinpin', 'Ninja Inflatable Park', '+91'):
+        assert old_brand not in html, f'{template} still mentions {old_brand}'
+
+
 # ── Site-wide hardening ──────────────────────────────────────────────────────
 
 @pytest.mark.django_db

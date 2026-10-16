@@ -12,6 +12,21 @@ from .models import EmailLog
 
 logger = logging.getLogger(__name__)
 
+ACTIVITY_NAMES = {
+    'all-access': 'All-Access Play Session',
+    'soft-play': 'Mega Soft Play',
+    'laser-arena': 'Laser Arena',
+    'go-karts': 'Go Karts',
+    'inflatable-park': 'Inflatable Park',
+}
+
+
+def activity_display_name(activity: Optional[str]) -> str:
+    """Customer-facing name for a booking's activity slug."""
+    if not activity:
+        return 'Play Session'
+    return ACTIVITY_NAMES.get(activity, activity.replace('-', ' ').title())
+
 
 class EmailService:
     """
@@ -62,6 +77,13 @@ class EmailService:
             EmailLog instance
         """
         
+        # Values every template can use (links back to the site, footer year)
+        context = {
+            'site_url': getattr(settings, 'FRONTEND_URL', '').rstrip('/'),
+            'current_year': timezone.now().year,
+            **context,
+        }
+
         # Create a JSON-serializable copy of context (without model instances)
         from decimal import Decimal
         serializable_context = {}
@@ -285,16 +307,7 @@ class EmailService:
         logger.error(f"CREATING EMAILLOG FOR BOOKING {booking.id}")
         
         # Format activity name
-        activity_name = "Session"
-        if booking.activity:
-            if 'skating' in booking.activity.lower():
-                activity_name = "Roller Skating"
-            elif 'bowling' in booking.activity.lower():
-                activity_name = "Ten Pin Bowling"
-            elif 'combined' in booking.activity.lower():
-                activity_name = "Skating + Bowling"
-            else:
-                activity_name = booking.activity.replace('-', ' ').title()
+        activity_name = activity_display_name(booking.activity)
 
         context = {
             'booking': booking,
@@ -327,16 +340,7 @@ class EmailService:
         logger.error(f"CREATING EMAILLOG FOR POST VISIT THANK YOU {booking.id}")
         
         # Format activity name
-        activity_name = "Session"
-        if booking.activity:
-            if 'skating' in booking.activity.lower():
-                activity_name = "Roller Skating"
-            elif 'bowling' in booking.activity.lower():
-                activity_name = "Ten Pin Bowling"
-            elif 'combined' in booking.activity.lower():
-                activity_name = "Skating + Bowling"
-            else:
-                activity_name = booking.activity.replace('-', ' ').title()
+        activity_name = activity_display_name(booking.activity)
 
         context = {
             'booking': booking,

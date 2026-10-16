@@ -67,17 +67,18 @@ export default function RootLayout({
                                     "currenciesAccepted": "GBP",
                                     "paymentAccepted": "Cash, Credit Card",
                                     "openingHoursSpecification": [
+                                        // Same term-time hours as the booking calendar (WEEKLY_OPENING_HOURS)
                                         {
                                             "@type": "OpeningHoursSpecification",
-                                            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                                            "opens": "10:00",
-                                            "closes": "18:00"
+                                            "dayOfWeek": ["Thursday", "Friday"],
+                                            "opens": "15:00",
+                                            "closes": "20:00"
                                         },
                                         {
                                             "@type": "OpeningHoursSpecification",
                                             "dayOfWeek": ["Saturday", "Sunday"],
-                                            "opens": "09:00",
-                                            "closes": "19:00"
+                                            "opens": "12:00",
+                                            "closes": "20:00"
                                         }
                                     ],
                                     "hasMap": "https://maps.google.com/?q=Go+Kids+Play+Coventry",
@@ -110,6 +111,14 @@ export default function RootLayout({
                         <Script id="ga4-init" strategy="afterInteractive">{`
                             window.dataLayer = window.dataLayer || [];
                             function gtag(){dataLayer.push(arguments);}
+                            window.gtag = gtag;
+                            // Consent mode: no analytics cookies until the visitor accepts (CookieConsent banner)
+                            var consent = null;
+                            try { consent = localStorage.getItem('gkp-cookie-consent'); } catch (e) {}
+                            gtag('consent', 'default', {
+                                analytics_storage: consent === 'accepted' ? 'granted' : 'denied',
+                                ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied'
+                            });
                             gtag('js', new Date());
                             gtag('config', '${gaId}', { page_path: window.location.pathname });
                         `}</Script>

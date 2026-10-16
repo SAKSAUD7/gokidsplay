@@ -17,7 +17,7 @@ export { API_ENDPOINTS };
  * Helper function to fetch data from API
  * Uses server-side authentication with httpOnly cookies
  */
-export async function fetchAPI<T>(url: string, options?: RequestInit): Promise<T> {
+export async function fetchAPI<T = any>(url: string, options?: RequestInit): Promise<T> {
     // Extract just the endpoint path from the full URL
     const endpoint = url.replace(API_BASE_URL, '');
     const response = await serverFetchAPI(endpoint, options);
@@ -34,7 +34,7 @@ export async function fetchAPI<T>(url: string, options?: RequestInit): Promise<T
  * Helper function to post data to API
  * Uses server-side authentication with httpOnly cookies
  */
-export async function postAPI<T>(url: string, data: any, options?: RequestInit): Promise<T> {
+export async function postAPI<T = any>(url: string, data: any, options?: RequestInit): Promise<T> {
     // Extract just the endpoint path from the full URL
     const endpoint = url.replace(API_BASE_URL, '');
     const result = await serverPostAPI(endpoint, data);
@@ -50,7 +50,7 @@ export async function postAPI<T>(url: string, data: any, options?: RequestInit):
  * Helper function to update data via API
  * Uses server-side authentication with httpOnly cookies
  */
-export async function putAPI<T>(url: string, data: any, options?: RequestInit): Promise<T> {
+export async function putAPI<T = any>(url: string, data: any, options?: RequestInit): Promise<T> {
     // Extract just the endpoint path from the full URL
     const endpoint = url.replace(API_BASE_URL, '');
     const result = await serverPutAPI(endpoint, data);

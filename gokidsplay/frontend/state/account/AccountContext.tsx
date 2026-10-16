@@ -24,7 +24,7 @@ interface AccountContextType {
 const AccountContext = createContext<AccountContextType | null>(null);
 
 const API_BASE = () => process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-const TOKEN_KEY = "gokidsplay_customer_token";
+export const TOKEN_KEY = "gokidsplay_customer_token";
 
 export function AccountProvider({ children }: { children: ReactNode }) {
     const [customer, setCustomer] = useState<Customer | null>(null);

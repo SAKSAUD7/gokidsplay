@@ -211,8 +211,13 @@ def create_event_booking(request):
     except SpecialEvent.DoesNotExist:
         return Response({'error': 'Event not found or not available'}, status=status.HTTP_404_NOT_FOUND)
 
-    num_children = int(data.get('num_children', 0))
-    num_adults = int(data.get('num_adults', 0))
+    try:
+        num_children = int(data.get('num_children') or 0)
+        num_adults = int(data.get('num_adults') or 0)
+    except (TypeError, ValueError):
+        return Response({'error': 'Attendee numbers must be whole numbers'}, status=status.HTTP_400_BAD_REQUEST)
+    if num_children < 0 or num_adults < 0:
+        return Response({'error': 'Attendee numbers cannot be negative'}, status=status.HTTP_400_BAD_REQUEST)
     total_attendees = num_children + num_adults
 
     if total_attendees == 0:
