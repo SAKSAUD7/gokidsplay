@@ -24,8 +24,6 @@ export default async function CmsDashboard() {
         { name: 'FAQs', href: '/admin/faqs', icon: 'HelpCircle', description: 'Questions on the FAQ, About and Guidelines pages' },
         { name: 'Pricing Plans', href: '/admin/cms/pricing-plans', icon: 'PoundSterling', description: 'Prices on the Prices page' },
         { name: 'Opening Hours', href: '/admin/cms/timing-cards', icon: 'Clock', description: 'Hours bar and Contact page hours' },
-        { name: 'Shop Products', href: '/admin/cms/collections/products', icon: 'ShoppingBag', description: 'Products, prices, stock and photos' },
-        { name: 'Membership Plans', href: '/admin/cms/collections/memberships', icon: 'BadgeCheck', description: 'Plans on the Memberships page' },
         { name: 'Customer Reviews', href: '/admin/cms/collections/testimonials', icon: 'Star', description: 'Genuine reviews on the Reviews page' },
         { name: 'Instagram Reels', href: '/admin/cms/instagram-reels', icon: 'Instagram', description: 'Reels on the Home and About pages' },
         { name: 'Stat Cards', href: '/admin/cms/stat-cards', icon: 'Award', description: 'Numbers on the Home and About pages' },

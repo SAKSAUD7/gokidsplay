@@ -2,20 +2,11 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status as http_status
-from .models import Product, Voucher
-from .serializers import ProductSerializer, VoucherSerializer
+from .models import Voucher
+from .serializers import VoucherSerializer
 from django.utils import timezone
 from decimal import Decimal
 from apps.bookings.permissions import IsSuperAdminOnly
-
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
-        return [IsSuperAdminOnly()]
 
 class VoucherViewSet(viewsets.ModelViewSet):
     queryset = Voucher.objects.all()
@@ -58,26 +49,3 @@ class VoucherViewSet(viewsets.ModelViewSet):
             'discount_amount': float(result.discount),
             'final_amount': float(order_amount - result.discount),
         })
-
-class MembershipPlanViewSet(viewsets.ModelViewSet):
-    from .models import MembershipPlan
-    queryset = MembershipPlan.objects.all()
-    from .serializers import MembershipPlanSerializer
-    serializer_class = MembershipPlanSerializer
-    
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [permissions.AllowAny()]
-        return [IsSuperAdminOnly()]
-
-class CustomerMembershipViewSet(viewsets.ModelViewSet):
-    from .models import CustomerMembership
-    queryset = CustomerMembership.objects.all()
-    from .serializers import CustomerMembershipSerializer
-    serializer_class = CustomerMembershipSerializer
-    
-    def get_permissions(self):
-        # Customers can view their own, admins can view all
-        if self.action in ['create']:
-            return [permissions.AllowAny()] # Or custom permission to allow creating if paid
-        return [permissions.AllowAny()] # Temporarily allow any for demo purposes

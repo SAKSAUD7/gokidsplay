@@ -1,12 +1,5 @@
 from django.contrib import admin
-from .models import Product, Voucher
-
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'stock', 'category', 'active', 'created_at']
-    list_filter = ['active', 'category', 'created_at']
-    search_fields = ['name', 'description']
-    ordering = ['-created_at']
+from .models import Voucher
 
 @admin.register(Voucher)
 class VoucherAdmin(admin.ModelAdmin):

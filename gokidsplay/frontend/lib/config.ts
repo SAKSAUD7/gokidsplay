@@ -29,9 +29,7 @@ export const navLinks = [
     { title: "Book Tickets", href: "/book" },
     { title: "Prices", href: "/pricing" },
     { title: "Gallery", href: "/gallery" },
-    { title: "Shop", href: "/shop" },
     { title: "FAQ", href: "/faq" },
-    { title: "Memberships", href: "/memberships" },
     { title: "Contact", href: "/contact" },
 ];
 
@@ -43,10 +41,8 @@ export const footerLinks = [
             { title: "Activities", href: "/attractions" },
             { title: "Gallery", href: "/gallery" },
             { title: "Events", href: "/events" },
-            { title: "Memberships", href: "/memberships" },
             { title: "Testimonies", href: "/testimonies" },
             { title: "About Us", href: "/about" },
-            { title: "Shop", href: "/shop" },
         ],
     },
     {

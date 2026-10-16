@@ -10,7 +10,7 @@ export interface ManagedCollection {
     key: string;
     label: string;
     description: string;
-    endpoint: string;      // e.g. "/shop/products/" (relative to NEXT_PUBLIC_API_URL)
+    endpoint: string;      // e.g. "/cms/faqs/" (relative to NEXT_PUBLIC_API_URL)
     publicPath: string;    // public page to revalidate after a change
     titleField: string;
     subtitleField?: string;
@@ -19,67 +19,6 @@ export interface ManagedCollection {
 }
 
 export const MANAGED_COLLECTIONS: ManagedCollection[] = [
-    {
-        key: "products",
-        label: "Shop Products",
-        description: "Gift cards, merchandise and party extras shown on the Shop page",
-        endpoint: "/shop/products/",
-        publicPath: "/shop",
-        titleField: "name",
-        subtitleField: "category",
-        imageField: "image_url",
-        schema: {
-            name: "Product",
-            fields: [
-                { name: "name", label: "Product name", type: "text", required: true },
-                { name: "description", label: "Description", type: "textarea", required: true },
-                { name: "price", label: "Price (£)", type: "number", required: true, min: 0 },
-                {
-                    name: "category",
-                    label: "Category",
-                    type: "text",
-                    helpText: "Products are grouped by category on the Shop page (e.g. Gift Cards, Merchandise, Party Extras)",
-                },
-                { name: "image_url", label: "Product photo", type: "image" },
-                { name: "stock", label: "Stock", type: "number", defaultValue: 0, min: 0, helpText: "0 shows the product as Sold Out" },
-                { name: "active", label: "Show on website", type: "boolean", defaultValue: true },
-            ],
-        },
-    },
-    {
-        key: "memberships",
-        label: "Membership Plans",
-        description: "Plans shown on the Memberships page",
-        endpoint: "/shop/membership-plans/",
-        publicPath: "/memberships",
-        titleField: "name",
-        subtitleField: "price",
-        imageField: "image_url",
-        schema: {
-            name: "Membership Plan",
-            fields: [
-                { name: "name", label: "Plan name", type: "text", required: true },
-                { name: "price", label: "Price (£)", type: "number", required: true, min: 0 },
-                {
-                    name: "duration_days",
-                    label: "Duration (days)",
-                    type: "number",
-                    defaultValue: 30,
-                    min: 1,
-                    helpText: "30 shows the price as /mo, 365 as /yr",
-                },
-                {
-                    name: "description",
-                    label: "Benefits",
-                    type: "textarea",
-                    required: true,
-                    helpText: "One benefit per line — each line becomes a bullet on the plan card",
-                },
-                { name: "image_url", label: "Plan image (optional)", type: "image" },
-                { name: "active", label: "Show on website", type: "boolean", defaultValue: true },
-            ],
-        },
-    },
 ];
 
 MANAGED_COLLECTIONS.push({

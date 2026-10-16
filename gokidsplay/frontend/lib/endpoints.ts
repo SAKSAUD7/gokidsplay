@@ -129,7 +129,6 @@ export const BACKEND = {
         STATIC_PAGES:   `${BACKEND_BASE}/cms/static-pages/`,
         SOCIAL_MEDIA:   `${BACKEND_BASE}/cms/social-media/`,
         FREE_ENTRIES:   `${BACKEND_BASE}/cms/free-entries/`,
-        PRODUCTS:       `${BACKEND_BASE}/cms/products/`,
         VIDEO_UPLOAD:   `${BACKEND_BASE}/cms/video-upload/`,
         UPLOAD:         `${BACKEND_BASE}/cms/upload/`,
         NOTIFICATIONS:  `${BACKEND_BASE}/cms/notifications/`,

@@ -47,11 +47,6 @@ export const API_ENDPOINTS = {
         bookingBlocks: `${API_BASE_URL}/bookings/booking-blocks/`,
     },
 
-    // Shop Endpoints
-    shop: {
-        products: `${API_BASE_URL}/shop/products/`,
-    },
-
     // Marketing Endpoints
     marketing: {
         campaigns: `${API_BASE_URL}/marketing/marketing-campaigns/`,

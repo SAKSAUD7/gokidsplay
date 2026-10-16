@@ -156,6 +156,11 @@ const nextConfig = {
                 destination: '/pricing',
                 permanent: true,
             },
+            // The shop and memberships were removed — send old links to the prices page
+            { source: '/shop', destination: '/pricing', permanent: true },
+            { source: '/memberships', destination: '/pricing', permanent: true },
+            { source: '/admin/cms/collections/products', destination: '/admin/cms', permanent: false },
+            { source: '/admin/cms/collections/memberships', destination: '/admin/cms', permanent: false },
             {
                 source: '/information/disclaimer',
                 destination: '/disclaimer',
