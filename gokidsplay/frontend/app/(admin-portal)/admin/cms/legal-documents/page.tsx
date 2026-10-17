@@ -9,7 +9,7 @@ export default async function LegalDocumentsPage() {
     return (
         <CollectionList
             title="Legal Documents"
-            description="Manage terms, privacy policy, and waivers"
+            description="Manage terms, privacy policy and other policies"
             items={items}
             schema={schemas.legal_document}
             basePath="/admin/cms/legal-documents"

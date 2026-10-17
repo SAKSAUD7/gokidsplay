@@ -227,15 +227,7 @@ export function BookingTable({ bookings, title, type, readOnly = false }: Bookin
                                         £{booking.amount.toLocaleString()}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex flex-col gap-1">
-                                            <StatusBadge status={booking.status} />
-                                            <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                                                <span>Waiver:</span>
-                                                <span className={booking.waiverStatus === "SIGNED" ? "text-green-600" : "text-yellow-600"}>
-                                                    {booking.waiverStatus}
-                                                </span>
-                                            </div>
-                                        </div>
+                                        <StatusBadge status={booking.status} />
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2">

@@ -107,7 +107,6 @@ export function AdminSidebar({ permissions = [] }: AdminSidebarProps) {
     const [expandedGroups, setExpandedGroups] = useState<string[]>([
         "Overview",
         "Booking Management",
-        "Waivers & Entries",
         "Calendar & Availability",
         "Promotions",
         "Content Management",

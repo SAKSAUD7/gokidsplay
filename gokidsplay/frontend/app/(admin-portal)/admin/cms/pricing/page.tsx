@@ -6,7 +6,6 @@ import { getGroupPackages } from '@/app/actions/group-packages';
 import { PricingPlansManager } from '@/components/admin/cms/pricing/PricingPlansManager';
 import { PartyPackagesManager } from '@/components/admin/cms/pricing/PartyPackagesManager';
 import { GroupPackagesManager } from '@/components/admin/cms/pricing/GroupPackagesManager';
-import PricingCarouselManager from '@/components/admin/cms/pricing/PricingCarouselManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
 import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
@@ -36,15 +35,6 @@ export default async function PricingAdminPage() {
                 {/* Pricing Hero Section */}
                 <section>
                     <PageTextLink pageKey="pricing" />
-                </section>
-
-                {/* Carousel Section */}
-                <section>
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6 mb-8">
-                        <h2 className="text-lg font-semibold text-slate-900 mb-4">Image Carousel</h2>
-                        <p className="text-sm text-slate-500 mb-6">Manage images displayed below the hero section</p>
-                        <PricingCarouselManager />
-                    </div>
                 </section>
 
                 {/* Session Pricing */}

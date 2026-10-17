@@ -179,7 +179,7 @@ export default function ManagePartyParticipantsPage() {
                         <CheckCircle2 className="w-6 h-6 flex-shrink-0" />
                         <div>
                             <p className="font-bold">Participants Updated Successfully!</p>
-                            <p className="text-sm opacity-80">The waivers have been signed and updated in our system.</p>
+                            <p className="text-sm opacity-80">Your guest list has been saved.</p>
                         </div>
                     </motion.div>
                 )}
@@ -224,8 +224,8 @@ export default function ManagePartyParticipantsPage() {
                 <ParticipantCollection
                     onSubmit={handleParticipantSubmit}
                     totalParticipants={totalParticipantsExpected}
-                    title="Manage Participants & Waivers"
-                    subtitle="Update your guest list and ensure all waivers are signed before the party."
+                    title="Manage Your Guest List"
+                    subtitle="Add or update the names of the guests coming to the party."
                     initialAdults={existingAdults}
                     initialMinors={existingMinors}
                     initialWaiverSigned={booking.waiver_signed}

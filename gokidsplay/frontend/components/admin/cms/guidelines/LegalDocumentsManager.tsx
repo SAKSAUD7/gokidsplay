@@ -79,7 +79,7 @@ export function LegalDocumentsManager({ items }: LegalDocumentsManagerProps) {
                     <div>
                         <h2 className="text-lg font-semibold text-slate-900">Legal Documents</h2>
                         <p className="text-sm text-slate-500">
-                            Manage terms, conditions, waivers, and policies shown on the Guidelines page
+                            Manage terms, conditions and policies shown on the Guidelines page
                         </p>
                     </div>
                     <div className="flex items-center gap-3">

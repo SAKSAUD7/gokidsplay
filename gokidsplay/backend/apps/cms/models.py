@@ -522,11 +522,6 @@ class SessionBookingConfig(models.Model):
     duration_description = models.CharField(max_length=200, default="Play session is for 2 hours only", help_text="Duration description")
 
     # Add-on Pricing (per item, GBP)
-    skate_hire_price = models.DecimalField(max_digits=10, decimal_places=2, default=2.95, help_text="Skate hire price per pair")
-    shoe_hire_price = models.DecimalField(max_digits=10, decimal_places=2, default=1.50, help_text="Bowling shoe hire price per pair")
-    locker_hire_price = models.DecimalField(max_digits=10, decimal_places=2, default=2.00, help_text="Locker hire price per locker")
-    token_pack_20_price = models.DecimalField(max_digits=10, decimal_places=2, default=5.00, help_text="Arcade token pack (20 tokens)")
-    token_pack_50_price = models.DecimalField(max_digits=10, decimal_places=2, default=10.00, help_text="Arcade token pack (50 tokens)")
     parking_price = models.DecimalField(max_digits=10, decimal_places=2, default=3.00, help_text="Parking price per car")
 
     # ── Opening hours & session rules (used by the booking calendar and wizard) ──

@@ -204,30 +204,6 @@ class ApiClient {
         });
     }
 
-    // Waivers endpoints
-    async getWaivers(params?: any) {
-        const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
-        return this.request('/bookings/waivers/' + queryString);
-    }
-
-    async getWaiver(id: string) {
-        return this.request(`/bookings/waivers/${id}/`);
-    }
-
-    async createWaiver(data: any) {
-        return this.request('/bookings/waivers/', {
-            method: 'POST',
-            body: JSON.stringify(data),
-        });
-    }
-
-    async updateWaiver(id: string, data: any) {
-        return this.request(`/bookings/waivers/${id}/`, {
-            method: 'PUT',
-            body: JSON.stringify(data),
-        });
-    }
-
     // Calendar endpoints (Not implemented in backend yet, using bookings for now)
     async checkAvailability(date: string, time: string) {
         // Placeholder

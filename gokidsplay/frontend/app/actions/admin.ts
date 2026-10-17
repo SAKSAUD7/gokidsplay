@@ -419,99 +419,6 @@ export async function getBookingById(id: string) {
     return transformBooking(data);
 }
 
-// --- Waiver Actions ---
-
-export async function verifyWaiver(id: string) {
-    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
-        method: "PATCH",
-        body: JSON.stringify({ is_verified: true })
-    });
-
-    if (res && res.ok) {
-        revalidatePath("/admin/waivers");
-        return { success: true };
-    }
-    return { success: false };
-}
-
-export async function toggleWaiverVerification(id: string, isVerified: boolean) {
-    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
-        method: "PATCH",
-        body: JSON.stringify({ is_verified: isVerified })
-    });
-
-    if (res && res.ok) {
-        revalidatePath("/admin/waivers");
-        return { success: true };
-    }
-
-    // Log error details
-    let errorMessage = "Failed to update status";
-    if (res) {
-        const errorText = await res.text();
-        console.error(`toggleWaiverVerification failed: ${res.status} ${res.statusText}`, errorText);
-        errorMessage = `Error: ${res.status} ${res.statusText}`;
-    } else {
-        console.error("toggleWaiverVerification failed: No response");
-    }
-
-    return { success: false, error: errorMessage };
-}
-
-export async function updateWaiverMinors(id: string, minors: any[]) {
-    const payload = { minors };
-    console.log('updateWaiverMinors - Sending payload:', JSON.stringify(payload, null, 2));
-    console.log('updateWaiverMinors - Endpoint:', `/bookings/waivers/${id}/`);
-
-    const res = await fetchAPI(`/bookings/waivers/${id}/`, {
-        method: "PATCH",
-        body: JSON.stringify(payload)
-    });
-
-    console.log('updateWaiverMinors - Response status:', res?.status);
-    console.log('updateWaiverMinors - Response ok:', res?.ok);
-
-    if (res && res.ok) {
-        revalidatePath("/admin/waivers");
-        revalidatePath(`/admin/waivers/${id}`);
-        return { success: true };
-    }
-
-    // Log error details and get the actual error message
-    let errorMessage = "Failed to update minors";
-    if (res) {
-        try {
-            const errorData = await res.json();
-            console.error(`updateWaiverMinors failed: ${res.status} ${res.statusText}`, errorData);
-            errorMessage = errorData.minors ? errorData.minors[0] : (errorData.detail || `Error: ${res.status} ${res.statusText}`);
-        } catch (e) {
-            const errorText = await res.text();
-            console.error(`updateWaiverMinors failed: ${res.status} ${res.statusText}`, errorText);
-            errorMessage = `Error: ${res.status} ${res.statusText}`;
-        }
-    }
-
-    return { success: false, error: errorMessage };
-}
-
-export async function getWaivers(search?: string, bookingId?: string, partyBookingId?: string, isVerified?: boolean): Promise<any[]> {
-    const params = new URLSearchParams();
-    if (search) params.append("search", search);
-    if (bookingId) params.append("booking_id", bookingId);
-    if (partyBookingId) params.append("party_booking_id", partyBookingId);
-    if (isVerified !== undefined) params.append("is_verified", isVerified.toString());
-
-    const res = await fetchAPI(`/bookings/waivers/?${params.toString()}`);
-    if (!res || !res.ok) return [];
-
-    const data = await res.json();
-    
-    // Handle paginated response ({count, results}) or legacy flat array
-    const results = Array.isArray(data) ? data : (data.results ?? []);
-    
-    return results.map(transformWaiver);
-}
-
 // --- Customer Actions ---
 
 export async function updateCustomerDetails(id: string, data: { name?: string; email?: string; phone?: string }) {
@@ -547,13 +454,6 @@ export async function getCustomerEmails(id: string) {
     const res = await fetchAPI(`/bookings/customers/${id}/emails/`);
     if (!res || !res.ok) return [];
     return await res.json();
-}
-
-export async function getWaiverById(id: string) {
-    const res = await fetchAPI(`/bookings/waivers/${id}/`);
-    if (!res || !res.ok) return null;
-    const data = await res.json();
-    return transformWaiver(data);
 }
 
 // --- Booking Block Actions ---

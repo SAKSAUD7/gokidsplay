@@ -77,11 +77,6 @@ export async function createBooking(formData: any) {
             // Inject defaults for fields the full schema expects
             data = {
                 ...result.data,
-                waiverAccepted: false,
-                dateOfBirth: "",
-                dateOfArrival: "",
-                minors: [],
-                adultGuests: [],
             };
         } else {
             // Full customer booking validation

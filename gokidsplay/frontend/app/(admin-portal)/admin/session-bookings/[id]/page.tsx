@@ -164,30 +164,6 @@ export default function SessionBookingDetailPage({ params }: { params: { id: str
                         </div>
                     </div>
 
-                    {/* Waiver Status */}
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                        <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                            <FileSignature size={20} />
-                            Waiver Status
-                        </h2>
-                        <div className="mt-4">
-                            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold ${booking.waiver_status === 'SIGNED'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-yellow-100 text-yellow-700'
-                                }`}>
-                                {booking.waiver_status === 'SIGNED' ? (
-                                    <>
-                                        <CheckCircle size={16} />
-                                        Waiver Signed
-                                    </>
-                                ) : (
-                                    <>
-                                        Waiver Pending
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Sidebar Actions */}

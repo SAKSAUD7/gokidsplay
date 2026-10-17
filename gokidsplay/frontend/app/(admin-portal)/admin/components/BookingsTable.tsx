@@ -25,7 +25,6 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                                 <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Guests</th>
                                 <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
                                 <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                                <th className="text-left py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Waivers</th>
                                 <th className="text-right py-4 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -60,14 +59,6 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                                                     booking.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
                                                         'bg-gray-100 text-gray-800'}`}>
                                             {booking.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            ${booking.waivers.length >= booking.guests ? 'bg-green-100 text-green-800' :
-                                                booking.waivers.length > 0 ? 'bg-yellow-100 text-yellow-800' :
-                                                    'bg-red-100 text-red-800'}`}>
-                                            {booking.waivers.length}/{booking.guests} Signed
                                         </span>
                                     </td>
                                     <td className="py-4 px-6 text-right">

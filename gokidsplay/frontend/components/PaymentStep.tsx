@@ -32,12 +32,6 @@ interface BookingDetails {
     adultPrice?: number;
     kidPrice?: number;
     spectatorPrice?: number;
-    skateHireQty?: number;
-    skateHirePrice?: number;
-    shoeHireQty?: number;
-    shoeHirePrice?: number;
-    lockerQty?: number;
-    lockerPrice?: number;
     parkingQty?: number;
     parkingPrice?: number;
     discount?: number;
@@ -132,12 +126,6 @@ export function PaymentStep({
     const adultPrice   = d.adultPrice   ?? 9.95;
     const kidPrice     = d.kidPrice     ?? 9.95;
     const specPrice    = d.spectatorPrice ?? 2.95;
-    const skateQty     = d.skateHireQty  ?? 0;
-    const skatePrice   = d.skateHirePrice ?? 2.95;
-    const shoeQty      = d.shoeHireQty   ?? 0;
-    const shoePrice    = d.shoeHirePrice  ?? 1.50;
-    const lockerQty    = d.lockerQty     ?? 0;
-    const lockerPrice  = d.lockerPrice   ?? 2.00;
     const parkingQty   = d.parkingQty    ?? 0;
     const parkingPrice = d.parkingPrice  ?? 3.00;
     const discount     = d.discount      ?? 0;
@@ -165,11 +153,8 @@ export function PaymentStep({
     const partyExtraKidsCost = partyExtraKids * (d.partyExtraKidPrice ?? 20.00);
     const partyExtraSpecsCost = partyExtraSpecs * (d.partyExtraSpectatorPrice ?? 4.95);
     
-    const skateTotal       = skateQty  * skatePrice;
-    const shoeTotal        = shoeQty   * shoePrice;
-    const lockerTotal      = lockerQty * lockerPrice;
     const parkingTotal     = parkingQty * parkingPrice;
-    const addOnsTotal      = skateTotal + shoeTotal + lockerTotal + parkingTotal;
+    const addOnsTotal      = parkingTotal;
     
     const subtotal         = bookingType === "party" 
                                 ? (partyBasePrice + partyExtraKidsCost + partyExtraSpecsCost + addOnsTotal) 
@@ -267,17 +252,11 @@ export function PaymentStep({
                                     )}
 
                                     {/* Add-ons */}
-                                    {skateQty > 0 && <Row label="Skate Hire Quantity" value={String(skateQty)} />}
-                                    {shoeQty  > 0 && <Row label="Shoe Hire Quantity"  value={String(shoeQty)} />}
-                                    {lockerQty > 0 && <Row label="Locker Hire Quantity" value={String(lockerQty)} />}
                                     {parkingQty > 0 && <Row label="Parking Spaces"     value={String(parkingQty)} />}
 
                                     {/* Pricing breakdown */}
                                     {!ticketLines && <Row label="Visitor Tickets" value={fmt(ticketsAdults + ticketsKids)} />}
                                     {!ticketLines && spectators > 0 && <Row label="Non-playing adult tickets" value={fmt(ticketsSpecs)} />}
-                                    {skateQty  > 0 && <Row label="Total Skate Hire Price"  value={fmt(skateTotal)} />}
-                                    {shoeQty   > 0 && <Row label="Total Shoe Hire Price"   value={fmt(shoeTotal)} />}
-                                    {lockerQty > 0 && <Row label="Total Locker Hire Price" value={fmt(lockerTotal)} />}
                                     {parkingQty > 0 && <Row label="Total Parking Price"    value={fmt(parkingTotal)} />}
                                 </>
                             )}
@@ -304,7 +283,6 @@ export function PaymentStep({
                                 <Row label="Discount Applied" value="No" accent />
                             )}
 
-                            {lockerQty > 0 && <Row label="Pay For Locker?" value={fmt(lockerTotal)} />}
                             <Row label="Pay For Parking?" value={parkingQty > 0 ? fmt(parkingTotal) : "£0"} />
 
                             <Row label="Notes" value={notes} />

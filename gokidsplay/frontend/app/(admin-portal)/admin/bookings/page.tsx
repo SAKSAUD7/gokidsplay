@@ -7,7 +7,6 @@ import { exportBookingsToCSV } from "../../../../lib/export-csv";
 import { DateFilter, filterBookingsByDate } from "@/components/admin/DateFilter";
 import { getCachedData, setCachedData, clearCacheByPrefix } from "@/lib/admin-cache";
 import { ArrivedToggle } from "@/components/admin/ArrivedToggle";
-import { WaiverLink } from "../components/WaiverLink";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/admin/Button";
 import { EmptyState } from "@/components/admin/EmptyState";
@@ -284,7 +283,6 @@ export default function AdminBookings() {
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Payment</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Add-ons</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Arrival</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Waiver</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -387,24 +385,19 @@ export default function AdminBookings() {
                                             />
                                         </td>
                                         <td className="px-6 py-4">
-                                            <WaiverLink
-                                                bookingId={booking.id}
-                                                status={booking.waiverStatus || booking.waiver_status}
-                                            />
-                                        </td>
-                                        <td className="px-6 py-4">
                                             {/* Add-ons */}
                                             <div className="flex flex-wrap gap-1">
                                                 {(() => {
-                                                    const addOns = booking.add_ons || booking.addOns || {};
-                                                    const items: React.ReactNode[] = [];
-                                                    if (addOns.skate_hire > 0) items.push(<span key="sk" title={`Skate Hire x${addOns.skate_hire}`} className="text-base">🛼</span>);
-                                                    if (addOns.shoe_hire > 0) items.push(<span key="sh" title={`Shoe Hire x${addOns.shoe_hire}`} className="text-base">👟</span>);
-                                                    if (addOns.locker_hire > 0) items.push(<span key="lo" title={`Locker x${addOns.locker_hire}`} className="text-base">🔒</span>);
-                                                    if (addOns.token_pack_20 > 0) items.push(<span key="t20" title={`Token Pack 20 x${addOns.token_pack_20}`} className="text-base">🕹️</span>);
-                                                    if (addOns.token_pack_50 > 0) items.push(<span key="t50" title={`Token Pack 50 x${addOns.token_pack_50}`} className="text-base">🎮</span>);
-                                                    if (addOns.parking > 0) items.push(<span key="pk" title="Parking" className="text-base">🚗</span>);
-                                                    return items.length ? items : <span className="text-xs text-slate-400">—</span>;
+                                                    // Saved as a list ([{id, label, qty}]); older bookings used {id: qty}
+                                                    const raw = booking.add_ons || booking.addOns || [];
+                                                    const list: any[] = Array.isArray(raw)
+                                                        ? raw.filter((a: any) => (a?.qty ?? 1) > 0)
+                                                        : Object.entries(raw).filter(([, q]) => Number(q) > 0).map(([id, qty]) => ({ id, qty }));
+                                                    return list.length ? list.map((a: any, i: number) => (
+                                                        <span key={i} className="text-xs bg-slate-100 text-slate-700 rounded px-1.5 py-0.5 whitespace-nowrap">
+                                                            {a.emoji ? `${a.emoji} ` : ""}{a.label || a.id}{a.qty > 1 ? ` ×${a.qty}` : ""}
+                                                        </span>
+                                                    )) : <span className="text-xs text-slate-400">—</span>;
                                                 })()}
                                             </div>
                                         </td>

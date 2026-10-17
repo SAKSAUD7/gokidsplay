@@ -26,7 +26,6 @@ import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningH
 
 import { useToast } from "./ToastProvider";
 
-import { WaiverForm } from "./WaiverForm";
 
 import { PaymentStep } from "./PaymentStep";
 import { useAccount } from "../state/account/AccountContext";
@@ -241,14 +240,6 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
             phone: "",
 
-            waiverAccepted: false,
-
-            dateOfBirth: "",
-
-            dateOfArrival: "",
-
-            minors: [],
-
         },
 
     });
@@ -271,9 +262,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
         setIsAuthenticating(false);
         if (res.success) {
             // Auth succeeded — form will be populated by the useEffect below.
-            // Auto-advance past the auth gate to the Waiver step.
+            // Auto-advance past the auth gate to the Summary step.
             setAuthEmail(""); setAuthPassword(""); setAuthName(""); setAuthPhone("");
-            setStep(4); // Step 4 = Waiver
+            setStep(5); // Step 5 = Summary
         } else {
             setAuthError(res.error || "Authentication failed");
         }
@@ -522,7 +513,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                 if (customer) {
                     const detailsOk = await trigger(["name", "email", "phone"]);
                     if (detailsOk) {
-                        setStep(4); // Skip details and go straight to waiver
+                        setStep(5); // Signed in: skip the details step, straight to the summary
                         showToast("success", "Step completed!", 2000);
                         return;
                     }
@@ -543,40 +534,10 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
             fieldsToValidate = ["name", "email", "phone"];
         }
 
-        if (step === 4) {
-
-            fieldsToValidate = ["dateOfBirth", "dateOfArrival", "minors", "adultGuests", "waiverAccepted"];
-
-            const ok = await trigger(fieldsToValidate);
-
-            if (ok) {
-
-                const totalParticipants = formData.adults + formData.kids;
-                const additionalParticipantsNeeded = Math.max(0, totalParticipants - 1);
-                const totalAdded = (formData.minors?.length || 0) + (formData.adultGuests?.length || 0);
-
-                if (totalAdded !== additionalParticipantsNeeded) {
-                    showToast("error", `You have ${totalParticipants} total participants. Please add details for the remaining ${additionalParticipantsNeeded} guest(s) (Adults or Minors).`);
-                    return;
-                }
-
-                setStep(step + 1);
-
-                showToast("success", "Step completed!", 2000);
-
-            } else {
-
-                showToast("error", "Please fix errors before continuing.");
-
-            }
-
-            return;
-
-        }
-
         const ok = await trigger(fieldsToValidate);
 
-        if (ok) { setStep(step + 1); showToast("success", "Step completed!", 2000); }
+        // Step 4 (the old waiver step) no longer exists: Details → Summary
+        if (ok) { setStep(step === 3 ? 5 : step + 1); showToast("success", "Step completed!", 2000); }
 
         else { showToast("error", "Please fix errors before continuing."); }
 
@@ -793,19 +754,18 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     // --- Step Labels ----------------------------------------------------------
 
+    // `index` is the wizard step each label belongs to (step 4 is no longer used)
     const steps = [
 
-        { label: "Activity", icon: Sparkles },
+        { label: "Activity", icon: Sparkles, index: 0 },
 
-        { label: "Date & Time", icon: Calendar },
+        { label: "Date", icon: Calendar, index: 1 },
 
-        { label: "Guests", icon: Users },
+        { label: "Tickets", icon: Users, index: 2 },
 
-        { label: "Details", icon: User },
+        { label: "Details", icon: User, index: 3 },
 
-        { label: "Waiver", icon: FileText },
-
-        { label: "Summary", icon: CreditCard },
+        { label: "Summary", icon: CreditCard, index: 5 },
 
     ];
 
@@ -834,9 +794,9 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                     const Icon = s.icon;
 
                                     // step is 0-based (0 = Activity … 5 = Summary, 6 = payment)
-                                    const isActive = step === i;
+                                    const isActive = step === s.index;
 
-                                    const isDone = step > i;
+                                    const isDone = step > s.index;
 
                                     return (
 
@@ -1713,38 +1673,6 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
 
 
-                            {/* -- STEP 4 - Waiver ----------------------------- */}
-
-                            {step === 4 && (
-
-                                <div>
-
-                                    <div className="text-center mb-8">
-
-                                        <span className="inline-block px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-sm font-bold uppercase tracking-wider mb-3">
-
-                                            Step 5
-
-                                        </span>
-
-                                        <h2 className="text-3xl md:text-4xl font-display font-black text-white mb-2">
-
-                                            Safety Waiver
-
-                                        </h2>
-
-                                        <p className="text-white/60">Please complete participant details and accept the waiver</p>
-
-                                    </div>
-
-                                    <WaiverForm />
-
-                                </div>
-
-                            )}
-
-
-
                             {/* -- STEP 5 - Summary & Payment ----------------- */}
 
                             {step === 5 && (
@@ -1755,7 +1683,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                         <span className="inline-block px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-bold uppercase tracking-wider mb-3">
 
-                                            Step 6
+                                            Step 5
 
                                         </span>
 
@@ -2088,8 +2016,6 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                             adultPrice: prices.adult,
                                             kidPrice: prices.kid,
                                             spectatorPrice: prices.spectator,
-                                            lockerQty,
-                                            lockerPrice: 0,
                                             parkingQty,
                                             parkingPrice: prices.parking,
                                             discount: discount / 100,
@@ -2120,7 +2046,8 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                             <button type="button" onClick={() => {
                                 if (step === 1) setStep(0);
                                 // Logged-in users skipped step 3 (Auth Gate), so go back to Guests (step 2)
-                                else if (step === 4 && customer) setStep(2);
+                                // Summary goes back to Tickets when signed in (Details was skipped)
+                                else if (step === 5) setStep(customer ? 2 : 3);
                                 else setStep(step - 1);
                             }}
 

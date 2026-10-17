@@ -21,7 +21,7 @@ export default async function CmsDashboard() {
     const collections = [
         { name: 'Gallery', href: '/admin/cms/gallery', icon: 'Image', description: 'Photos on the Home and Gallery pages' },
         { name: 'Attractions', href: '/admin/cms/attractions', icon: 'Sparkles', description: 'Activity cards, attraction video & facilities' },
-        { name: 'FAQs', href: '/admin/faqs', icon: 'HelpCircle', description: 'Questions on the FAQ, About and Guidelines pages' },
+        { name: 'FAQs', href: '/admin/cms/faqs', icon: 'HelpCircle', description: 'Questions on the FAQ, About and Guidelines pages' },
         { name: 'Pricing Plans', href: '/admin/cms/pricing-plans', icon: 'PoundSterling', description: 'Prices on the Prices page' },
         { name: 'Opening Hours', href: '/admin/cms/timing-cards', icon: 'Clock', description: 'Hours bar and Contact page hours' },
         { name: 'Customer Reviews', href: '/admin/cms/collections/testimonials', icon: 'Star', description: 'Genuine reviews on the Reviews page' },

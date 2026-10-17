@@ -46,7 +46,7 @@ export default function LegalDocumentsPage() {
         <div className="space-y-8">
             <div>
                 <h1 className="text-2xl font-bold text-slate-900">Legal Documents</h1>
-                <p className="text-slate-500">Manage privacy policy, terms, and waivers.</p>
+                <p className="text-slate-500">Manage the privacy policy, terms and other policies.</p>
             </div>
 
             <CollectionList

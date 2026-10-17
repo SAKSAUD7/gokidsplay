@@ -166,14 +166,6 @@ export function AdminBookingModal({
                 {/* Footer Actions */}
                 <div className="p-6 border-t border-slate-100 bg-slate-50/50 flex flex-wrap gap-3 justify-end rounded-b-2xl">
                     <Link
-                        href={`/admin/waivers?${isParty ? 'party_booking' : 'booking'}=${booking.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-                        onClick={onClose}
-                    >
-                        <FileSignature size={16} />
-                        View Waivers
-                    </Link>
-                    <Link
                         href={editUrl}
                         className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                         onClick={onClose}

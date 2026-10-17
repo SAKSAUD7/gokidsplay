@@ -7,7 +7,6 @@ import { exportBookingsToCSV } from "../../../../lib/export-csv";
 import { DateFilter, filterBookingsByDate } from "@/components/admin/DateFilter";
 import { getCachedData, setCachedData, clearCacheByPrefix } from "@/lib/admin-cache";
 import { ArrivedToggle } from "@/components/admin/ArrivedToggle";
-import { WaiverLink } from "../components/WaiverLink";
 import { PageHeader } from "@/components/admin/PageHeader";
 import { Button } from "@/components/admin/Button";
 import { EmptyState } from "@/components/admin/EmptyState";
@@ -261,7 +260,6 @@ export default function PartyBookingsPage() {
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Amount</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Arrival</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Waiver</th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -356,12 +354,6 @@ export default function PartyBookingsPage() {
                                                     }
                                                 }}
                                                 type="party"
-                                            />
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <WaiverLink
-                                                bookingId={booking.id}
-                                                status={booking.waiverStatus || booking.waiver_status}
                                             />
                                         </td>
                                         <td className="px-6 py-4">

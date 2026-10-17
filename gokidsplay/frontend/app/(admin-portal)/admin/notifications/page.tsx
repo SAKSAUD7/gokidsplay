@@ -4,8 +4,6 @@ import { useEffect, useState } from 'react';
 import { Bell, CheckCircle, AlertTriangle, XCircle, Car, Users } from 'lucide-react';
 import Link from 'next/link';
 
-const BOWLING_MAX_LANES = 6;
-const SKATING_MAX = 60;
 
 function getTodayStr() {
     return new Date().toISOString().split('T')[0];
@@ -22,47 +20,28 @@ export default function NotificationsPage() {
             .then(r => r.ok ? r.json() : {})
             .then((data: Record<string, any>) => {
                 const alerts: any[] = [];
-                for (const [slot, info] of Object.entries(data)) {
-                    if (info.bowling_status === 'full') {
+                // Today's play sessions from the availability API (capacity is set in Website Content → Session Booking)
+                for (const [slot, info] of Object.entries<any>(data?.slots || {})) {
+                    const status = String(info.status || '').toUpperCase();
+                    if (status === 'FULL') {
                         alerts.push({
-                            id: `bowling-full-${slot}`,
+                            id: `session-full-${slot}`,
                             type: 'error',
-                            icon: '🎳',
-                            title: `Bowling FULL — ${slot}`,
-                            message: `All ${BOWLING_MAX_LANES} lanes are booked (${info.bowling_players} players). No more bowling bookings can be accepted for this slot.`,
+                            icon: '🎟️',
+                            title: `Sold out — ${slot}`,
+                            message: `${info.booked_count}/${info.total_capacity} players booked. No more online bookings can be taken for this session.`,
                             slot,
-                            link: `/admin/bowling-bookings`,
+                            link: `/admin/session-bookings`,
                         });
-                    } else if (info.bowling_status === 'busy') {
+                    } else if (status === 'LIMITED') {
                         alerts.push({
-                            id: `bowling-busy-${slot}`,
+                            id: `session-busy-${slot}`,
                             type: 'warn',
-                            icon: '🎳',
-                            title: `Bowling Almost Full — ${slot}`,
-                            message: `${info.bowling_lanes_used}/${BOWLING_MAX_LANES} lanes booked (${info.bowling_players} players). Only ${BOWLING_MAX_LANES - info.bowling_lanes_used} lane(s) remaining.`,
+                            icon: '🎟️',
+                            title: `Almost full — ${slot}`,
+                            message: `${info.booked_count}/${info.total_capacity} players booked, ${info.remaining_capacity} places left.`,
                             slot,
-                            link: `/admin/bowling-bookings`,
-                        });
-                    }
-                    if (info.skating_status === 'full') {
-                        alerts.push({
-                            id: `skating-full-${slot}`,
-                            type: 'error',
-                            icon: '🛼',
-                            title: `Skating FULL — ${slot}`,
-                            message: `${info.skating_headcount}/${SKATING_MAX} skaters booked. Slot is at full capacity.`,
-                            slot,
-                            link: `/admin/skating-bookings`,
-                        });
-                    } else if (info.skating_status === 'busy') {
-                        alerts.push({
-                            id: `skating-busy-${slot}`,
-                            type: 'warn',
-                            icon: '🛼',
-                            title: `Skating Almost Full — ${slot}`,
-                            message: `${info.skating_headcount}/${SKATING_MAX} skaters booked (${Math.round(info.skating_headcount / SKATING_MAX * 100)}% capacity).`,
-                            slot,
-                            link: `/admin/skating-bookings`,
+                            link: `/admin/session-bookings`,
                         });
                     }
                 }

@@ -161,6 +161,17 @@ const nextConfig = {
             },
             // The shop and memberships were removed — send old links to the prices page
             { source: '/shop', destination: '/pricing', permanent: true },
+            // Waivers were removed; the old waiver/kiosk pages go to the play rules / terms
+            { source: '/waiver', destination: '/guidelines', permanent: true },
+            { source: '/waiver-terms', destination: '/terms', permanent: true },
+            { source: '/kiosk/:path*', destination: '/', permanent: false },
+            { source: '/admin/waivers/:path*', destination: '/admin', permanent: false },
+            // Old duplicate admin screens → their Website Content replacements
+            { source: '/admin/faqs/:path*', destination: '/admin/cms/faqs', permanent: false },
+            { source: '/admin/misc-content/:path*', destination: '/admin/cms/gallery', permanent: false },
+            { source: '/admin/social-media', destination: '/admin/cms/social-links', permanent: false },
+            { source: '/admin/bowling-bookings', destination: '/admin/session-bookings', permanent: false },
+            { source: '/admin/skating-bookings', destination: '/admin/session-bookings', permanent: false },
             { source: '/memberships', destination: '/pricing', permanent: true },
             { source: '/admin/cms/collections/products', destination: '/admin/cms', permanent: false },
             { source: '/admin/cms/collections/memberships', destination: '/admin/cms', permanent: false },

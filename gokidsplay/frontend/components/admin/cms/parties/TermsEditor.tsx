@@ -32,7 +32,7 @@ export function TermsEditor({ section: initialSection, pageSlug }: TermsEditorPr
                 <li>All Party Guests Must Leave The Party Room / Area At The End Of The Party Time. Any Additional Time In The Party Area/ Room Will Be Charged £10 For Every 10 Minutes.</li>
                 <li>Party Staff Is Available To Help You Run Your Party Smoothly And Not For Entertainment Purpose. All Party Feast And Play Equipment's Are Subject To Availability.</li>
                 <li>Activities Will Be Closed With 10mins Prior Notice. Compensation Or Refund Will Not Be Authorised For Such Events.</li>
-                <li>All Participants Must Sign A Waiver Prior To Participating. Party Host Must Ensure The Waiver Are Complete For Their Invited Guest Participants.</li>
+                <li>All guests must follow the play rules shown on our Guidelines page. The party host is responsible for their invited guests.</li>
                 <li>Rules And Terms &amp; Conditions Apply At All Times. Visit www.gokidsplay.com For Full List Of T&amp;C &amp; Rules Of Play.</li>
                 <li>By Receiving The Confirmation Email Or By Signing The Booking Form You Agree To Abide By The Above-Mentioned Terms.</li>
             </ol>

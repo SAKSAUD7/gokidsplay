@@ -269,12 +269,6 @@ function FeatureSettings({ settings, onUpdate }: { settings: any; onUpdate: (s: 
                     danger
                     onChange={(val) => handleToggle("maintenanceMode", val)}
                 />
-                <ToggleItem
-                    title="Waiver Requirement"
-                    description="Force waiver signing before checkout."
-                    enabled={settings.waiverRequired}
-                    onChange={(val) => handleToggle("waiverRequired", val)}
-                />
             </div>
         </div>
     );
