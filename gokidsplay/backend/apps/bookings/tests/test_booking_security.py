@@ -405,6 +405,16 @@ class TestPasswordReset:
         again = client.post(self.AUTH + 'reset-password/', {'token': token, 'password': 'other-password'}, format='json')
         assert again.status_code == 400
 
+    def test_signing_out_keeps_the_account(self):
+        self.register('logout-ok@example.com')
+        client = APIClient()
+        token = client.post(self.AUTH + 'login/', {'email': 'logout-ok@example.com', 'password': 'old-password'}, format='json').data['token']
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        assert client.post(self.AUTH + 'logout/').status_code == 200
+        assert client.get(self.AUTH + 'me/').status_code == 401               # old session ended
+        again = APIClient().post(self.AUTH + 'login/', {'email': 'logout-ok@example.com', 'password': 'old-password'}, format='json')
+        assert again.status_code == 200                                         # can still sign in
+
     def test_unknown_email_gets_the_same_reply(self):
         from apps.emails.models import EmailLog
         response = APIClient().post(self.AUTH + 'forgot-password/', {'email': 'nobody-here@example.com'}, format='json')

@@ -480,6 +480,16 @@ def customer_booking_detail(request, booking_type, booking_id):
         })
 
 
+def end_customer_session(customer) -> int:
+    """
+    Sign the customer out everywhere. The CustomerToken row also holds the
+    password hash, so it must be kept: only the session token is replaced and
+    expired (deleting the row used to erase the account's login).
+    """
+    return CustomerToken.objects.filter(customer=customer).update(
+        token=secrets.token_urlsafe(40), expires_at=timezone.now())
+
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -487,7 +497,7 @@ def customer_logout(request):
     """Invalidate the customer's token."""
     customer = get_customer_from_request(request)
     if customer:
-        CustomerToken.objects.filter(customer=customer).delete()
+        end_customer_session(customer)
     return Response({"message": "Logged out."})
 
 
@@ -561,8 +571,8 @@ def admin_revoke_customer_token(request, customer_id):
     from apps.bookings.models import Customer
     try:
         customer = Customer.objects.get(pk=customer_id)
-        deleted, _ = CustomerToken.objects.filter(customer=customer).delete()
-        return Response({"message": f"Token revoked. Customer will need to log in again.", "deleted": deleted})
+        revoked = end_customer_session(customer)
+        return Response({"message": "Signed out. The customer will need to log in again.", "deleted": revoked})
     except Customer.DoesNotExist:
         return Response({"error": "Customer not found."}, status=404)
 

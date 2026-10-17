@@ -139,6 +139,12 @@ export default function EInvitationStep({ bookingId, bookingDetails, onNext, onS
         }
     };
 
+    // Nothing to choose from: go straight on to payment
+    const noTemplates = !loading && templates.length === 0;
+    useEffect(() => {
+        if (noTemplates) onSkip();
+    }, [noTemplates, onSkip]);
+
     if (loading) return (
         <div className="flex justify-center py-20">
             <Loader2 className="animate-spin text-primary w-10 h-10" />
@@ -147,13 +153,8 @@ export default function EInvitationStep({ bookingId, bookingDetails, onNext, onS
 
     if (templates.length === 0) {
         return (
-            <div className="text-center py-10 bg-surface-800/50 rounded-2xl border border-white/10">
-                <p className="text-white/60">No invitation templates available at the moment.</p>
-                <div className="mt-4">
-                    <button onClick={onSkip} className="text-primary hover:text-white underline">
-                        Skip this step
-                    </button>
-                </div>
+            <div className="flex justify-center py-20">
+                <Loader2 className="animate-spin text-primary w-10 h-10" />
             </div>
         );
     }
