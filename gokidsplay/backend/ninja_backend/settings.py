@@ -229,7 +229,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon_read': '600/minute',  # page content, slot availability
         'anon_write': '30/minute',  # booking, login, register, contact
-        'user': '300/minute',       # authenticated customers and staff
+        'user': '3000/minute',      # signed-in staff (each admin page makes several calls)
     },
     # Never trust a client-sent X-Forwarded-For directly (see TRUSTED_PROXY_COUNT)
     'NUM_PROXIES': 0,

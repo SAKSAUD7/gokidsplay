@@ -978,7 +978,9 @@ export function resolveSections(pageKey: string, rows: any[] = []): Record<strin
 }
 
 /** Split a `list` field into trimmed, non-empty lines. */
-export function listItems(value: string | undefined): string[] {
+export function listItems(value: string | string[] | null | undefined): string[] {
+    // CMS lists are one item per line; some records (e.g. party package "includes") are saved as JSON lists
+    if (Array.isArray(value)) return value.map((v) => String(v).trim()).filter(Boolean);
     return (value || '').split('\n').map((l) => l.trim()).filter(Boolean);
 }
 

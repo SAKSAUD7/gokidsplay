@@ -70,3 +70,28 @@ def session_start_times(check_date: date, config: Optional[SessionBookingConfig]
         times.append(t.strftime('%H:%M'))
         t += step
     return times
+
+
+def is_session_still_bookable(check_date: date, start_time: str, now: Optional[datetime] = None,
+                              config: Optional[SessionBookingConfig] = None) -> bool:
+    """
+    Whether a customer can still book this session online.
+    Anytime sessions can be booked on the day until an hour before closing;
+    arrival times only while they are still in the future.
+    """
+    from django.utils import timezone
+    config = config or session_config()
+    now = now or timezone.localtime()
+    today = now.date()
+    if check_date < today:
+        return False
+    if check_date > today:
+        return True
+    current = now.strftime('%H:%M')
+    if is_anytime(config):
+        hours = hours_for_booking_day(check_date, config)
+        if not hours:
+            return False
+        last_booking = (datetime.strptime(hours[1], '%H:%M') - timedelta(minutes=60)).strftime('%H:%M')
+        return current < last_booking
+    return start_time > current

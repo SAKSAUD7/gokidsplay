@@ -152,6 +152,12 @@ class TestPublicSessionBooking:
         assert response.status_code == 201, response.data
         assert Booking.objects.get(id=response.data['id']).amount == Decimal('5.00')
 
+    def test_booking_list_is_a_plain_list_unless_a_page_is_asked_for(self, config, plans, staff_client):
+        APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
+        assert isinstance(staff_client.get(SESSIONS_URL).data, list)
+        paged = staff_client.get(SESSIONS_URL, {'page': 1, 'page_size': 10}).data
+        assert paged['count'] == 1 and len(paged['results']) == 1
+
     def test_admin_booking_list_works_with_bookings(self, config, plans, staff_client):
         APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
         assert staff_client.get(SESSIONS_URL).status_code == 200
@@ -192,6 +198,16 @@ class TestSessionRules:
         past = (date.today() - timedelta(days=7)).isoformat()
         response = APIClient().post(SESSIONS_URL, session_payload(plans, date=past), format='json')
         assert response.status_code == 400
+
+    def test_same_day_anytime_booking_until_an_hour_before_closing(self, config):
+        from datetime import datetime
+        from django.utils import timezone
+        from apps.bookings.opening_hours import is_session_still_bookable
+        saturday = next_saturday()
+        tz = timezone.get_current_timezone()
+        at = lambda hhmm: timezone.make_aware(datetime.combine(saturday, datetime.strptime(hhmm, '%H:%M').time()), tz)
+        assert is_session_still_bookable(saturday, '10:00', now=at('14:00'))      # 10:00 start, booked at 2pm
+        assert not is_session_still_bookable(saturday, '10:00', now=at('16:45'))  # within the last hour
 
     def test_anytime_capacity_counts_the_whole_day(self, config, plans):
         config.session_capacity = 5

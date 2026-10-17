@@ -785,6 +785,9 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                             onSubmit={handleParticipantSubmit}
                             onBack={() => customer ? setStep(1) : setStep(2)}
                             totalParticipants={formData.participants}
+                            // Pre-fill from step 1: the parent as primary contact, the birthday child as first guest
+                            initialAdults={[{ id: "1", name: formData.name, email: formData.email, phone: formData.phone, dob: "", isPrimary: true }]}
+                            initialMinors={formData.childName ? [{ id: "birthday-child", name: formData.childName, dob: "", guardian: formData.name }] : []}
                             title={getContent('step-2', 'Participants', '').title}
                             subtitle={getContent('step-2', '', `Add details for all ${formData.participants} participants`).subtitle}
                         />

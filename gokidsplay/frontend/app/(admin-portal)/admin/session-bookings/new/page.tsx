@@ -1,40 +1,87 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createBooking } from "@/app/actions/createBooking";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Calendar, Clock, Users, User, Mail, Phone, Ticket, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, Users, User, Mail, Phone, Ticket, ArrowLeft, Minus, Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { applySessionRules, getOpeningHours, getSessionRules, formatClock, todayInUK } from "@/lib/api/types";
+
+interface TicketPlan { id: number; name: string; price: string; is_spectator?: boolean; order?: number }
+
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
+const input = "w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent";
+
+/** Session start times for staff: every session that day, including ones already under way. */
+function staffSessionTimes(date: string): string[] {
+    const hours = getOpeningHours(date) ?? getSessionRules().holiday_hours;
+    if (!date || !hours) return [];
+    const rules = getSessionRules();
+    if (rules.session_mode === "ANYTIME") return [hours.open];
+    const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+    const out: string[] = [];
+    for (let t = toMin(hours.open); t + rules.duration_minutes <= toMin(hours.close); t += rules.arrival_interval_minutes) {
+        out.push(`${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`);
+    }
+    return out;
+}
 
 export default function NewSessionBookingPage() {
     const router = useRouter();
-    const formRef = useRef<HTMLFormElement>(null);
     const [loading, setLoading] = useState(false);
+    const [plans, setPlans] = useState<TicketPlan[]>([]);
+    const [qty, setQty] = useState<Record<number, number>>({});
+    const [fee, setFee] = useState(0);
+    const [rulesReady, setRulesReady] = useState(false);
+    const [form, setForm] = useState({ name: "", email: "", phone: "", date: todayInUK(), time: "", voucherCode: "", paidAtDesk: true });
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    useEffect(() => {
+        fetch(`${API}/cms/pricing-plans/`).then(r => (r.ok ? r.json() : [])).then((data: any[]) =>
+            setPlans((Array.isArray(data) ? data : []).filter(p => p.type === "SESSION" && p.active !== false).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))),
+        ).catch(() => setPlans([]));
+        fetch(`${API}/cms/session-booking-config/1/`).then(r => (r.ok ? r.json() : null)).then(cfg => {
+            if (cfg) { applySessionRules(cfg); setFee(0); }
+            setRulesReady(true);
+        }).catch(() => setRulesReady(true));
+    }, []);
+
+    const times = useMemo(() => (rulesReady ? staffSessionTimes(form.date) : []), [form.date, rulesReady]);
+    useEffect(() => {
+        if (times.length && !times.includes(form.time)) setForm(f => ({ ...f, time: times[0] }));
+    }, [times, form.time]);
+
+    const set = (k: keyof typeof form, v: any) => setForm(f => ({ ...f, [k]: v }));
+    const lines = plans.filter(p => (qty[p.id] || 0) > 0).map(p => ({ plan: p, qty: qty[p.id], total: parseFloat(p.price) * qty[p.id] }));
+    const total = lines.reduce((s, l) => s + l.total, 0) + fee;
+    const players = plans.filter(p => !p.is_spectator).reduce((s, p) => s + (qty[p.id] || 0), 0);
+    const spectators = plans.filter(p => p.is_spectator).reduce((s, p) => s + (qty[p.id] || 0), 0);
+    const hours = rulesReady ? getOpeningHours(form.date) : null;
+    const anytime = getSessionRules().session_mode === "ANYTIME";
+
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const formData = new FormData(formRef.current!);
+        if (players === 0) { toast.error("Add at least one playing ticket"); return; }
+        if (!form.time) { toast.error("Choose a session"); return; }
         setLoading(true);
         try {
-            const data = {
-                date: formData.get("date") as string,
-                time: formData.get("time") as string,
-                duration: formData.get("duration") as string,
-                adults: Number(formData.get("adults")),
-                kids: Number(formData.get("kids")),
-                spectators: Number(formData.get("spectators")),
-                name: formData.get("name") as string,
-                email: formData.get("email") as string,
-                phone: formData.get("phone") as string,
-                voucherCode: formData.get("voucherCode") as string || undefined,
-                activity: formData.get("activity") as string || null,
-            };
-
-            const result = await createBooking(data);
-
+            const result = await createBooking({
+                date: form.date,
+                time: form.time,
+                duration: String(getSessionRules().duration_minutes),
+                adults: 0,
+                kids: players,
+                spectators,
+                tickets: qty,
+                name: form.name,
+                email: form.email,
+                phone: form.phone,
+                voucherCode: form.voucherCode || undefined,
+                activity: "all-access",
+                paidAtDesk: form.paidAtDesk,
+            });
             if (result.success) {
-                toast.success("Session booking created successfully");
+                toast.success("Booking created");
                 router.push("/admin/session-bookings");
                 router.refresh();
             } else {
@@ -50,239 +97,102 @@ export default function NewSessionBookingPage() {
     return (
         <div className="p-8 max-w-4xl mx-auto">
             <div className="mb-8">
-                <Link
-                    href="/admin/session-bookings"
-                    className="text-slate-500 hover:text-slate-700 flex items-center gap-2 mb-4 transition-colors"
-                >
-                    <ArrowLeft size={16} />
-                    Back to Session Bookings
+                <Link href="/admin/session-bookings" className="text-slate-500 hover:text-slate-700 flex items-center gap-2 mb-4">
+                    <ArrowLeft size={16} /> Back to Session Bookings
                 </Link>
                 <h1 className="text-3xl font-bold text-slate-900">Manual Booking — Walk-in / Phone</h1>
-                <p className="text-slate-500 mt-1">Create a skating or bowling booking for walk-in or phone customers</p>
+                <p className="text-slate-500 mt-1">Book an all-access play session for a walk-in or phone customer. No online booking fee is added.</p>
             </div>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-8">
-            {/* Activity Selection */}
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span className="text-xl">🎯</span>
-                        Activity
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-pink-400 has-[:checked]:border-pink-500 has-[:checked]:bg-pink-50">
-                            <input
-                                type="radio"
-                                name="activity"
-                                value="roller-skating"
-                                defaultChecked
-                                className="accent-pink-500"
-                            />
-                            <div>
-                                <p className="font-bold text-slate-900">🛼 Roller Skating</p>
-                                <p className="text-sm text-slate-500">Leicester's first roller rink</p>
-                            </div>
-                        </label>
-                        <label className="flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-blue-400 has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                            <input
-                                type="radio"
-                                name="activity"
-                                value="ten-pin-bowling"
-                                className="accent-blue-500"
-                            />
-                            <div>
-                                <p className="font-bold text-slate-900">🎳 Ten Pin Bowling</p>
-                                <p className="text-sm text-slate-500">Strike it big in Leicester</p>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                {/* Customer Details */}
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <User className="w-5 h-5 text-primary" />
-                        Customer Details
-                    </h3>
+            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-8">
+                <section>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><User className="w-5 h-5 text-primary" /> Customer</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    name="name"
-                                    type="text"
-                                    required
-                                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="John Doe"
-                                />
-                            </div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Full name</label>
+                            <div className="relative"><User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input required className={input} value={form.name} onChange={e => set("name", e.target.value)} placeholder="Jane Smith" /></div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="john@example.com"
-                                />
-                            </div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                            <div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input required type="email" className={input} value={form.email} onChange={e => set("email", e.target.value)} placeholder="jane@example.com" /></div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Phone Number</label>
-                            <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    name="phone"
-                                    type="tel"
-                                    required
-                                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="+44 7700 900000"
-                                />
-                            </div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                            <div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input required type="tel" className={input} value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="07700 900000" /></div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                {/* Booking Schedule */}
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-primary" />
-                        Booking Schedule
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <section>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><Calendar className="w-5 h-5 text-primary" /> Session</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Date</label>
-                            <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <input
-                                    name="date"
-                                    type="date"
-                                    required
-                                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                                />
-                            </div>
+                            <div className="relative"><Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input required type="date" min={todayInUK()} className={input} value={form.date} onChange={e => set("date", e.target.value)} /></div>
+                            <p className="text-xs text-slate-500 mt-1">
+                                {hours ? `Open ${formatClock(hours.open)} – ${formatClock(hours.close)}` : "Normally closed this day (fine for a school or bank holiday)"}
+                            </p>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Time Slot</label>
-                            <div className="relative">
-                                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <select
-                                    name="time"
-                                    required
-                                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white"
-                                >
-                                    <option value="">Select Time</option>
-                                    <option value="12:00">12:00 PM — Midday</option>
-                                    <option value="13:00">01:00 PM</option>
-                                    <option value="14:00">02:00 PM</option>
-                                    <option value="15:00">03:00 PM</option>
-                                    <option value="16:00">04:00 PM</option>
-                                    <option value="17:00">05:00 PM</option>
-                                    <option value="18:00">06:00 PM</option>
-                                    <option value="19:00">07:00 PM</option>
-                                    <option value="20:00">08:00 PM</option>
-                                    <option value="21:00">09:00 PM</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Duration</label>
-                            <select
-                                name="duration"
-                                required
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white"
-                            >
-                                <option value="60">60 minutes</option>
-                                <option value="90">90 minutes</option>
-                                <option value="120">120 minutes</option>
-                            </select>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">{anytime ? "Session" : "Arrival time"}</label>
+                            <div className="relative"><Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <select required className={`${input} bg-white appearance-none`} value={form.time} onChange={e => set("time", e.target.value)}>
+                                    {times.map(t => (
+                                        <option key={t} value={t}>{anytime && hours ? `Any ${getSessionRules().duration_minutes / 60} hours, ${formatClock(hours.open)} – ${formatClock(hours.close)}` : formatClock(t)}</option>
+                                    ))}
+                                </select></div>
                         </div>
                     </div>
-                </div>
+                </section>
 
-                {/* Guest Count */}
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-primary" />
-                        Guest Count
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Adults</label>
-                            <input
-                                name="adults"
-                                type="number"
-                                required
-                                min="0"
-                                defaultValue="0"
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">£9.95 per adult</p>
+                <section>
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2"><Users className="w-5 h-5 text-primary" /> Tickets</h3>
+                    {plans.length === 0 ? <p className="text-sm text-slate-500 flex items-center gap-2"><Loader2 size={14} className="animate-spin" /> Loading ticket types…</p> : (
+                        <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg">
+                            {plans.map(p => (
+                                <div key={p.id} className="flex items-center justify-between px-4 py-3">
+                                    <div>
+                                        <div className="font-semibold text-slate-900">{p.name}</div>
+                                        <div className="text-xs text-slate-500">£{parseFloat(p.price).toFixed(2)}{p.is_spectator ? " · doesn't play" : ""}</div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <button type="button" aria-label={`Remove one: ${p.name}`} onClick={() => setQty(q => ({ ...q, [p.id]: Math.max(0, (q[p.id] || 0) - 1) }))}
+                                            className="w-8 h-8 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 hover:bg-slate-50"><Minus size={14} /></button>
+                                        <span className="w-6 text-center font-bold text-slate-900">{qty[p.id] || 0}</span>
+                                        <button type="button" aria-label={`Add one: ${p.name}`} onClick={() => setQty(q => ({ ...q, [p.id]: Math.min(50, (q[p.id] || 0) + 1) }))}
+                                            className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700"><Plus size={14} /></button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Kids</label>
-                            <input
-                                name="kids"
-                                type="number"
-                                required
-                                min="0"
-                                defaultValue="0"
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">£9.95 per child</p>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Spectators</label>
-                            <input
-                                name="spectators"
-                                type="number"
-                                required
-                                min="0"
-                                defaultValue="0"
-                                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                            />
-                            <p className="text-xs text-slate-500 mt-1">£2.95 per spectator</p>
-                        </div>
+                    )}
+                </section>
+
+                <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Voucher code (optional)</label>
+                        <div className="relative"><Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <input className={`${input} uppercase`} value={form.voucherCode} onChange={e => set("voucherCode", e.target.value)} placeholder="DISCOUNT20" /></div>
                     </div>
-                </div>
-
-                {/* Voucher */}
-                <div>
-                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <Ticket className="w-5 h-5 text-primary" />
-                        Discount Code (Optional)
-                    </h3>
-                    <div className="max-w-md">
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Voucher Code</label>
-                        <div className="relative">
-                            <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                                name="voucherCode"
-                                type="text"
-                                className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent uppercase"
-                                placeholder="DISCOUNT20"
-                            />
-                        </div>
+                    <div className="bg-slate-50 rounded-lg p-4">
+                        {lines.map(l => (
+                            <div key={l.plan.id} className="flex justify-between text-sm text-slate-700"><span>{l.plan.name} × {l.qty}</span><span>£{l.total.toFixed(2)}</span></div>
+                        ))}
+                        <div className="flex justify-between font-bold text-slate-900 border-t border-slate-200 mt-2 pt-2"><span>Total</span><span>£{total.toFixed(2)}</span></div>
+                        <label className="flex items-center gap-2 text-sm text-slate-700 mt-3">
+                            <input type="checkbox" checked={form.paidAtDesk} onChange={e => set("paidAtDesk", e.target.checked)} /> Paid at the desk
+                        </label>
                     </div>
-                </div>
+                </section>
 
-                {/* Submit */}
                 <div className="pt-4 border-t border-slate-200 flex justify-end gap-3">
-                    <Link
-                        href="/admin/session-bookings"
-                        className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
-                    >
-                        Cancel
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {loading ? "Creating Booking..." : "Create Session Booking"}
+                    <Link href="/admin/session-bookings" className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50">Cancel</Link>
+                    <button type="submit" disabled={loading} className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                        {loading ? "Creating booking…" : "Create Booking"}
                     </button>
                 </div>
             </form>

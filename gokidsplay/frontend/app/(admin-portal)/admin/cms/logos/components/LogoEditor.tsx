@@ -191,7 +191,8 @@ export default function LogoEditor({ logos: initialLogos }: LogoEditorProps) {
 
                                 <div className="mb-3 flex items-center justify-center h-32 bg-slate-50 rounded-lg border border-slate-100">
                                     <Image
-                                        src={logo.image_url}
+                                        // No URL means the website's built-in logo file
+                                        src={logo.image_url || '/gokidsplay-logo.png'}
                                         alt={logo.name}
                                         width={200}
                                         height={100}

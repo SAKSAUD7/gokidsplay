@@ -61,7 +61,7 @@ export async function createBooking(formData: any) {
             const adminSchema = z.object({
                 date: z.string().min(1, "Please select a date"),
                 time: z.string().min(1, "Please select a time slot"),
-                duration: z.enum(["60", "90", "120"]),
+                duration: z.string().regex(/^\d+$/, "Invalid session length"),
                 adults: z.number().min(0),
                 kids: z.number().min(0),
                 spectators: z.number().min(0),
@@ -113,13 +113,8 @@ export async function createBooking(formData: any) {
             return { success: false, error: "Cannot book for past dates" };
         }
 
-        // Validate time is not in the past for today's bookings (UK time)
-        if (data.date === ukTodayStr) {
-            const ukNowStr = new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false });
-            if (data.time <= ukNowStr) {
-                return { success: false, error: "Selected time has passed. Please choose a future time slot." };
-            }
-        }
+        // Same-day cut-offs are checked by the API (an "anytime" session starts at
+        // opening time but can still be booked until an hour before closing)
 
         // ── Fetch pricing from CMS config (dynamic, admin-controlled) ─────────
         let cmsConfig: Record<string, string> = {};
@@ -262,8 +257,9 @@ export async function createBooking(formData: any) {
             voucher: voucherId,
             status: "CONFIRMED",
             booking_status: "CONFIRMED",
-            payment_status: "PENDING",
-            waiver_status: "PENDING",
+            // Staff can record a walk-in that has already paid at the desk
+            payment_status: isAdminBooking && formData.paidAtDesk ? "PAID" : "PENDING",
+            ...(isAdminBooking && formData.paidAtDesk ? { paid_amount: Number(totalAmount.toFixed(2)) } : {}),
             type: "SESSION",
             activity: formData.activity || null,
             add_ons: addOnsList.length > 0 ? addOnsList : null,

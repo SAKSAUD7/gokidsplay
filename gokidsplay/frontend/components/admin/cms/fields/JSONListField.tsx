@@ -9,7 +9,22 @@ interface JSONListFieldProps {
     error?: string;
 }
 
-export function JSONListField({ field, value = [], onChange, error }: JSONListFieldProps) {
+/** Older records sometimes stored the list as JSON text or one item per line. */
+function toList(raw: any): any[] {
+    if (Array.isArray(raw)) return raw;
+    if (typeof raw === 'string' && raw.trim()) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) return parsed;
+        } catch { /* plain text */ }
+        // one item per line, or comma-separated text
+        return raw.split(raw.includes('\n') ? '\n' : ',').map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+}
+
+export function JSONListField({ field, value: rawValue, onChange, error }: JSONListFieldProps) {
+    const value = toList(rawValue);
     const [newItem, setNewItem] = useState('');
 
     const handleAdd = () => {

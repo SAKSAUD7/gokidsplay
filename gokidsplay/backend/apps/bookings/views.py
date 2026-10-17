@@ -70,6 +70,13 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     pagination_class = BookingPagination  # 50 per page by default; use ?page_size=N to override
+
+    def paginate_queryset(self, queryset):
+        """Paginate only when ?page= or ?page_size= is given; admin screens without them get the full list."""
+        params = self.request.query_params
+        if 'page' not in params and 'page_size' not in params:
+            return None
+        return super().paginate_queryset(queryset)
     
     def get_queryset(self):
         queryset = Booking.objects.all()
@@ -130,14 +137,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             queryset = queryset.order_by(ordering)
         else:
             queryset = queryset.order_by('-created_at')  # Default to newest first
-
-        # Pagination: if page_size is given, paginate; otherwise return all (for backward compat)
-        page_size = self.request.query_params.get('page_size', None)
-        if page_size:
-            from rest_framework.pagination import PageNumberPagination
-            paginator = PageNumberPagination()
-            paginator.page_size = int(page_size)
-            self._paginator_instance = paginator
 
         return queryset.select_related('customer', 'voucher').prefetch_related('transactions')
     
@@ -209,14 +208,13 @@ class BookingViewSet(viewsets.ModelViewSet):
                 # ── Public bookings must use a real session start for that day ──
                 # (opening hours / session mode from the CMS; staff may book anything)
                 if not is_staff:
-                    from django.utils import timezone as dj_timezone
-                    from .opening_hours import session_start_times
-                    if req_date < dj_timezone.localdate():
-                        return Response({'detail': 'Please choose a date in the future.', 'code': 'PAST_DATE'},
-                                        status=status.HTTP_400_BAD_REQUEST)
+                    from .opening_hours import is_session_still_bookable, session_start_times
                     if req_time not in session_start_times(req_date):
                         return Response({'detail': 'Please choose one of the available session times.',
                                          'code': 'INVALID_TIME'}, status=status.HTTP_400_BAD_REQUEST)
+                    if not is_session_still_bookable(req_date, req_time):
+                        return Response({'detail': 'Online booking for this session has closed. Please choose another date or time.',
+                                         'code': 'PAST_DATE'}, status=status.HTTP_400_BAD_REQUEST)
 
                 # ── Go Kids Play capacity check (select_for_update for race safety) ──
                 svc = GKPAvailabilityService()
