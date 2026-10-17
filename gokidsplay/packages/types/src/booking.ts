@@ -37,7 +37,8 @@ export const bookingSchema = z.object({
     time: z.string()
         .min(1, "Please select a time slot"),
 
-    duration: z.enum(["60", "90", "120"]),
+    // Session length in minutes (Website Content → Session Booking)
+    duration: z.string().regex(/^\d+$/, "Invalid session length"),
 
     // Guest Details
     adults: z.number()
@@ -72,30 +73,13 @@ export const bookingSchema = z.object({
         .regex(phoneRegex, "Please enter a valid phone number")
         .transform((phone) => formatPhoneNumber(phone)),
 
-    // Waiver Details
-    dateOfBirth: z.string().min(1, "Date of birth is required"),
-    dateOfArrival: z.string().min(1, "Date of arrival is required"),
-    minors: z.array(z.object({
-        name: z.string().min(1, "Minor name is required"),
-        dob: z.string().min(1, "Minor DOB is required")
-    })).optional(),
-    adultGuests: z.array(z.object({
-        name: z.string().min(1, "Adult name is required"),
-        email: z.string().email("Valid email required").optional(),
-        phone: z.string().min(10, "Valid phone required").optional(),
-        dob: z.string().min(1, "Adult DOB is required")
-    })).optional(),
     voucherCode: z.string().optional(),
     discountAmount: z.number().optional(),
-
-    // Waiver
-    waiverAccepted: z.boolean()
-        .refine((val) => val === true, "You must accept the waiver to proceed")
 }).refine((data) => {
-    // At least one jumper (adult or kid) must be selected
+    // At least one playing ticket must be selected
     return data.adults > 0 || data.kids > 0;
 }, {
-    message: "At least one jumper (adult or kid) is required for booking",
+    message: "Please add at least one playing ticket",
     path: ["adults"]
 }).refine((data) => {
     // Total guests should not exceed 100

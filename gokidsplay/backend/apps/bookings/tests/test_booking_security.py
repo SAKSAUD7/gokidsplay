@@ -415,6 +415,15 @@ class TestPasswordReset:
         again = APIClient().post(self.AUTH + 'login/', {'email': 'logout-ok@example.com', 'password': 'old-password'}, format='json')
         assert again.status_code == 200                                         # can still sign in
 
+    def test_signing_in_on_another_device_keeps_the_first_session(self):
+        self.register('two-devices@example.com')
+        creds = {'email': 'two-devices@example.com', 'password': 'old-password'}
+        first = APIClient().post(self.AUTH + 'login/', creds, format='json').data['token']
+        APIClient().post(self.AUTH + 'login/', creds, format='json')
+        laptop = APIClient()
+        laptop.credentials(HTTP_AUTHORIZATION=f'Bearer {first}')
+        assert laptop.get(self.AUTH + 'me/').status_code == 200
+
     def test_unknown_email_gets_the_same_reply(self):
         from apps.emails.models import EmailLog
         response = APIClient().post(self.AUTH + 'forgot-password/', {'email': 'nobody-here@example.com'}, format='json')

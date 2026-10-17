@@ -131,9 +131,11 @@ def customer_login(request):
     if not check_password(password, token_obj.password_hash):
         return Response({"error": "Incorrect password. Please try again."}, status=401)
 
-    # Refresh token
-    token_key = secrets.token_urlsafe(40)
-    token_obj.token = token_key
+    # Keep a still-valid session (so signing in on a phone doesn't sign out the
+    # laptop); otherwise start a new one. Either way it lasts 30 days from now.
+    if token_obj.expires_at <= timezone.now():
+        token_obj.token = secrets.token_urlsafe(40)
+    token_key = token_obj.token
     token_obj.expires_at = timezone.now() + timezone.timedelta(days=30)
     token_obj.save()
 

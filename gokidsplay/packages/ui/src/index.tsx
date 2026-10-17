@@ -4,7 +4,6 @@ export { Footer } from "./Footer";
 export { Hero } from "./Hero";
 export { Button } from "./Button";
 export { ActivityCard } from "./ActivityCard";
-export { BookingWizard } from "./BookingWizard";
 
 // New Wonderla-Style Components
 export { AnimatedHero } from "./components/AnimatedHero";

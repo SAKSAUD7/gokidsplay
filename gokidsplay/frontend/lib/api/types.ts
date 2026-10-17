@@ -166,7 +166,8 @@ export const bookingSchema = z.object({
     time: z.string()
         .min(1, "Please select a time slot"),
 
-    duration: z.enum(["60", "90", "120"]),
+    // Session length in minutes (Website Content → Session Booking)
+    duration: z.string().regex(/^\d+$/, "Invalid session length"),
 
     // Guest Details
     adults: z.number()

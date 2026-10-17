@@ -321,12 +321,12 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
 
 
-    // Auto-set duration (120 min for all GKP activities)
+    // Session length from Website Content → Session Booking (2 hours by default)
     useEffect(() => {
         if (selectedActivity) {
-            setValue("duration", "120");
+            setValue("duration", String(getSessionRules().duration_minutes));
         }
-    }, [selectedActivity]);
+    }, [selectedActivity, config]);
 
     // Update available slots when date or activity changes
     useEffect(() => {
