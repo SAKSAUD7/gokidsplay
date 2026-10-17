@@ -381,7 +381,7 @@ export const PAGES: PageDef[] = [
                     area('subtitle', 'Text', 'Book your session online — Soft Play, Laser Arena, Go Karts, or Inflatables, your choice!', 'subtitle'),
                     text('button_text', 'Button text', '🎟️ Book Tickets — every activity included', 'cta_text'),
                     link('button_link', 'Button link', '/book', 'cta_link'),
-                    text('note', 'Opening hours note', 'Open Wed–Sun (10am–5:30pm). Also open Bank & School Holidays.'),
+                    text('note', 'Opening hours note', 'Open {days} ({hours}). Also open school & bank holidays.'),
                 ],
             },
         ],
@@ -518,7 +518,7 @@ export const PAGES: PageDef[] = [
                 label: 'Session info banner',
                 fields: [
                     text('title', 'Banner heading', 'Play Session is for 2 hours only', 'title'),
-                    area('content', 'Banner text', 'Open SATURDAY, SUNDAY, SCHOOL & BANK HOLIDAYS. (10:00am - 5:30pm)', 'content'),
+                    area('content', 'Banner text', 'Open {days}, school & bank holidays ({hours})', 'content'),
                 ],
             },
             {
@@ -569,7 +569,7 @@ export const PAGES: PageDef[] = [
                     text('title', 'Heading', 'Go Kids Play Party Booking', 'title'),
                     area('subtitle', 'Subheading', "Celebrate with the ultimate adventure! Birthdays, school trips, corporate events - we've got you covered.", 'content'),
                     image('image', 'Background image', '/images/uploads/img-3.jpg', 'image_url'),
-                    text('availability', 'Availability line', 'Available: Wednesday - Sunday'),
+                    text('availability', 'Availability line', 'Available: {days} & school holidays'),
                 ],
             },
             {

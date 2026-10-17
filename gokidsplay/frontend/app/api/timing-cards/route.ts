@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { fillHours, hoursPlaceholdersFromConfig } from '@/lib/hours-text';
 
 /**
  * Proxy route for timing-cards.
@@ -12,9 +13,10 @@ export async function GET() {
         || 'http://localhost:9000/api/v1';
 
     try {
-        const res = await fetch(`${backendUrl}/cms/timing-cards/`, {
-            next: { revalidate: 60 }, // cache for 60 seconds
-        });
+        const [res, configRes] = await Promise.all([
+            fetch(`${backendUrl}/cms/timing-cards/`, { next: { revalidate: 60 } }), // cache for 60 seconds
+            fetch(`${backendUrl}/cms/session-booking-config/1/`, { next: { revalidate: 60 } }).catch(() => null),
+        ]);
 
         if (!res.ok) {
             // Backend error — return empty array so the UI just hides gracefully
@@ -22,7 +24,9 @@ export async function GET() {
         }
 
         const data = await res.json();
-        return NextResponse.json(Array.isArray(data) ? data : []);
+        const config = configRes && configRes.ok ? await configRes.json() : null;
+        // {open}, {close}, {days}… come from the Session Booking opening hours
+        return NextResponse.json(Array.isArray(data) ? fillHours(data, hoursPlaceholdersFromConfig(config)) : []);
     } catch {
         // Network error / backend down — fail silently
         return NextResponse.json([]);

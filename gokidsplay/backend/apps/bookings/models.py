@@ -93,7 +93,7 @@ class Booking(models.Model):
     tickets = models.JSONField(null=True, blank=True, help_text="Admission tickets: [{plan_id, label, qty, price_each, subtotal, playing}]")
     parking_plates = models.JSONField(null=True, blank=True, help_text="Car registration plates for pre-booked parking: ['LE21 ABC', ...]")
     qr_code = models.CharField(max_length=255, unique=True, null=True, blank=True)
-    booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Unique booking number (SP-YYYYMMDD-XXXX)")
+    booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Booking number, e.g. GK482913 (see references.py)")
     
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
@@ -133,17 +133,14 @@ class Booking(models.Model):
         return self.amount - self.paid_amount
     
     def generate_booking_number(self):
-        """Generate unique booking number: SP-XXXX"""
-        return f"SP-{self.id}"
+        """Short random booking number, e.g. GK482913."""
+        from .references import new_reference, SESSION_PREFIX
+        return new_reference(SESSION_PREFIX, Booking)
     
     def save(self, *args, **kwargs):
-        # Generate booking number on first save
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
-        
-        if is_new and not self.booking_number:
+        if not self.booking_number:
             self.booking_number = self.generate_booking_number()
-            super().save(update_fields=['booking_number'])
+        super().save(*args, **kwargs)
 
 class PartyBooking(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -209,7 +206,7 @@ class PartyBooking(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='party_bookings')
-    booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Unique booking number (SPPARTY-YYYYMMDD-XXXX)")
+    booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Booking number, e.g. GP105377 (see references.py)")
     
     # Arrival tracking (matching Booking model)
     arrived = models.BooleanField(default=False)
@@ -242,17 +239,14 @@ class PartyBooking(models.Model):
         return self.amount - self.paid_amount
     
     def generate_booking_number(self):
-        """Generate unique booking number: SP-PXXXX"""
-        return f"SP-P{self.id}"
+        """Short random booking number, e.g. GP105377."""
+        from .references import new_reference, PARTY_PREFIX
+        return new_reference(PARTY_PREFIX, PartyBooking)
     
     def save(self, *args, **kwargs):
-        # Generate booking number on first save
-        is_new = self.pk is None
-        super().save(*args, **kwargs)
-        
-        if is_new and not self.booking_number:
+        if not self.booking_number:
             self.booking_number = self.generate_booking_number()
-            super().save(update_fields=['booking_number'])
+        super().save(*args, **kwargs)
 
 
 class Transaction(models.Model):
@@ -284,7 +278,7 @@ class BookingBlock(models.Model):
     TYPE_CHOICES = [
         ('BLOCKED_DATE', 'Blocked Date'),
         ('CLOSED_TODAY', 'Closed Today (Popup)'),
-        ('OPEN_TODAY', 'Open Today (Holiday)'),
+        ('OPEN_TODAY', 'Special opening'),
         ('SLOT_CLOSED', 'Individual Slot Closed'),
         # Legacy choices kept for backward compatibility
         ('CLOSED', 'Closed'),
@@ -303,6 +297,9 @@ class BookingBlock(models.Model):
     # GKP granular override fields
     blocks_normal_bookings = models.BooleanField(default=True, help_text='Block normal session bookings on this date')
     blocks_party_bookings = models.BooleanField(default=True, help_text='Block party bookings on this date')
+    # Special opening (type OPEN_TODAY): optional hours, otherwise the holiday hours are used
+    open_time = models.TimeField(null=True, blank=True, help_text='Opening time for a special opening')
+    close_time = models.TimeField(null=True, blank=True, help_text='Closing time for a special opening')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -627,18 +624,12 @@ class EventBooking(models.Model):
         return f"EventBooking #{self.booking_reference} — {self.name} @ {self.event.title}"
 
     def generate_booking_reference(self):
-        import random
-        import string
-        prefix = 'EV'
-        suffix = ''.join(random.choices(string.digits, k=6))
-        return f"{prefix}{suffix}"
+        from .references import new_reference, EVENT_PREFIX
+        return new_reference(EVENT_PREFIX, EventBooking, 'booking_reference')
 
     def save(self, *args, **kwargs):
         if not self.booking_reference:
-            ref = self.generate_booking_reference()
-            while EventBooking.objects.filter(booking_reference=ref).exists():
-                ref = self.generate_booking_reference()
-            self.booking_reference = ref
+            self.booking_reference = self.generate_booking_reference()
         # Recalculate balance
         self.balance_due = max(0, self.subtotal - self.amount_paid)
         super().save(*args, **kwargs)
@@ -690,10 +681,6 @@ class EventRequest(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.reference:
-            import random
-            import string
-            ref = 'ER' + ''.join(random.choices(string.digits, k=6))
-            while EventRequest.objects.filter(reference=ref).exists():
-                ref = 'ER' + ''.join(random.choices(string.digits, k=6))
-            self.reference = ref
+            from .references import new_reference, EVENT_REQUEST_PREFIX
+            self.reference = new_reference(EVENT_REQUEST_PREFIX, EventRequest, 'reference')
         super().save(*args, **kwargs)

@@ -107,7 +107,7 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
 
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Booking #{String(booking.id).padStart(6, '0')}</h1>
+                    <h1 className="text-3xl font-bold text-slate-900">Booking <span className="font-mono">{booking.booking_number || `#${booking.id}`}</span></h1>
                     <p className="text-slate-500 mt-1">Created on {new Date(booking.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex gap-3">

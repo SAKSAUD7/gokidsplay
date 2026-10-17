@@ -2,13 +2,16 @@
 
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { isHolidayOpen, getOpeningHours, getAvailableTimeSlots, formatClock, nowInUK, todayInUK } from "@/lib/api/types";
-import type { BookingBlock } from "@/lib/api/booking-blocks";
+import {
+    getAvailableTimeSlots, getCalendarDay, getClosedReason, getOpeningHours, getPartyHours,
+    getPartyStartTimes, formatClock, isHolidayOpen, nowInUK, todayInUK,
+} from "@/lib/api/types";
 
 interface SmartCalendarProps {
     value: string; // YYYY-MM-DD
     onChange: (date: string) => void;
-    bookingBlocks?: BookingBlock[];
+    /** Which bookings the calendar is for: play sessions (default) or parties */
+    mode?: "session" | "party";
     minDate?: string; // YYYY-MM-DD
     maxDate?: string;
 }
@@ -21,72 +24,47 @@ function toYMD(y: number, m: number, d: number) {
     return `${y}-${pad(m + 1)}-${pad(d)}`;
 }
 
-function getDayType(
-    dateStr: string,
-    bookingBlocks: BookingBlock[],
-): "closed" | "blocked" | "school-holiday" | "weekend" | "normal" {
-    const date = new Date(dateStr + "T12:00:00");
-    const dow = date.getDay(); // 0=Sun,1=Mon,...6=Sat
+type DayType = "closed" | "blocked" | "special" | "school-holiday" | "weekend" | "normal";
 
-    // Check booking blocks first (manual closures override everything)
-    for (const block of bookingBlocks) {
-        const start = block.start_date.split("T")[0];
-        const end = block.end_date.split("T")[0];
-        if (dateStr >= start && dateStr <= end) return "blocked";
+/**
+ * Open / closed comes from the opening calendar (weekly hours, Coventry school &
+ * bank holidays and the admin's Opening Days), loaded by the wizard with
+ * loadOpeningCalendar(); until then the standard rules are used.
+ */
+function getDay(dateStr: string, mode: "session" | "party"): { type: DayType; title: string } {
+    const info = getCalendarDay(dateStr);
+    const hours = mode === "party" ? getPartyHours(dateStr) : getOpeningHours(dateStr);
+
+    if (!hours) {
+        const reason = getClosedReason(dateStr, mode) || "Closed";
+        return { type: info?.source === "closure" ? "blocked" : "closed", title: reason };
     }
 
-    // Closed days (from the CMS opening hours; school & bank holidays open) — and
-    // today once online booking has closed
-    if (!getOpeningHours(dateStr)) return "closed";
-    if (dateStr === todayInUK() && getAvailableTimeSlots(dateStr).length === 0) return "closed";
-
-    // Weekend
-    if (dow === 0 || dow === 6) return "weekend";
-
-    // School holiday weekday (incl. holiday Mondays)
-    if (isHolidayOpen(dateStr)) return "school-holiday";
-
-    return "normal";
-}
-
-function getBlockReason(dateStr: string, bookingBlocks: BookingBlock[]): string | null {
-    for (const block of bookingBlocks) {
-        const start = block.start_date.split("T")[0];
-        const end = block.end_date.split("T")[0];
-        if (dateStr >= start && dateStr <= end) return block.reason;
+    // Today, once online booking has closed
+    if (dateStr === todayInUK()) {
+        const left = mode === "party" ? getPartyStartTimes(dateStr) : getAvailableTimeSlots(dateStr);
+        if (left.length === 0) return { type: "closed", title: "Online booking has closed for today" };
     }
-    return null;
+
+    const time = `${formatClock(hours.open)} – ${formatClock(hours.close)}`;
+    if (info?.source === "special_opening") return { type: "special", title: `${info.reason || "Special opening"} · ${time}` };
+    if (isHolidayOpen(dateStr) || info?.source === "school_holiday" || info?.source === "bank_holiday") {
+        return { type: "school-holiday", title: `${info?.reason || "School / bank holiday"} — open ${time}` };
+    }
+    const dow = new Date(dateStr + "T12:00:00").getDay();
+    return { type: dow === 0 || dow === 6 ? "weekend" : "normal", title: `Open ${time}` };
 }
 
-const TYPE_STYLES: Record<string, { cell: string; dot: string; label: string }> = {
-    closed: {
-        cell: "opacity-30 cursor-not-allowed line-through",
-        dot: "bg-red-500",
-        label: "Closed",
-    },
-    blocked: {
-        cell: "opacity-30 cursor-not-allowed line-through text-red-400",
-        dot: "bg-red-700",
-        label: "Unavailable",
-    },
-    "school-holiday": {
-        cell: "hover:bg-emerald-500/20 cursor-pointer",
-        dot: "bg-emerald-400",
-        label: "School / bank holiday — open",
-    },
-    weekend: {
-        cell: "hover:bg-primary/20 cursor-pointer",
-        dot: "bg-primary",
-        label: "Open",
-    },
-    normal: {
-        cell: "hover:bg-secondary/20 cursor-pointer",
-        dot: "bg-yellow-400",
-        label: "Open",
-    },
+const TYPE_STYLES: Record<DayType, { cell: string; dot: string }> = {
+    closed: { cell: "opacity-30 cursor-not-allowed line-through", dot: "bg-red-500" },
+    blocked: { cell: "opacity-30 cursor-not-allowed line-through text-red-400", dot: "bg-red-700" },
+    special: { cell: "hover:bg-sky-500/20 cursor-pointer", dot: "bg-sky-400" },
+    "school-holiday": { cell: "hover:bg-emerald-500/20 cursor-pointer", dot: "bg-emerald-400" },
+    weekend: { cell: "hover:bg-primary/20 cursor-pointer", dot: "bg-primary" },
+    normal: { cell: "hover:bg-secondary/20 cursor-pointer", dot: "bg-yellow-400" },
 };
 
-export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, maxDate }: SmartCalendarProps) {
+export function SmartCalendar({ value, onChange, mode = "session", minDate, maxDate }: SmartCalendarProps) {
     // Always use UK time so the calendar reflects Coventry's current date,
     // regardless of where the visitor's device is located.
     const ukNow = nowInUK();
@@ -165,13 +143,13 @@ export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, ma
                         );
                     }
 
-                    const type = getDayType(dateStr, bookingBlocks);
+                    const { type, title } = getDay(dateStr, mode);
                     const styles = TYPE_STYLES[type];
                     const isSelectable = type !== "closed" && type !== "blocked";
-                    const blockReason = type === "blocked" ? getBlockReason(dateStr, bookingBlocks) : null;
 
                     return (
-                        <div key={dateStr} title={blockReason || styles.label}
+                        <div key={dateStr} title={title} aria-label={`${dateStr}: ${title}`}
+                            data-date={dateStr} data-open={isSelectable ? "true" : "false"}
                             onClick={() => isSelectable && onChange(dateStr)}
                             className={`relative h-9 flex flex-col items-center justify-center text-xs font-semibold rounded-lg transition-all
                                 ${isSelected ? "bg-primary text-black shadow-lg shadow-primary/30 scale-110 z-10" : ""}
@@ -191,9 +169,9 @@ export function SmartCalendar({ value, onChange, bookingBlocks = [], minDate, ma
             <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
                 {[
                     { dot: "bg-red-500", label: "Closed" },
-                    { dot: "bg-yellow-400", label: "Open" },
                     { dot: "bg-primary", label: "Weekend" },
                     { dot: "bg-emerald-400", label: "School / bank holiday" },
+                    { dot: "bg-sky-400", label: "Special opening" },
                 ].map(l => (
                     <div key={l.label} className="flex items-center gap-1">
                         <span className={`w-1.5 h-1.5 rounded-full ${l.dot}`} />

@@ -22,7 +22,9 @@ import {
 
 import { motion, AnimatePresence } from "framer-motion";
 
-import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningHours, isSchoolHoliday, isPublicHoliday, isHolidayOpen, applySessionRules, getSessionRules, formatClock } from "../lib/api/types";
+import { bookingSchema, type BookingFormData, getAvailableTimeSlots, getOpeningHours, getCalendarDay, getClosedReason, isSchoolHoliday, isPublicHoliday, isHolidayOpen, applySessionRules, getSessionRules, formatClock } from "../lib/api/types";
+import { loadOpeningCalendar } from "../lib/api/opening-calendar";
+import { fillHours, hoursPlaceholders } from "../lib/hours-text";
 
 import { useToast } from "./ToastProvider";
 
@@ -31,7 +33,6 @@ import { PaymentStep } from "./PaymentStep";
 import { useAccount } from "../state/account/AccountContext";
 import { validateVoucher } from "../app/actions/validateVoucher";
 import { PageSection } from "../lib/cms/types";
-import { fetchBookingBlocks, isDateBlocked, BookingBlock } from "../lib/api/booking-blocks";
 import { SmartCalendar } from "./SmartCalendar";
 
 
@@ -134,16 +135,7 @@ type ActivityId = typeof ACTIVITIES[number]["id"];
 
 
 
-// --- Opening hours for Go Kids Play ------------------------------------------------
-const OPENING_HOURS: Record<number, { open: string; close: string } | null> = {
-    0: { open: "12:00", close: "20:00" }, // Sunday
-    1: null,                               // Monday
-    2: null,                               // Tuesday
-    3: null,                               // Wednesday (unless holidays)
-    4: { open: "15:00", close: "20:00" }, // Thursday
-    5: { open: "15:00", close: "20:00" }, // Friday
-    6: { open: "12:00", close: "20:00" }, // Saturday
-};
+
 
 
 
@@ -206,7 +198,8 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
     const [parkingPlates, setParkingPlates] = useState<string[]>([]);
 
-    const [bookingBlocks, setBookingBlocks] = useState<BookingBlock[]>([]);
+    // Bumped when the opening calendar (holidays + admin openings / closures) has loaded
+    const [calendarVersion, setCalendarVersion] = useState(0);
 
     // Slot availability: { "14:00": { skating_status, bowling_status, ... } }
     const [slotAvailability, setSlotAvailability] = useState<Record<string, any>>({});
@@ -278,11 +271,11 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
         }
     }, [customer, setValue]);
 
-    // Load config + booking blocks
+    // Load config + the opening calendar
 
     useEffect(() => {
 
-        fetchBookingBlocks().then(setBookingBlocks);
+        loadOpeningCalendar().then(() => setCalendarVersion(v => v + 1));
 
         (async () => {
 
@@ -333,13 +326,13 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         if (formData.date) {
 
-            const blockReason = isDateBlocked(formData.date, bookingBlocks);
+            const closedReason = getClosedReason(formData.date, "session");
 
-            if (blockReason) {
+            if (closedReason) {
 
                 setValue("date", "", { shouldValidate: true });
 
-                showToast("error", `This date is not available: ${blockReason}`);
+                showToast("error", `This date is not available: ${closedReason}`);
 
                 return;
 
@@ -360,7 +353,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         }
 
-    }, [formData.date, bookingBlocks, selectedActivity, config]);
+    }, [formData.date, calendarVersion, selectedActivity, config]);
 
     // Fetch real-time slot occupancy whenever date changes
     useEffect(() => {
@@ -379,7 +372,15 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
         return status === 'limited' ? 'busy' : status;  // AVAILABLE / LIMITED / FULL from the API
     };
 
-    // How the chosen session time is described ("Any 2 hours, 10am – 5.30pm" in Anytime mode)
+    // {open}, {close}, {hours} in the notice: the chosen day's hours (a special opening may differ)
+    const dayHoursText = (date: string) => {
+        const values = hoursPlaceholders(getSessionRules());
+        const hours = date ? getOpeningHours(date) : null;
+        if (!hours) return values;
+        return { ...values, open: formatClock(hours.open), close: formatClock(hours.close), hours: `${formatClock(hours.open)} – ${formatClock(hours.close)}` };
+    };
+
+    // How the chosen session time is described ("Any 2 hours, 10.30am – 6pm" in Anytime mode)
     const describeSessionTime = (date: string, time: string) => {
         const rules = getSessionRules();
         const hours = date ? getOpeningHours(date) : null;
@@ -1044,11 +1045,11 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 onChange={(d) => {
 
-                                                    const blockReason = isDateBlocked(d, bookingBlocks);
+                                                    const closedReason = getClosedReason(d, "session");
 
-                                                    if (blockReason) {
+                                                    if (closedReason) {
 
-                                                        showToast("error", `This date is not available: ${blockReason}`);
+                                                        showToast("error", `This date is not available: ${closedReason}`);
 
                                                         return;
 
@@ -1060,7 +1061,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                                 }}
 
-                                                bookingBlocks={bookingBlocks}
+                                                mode="session"
 
                                             />
 
@@ -1075,44 +1076,43 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                         {formData.date && (() => {
 
                                             const dow = new Date(formData.date + 'T12:00:00').getDay();
-
                                             const isHoliday = isHolidayOpen(formData.date);
-
-                                            // School / bank holiday on a weekday (we open Mon & Tue too)
-                                            if (dow >= 1 && dow <= 5 && isHoliday) {
-
-                                                return (
-
-                                                    <div className="flex items-start gap-2.5 p-3 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm">
-
-                                                        <School className="w-4 h-4 mt-0.5 flex-shrink-0" />
-
-                                                        <span><strong>Holiday!</strong> We're open <strong>{formatClock(getOpeningHours(formData.date)?.open ?? "10:00")} – {formatClock(getOpeningHours(formData.date)?.close ?? "17:30")}</strong> 🎉 Perfect for families!</span>
-
-                                                    </div>
-
-                                                );
-
-                                            }
-
+                                            const dayInfo = getCalendarDay(formData.date);
                                             const dayHours = getOpeningHours(formData.date);
                                             if (!dayHours) {
                                                 return (
                                                     <p className="text-red-400 text-xs mt-2 flex items-center gap-1">
-                                                        <AlertCircle className="w-3 h-3" /> We are closed on this day — please pick another date.
+                                                        <AlertCircle className="w-3 h-3" /> We are closed on this day ({getClosedReason(formData.date, "session")}) — please pick another date.
                                                     </p>
                                                 );
                                             }
+                                            const time = `${formatClock(dayHours.open)} – ${formatClock(dayHours.close)}`;
+
+                                            // A date the admin has opened specially (Calendar → Opening Days)
+                                            if (dayInfo?.source === "special_opening") {
+                                                return (
+                                                    <div className="flex items-start gap-2.5 p-3 bg-sky-500/15 border border-sky-500/30 rounded-xl text-sky-200 text-sm">
+                                                        <Star className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                        <span><strong>{dayInfo.reason || "Special opening"}</strong> — we're open <strong>{time}</strong> 🎉</span>
+                                                    </div>
+                                                );
+                                            }
+
+                                            // School / bank holiday on a weekday (we open Monday–Friday too)
+                                            if (dow >= 1 && dow <= 5 && isHoliday) {
+                                                return (
+                                                    <div className="flex items-start gap-2.5 p-3 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-emerald-300 text-sm">
+                                                        <School className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                        <span><strong>Holiday!</strong> We're open <strong>{time}</strong> 🎉 Perfect for families!</span>
+                                                    </div>
+                                                );
+                                            }
+
                                             const dayName = new Date(formData.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short' });
-
                                             return (
-
                                                 <p className="text-white/50 text-xs mt-2 flex items-center gap-1">
-
-                                                    <Clock className="w-3 h-3" /> Open {dayName}: {formatClock(dayHours.open)} – {formatClock(dayHours.close)}
-
+                                                    <Clock className="w-3 h-3" /> Open {dayName}: {time}
                                                 </p>
-
                                             );
 
                                         })()}
@@ -1159,7 +1159,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                             <div className="p-4 rounded-xl border border-yellow-400/30 bg-yellow-400/10">
                                                 <p className="text-yellow-300 text-xs font-bold uppercase tracking-wider mb-2">Important Notice</p>
                                                 <ul className="space-y-1">
-                                                    {String(config.booking_notice).split("\n").map((line: string) => line.trim()).filter(Boolean).map((line: string) => (
+                                                    {fillHours(String(config.booking_notice), dayHoursText(formData.date)).split("\n").map((line: string) => line.trim()).filter(Boolean).map((line: string) => (
                                                         <li key={line} className="text-white/80 text-sm flex items-start gap-2">
                                                             <span className="text-yellow-300 mt-0.5">•</span> {line}
                                                         </li>
@@ -2001,6 +2001,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
                                         bookingType="session"
                                         amount={Math.round(Math.max(0, totals.total - discount / 100) * 100)}
                                         bookingDetails={{
+                                            booking_number: bookingNumber,
                                             date: formData.date,
                                             time: formData.time,
                                             timeLabel: describeSessionTime(formData.date, formData.time),

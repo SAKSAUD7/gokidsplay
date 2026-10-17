@@ -7,6 +7,9 @@ import { GlobalAlert } from "../components/GlobalAlert";
 import Script from "next/script";
 
 import { getMetadata } from "@/seo/seo.config";
+import { getPublicSessionSettings } from "@/lib/public-api";
+import { openingHoursSpecification } from "@/lib/hours-text";
+import { readSessionRules } from "@/lib/api/types";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -20,12 +23,14 @@ export const viewport = {
     themeColor: "#0a0118",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: {
     children: React.ReactNode;
-}): JSX.Element {
+}): Promise<JSX.Element> {
     const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+    // Opening hours for search engines, from Website Content → Session Booking
+    const hoursSpec = openingHoursSpecification(readSessionRules(await getPublicSessionSettings()));
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -66,15 +71,7 @@ export default function RootLayout({
                                     "priceRange": "££",
                                     "currenciesAccepted": "GBP",
                                     "paymentAccepted": "Cash, Credit Card",
-                                    "openingHoursSpecification": [
-                                        // Same default hours as the booking calendar (DEFAULT_SESSION_RULES)
-                                        {
-                                            "@type": "OpeningHoursSpecification",
-                                            "dayOfWeek": ["Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-                                            "opens": "10:00",
-                                            "closes": "17:30"
-                                        }
-                                    ],
+                                    "openingHoursSpecification": hoursSpec,
                                     "hasMap": "https://maps.google.com/?q=Go+Kids+Play+Coventry",
                                     "sameAs": [
                                         "https://www.facebook.com/GoKidsPlayCoventry",

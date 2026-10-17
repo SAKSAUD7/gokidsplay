@@ -65,7 +65,7 @@ def staff_client(db):
 def session_payload(plans, **overrides):
     payload = {
         'name': 'Test Parent', 'email': 'parent@example.com', 'phone': '07700900123',
-        'date': next_saturday().isoformat(), 'time': '10:00', 'duration': 120, 'type': 'SESSION',
+        'date': next_saturday().isoformat(), 'time': '10:30', 'duration': 120, 'type': 'SESSION',
         # 3 children + 1 toddler + 2 non-playing adults
         'tickets': {plans['child'].id: 3, plans['toddler'].id: 1, plans['adult'].id: 2},
     }
@@ -170,10 +170,11 @@ class TestSessionRules:
     def test_live_site_defaults(self, config):
         from apps.bookings.opening_hours import session_start_times, weekly_hours
         saturday = next_saturday()
-        monday = saturday + timedelta(days=2)
-        assert weekly_hours(saturday) == ('10:00', '17:30')
-        assert weekly_hours(monday) is None             # closed except school / bank holidays
-        assert session_start_times(saturday) == ['10:00']  # "2 Hours Anytime"
+        sunday = saturday + timedelta(days=1)
+        assert weekly_hours(saturday) == weekly_hours(sunday) == ('10:30', '18:00')
+        for weekday in range(2, 7):                     # Monday–Friday: closed except school / bank holidays
+            assert weekly_hours(saturday + timedelta(days=weekday)) is None
+        assert session_start_times(saturday) == ['10:30']  # "2 Hours Anytime"
 
     def test_arrival_mode_lists_times_that_fit_before_closing(self, config):
         from apps.bookings.opening_hours import session_start_times
@@ -181,7 +182,7 @@ class TestSessionRules:
         config.arrival_interval_minutes = 30
         config.save()
         times = session_start_times(next_saturday())
-        assert times[0] == '10:00' and times[-1] == '15:30'  # 15:30 + 2h = 17:30 closing
+        assert times[0] == '10:30' and times[-1] == '16:00'  # 16:00 + 2h = 18:00 closing
 
     def test_booking_fee_comes_from_cms(self, config, plans):
         from apps.bookings.pricing import price_admission
@@ -206,8 +207,9 @@ class TestSessionRules:
         saturday = next_saturday()
         tz = timezone.get_current_timezone()
         at = lambda hhmm: timezone.make_aware(datetime.combine(saturday, datetime.strptime(hhmm, '%H:%M').time()), tz)
-        assert is_session_still_bookable(saturday, '10:00', now=at('14:00'))      # 10:00 start, booked at 2pm
-        assert not is_session_still_bookable(saturday, '10:00', now=at('16:45'))  # within the last hour
+        assert is_session_still_bookable(saturday, '10:30', now=at('14:00'))      # booked at 2pm
+        assert is_session_still_bookable(saturday, '10:30', now=at('16:55'))
+        assert not is_session_still_bookable(saturday, '10:30', now=at('17:15'))  # within the last hour
 
     def test_anytime_capacity_counts_the_whole_day(self, config, plans):
         config.session_capacity = 5
@@ -219,8 +221,8 @@ class TestSessionRules:
     def test_slot_availability_uses_cms_hours(self, config):
         response = APIClient().get(SESSIONS_URL + 'slot_availability/', {'date': next_saturday().isoformat()})
         assert response.status_code == 200
-        assert list(response.data['slots']) == ['10:00']
-        assert response.data['slots']['10:00']['slot_end'] == '17:30'
+        assert list(response.data['slots']) == ['10:30']
+        assert response.data['slots']['10:30']['slot_end'] == '18:00'
 
     def test_party_slots_follow_party_config(self):
         from apps.bookings.availability_service import GKPAvailabilityService
@@ -491,3 +493,112 @@ def test_rate_limit_ip_cannot_be_spoofed(settings):
     settings.TRUSTED_PROXY_COUNT = 1
     behind_azure = factory.get('/', HTTP_X_FORWARDED_FOR='1.2.3.4, 81.2.69.160:53122', REMOTE_ADDR='10.0.0.5')
     assert client_ip(behind_azure) == '81.2.69.160'  # entry added by Azure, port removed
+
+
+# ── Opening calendar (Coventry council dates + admin overrides) ──────────────
+
+def test_backend_and_website_use_the_same_council_calendar():
+    """apps/bookings/uk_calendar.py must list the same dates as frontend/lib/api/types.ts."""
+    import re
+    from pathlib import Path
+    from apps.bookings.uk_calendar import SCHOOL_HOLIDAY_RANGES, UK_BANK_HOLIDAYS
+    ts = (Path(__file__).resolve().parents[4] / 'frontend' / 'lib' / 'api' / 'types.ts').read_text(encoding='utf-8')
+    ranges_block = ts[ts.index('const SCHOOL_HOLIDAY_RANGES'):ts.index('];', ts.index('const SCHOOL_HOLIDAY_RANGES'))]
+    holidays_block = ts[ts.index('const UK_PUBLIC_HOLIDAYS'):ts.index('];', ts.index('const UK_PUBLIC_HOLIDAYS'))]
+    ts_ranges = re.findall(r'\["(\d{4}-\d\d-\d\d)", "(\d{4}-\d\d-\d\d)"\]', ranges_block)
+    ts_holidays = set(re.findall(r'"(\d{4}-\d\d-\d\d)"', holidays_block))
+    assert ts_ranges == SCHOOL_HOLIDAY_RANGES
+    assert ts_holidays == UK_BANK_HOLIDAYS
+
+
+@pytest.mark.django_db
+class TestOpeningCalendar:
+    TERM_MONDAY = '2026-11-02'
+    HALF_TERM_MONDAY = '2026-10-26'
+
+    def days(self, start, end=None):
+        response = APIClient().get('/api/v1/bookings/public/calendar/', {'start': start, 'end': end or start})
+        assert response.status_code == 200
+        return response.data
+
+    def test_council_calendar(self, config):
+        assert self.days(self.TERM_MONDAY)[0]['sessions_open'] is False
+        half_term = self.days(self.HALF_TERM_MONDAY)[0]
+        assert half_term['sessions_open'] and half_term['source'] == 'school_holiday'
+        assert (half_term['open'], half_term['close']) == ('10:30', '18:00')
+        assert self.days('2026-11-04')[0]['sessions_open'] is False      # term-time Wednesday
+        assert self.days('2027-03-29')[0]['source'] == 'bank_holiday'   # Easter Monday
+
+    def test_special_opening_opens_a_closed_day_with_its_own_hours(self, config, plans):
+        from datetime import time
+        from apps.bookings.models import BookingBlock
+        BookingBlock.objects.create(start_date=self.TERM_MONDAY, end_date=self.TERM_MONDAY, type='OPEN_TODAY',
+                                    reason='Inset day opening', open_time=time(12, 0), close_time=time(18, 0))
+        day = self.days(self.TERM_MONDAY)[0]
+        assert day['sessions_open'] and day['parties_open'] and (day['open'], day['close']) == ('12:00', '18:00')
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, date=self.TERM_MONDAY, time='12:00'), format='json')
+        assert response.status_code == 201, response.data
+
+    def test_closure_blocks_bookings(self, config, plans):
+        from apps.bookings.models import BookingBlock
+        saturday = next_saturday().isoformat()
+        BookingBlock.objects.create(start_date=saturday, end_date=saturday, type='CLOSED', reason='Private hire')
+        assert self.days(saturday)[0]['sessions_open'] is False
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, date=saturday), format='json')
+        assert response.status_code == 400
+
+    def test_parties_only_closure_keeps_sessions_open(self, config):
+        from apps.bookings.models import BookingBlock
+        saturday = next_saturday().isoformat()
+        BookingBlock.objects.create(start_date=saturday, end_date=saturday, type='CLOSED', reason='Party room repairs',
+                                    blocks_normal_bookings=False, blocks_party_bookings=True)
+        day = self.days(saturday)[0]
+        assert day['sessions_open'] is True and day['parties_open'] is False
+        response = APIClient().post(PARTIES_URL, {
+            'name': 'Party Parent', 'email': 'party@example.com', 'phone': '07700900123',
+            'date': saturday, 'time': '12:00:00', 'kids': 10, 'adults': 2}, format='json')
+        assert response.status_code == 400
+
+
+# ── Booking numbers & payment tracking ───────────────────────────────────────
+
+@pytest.mark.django_db
+class TestBookingNumbers:
+    def test_session_and_party_numbers_are_short_and_unique(self, config, plans):
+        import re
+        response = APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
+        assert response.status_code == 201, response.data
+        number = response.data['booking_number']
+        assert re.fullmatch(r'GK\d{6}', number)
+        assert Booking.objects.get(pk=response.data['id']).booking_number == number
+        party = PartyBooking.objects.create(name='P', email='p@example.com', phone='07700900123',
+                                            date=next_saturday(), time='12:00', kids=10, adults=2, amount=0)
+        assert re.fullmatch(r'GP\d{6}', party.booking_number)
+
+    def test_customers_cannot_choose_the_booking_number(self, config, plans):
+        response = APIClient().post(SESSIONS_URL, session_payload(plans, booking_number='GK000001'), format='json')
+        assert response.status_code == 201
+        assert response.data['booking_number'] != 'GK000001'
+
+    def test_admin_finds_a_booking_by_its_number(self, config, plans, staff_client):
+        number = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['booking_number']
+        for typed in (number, number.lower(), f'#{number}', f'{number[:2]} {number[2:5]}-{number[5:]}'):
+            response = staff_client.get(SESSIONS_URL, {'search': typed})
+            results = response.data['results'] if isinstance(response.data, dict) else response.data
+            assert [b['booking_number'] for b in results] == [number], typed
+
+    def test_payments_show_and_search_by_booking_number(self, config, plans, staff_client):
+        from apps.payments.models import Payment
+        booking = Booking.objects.get(pk=APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['id'])
+        Payment.objects.create(booking=booking, provider='SUMUP', order_id='chk_1', amount=Decimal('19.90'),
+                               currency='GBP', status='SUCCESS')
+        Payment.objects.create(provider='SUMUP', order_id='chk_other', amount=Decimal('5'), currency='GBP')
+        response = staff_client.get('/api/v1/payments/', {'search': booking.booking_number.lower()})
+        assert response.status_code == 200
+        assert [p['booking_number'] for p in response.data['results']] == [booking.booking_number]
+
+    def test_payments_are_staff_only(self, db):
+        client = APIClient()
+        for url in ('/api/v1/payments/', '/api/v1/payments/stats/', '/api/v1/payments/1/'):
+            assert client.get(url).status_code in (401, 403), url
+        assert client.post('/api/v1/payments/refund/', {'payment_id': 1, 'amount': 1}, format='json').status_code in (401, 403)

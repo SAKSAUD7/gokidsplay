@@ -186,6 +186,20 @@ export default function SessionBookingEditor() {
     );
 }
 
+/** Tells admins how to show the opening hours in website text without typing the times. */
+export function HoursPlaceholderHint() {
+    return (
+        <p className="text-xs text-slate-500 mt-1">
+            Tip: write <code className="bg-slate-100 px-1 rounded">{"{hours}"}</code>,{" "}
+            <code className="bg-slate-100 px-1 rounded">{"{open}"}</code>,{" "}
+            <code className="bg-slate-100 px-1 rounded">{"{close}"}</code>,{" "}
+            <code className="bg-slate-100 px-1 rounded">{"{days}"}</code> or{" "}
+            <code className="bg-slate-100 px-1 rounded">{"{closed_days}"}</code> and the website shows the opening hours set here
+            (e.g. &quot;Open {"{days}"} {"{hours}"}&quot; → &quot;Open Saturday &amp; Sunday 10.30am – 6pm&quot;). This works in any website text.
+        </p>
+    );
+}
+
 const WEEK = [
     { key: "1", label: "Monday" }, { key: "2", label: "Tuesday" }, { key: "3", label: "Wednesday" },
     { key: "4", label: "Thursday" }, { key: "5", label: "Friday" }, { key: "6", label: "Saturday" }, { key: "0", label: "Sunday" },
@@ -256,7 +270,10 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                 {/* Weekly opening hours */}
                 <div>
                     <h4 className="font-semibold text-slate-800 mb-1">Weekly opening hours</h4>
-                    <p className="text-xs text-slate-500 mb-3">Closed days still open on school &amp; bank holidays (Coventry council calendar) using the holiday hours below.</p>
+                    <p className="text-xs text-slate-500 mb-3">
+                        Closed days still open on school &amp; bank holidays (Coventry council calendar) using the holiday hours below.
+                        To open or close one particular date, use <a href="/admin/calendar/opening" className="text-emerald-700 font-semibold underline">Calendar → Opening Days</a>.
+                    </p>
                     <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg">
                         {WEEK.map(d => {
                             const h = weekly[d.key];
@@ -265,7 +282,7 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                                     <span className="w-28 text-sm font-medium text-slate-700">{d.label}</span>
                                     <label className="flex items-center gap-2 text-sm text-slate-600">
                                         <input type="checkbox" checked={!!h}
-                                            onChange={e => setDay(d.key, e.target.checked ? { open: "10:00", close: "17:30" } : null)} />
+                                            onChange={e => setDay(d.key, e.target.checked ? { open: "10:30", close: "18:00" } : null)} />
                                         Open
                                     </label>
                                     {h ? (
@@ -287,7 +304,7 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                 <div className="flex flex-wrap items-center gap-3">
                     <span className="w-56 text-sm font-semibold text-slate-800">School &amp; bank holiday hours</span>
                     <label className="flex items-center gap-2 text-sm text-slate-600">
-                        <input type="checkbox" checked={!!holiday} onChange={e => setHoliday(e.target.checked ? { open: "10:00", close: "17:30" } : null)} />
+                        <input type="checkbox" checked={!!holiday} onChange={e => setHoliday(e.target.checked ? { open: "10:30", close: "18:00" } : null)} />
                         Own hours
                     </label>
                     {holiday ? (
@@ -350,6 +367,7 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                 <div className="pt-4 border-t border-slate-200">
                     <label className="block text-sm font-medium text-slate-700 mb-1">Important notice (one point per line, shown when choosing the date)</label>
                     <textarea rows={5} value={notice} onChange={e => setNotice(e.target.value)} className={`${input} w-full`} />
+                    <HoursPlaceholderHint />
                 </div>
 
                 {error && <p className="text-red-600 text-sm">{error}</p>}

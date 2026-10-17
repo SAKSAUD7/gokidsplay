@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     description: "Manage payments and refunds",
 };
 
-export default function PaymentsPage() {
-    return <PaymentsListPage />;
+// ?search=GK482913 opens the list filtered to that booking's payments
+export default function PaymentsPage({ searchParams }: { searchParams?: { search?: string } }) {
+    return <PaymentsListPage initialSearch={searchParams?.search || ""} />;
 }

@@ -14,11 +14,6 @@ export const siteConfig = {
         address: "310 Kingfield Road, Coventry, CV14LD",
         mapUrl: "https://maps.google.com/?q=310+Kingfield+Road,+Coventry,+CV1+4LD",
     },
-    hours: {
-        note: "Except Bank & School Holidays",
-        monTue: "Closed",
-        wedSun: "10:00am to 05:30pm",
-    },
 };
 
 export const navLinks = [

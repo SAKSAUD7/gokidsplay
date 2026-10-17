@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Calendar, Clock, Users, User, Mail, Phone, Ticket, ArrowLeft, Minus, Plus, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { applySessionRules, getOpeningHours, getSessionRules, formatClock, todayInUK } from "@/lib/api/types";
+import { loadOpeningCalendar } from "@/lib/api/opening-calendar";
 
 interface TicketPlan { id: number; name: string; price: string; is_spectator?: boolean; order?: number }
 
@@ -40,10 +41,13 @@ export default function NewSessionBookingPage() {
         fetch(`${API}/cms/pricing-plans/`).then(r => (r.ok ? r.json() : [])).then((data: any[]) =>
             setPlans((Array.isArray(data) ? data : []).filter(p => p.type === "SESSION" && p.active !== false).sort((a, b) => (a.order ?? 0) - (b.order ?? 0))),
         ).catch(() => setPlans([]));
-        fetch(`${API}/cms/session-booking-config/1/`).then(r => (r.ok ? r.json() : null)).then(cfg => {
-            if (cfg) { applySessionRules(cfg); setFee(0); }
-            setRulesReady(true);
-        }).catch(() => setRulesReady(true));
+        // Session rules + the opening calendar (holidays and Opening Days changes)
+        Promise.all([
+            fetch(`${API}/cms/session-booking-config/1/`).then(r => (r.ok ? r.json() : null)).then(cfg => {
+                if (cfg) { applySessionRules(cfg); setFee(0); }
+            }).catch(() => {}),
+            loadOpeningCalendar(),
+        ]).finally(() => setRulesReady(true));
     }, []);
 
     const times = useMemo(() => (rulesReady ? staffSessionTimes(form.date) : []), [form.date, rulesReady]);
@@ -81,7 +85,7 @@ export default function NewSessionBookingPage() {
                 paidAtDesk: form.paidAtDesk,
             });
             if (result.success) {
-                toast.success("Booking created");
+                toast.success(result.bookingNumber ? `Booking ${result.bookingNumber} created` : "Booking created");
                 router.push("/admin/session-bookings");
                 router.refresh();
             } else {

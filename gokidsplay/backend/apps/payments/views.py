@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
+from apps.bookings.permissions import IsStaffUser
 from .services import payment_service
 
 logger = logging.getLogger(__name__)
@@ -143,14 +144,10 @@ def verify_payment(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        # If order_id is a Go Kids Play reference (SP-...), look up the actual checkout ID
-        if order_id.startswith('SP-'):
-            from .models import Payment
-            from django.db.models import Q
-            payment = Payment.objects.filter(
-                Q(order_id=order_id) | 
-                Q(provider_response__checkout_reference=order_id)
-            ).first()
+        # A Go Kids Play checkout reference (e.g. GK482913-7F3A or an older SP-…) → the checkout ID
+        from .models import Payment
+        if not Payment.objects.filter(order_id=order_id).exists():
+            payment = Payment.objects.filter(provider_response__checkout_reference=order_id).first()
             if payment:
                 order_id = payment.order_id
         
@@ -177,7 +174,7 @@ def verify_payment(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Only admins can refund
+@permission_classes([IsStaffUser])  # Only staff can refund
 def process_refund(request):
     """
     Process a refund.
@@ -293,7 +290,7 @@ def get_booking_payment_status(request, booking_id, booking_type):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Only admins can view stats
+@permission_classes([IsStaffUser])  # Only staff can view stats
 def get_payment_stats(request):
     """
     Get payment statistics and analytics.
@@ -427,7 +424,7 @@ def get_payment_stats(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsStaffUser])
 def list_payments(request):
     """
     List all payments with optional filtering.
@@ -437,6 +434,7 @@ def list_payments(request):
     Query params:
         - status: Filter by status (SUCCESS, FAILED, CREATED, REFUNDED)
         - provider: Filter by provider (MOCK, RAZORPAY)
+        - search: booking number (GK482913), customer name / email, order or transaction id
         - limit: Number of results (default: 100)
         - offset: Pagination offset (default: 0)
     
@@ -464,6 +462,21 @@ def list_payments(request):
         
         if provider_filter:
             queryset = queryset.filter(provider=provider_filter)
+
+        search = (request.query_params.get('search') or '').strip()
+        if search:
+            from django.db.models import Q
+            from apps.bookings.references import normalise_reference
+            ref = normalise_reference(search)
+            query = (
+                Q(order_id__icontains=search) | Q(payment_id__icontains=search) |
+                Q(booking__booking_number__icontains=ref) | Q(party_booking__booking_number__icontains=ref) |
+                Q(booking__name__icontains=search) | Q(booking__email__icontains=search) |
+                Q(party_booking__name__icontains=search) | Q(party_booking__email__icontains=search)
+            )
+            if search.isdigit():
+                query |= Q(id=int(search)) | Q(booking_id=int(search)) | Q(party_booking_id=int(search))
+            queryset = queryset.filter(query)
         
         # Order by most recent first
         queryset = queryset.order_by('-created_at')
@@ -637,8 +650,7 @@ def auto_verify_pending_payments(request):
     })
 
 @api_view(['GET'])
-@authentication_classes([])
-@permission_classes([AllowAny])
+@permission_classes([IsStaffUser])
 def get_payment(request, payment_id):
     """
     Get a single payment by ID.

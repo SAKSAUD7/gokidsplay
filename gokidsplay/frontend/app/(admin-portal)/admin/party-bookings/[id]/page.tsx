@@ -134,9 +134,9 @@ export default function PartyBookingDetailPage({ params }: { params: { id: strin
 
             <div className="flex flex-wrap justify-between items-start mb-8 gap-3">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Party #{String(booking.id).padStart(6, '0')}</h1>
+                    <h1 className="text-3xl font-bold text-slate-900">Party <span className="font-mono">{booking.booking_number || `#${booking.id}`}</span></h1>
                     <p className="text-slate-500 mt-1">
-                        Ref: <span className="font-mono font-bold text-purple-600">{booking.booking_number || `SPPARTY-${booking.id}`}</span>
+                        Ref: <span className="font-mono font-bold text-purple-600">{booking.booking_number || `#${booking.id}`}</span>
                         {' · '}Created {new Date(booking.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                 </div>

@@ -34,6 +34,8 @@ class PaymentSerializer(serializers.ModelSerializer):
             'customer_email',
             'booking_number',
             'booking_date',
+            'notes',
+            'provider_response',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
     
@@ -54,11 +56,11 @@ class PaymentSerializer(serializers.ModelSerializer):
         return None
     
     def get_booking_number(self, obj):
-        """Get booking number."""
+        """The booking's number (e.g. GK482913) so payments can be traced to bookings."""
         if obj.booking:
-            return f"#{obj.booking.id}"
+            return obj.booking.booking_number or f"#{obj.booking.id}"
         elif obj.party_booking:
-            return f"P#{obj.party_booking.id}"
+            return obj.party_booking.booking_number or f"P#{obj.party_booking.id}"
         return None
     
     def get_booking_date(self, obj):

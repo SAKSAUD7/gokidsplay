@@ -7,7 +7,6 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, Search } f
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { BookingEvent } from './components/BookingEvent';
 import { BookingDetailsModal } from './components/BookingDetailsModal';
-import { DateOverrideModal } from './components/DateOverrideModal';
 
 const locales = {
     'en-US': require('date-fns/locale/en-US')
@@ -52,7 +51,6 @@ export default function CalendarPage() {
     const [view, setView] = useState<View>('month');
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [showModal, setShowModal] = useState(false);
-    const [showOverrideModal, setShowOverrideModal] = useState(false);
     const [filterType, setFilterType] = useState<'all' | 'session' | 'party'>('all');
     const [activityFilter, setActivityFilter] = useState<'all' | 'soft-play' | 'laser-arena' | 'go-kart' | 'inflatable-park'>('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -340,12 +338,12 @@ export default function CalendarPage() {
                                 <span className="text-blue-600">{selectedDate}</span>
                             </h2>
                             <div className="flex gap-2">
-                                <button
-                                    onClick={() => setShowOverrideModal(true)}
+                                <a
+                                    href={`/admin/calendar/opening?date=${selectedDate}`}
                                     className="text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 font-semibold rounded px-3 py-1.5 transition-colors flex items-center gap-1"
                                 >
-                                    ⚙️ Manage Date
-                                </button>
+                                    ⚙️ Open / close this date
+                                </a>
                                 <button onClick={() => setSelectedDate('')} className="text-xs text-slate-400 hover:text-slate-600 border border-slate-200 rounded px-3 py-1.5 transition-colors">✕ Close</button>
                             </div>
                         </div>
@@ -580,23 +578,6 @@ export default function CalendarPage() {
                 />
             )}
 
-            {/* Date Override Modal */}
-            {showOverrideModal && selectedDate && (
-                <DateOverrideModal
-                    date={selectedDate}
-                    onClose={() => setShowOverrideModal(false)}
-                    onRefresh={() => {
-                        fetchBookings(currentDate);
-                        // Refresh capacity grid data for the selected date
-                        setCapacityLoading(true);
-                        fetch(`/api/bookings/slot-availability?date=${selectedDate}`, { cache: 'no-store' })
-                            .then(r => r.ok ? r.json() : {})
-                            .then(data => setSlotCapacity(data || {}))
-                            .catch(() => setSlotCapacity({}))
-                            .finally(() => setCapacityLoading(false));
-                    }}
-                />
-            )}
         </div>
     );
 }

@@ -82,11 +82,14 @@ class GlobalSearchService:
     
     def _search_bookings(self):
         """Search session and party bookings."""
-        from apps.bookings.models import Booking, PartyBooking
+        from apps.bookings.models import Booking, PartyBooking, EventBooking
+        from apps.bookings.references import normalise_reference
+        ref = normalise_reference(self.query)
 
         # Session bookings
         session_bookings = Booking.objects.filter(
             Q(booking_number__icontains=self.query) |
+            Q(booking_number__icontains=ref) |
             Q(name__icontains=self.query) |
             Q(email__icontains=self.query) |
             Q(phone__icontains=self.query) |
@@ -98,12 +101,13 @@ class GlobalSearchService:
                 'type': 'booking',
                 'title': booking.name,
                 'subtitle': f"{booking.booking_number or f'#{booking.id}'} • {booking.date.strftime('%d %b %Y')}",
-                'route': f'/admin/session-bookings/{booking.id}'
+                'route': f'/admin/bookings/{booking.id}'
             })
         
         # Party bookings
         party_bookings = PartyBooking.objects.filter(
             Q(booking_number__icontains=self.query) |
+            Q(booking_number__icontains=ref) |
             Q(name__icontains=self.query) |
             Q(email__icontains=self.query) |
             Q(phone__icontains=self.query) |
@@ -116,6 +120,22 @@ class GlobalSearchService:
                 'title': booking.name,
                 'subtitle': f"{booking.booking_number or f'P#{booking.id}'} • {booking.date.strftime('%d %b %Y')}",
                 'route': f'/admin/party-bookings/{booking.id}'
+            })
+
+        # Event reservations (EV…)
+        event_bookings = EventBooking.objects.filter(
+            Q(booking_reference__icontains=ref) |
+            Q(name__icontains=self.query) |
+            Q(email__icontains=self.query) |
+            Q(phone__icontains=self.query)
+        ).select_related('event')[:5]
+
+        for booking in event_bookings:
+            self.results.append({
+                'type': 'event_booking',
+                'title': booking.name,
+                'subtitle': f"{booking.booking_reference} • {booking.event.title}",
+                'route': f'/admin/events/reservations?search={booking.booking_reference}'
             })
     
     def _search_users(self):
@@ -141,9 +161,13 @@ class GlobalSearchService:
     def _search_payments(self):
         """Search payment records."""
         from apps.payments.models import Payment
+        from apps.bookings.references import normalise_reference
+        ref = normalise_reference(self.query)
 
         payments = Payment.objects.filter(
             Q(order_id__icontains=self.query) |
+            Q(booking__booking_number__icontains=ref) |
+            Q(party_booking__booking_number__icontains=ref) |
             Q(payment_id__icontains=self.query) |
             Q(booking__email__icontains=self.query) |
             Q(booking__name__icontains=self.query) |
@@ -153,14 +177,17 @@ class GlobalSearchService:
         
         for payment in payments:
             customer_name = 'Unknown'
+            booking_number = ''
             if payment.booking:
                 customer_name = payment.booking.name
+                booking_number = payment.booking.booking_number or f'#{payment.booking.id}'
             elif payment.party_booking:
                 customer_name = payment.party_booking.name
+                booking_number = payment.party_booking.booking_number or f'P#{payment.party_booking.id}'
             
             self.results.append({
                 'type': 'payment',
-                'title': f"Order #{payment.order_id}",
+                'title': f"Payment for {booking_number}" if booking_number else f"Order #{payment.order_id}",
                 'subtitle': f"£{payment.amount:,.0f} • {customer_name} • {payment.status}",
                 'route': f'/admin/payments/{payment.id}'
             })

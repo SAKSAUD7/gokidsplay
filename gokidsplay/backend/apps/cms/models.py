@@ -478,20 +478,22 @@ class FreeEntry(models.Model):
 
 
 def default_weekly_opening_hours():
-    """Go Kids Play hours: Wednesday to Sunday 10:00-17:30; Monday & Tuesday closed (except holidays)."""
-    day = {"open": "10:00", "close": "17:30"}
-    return {"0": dict(day), "1": None, "2": None, "3": dict(day), "4": dict(day), "5": dict(day), "6": dict(day)}
+    """Go Kids Play hours: Saturday & Sunday 10:30-18:00; Monday to Friday closed (open on school & bank holidays)."""
+    day = {"open": "10:30", "close": "18:00"}
+    return {"0": dict(day), "1": None, "2": None, "3": None, "4": None, "5": None, "6": dict(day)}
 
 
 def default_holiday_hours():
-    return {"open": "10:00", "close": "17:30"}
+    return {"open": "10:30", "close": "18:00"}
 
 
+# {hours}, {open}, {close}, {days} etc. are filled in from the opening hours above
+# wherever the text is shown on the website (see frontend/lib/hours-text.ts)
 DEFAULT_BOOKING_NOTICE = (
     "Session time 2 hours only.\n"
-    "Please visit for any 2 hours between 10am - 5.30pm.\n"
-    "We close at 5.30pm.\n"
-    "Laser, climbing trees and go-kart activities close at 5pm."
+    "Please visit for any 2 hours between {open} - {close}.\n"
+    "We close at {close}.\n"
+    "Laser, climbing trees and go-kart activities close 30 minutes before we close."
 )
 
 
@@ -536,11 +538,11 @@ class SessionBookingConfig(models.Model):
         help_text="Fee added to online bookings (paying cash at the centre avoids it)")
     opening_hours = models.JSONField(
         default=default_weekly_opening_hours, blank=True,
-        help_text='Weekly hours keyed by day number (0=Sunday … 6=Saturday): {"open": "10:00", "close": "17:30"} '
+        help_text='Weekly hours keyed by day number (0=Sunday … 6=Saturday): {"open": "10:30", "close": "18:00"} '
                   'or null when closed')
     holiday_hours = models.JSONField(
         default=default_holiday_hours, null=True, blank=True,
-        help_text='Hours on school & bank holidays (any day of the week), e.g. {"open": "10:00", "close": "17:30"}; '
+        help_text='Hours on school & bank holidays (any day of the week), e.g. {"open": "10:30", "close": "18:00"}; '
                   'null keeps holidays on the normal weekly hours')
     session_mode = models.CharField(
         max_length=10, choices=SESSION_MODE_CHOICES, default=SESSION_MODE_ANYTIME,
@@ -552,7 +554,8 @@ class SessionBookingConfig(models.Model):
         default=150, help_text="Maximum players per session (per day in Anytime mode, per arrival time otherwise)")
     booking_notice = models.TextField(
         blank=True, default=DEFAULT_BOOKING_NOTICE,
-        help_text="Important notice shown when choosing a date and time (one point per line)")
+        help_text="Important notice shown when choosing a date and time (one point per line). "
+                  "{hours}, {open}, {close}, {days}, {closed_days} and {holiday_hours} show the opening hours.")
 
     # Meta
     active = models.BooleanField(default=True)

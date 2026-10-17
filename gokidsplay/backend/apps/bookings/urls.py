@@ -6,7 +6,7 @@ from .views import (
     PartyBookingHistoryViewSet, create_party_booking_view, add_party_participants_view, party_booking_detail_view,
     party_booking_update_status_view,
     mark_party_arrived_view, mark_party_not_arrived_view,
-    PublicBookingBlockViewSet, PublicSiteAlertViewSet
+    PublicBookingBlockViewSet, PublicSiteAlertViewSet, public_opening_calendar
 )
 from .events_views import (
     SpecialEventViewSet, EventBookingViewSet, EventRequestViewSet,
@@ -70,6 +70,7 @@ urlpatterns = [
     path('party-bookings/<uuid:uuid>/add_participants/', add_party_participants_view, name='party-booking-add-participants'),
     path('party-bookings/ticket/<uuid:uuid>/', PartyBookingViewSet.as_view({'get': 'ticket'}), name='party-booking-ticket'),
     # ── Special Events Public API (Section 7) ──────────────────────────────────
+    path('public/calendar/', public_opening_calendar, name='public-opening-calendar'),
     path('public/events/', public_events_list, name='public-events-list'),
     # book/ must come before <slug>/, otherwise "book" is treated as an event slug
     path('public/events/book/', create_event_booking, name='create-event-booking'),

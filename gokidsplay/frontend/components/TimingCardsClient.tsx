@@ -3,17 +3,19 @@
 /**
  * TimingCardsClient — Dynamic Opening Hours Bar
  *
- * Priority order for today's status:
- *  1. Admin OPEN_TODAY / CLOSED_TODAY block from booking calendar (fetched async)
- *  2. Hard-coded school holiday / public holiday list (instant, no fetch needed)
- *  3. The CMS timing cards (e.g. "Wednesday to Sunday 10:00-17:30", "Monday & Tuesday Closed")
+ *  - The cards come from Website Content → Timing Cards; their {open}, {close},
+ *    {days}… placeholders are filled from the Session Booking opening hours.
+ *  - Today's card is highlighted from the opening calendar, which includes the
+ *    Coventry school / bank holidays and the admin's Opening Days (special
+ *    openings and closures).
  *
- * The strip renders immediately using priority 2+3 so it never goes blank.
- * If an admin block overrides it, the strip updates silently once loaded.
+ * The strip renders from the standard hours straight away and updates once the
+ * calendar for today has loaded.
  */
 
 import { Clock } from "lucide-react";
-import { isHolidayOpen, todayInUK, nowInUK, getOpeningHours, formatClock } from "@/lib/api/types";
+import { isHolidayOpen, todayInUK, nowInUK, getOpeningHours, formatClock, type CalendarDay } from "@/lib/api/types";
+import { fetchOpeningCalendar } from "@/lib/api/opening-calendar";
 import { useEffect, useState } from "react";
 
 const DAY_NAME_TO_DOW: Record<string, number> = {
@@ -27,18 +29,17 @@ function getUKDow(): number {
 
 export function TimingCardsClient() {
     const [schedule, setSchedule] = useState<any[]>([]);
-    // 'open' | 'closed' from booking calendar, or null if not yet fetched / no block
-    const [adminOverride, setAdminOverride] = useState<'open' | 'closed' | null>(null);
+    const [todayStatus, setTodayStatus] = useState<CalendarDay | null>(null);
 
-    // 1. Fetch static per-weekday CMS hours
+    // 1. The timing cards (placeholders already filled by /api/timing-cards)
     useEffect(() => {
         fetch('/api/timing-cards')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data) && data.length > 0) {
                     setSchedule(data.map((item: any) => {
-                        // Labels may combine days ("Monday & Tuesday") or give a range
-                        // ("Wednesday to Sunday") — match every day they cover
+                        // Labels may combine days ("Saturday & Sunday") or give a range
+                        // ("Monday to Friday") — match every day they cover
                         const label: string = item.day_label || '';
                         const range = label.match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*(?:to|–|-)\s*(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)/);
                         let dows = Object.entries(DAY_NAME_TO_DOW)
@@ -51,10 +52,8 @@ export function TimingCardsClient() {
                                 if (d === DAY_NAME_TO_DOW[range[2]]) break;
                             }
                         }
-                        const dow = dows.length === 1 ? dows[0] : -1;
                         const closed = !item.open_time || item.open_time.toLowerCase() === "closed";
                         return {
-                            dow,
                             dows,
                             label: item.day_label,
                             id: item.id,
@@ -64,70 +63,61 @@ export function TimingCardsClient() {
                     }));
                 }
             })
-            .catch(() => {}); // fail silently — fallback handles it
+            .catch(() => {}); // fail silently — the strip just stays hidden
     }, []);
 
-    // 2. Fetch today's admin block from booking calendar (async, non-blocking)
+    // 2. Today's opening status (holidays + admin special openings / closures)
     useEffect(() => {
-        const todayStr = todayInUK();
-        fetch('/api/bookings/site-alerts')
-            .then(res => res.json())
-            .then((alerts: any[]) => {
-                if (!Array.isArray(alerts)) return;
-                for (const alert of alerts) {
-                    const start = (alert.start_date || '').split('T')[0];
-                    const end   = (alert.end_date   || '').split('T')[0];
-                    if (todayStr >= start && todayStr <= end) {
-                        if (alert.type === 'OPEN_TODAY')   { setAdminOverride('open');   return; }
-                        if (alert.type === 'CLOSED_TODAY') { setAdminOverride('closed'); return; }
-                    }
-                }
-            })
-            .catch(() => {}); // fail silently
+        const today = todayInUK();
+        fetchOpeningCalendar(today, today)
+            .then(days => setTodayStatus(days.find(d => d.date === today) ?? null))
+            .catch(() => {}); // fail silently — standard hours are shown
     }, []);
 
     if (schedule.length === 0) return null; // wait only for the fast CMS fetch
 
-    const today    = todayInUK();
+    const today = todayInUK();
     const todayDow = getUKDow();
+    const fallbackHours = getOpeningHours(today);
+    const isTodayOpen = todayStatus ? todayStatus.sessions_open : !!fallbackHours;
+    const todayHours = todayStatus
+        ? (todayStatus.open && todayStatus.close ? { open: todayStatus.open, close: todayStatus.close } : null)
+        : fallbackHours;
+    const holidayToday = todayStatus
+        ? ["school_holiday", "bank_holiday"].includes(todayStatus.source)
+        : isHolidayOpen(today);
+    const specialOpening = todayStatus?.source === "special_opening";
 
-    // Is today a school/bank holiday? (instant — uses hard-coded list)
-    const isBankOrSchoolHoliday = isHolidayOpen(today);
-
-    // Final open/closed decision for TODAY
-    const isTodayOpen =
-        adminOverride === 'open' ||                                 // admin explicitly opened
-        (adminOverride !== 'closed' && isBankOrSchoolHoliday);     // holiday fallback
-
-    const isTodayClosed = adminOverride === 'closed';
+    const isHolidayCard = (day: any) => /holiday/i.test(day.label || '') && day.dows.length === 0;
+    const hasHolidayCard = schedule.some(isHolidayCard);
 
     const cards = schedule.map(day => {
-        // A "School & Bank Holidays" card is today's card on a holiday
-        const isHolidayCard = /holiday/i.test(day.label || '') && day.dows.length === 0;
-        const isToday = isHolidayCard ? isBankOrSchoolHoliday : day.dows.includes(todayDow);
+        // On a school / bank holiday the "School & Bank Holidays" card is today's card
+        const isToday = isHolidayCard(day)
+            ? holidayToday && !specialOpening
+            : day.dows.includes(todayDow) && !(holidayToday && hasHolidayCard && !specialOpening);
 
-        let open  = day.open;
+        let open = day.open;
         let close = day.close;
         let holidayBadge = false;
         let adminOpenBadge = false;
 
         if (isToday) {
-            if (isTodayClosed) {
+            if (!isTodayOpen || !todayHours) {
                 open = null; close = null;
-            } else if (isTodayOpen && !open) {
-                // A normally closed day that opens today (holiday or admin "open today")
-                const hours = getOpeningHours(today) ?? { open: "10:00", close: "17:30" };
-                open  = hours.open;
-                close = hours.close;
-                holidayBadge   = isBankOrSchoolHoliday && adminOverride !== 'open';
-                adminOpenBadge = adminOverride === 'open';
+            } else {
+                // Today's real hours (a special opening may have its own)
+                open = todayHours.open;
+                close = todayHours.close;
+                holidayBadge = holidayToday && !day.open;
+                adminOpenBadge = specialOpening;
             }
         }
 
         return { ...day, open, close, isToday, holidayBadge, adminOpenBadge };
     });
 
-    // "17:30" -> "5.30pm"; anything else (e.g. "Late") is shown as typed
+    // "18:00" -> "6pm"; anything else (e.g. "10.30am", "Late") is shown as typed
     const show = (t: string) => (/^\d{1,2}:\d{2}$/.test(t) ? formatClock(t.padStart(5, "0")) : t);
 
     return (

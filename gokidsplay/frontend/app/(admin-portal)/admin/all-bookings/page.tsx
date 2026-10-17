@@ -1,5 +1,6 @@
 "use client";
 
+import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getAllBookings } from "@/app/actions/admin";
 import { formatDate, formatCurrency, getInitials } from "@/lib/format-utils";
@@ -72,15 +73,7 @@ export default function AllBookingsPage() {
 
         // Search filter
         if (searchTerm) {
-            const search = searchTerm.toLowerCase();
-            filtered = filtered.filter(booking =>
-                booking.customer?.name?.toLowerCase().includes(search) ||
-                booking.name?.toLowerCase().includes(search) ||
-                booking.customer?.email?.toLowerCase().includes(search) ||
-                booking.email?.toLowerCase().includes(search) ||
-                booking.birthday_child_name?.toLowerCase().includes(search) ||
-                booking.id?.toString().includes(search)
-            );
+            filtered = filtered.filter(booking => matchesBookingSearch(booking, searchTerm));
         }
 
         // Type filter
@@ -163,7 +156,7 @@ export default function AllBookingsPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
                             type="text"
-                            placeholder="Search by name, email, or booking ID..."
+                            placeholder="Booking number (GK… / GP…), name, email or phone"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-slate-900 placeholder:text-slate-400 transition-all"
@@ -238,6 +231,9 @@ export default function AllBookingsPage() {
                                                 }`}>
                                                 {booking.type?.toUpperCase() || 'PARTY'}
                                             </span>
+                                            {booking.booking_number && (
+                                                <span className="block mt-1.5 font-mono text-xs font-bold text-slate-700">{booking.booking_number}</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">

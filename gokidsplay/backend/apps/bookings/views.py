@@ -7,6 +7,7 @@ from rest_framework import status
 from .models import Customer, Booking, Transaction, BookingBlock, PartyBooking, SessionBookingHistory, PartyBookingHistory, BookingAuditLog
 from .serializers import CustomerSerializer, BookingSerializer, TransactionSerializer, BookingBlockSerializer, PartyBookingSerializer, SessionBookingHistorySerializer, PartyBookingHistorySerializer, BookingAuditLogSerializer
 from .permissions import IsStaffUser, IsSuperAdminOnly
+from .references import normalise_reference
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from reportlab.pdfgen import canvas
@@ -107,11 +108,13 @@ class BookingViewSet(viewsets.ModelViewSet):
             
         search = self.request.query_params.get('search', None)
         if search:
+            search = search.strip()
             query = (
                 Q(name__icontains=search) |
                 Q(email__icontains=search) |
                 Q(phone__icontains=search) |
                 Q(booking_number__icontains=search) |
+                Q(booking_number__icontains=normalise_reference(search)) |
                 Q(uuid__icontains=search)
             )
             if search.isdigit():
@@ -395,9 +398,6 @@ class BookingViewSet(viewsets.ModelViewSet):
         POST /api/v1/bookings/bookings/{id}/duplicate/
         Body: { "date": "YYYY-MM-DD", "time": "HH:MM" }
         """
-        import uuid as uuid_module
-        from datetime import datetime as dt
-
         original = get_object_or_404(Booking, pk=pk)
         new_date = request.data.get('date')
         new_time = request.data.get('time')
@@ -405,11 +405,7 @@ class BookingViewSet(viewsets.ModelViewSet):
         if not new_date or not new_time:
             return Response({'error': 'date and time are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Generate unique booking number for the duplicate
-        date_part = dt.now().strftime('%Y%m%d')
-        rand_suffix = str(uuid_module.uuid4().int)[:4].upper()
-        new_booking_number = f"GKP-{date_part}-{rand_suffix}"
-
+        # The copy gets its own booking number when it is saved
         new_booking = Booking.objects.create(
             name=original.name,
             email=original.email,
@@ -431,7 +427,6 @@ class BookingViewSet(viewsets.ModelViewSet):
             payment_status='PENDING',
             waiver_status='PENDING',
             customer=original.customer,
-            booking_number=new_booking_number,
         )
 
         # Log the duplication in audit trail
@@ -633,13 +628,13 @@ class PublicSiteAlertViewSet(viewsets.ReadOnlyModelViewSet):
         # (DateField cannot be compared to timezone-aware datetime)
         today = timezone.now().date()
 
-        alert_types = ['CLOSED_TODAY', 'OPEN_TODAY']
-
-        # Overlap logic: block starts on or before today, and ends on or after today
+        # Today's special opening, or a closure of play sessions (Calendar → Opening Days)
+        from .opening_hours import CLOSING_BLOCK_TYPES, OPENING_BLOCK_TYPE
         return BookingBlock.objects.filter(
-            type__in=alert_types,
+            Q(type=OPENING_BLOCK_TYPE) | Q(type__in=CLOSING_BLOCK_TYPES, blocks_normal_bookings=True),
             start_date__lte=today,
-            end_date__gte=today
+            end_date__gte=today,
+            slot_time__isnull=True,
         ).order_by('-start_date')
 
 
@@ -700,6 +695,21 @@ def create_party_booking_view(request):
     adults = as_int(data.get('adults'))
     payment_type = 'FULL' if data.get('payment_type') == 'FULL' else 'DEPOSIT'
     voucher_to_count = None
+
+    # Public party bookings only on dates open for parties (opening calendar)
+    if not is_staff:
+        from datetime import date as date_cls
+        from .opening_hours import day_status
+        try:
+            party_date = date_cls.fromisoformat(str(data.get('date'))[:10])
+        except ValueError:
+            return Response({'detail': 'Invalid date.'}, status=status.HTTP_400_BAD_REQUEST)
+        if party_date < timezone.localdate():
+            return Response({'detail': 'Please choose a date in the future.'}, status=status.HTTP_400_BAD_REQUEST)
+        day = day_status(party_date)
+        if not day['parties_open']:
+            return Response({'detail': f"We're not taking party bookings on this date ({day['reason'] or 'closed'}). Please choose another date.",
+                             'code': 'DATE_CLOSED'}, status=status.HTTP_400_BAD_REQUEST)
 
     if is_staff:
         # Staff/admin bookings may set custom amounts and statuses
@@ -795,11 +805,13 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
         # Search filter
         search = self.request.query_params.get('search', None)
         if search:
+            search = search.strip()
             query = (
                 Q(name__icontains=search) |
                 Q(email__icontains=search) |
                 Q(phone__icontains=search) |
                 Q(booking_number__icontains=search) |
+                Q(booking_number__icontains=normalise_reference(search)) |
                 Q(uuid__icontains=search) |
                 Q(birthday_child_name__icontains=search)
             )
@@ -1384,3 +1396,23 @@ class PartyBookingHistoryViewSet(viewsets.ModelViewSet):
                 'error': f'Failed to restore party booking: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def public_opening_calendar(request):
+    """
+    Opening calendar for the booking wizards and the admin portal:
+    GET ?start=YYYY-MM-DD&end=YYYY-MM-DD (up to 400 days) → one entry per date with
+    sessions_open, parties_open, open, close, source and reason.
+    """
+    from datetime import date as date_cls, timedelta
+    from .opening_hours import calendar_days
+    today = timezone.localdate()
+    try:
+        start = date_cls.fromisoformat(request.query_params.get('start') or today.isoformat())
+        end = date_cls.fromisoformat(request.query_params.get('end') or (start + timedelta(days=120)).isoformat())
+    except ValueError:
+        return Response({'detail': 'Use YYYY-MM-DD dates.'}, status=status.HTTP_400_BAD_REQUEST)
+    if end < start or (end - start).days > 400:
+        return Response({'detail': 'Choose a range of up to 400 days.'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(calendar_days(start, end))

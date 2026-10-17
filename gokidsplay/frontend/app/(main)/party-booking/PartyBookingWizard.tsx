@@ -9,10 +9,10 @@ import { createPartyBooking } from "../../actions/createPartyBooking";
 import ParticipantCollection from "../../../components/ParticipantCollection";
 import { PaymentStep } from "../../../components/PaymentStep";
 import { PartyBookingPDF } from "../../../components/PartyBookingPDF";
-import { fetchBookingBlocks, isDateBlocked, BookingBlock } from "@/lib/api/booking-blocks";
+import { loadOpeningCalendar } from "@/lib/api/opening-calendar";
 import { PageSection } from "@/lib/cms/types";
 import { SmartCalendar } from "@/components/SmartCalendar";
-import { isSchoolHoliday, isHolidayOpen, getPartyStartTimes } from "@/lib/api/types";
+import { isHolidayOpen, getPartyStartTimes, getPartyHours, getCalendarDay, getClosedReason, formatClock } from "@/lib/api/types";
 import { useAccount } from "@/state/account/AccountContext";
 
 interface PartyBookingWizardProps {
@@ -30,7 +30,8 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     const [selectedPackage, setSelectedPackage] = useState(
         searchParams.get('package') || 'Birthday Party'
     );
-    const [bookingBlocks, setBookingBlocks] = useState<BookingBlock[]>([]);
+    // Bumped when the opening calendar (holidays + admin openings / closures) has loaded
+    const [, setCalendarVersion] = useState(0);
     const [config, setConfig] = useState<any>(null);
     const [submitted, setSubmitted] = useState(false);
     const [tempBookingId, setTempBookingId] = useState<string | null>(null);
@@ -91,11 +92,10 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         }
     }, [customer]);
 
-    // Load party booking config from CMS AND Booking Blocks
+    // Load party booking config from CMS and the opening calendar
     useEffect(() => {
         const loadConfigAndBlocks = async () => {
-            // Load blocks
-            fetchBookingBlocks().then(setBookingBlocks);
+            loadOpeningCalendar().then(() => setCalendarVersion(v => v + 1));
 
             try {
                 const res = await fetch('/api/party-config', {
@@ -114,10 +114,10 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = e.target.value;
-        const blockReason = isDateBlocked(newDate, bookingBlocks);
+        const closedReason = getClosedReason(newDate, "party");
 
-        if (blockReason) {
-            alert(`This date is not available due to ${blockReason}`);
+        if (closedReason) {
+            alert(`This date is not available: ${closedReason}`);
             // Don't update state, effectively clearing or keeping previous (or clear it)
             setFormData({ ...formData, date: "" });
             return;
@@ -129,10 +129,10 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     const handleBasicInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Blocking Check on Submit (Double check)
-        const blockReason = isDateBlocked(formData.date, bookingBlocks);
-        if (blockReason) {
-            alert(`This date is not available due to ${blockReason}`);
+        // Closed-date check on submit (double check)
+        const closedReason = getClosedReason(formData.date, "party");
+        if (closedReason) {
+            alert(`This date is not available: ${closedReason}`);
             setFormData({ ...formData, date: "" });
             return;
         }
@@ -292,7 +292,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                             <div className="bg-background-dark rounded-2xl p-6 mb-6 text-left">
                                 <h3 className="font-bold text-lg mb-4 text-white">Booking Summary</h3>
                                 <div className="space-y-2 text-white/70">
-                                    <p><strong className="text-white">Booking ID:</strong> {bookingDetails.bookingId}</p>
+                                    <p><strong className="text-white">Booking number:</strong> <span className="font-mono">{bookingDetails.booking_number || bookingDetails.bookingId}</span></p>
                                     <p><strong className="text-white">Total Amount:</strong> £{costs.total.toFixed(2)}</p>
                                     <p><strong className="text-white">Deposit Required ({depositPercentage}%):</strong> £{costs.deposit.toFixed(2)}</p>
                                     <p><strong className="text-white">Date:</strong> {formData.date}</p>
@@ -507,38 +507,37 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                         <SmartCalendar
                                             value={formData.date}
                                             onChange={(d) => {
-                                                const blockReason = isDateBlocked(d, bookingBlocks);
-                                                if (blockReason) {
-                                                    alert(`This date is not available due to ${blockReason}`);
+                                                const closedReason = getClosedReason(d, "party");
+                                                if (closedReason) {
+                                                    alert(`This date is not available: ${closedReason}`);
                                                     return;
                                                 }
-                                                setFormData({ ...formData, date: d });
+                                                setFormData({ ...formData, date: d, time: "" });
                                             }}
-                                            bookingBlocks={bookingBlocks}
+                                            mode="party"
                                         />
-                                        {/* Monday closed / holiday note */}
+                                        {/* Opening hours for the chosen date (holidays + admin special openings) */}
                                         {formData.date && (() => {
-                                            const dow = new Date(formData.date + 'T12:00:00').getDay();
-                                            const isHoliday = isHolidayOpen(formData.date);
-                                            
-                                            // Monday open on holidays
-                                            if (dow === 1 && isHoliday) {
-                                                return (
-                                                    <div className="mt-2 flex items-start gap-2 p-2.5 bg-emerald-500/15 border border-emerald-500/30 rounded-lg text-emerald-300 text-xs">
-                                                        <School className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-                                                        <span><strong>Holiday!</strong> We're open today (Mon) 🎉 Open from <strong>12:00 PM</strong>.</span>
-                                                    </div>
-                                                );
-                                            }
-                                            // Monday normally closed
-                                            if (dow === 1) {
+                                            const hours = getPartyHours(formData.date);
+                                            if (!hours) {
                                                 return (
                                                     <p className="mt-2 text-red-400 text-xs flex items-center gap-1">
-                                                        <span>⚠️</span> We are closed on Mondays — please pick another date.
+                                                        <span>⚠️</span> We are closed on this day ({getClosedReason(formData.date, "party")}) — please pick another date.
                                                     </p>
                                                 );
                                             }
-                                            return null;
+                                            const time = `${formatClock(hours.open)} – ${formatClock(hours.close)}`;
+                                            const day = getCalendarDay(formData.date);
+                                            const dow = new Date(formData.date + 'T12:00:00').getDay();
+                                            if (day?.source === "special_opening" || (dow >= 1 && dow <= 5 && isHolidayOpen(formData.date))) {
+                                                return (
+                                                    <div className="mt-2 flex items-start gap-2 p-2.5 bg-emerald-500/15 border border-emerald-500/30 rounded-lg text-emerald-300 text-xs">
+                                                        <School className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                                                        <span><strong>{day?.source === "special_opening" ? (day.reason || "Special opening") : "Holiday!"}</strong> We&apos;re open {time} 🎉</span>
+                                                    </div>
+                                                );
+                                            }
+                                            return <p className="mt-2 text-white/50 text-xs">Open {time}</p>;
                                         })()}
                                     </div>
 
@@ -570,9 +569,11 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                                 const configured: string[] = Array.isArray(config?.available_time_slots)
                                                     ? config.available_time_slots.map(to24h).filter(Boolean)
                                                     : [];
-                                                return configured.length > 0 ? openSlots.filter((slot) => configured.includes(slot)) : openSlots;
+                                                const matching = configured.length > 0 ? openSlots.filter((slot) => configured.includes(slot)) : openSlots;
+                                                // A special opening with its own hours may not include the usual start times
+                                                return matching.length > 0 ? matching : openSlots;
                                             })().map((slot: string) => (
-                                                <option key={slot} value={slot}>{slot}</option>
+                                                <option key={slot} value={slot}>{formatClock(slot)}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -838,6 +839,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                             bookingType="party"
                             amount={Math.round((paymentOption === "deposit" ? costs.deposit : costs.total) * 100)}
                             bookingDetails={{
+                                booking_number: bookingDetails?.booking_number,
                                 date: formData.date,
                                 time: formData.time,
                                 duration: 120, // parties last 2 hours

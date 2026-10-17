@@ -30,14 +30,89 @@ def weekly_hours(check_date: date, config: Optional[SessionBookingConfig] = None
     return _parse(hours.get(str(js_day)))
 
 
-def hours_for_booking_day(check_date: date, config: Optional[SessionBookingConfig] = None) -> Optional[Tuple[str, str]]:
+# Admin date overrides (BookingBlock) that close a date
+CLOSING_BLOCK_TYPES = ('BLOCKED_DATE', 'CLOSED', 'CLOSED_TODAY', 'MAINTENANCE', 'PRIVATE_EVENT', 'OTHER')
+OPENING_BLOCK_TYPE = 'OPEN_TODAY'
+
+
+def _date_blocks(start: date, end: date):
+    from .models import BookingBlock
+    return list(BookingBlock.objects.filter(start_date__lte=end, end_date__gte=start, slot_time__isnull=True)
+                .order_by('created_at'))
+
+
+def day_status(check_date: date, config: Optional[SessionBookingConfig] = None, blocks=None) -> dict:
     """
-    Hours used for a date a customer was allowed to book. A normally closed day is
-    only bookable on a school / bank holiday (the website checks the council calendar),
-    so it uses the holiday hours.
+    Whether Go Kids Play is open on a date, for play sessions and for parties.
+
+    1. Weekly hours (Website Content → Session Booking), e.g. Saturday & Sunday 10.30am–6pm
+    2. Coventry school holidays / bank holidays: open with the holiday hours
+    3. Admin overrides (Calendar → Opening Days): a special opening opens the
+       date; a closure closes sessions and/or parties. Closures win.
     """
+    from .uk_calendar import is_bank_holiday, is_school_holiday
     config = config or session_config()
-    return weekly_hours(check_date, config) or _parse(config.holiday_hours or default_holiday_hours())
+    blocks = _date_blocks(check_date, check_date) if blocks is None else [
+        b for b in blocks if b.start_date <= check_date <= b.end_date and b.slot_time is None]
+
+    hours = weekly_hours(check_date, config)
+    holiday = is_bank_holiday(check_date) or is_school_holiday(check_date)
+    holiday_hours = _parse(config.holiday_hours or default_holiday_hours())
+    if holiday:
+        hours = holiday_hours or hours
+        source = 'bank_holiday' if is_bank_holiday(check_date) else 'school_holiday'
+        reason = 'Bank holiday' if source == 'bank_holiday' else 'School holiday'
+    else:
+        source = 'weekly' if hours else 'closed_weekly'
+        reason = '' if hours else 'Closed (open on school & bank holidays)'
+    sessions_open = parties_open = hours is not None
+    override = None
+
+    opening = next((b for b in blocks if b.type == OPENING_BLOCK_TYPE), None)
+    if opening:
+        custom = (opening.open_time.strftime('%H:%M'), opening.close_time.strftime('%H:%M'))             if opening.open_time and opening.close_time else None
+        hours = custom or hours or holiday_hours
+        sessions_open = parties_open = hours is not None
+        source, reason, override = 'special_opening', opening.reason or 'Special opening', opening
+
+    for block in blocks:
+        if block.type not in CLOSING_BLOCK_TYPES:
+            continue
+        if block.blocks_normal_bookings:
+            sessions_open = False
+        if block.blocks_party_bookings:
+            parties_open = False
+        if block.blocks_normal_bookings or block.blocks_party_bookings:
+            source, reason, override = 'closure', block.reason or 'Closed', block
+
+    return {
+        'date': check_date.isoformat(),
+        'sessions_open': sessions_open,
+        'parties_open': parties_open,
+        'open': hours[0] if hours else None,
+        'close': hours[1] if hours else None,
+        'source': source,
+        'reason': reason,
+        'override_id': override.id if override else None,
+        'override_type': override.type if override else None,
+    }
+
+
+def calendar_days(start: date, end: date, config: Optional[SessionBookingConfig] = None) -> list:
+    """day_status for every date from start to end (inclusive), with one database query."""
+    config = config or session_config()
+    blocks = _date_blocks(start, end)
+    days, d = [], start
+    while d <= end:
+        days.append(day_status(d, config, blocks))
+        d += timedelta(days=1)
+    return days
+
+
+def hours_for_booking_day(check_date: date, config: Optional[SessionBookingConfig] = None) -> Optional[Tuple[str, str]]:
+    """(open, close) for play sessions on this date, or None when sessions can't be booked."""
+    status = day_status(check_date, config)
+    return (status['open'], status['close']) if status['sessions_open'] else None
 
 
 def session_minutes(config: Optional[SessionBookingConfig] = None) -> int:

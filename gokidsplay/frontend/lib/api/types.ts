@@ -259,8 +259,8 @@ export function isValidBookingDate(date: string): boolean {
 // ─── Opening hours & session rules ──────────────────────────────────────────
 // Editable in the admin portal (Website Content → Session Booking). The booking
 // wizard loads them with applySessionRules(); until then these defaults — the
-// same hours as the live site — are used. The Coventry school / bank holiday
-// calendar above decides when the holiday hours apply (including Mon & Tue).
+// Saturday & Sunday 10.30am–6pm — are used. The Coventry school / bank holiday
+// calendar above decides when the holiday hours apply (Monday–Friday too).
 
 /** Opening and closing time as 24-hour "HH:MM". */
 export interface DayHours { open: string; close: string }
@@ -276,10 +276,10 @@ export interface SessionRules {
     duration_minutes: number;
 }
 
-const LIVE_SITE_DAY: DayHours = { open: "10:00", close: "17:30" };
+const LIVE_SITE_DAY: DayHours = { open: "10:30", close: "18:00" };
 
 export const DEFAULT_SESSION_RULES: SessionRules = {
-    opening_hours: { "0": LIVE_SITE_DAY, "1": null, "2": null, "3": LIVE_SITE_DAY, "4": LIVE_SITE_DAY, "5": LIVE_SITE_DAY, "6": LIVE_SITE_DAY },
+    opening_hours: { "0": LIVE_SITE_DAY, "1": null, "2": null, "3": null, "4": null, "5": null, "6": LIVE_SITE_DAY },
     holiday_hours: LIVE_SITE_DAY,
     session_mode: "ANYTIME",
     arrival_interval_minutes: 30,
@@ -296,20 +296,26 @@ function readHours(value: any): DayHours | null {
     return null;
 }
 
-/** Use the opening hours / session rules from the CMS Session Booking Configuration. */
-export function applySessionRules(config: any): void {
-    if (!config || typeof config !== "object") return;
+/** Session rules from a CMS Session Booking Configuration (defaults for anything missing). */
+export function readSessionRules(config: any): SessionRules {
+    if (!config || typeof config !== "object") return DEFAULT_SESSION_RULES;
     const weekly: Record<string, DayHours | null> = { ...DEFAULT_SESSION_RULES.opening_hours };
     if (config.opening_hours && typeof config.opening_hours === "object") {
         for (let d = 0; d < 7; d++) weekly[String(d)] = readHours(config.opening_hours[String(d)]);
     }
-    sessionRules = {
+    return {
         opening_hours: weekly,
         holiday_hours: config.holiday_hours === undefined ? DEFAULT_SESSION_RULES.holiday_hours : readHours(config.holiday_hours),
         session_mode: config.session_mode === "ARRIVAL" ? "ARRIVAL" : "ANYTIME",
         arrival_interval_minutes: Math.max(5, Number(config.arrival_interval_minutes) || DEFAULT_SESSION_RULES.arrival_interval_minutes),
         duration_minutes: Math.max(15, Number(config.duration_minutes) || DEFAULT_SESSION_RULES.duration_minutes),
     };
+}
+
+/** Use the opening hours / session rules from the CMS Session Booking Configuration. */
+export function applySessionRules(config: any): void {
+    if (!config || typeof config !== "object") return;
+    sessionRules = readSessionRules(config);
 }
 
 export function getSessionRules(): SessionRules {
@@ -322,7 +328,7 @@ export const SESSION_LENGTH_HOURS = DEFAULT_SESSION_RULES.duration_minutes / 60;
 const toMinutes = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + (m || 0); };
 const fromMinutes = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
 
-/** "17:30" → "5.30pm", "10:00" → "10am" (the style used on the Go Kids Play site). */
+/** "18:00" → "6pm", "10:30" → "10.30am" (the style used on the Go Kids Play site). */
 export function formatClock(t: string): string {
     const [h, m] = t.split(":").map(Number);
     const suffix = h >= 12 ? "pm" : "am";
@@ -330,12 +336,69 @@ export function formatClock(t: string): string {
     return m ? `${h12}.${String(m).padStart(2, "0")}${suffix}` : `${h12}${suffix}`;
 }
 
-/** Opening hours for a date (YYYY-MM-DD), or null when closed. */
+// ─── Opening calendar from the server ─────────────────────────────────────────
+// GET /bookings/public/calendar/ works out every date from the weekly hours, the
+// Coventry holidays above and the admin's Opening Days overrides (special
+// openings and closures). Once loaded with applyCalendarDays() it decides which
+// dates the wizards offer; dates it doesn't cover fall back to the rules above.
+
+export interface CalendarDay {
+    date: string;
+    sessions_open: boolean;
+    parties_open: boolean;
+    open: string | null;
+    close: string | null;
+    /** weekly | closed_weekly | school_holiday | bank_holiday | special_opening | closure */
+    source: string;
+    reason: string;
+    override_id: number | null;
+    override_type: string | null;
+}
+
+let calendarDays: Record<string, CalendarDay> = {};
+
+export function applyCalendarDays(days: CalendarDay[]): void {
+    if (!Array.isArray(days)) return;
+    const next = { ...calendarDays };
+    for (const day of days) {
+        if (day && typeof day.date === "string") next[day.date] = day;
+    }
+    calendarDays = next;
+}
+
+/** The server's opening status for a date, if it has been loaded. */
+export function getCalendarDay(date: string): CalendarDay | null {
+    return calendarDays[date] ?? null;
+}
+
+function calendarHours(day: CalendarDay, open: boolean): DayHours | null {
+    return open && day.open && day.close ? { open: day.open, close: day.close } : null;
+}
+
+/** Opening hours for play sessions on a date (YYYY-MM-DD), or null when closed. */
 export function getOpeningHours(date: string): DayHours | null {
     if (!date) return null;
+    const day = calendarDays[date];
+    if (day) return calendarHours(day, day.sessions_open);
     const weekly = sessionRules.opening_hours[String(new Date(date + "T12:00:00").getDay())] ?? null;
     if (isHolidayOpen(date)) return sessionRules.holiday_hours ?? weekly ?? LIVE_SITE_DAY;
     return weekly;
+}
+
+/** Opening hours for parties on a date, or null when parties can't be booked. */
+export function getPartyHours(date: string): DayHours | null {
+    if (!date) return null;
+    const day = calendarDays[date];
+    if (day) return calendarHours(day, day.parties_open);
+    return getOpeningHours(date);
+}
+
+/** Why a date can't be booked (sessions or parties), or null when it's open. */
+export function getClosedReason(date: string, kind: "session" | "party" = "session"): string | null {
+    if (!date) return null;
+    const hours = kind === "party" ? getPartyHours(date) : getOpeningHours(date);
+    if (hours) return null;
+    return calendarDays[date]?.reason || "Closed";
 }
 
 /** Minutes past midnight right now in the UK. */
@@ -373,7 +436,7 @@ export function getAvailableTimeSlots(date: string, _activity?: string): string[
 
 /** Party start times: on the hour, leaving a full party (default 2 hours) before closing. */
 export function getPartyStartTimes(date: string, partyMinutes = 120): string[] {
-    const hours = getOpeningHours(date);
+    const hours = getPartyHours(date);
     if (!hours) return [];
     const close = toMinutes(hours.close);
     const isToday = date === todayInUK();

@@ -10,7 +10,8 @@ import { RequestsPanel } from "../components/RequestsPanel";
 /** All event reservations (paid at the venue) and customers' event requests. */
 function ReservationsAndRequests() {
     const router = useRouter();
-    const tab = useSearchParams().get("tab") === "requests" ? "requests" : "reservations";
+    const params = useSearchParams();
+    const tab = params.get("tab") === "requests" ? "requests" : "reservations";
     const [newRequests, setNewRequests] = useState(0);
     const show = (t: string) => router.replace(`/admin/events/reservations${t === "requests" ? "?tab=requests" : ""}`);
 
@@ -38,7 +39,7 @@ function ReservationsAndRequests() {
             </div>
 
             {/* Both stay mounted so the "new requests" badge is right on either tab */}
-            <div className={tab === "reservations" ? "" : "hidden"}><ReservationsTable /></div>
+            <div className={tab === "reservations" ? "" : "hidden"}><ReservationsTable initialSearch={params.get("search") || ""} /></div>
             <div className={tab === "requests" ? "" : "hidden"}><RequestsPanel onCountChange={setNewRequests} /></div>
         </div>
     );

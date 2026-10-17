@@ -118,7 +118,9 @@ class SumUpGateway(BasePaymentGateway):
         )
 
         # ── Build checkout payload ────────────────────────────────────────────
-        reference = f"SP-{booking.id}-{uuid.uuid4().hex[:8].upper()}"
+        # Starts with the booking number (e.g. GK482913-7F3A9C) so the payment can be
+        # found in the SumUp dashboard and in Admin → Payments by booking number
+        reference = f"{booking.booking_number or f'GKP-{booking.id}'}-{uuid.uuid4().hex[:6].upper()}"
 
         # Build a concise description with key booking info for SumUp tracking
         booking_date_obj = getattr(booking, 'date', None)

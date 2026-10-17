@@ -6,6 +6,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Q, Sum, Count
+from .references import normalise_reference
 from .models import SpecialEvent, EventBooking, EventRequest, Customer
 from .serializers import SpecialEventSerializer, EventBookingSerializer, EventRequestSerializer
 from .permissions import IsStaffUser, IsSuperAdminOnly
@@ -136,7 +137,8 @@ class EventBookingViewSet(viewsets.ModelViewSet):
         if status_filter:
             qs = qs.filter(status=status_filter)
         if search:
-            qs = qs.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(booking_reference__icontains=search))
+            qs = qs.filter(Q(name__icontains=search) | Q(email__icontains=search) | Q(phone__icontains=search)
+                           | Q(booking_reference__icontains=normalise_reference(search)))
         return qs.order_by('-created_at')
 
     def _reply(self, booking):
@@ -220,7 +222,7 @@ class EventRequestViewSet(viewsets.ModelViewSet):
             qs = qs.filter(status=status_filter)
         if search:
             qs = qs.filter(Q(name__icontains=search) | Q(email__icontains=search)
-                           | Q(reference__icontains=search) | Q(phone__icontains=search))
+                           | Q(reference__icontains=normalise_reference(search)) | Q(phone__icontains=search))
         return qs.order_by('-created_at')
 
 

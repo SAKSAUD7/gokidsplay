@@ -1,4 +1,6 @@
 // Public API functions - fetch from Django backend
+import { fillHours, hoursPlaceholdersFromConfig } from './hours-text';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1';
 
 // Cache CMS content for 60 seconds (ISR) — dramatically improves page load speed.
@@ -101,8 +103,8 @@ export async function getPublicGallery() {
 }
 
 export async function getPublicPageSections(page: string) {
-    const sections = await fetchFromAPI(`/cms/page-sections/?page=${page}`);
-    return sections.filter((s: any) => s.active);
+    const [sections, hours] = await Promise.all([fetchFromAPI(`/cms/page-sections/?page=${page}`), getPublicHoursText()]);
+    return fillHours(sections.filter((s: any) => s.active), hours);
 }
 
 export async function getPublicInstagramReels() {
@@ -124,6 +126,14 @@ export async function getPublicPartyPackages() {
 export async function getPublicSessionSettings(): Promise<Record<string, any> | null> {
     const data = await fetchFromAPI('/cms/session-booking-config/1/');
     return data && !Array.isArray(data) ? data : null;
+}
+
+/**
+ * Values for the {open}, {close}, {hours}, {days}… placeholders in website text,
+ * from the Session Booking opening hours (see lib/hours-text.ts).
+ */
+export async function getPublicHoursText(): Promise<Record<string, string>> {
+    return hoursPlaceholdersFromConfig(await getPublicSessionSettings());
 }
 
 /** Live-site wording for the online booking fee, or null when there is no fee. */
@@ -175,8 +185,8 @@ export async function getPublicPricingCarouselImages() {
 }
 
 export async function getPublicTimingCards() {
-    const cards = await fetchFromAPI('/cms/timing-cards/');
-    return cards.filter((c: any) => c.active);
+    const [cards, hours] = await Promise.all([fetchFromAPI('/cms/timing-cards/'), getPublicHoursText()]);
+    return fillHours(cards.filter((c: any) => c.active), hours);
 }
 
 /**
@@ -186,6 +196,7 @@ export async function getPublicTimingCards() {
  */
 export async function getPublicPageContent(page: string) {
     const { resolveSections } = await import('./cms/page-registry');
+    const hoursText = getPublicHoursText();
     let rows: any[] = [];
     try {
         const response = await fetch(`${API_URL}/cms/page-sections/?page=${encodeURIComponent(page)}`, {
@@ -195,7 +206,7 @@ export async function getPublicPageContent(page: string) {
     } catch (error) {
         console.error(`Failed to fetch page content for ${page}:`, error);
     }
-    return resolveSections(page, Array.isArray(rows) ? rows : []);
+    return fillHours(resolveSections(page, Array.isArray(rows) ? rows : []), await hoursText);
 }
 
 export async function getPublicTestimonials() {

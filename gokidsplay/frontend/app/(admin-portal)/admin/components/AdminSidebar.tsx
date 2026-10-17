@@ -38,6 +38,7 @@ const navigation: NavGroup[] = [
         items: [
             { name: "All Bookings", href: "/admin/all-bookings", icon: "Calendar", permission: { entity: 'bookings', action: 'read' } },
             { name: "Calendar", href: "/admin/calendar", icon: "CalendarDays", permission: { entity: 'bookings', action: 'read' } },
+            { name: "Opening Days", href: "/admin/calendar/opening", icon: "CalendarCheck", permission: { entity: 'bookings', action: 'read' } },
             { name: "Session Bookings", href: "/admin/bookings", icon: "Users", permission: { entity: 'bookings', action: 'read' } },
             { name: "Manual Session Booking", href: "/admin/session-bookings/new", icon: "Plus", permission: { entity: 'bookings', action: 'write' } },
             { name: "Session History", href: "/admin/bookings/history", icon: "Clock", permission: { entity: 'bookings', action: 'read' } },
@@ -125,7 +126,10 @@ export function AdminSidebar({ permissions = [] }: AdminSidebarProps) {
         if (href === "/admin") {
             return pathname === href;
         }
-        return pathname.startsWith(href);
+        if (!pathname.startsWith(href)) return false;
+        // Only the closest match: /admin/calendar/opening highlights "Opening Days", not "Calendar" too
+        return !navigation.some(group => group.items.some(item =>
+            item.href.length > href.length && item.href.startsWith(href) && pathname.startsWith(item.href)));
     };
 
     // Filter navigation based on permissions

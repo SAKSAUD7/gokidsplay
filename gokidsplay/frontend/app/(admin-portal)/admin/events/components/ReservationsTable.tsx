@@ -32,10 +32,10 @@ interface Reservation {
 const ACTIVE = (r: Reservation) => !["CANCELLED", "REFUNDED"].includes(r.status);
 
 /** Reservations for one event (eventId) or for every event. */
-export function ReservationsTable({ eventId, onChange }: { eventId?: number | string; onChange?: () => void }) {
+export function ReservationsTable({ eventId, onChange, initialSearch = "" }: { eventId?: number | string; onChange?: () => void; initialSearch?: string }) {
     const [rows, setRows] = useState<Reservation[]>([]);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(initialSearch);
     const [statusFilter, setStatusFilter] = useState("active");
     const [paymentFilter, setPaymentFilter] = useState("");
     const [busy, setBusy] = useState<number | null>(null);

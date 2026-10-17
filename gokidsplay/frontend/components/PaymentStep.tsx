@@ -18,7 +18,7 @@ import {
 
 interface BookingDetails {
     ticketLines?: Array<{ label: string; qty: number; subtotal: number }>; // admission tickets by type
-    timeLabel?: string; // ready-made session time text (e.g. "Any 2 hours, 10am – 5.30pm")
+    timeLabel?: string; // ready-made session time text (e.g. "Any 2 hours, 10.30am – 6pm")
     duration?: string | number; // session length in minutes
     date: string;
     time: string;
@@ -328,7 +328,7 @@ export function PaymentStep({
                         {/* Booking Ref */}
                         <div className="bg-gray-50 rounded-xl px-4 py-3 mb-4 flex justify-between items-center">
                             <span className="text-gray-500 text-xs font-medium">Booking Ref</span>
-                            <span className="text-gray-800 font-mono font-bold text-sm">#{bookingId}</span>
+                            <span className="text-gray-800 font-mono font-bold text-sm">{bookingDetails.booking_number || `#${bookingId}`}</span>
                         </div>
 
                         {/* Merchant */}

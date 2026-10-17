@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fetchSiteAlerts, BookingBlock } from "../lib/api/booking-blocks";
 import { AlertCircle, Calendar, Info, X } from "lucide-react";
+import { formatClock } from "../lib/api/types";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const GlobalAlert = () => {
@@ -18,8 +19,8 @@ export const GlobalAlert = () => {
                 // Backend sends order_by('-priority')
                 setAlerts(data);
 
-                // Pick the highest priority alert
-                const current = data[0];
+                // A closure today wins over a special opening
+                const current = data.find(a => a.type !== 'OPEN_TODAY') ?? data[0];
 
                 // Check if user dismissed this specific alert session-wise?
                 // User req: "Dismissible per session"
@@ -43,7 +44,11 @@ export const GlobalAlert = () => {
 
     if (!activeAlert || !isVisible) return null;
 
-    const isClosed = activeAlert.type === 'CLOSED_TODAY';
+    // Closures win over a special opening (backend sends both kinds for today)
+    const isClosed = activeAlert.type !== 'OPEN_TODAY';
+    const hours = !isClosed && activeAlert.open_time && activeAlert.close_time
+        ? ` — open ${formatClock(activeAlert.open_time.slice(0, 5))} – ${formatClock(activeAlert.close_time.slice(0, 5))}`
+        : '';
 
     return (
         <AnimatePresence>
@@ -63,10 +68,10 @@ export const GlobalAlert = () => {
                         </div>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                             <span className="font-bold uppercase tracking-wider text-xs sm:text-sm px-2 py-0.5 rounded-full bg-black/20 w-fit">
-                                {isClosed ? 'Closed Today' : 'Holiday Hours'}
+                                {isClosed ? 'Closed Today' : 'Open Today'}
                             </span>
                             <span className="font-medium text-sm sm:text-base">
-                                {activeAlert.reason}
+                                {activeAlert.reason}{hours}
                             </span>
                         </div>
                     </div>

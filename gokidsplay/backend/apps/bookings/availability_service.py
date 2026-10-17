@@ -168,11 +168,14 @@ class GKPAvailabilityService:
                 status = DATE_STATUS_OPEN_OVERRIDE
                 # Override open — don't block bookings
 
-            # Check extended fields if they exist (added in migration 0026)
-            if hasattr(override, 'blocks_normal_bookings') and override.blocks_normal_bookings is not None:
-                blocks_normal = override.blocks_normal_bookings
-            if hasattr(override, 'blocks_party_bookings') and override.blocks_party_bookings is not None:
-                blocks_party = override.blocks_party_bookings
+        # Whether sessions / parties can be booked comes from the opening calendar
+        # (weekly hours, Coventry holidays and admin overrides) — one source of truth
+        from .opening_hours import day_status
+        day = day_status(check_date)
+        blocks_normal = not day['sessions_open']
+        blocks_party = not day['parties_open']
+        if (blocks_normal or blocks_party) and not closure_reason:
+            closure_reason = day['reason'] or None
 
         # Count existing bookings (for admin warnings)
         session_count = Booking.objects.filter(
@@ -537,16 +540,15 @@ class GKPAvailabilityService:
         today = timezone.now().date()
         date_status = self.get_date_status(today)
 
-        is_open = date_status['status'] in (DATE_STATUS_OPEN, DATE_STATUS_OPEN_OVERRIDE)
-
-        # Normal operating day = open in the CMS weekly hours (holiday openings are
-        # added by admins as OPEN_TODAY overrides, or shown by the website calendar)
-        from .opening_hours import weekly_hours
-        normal_operating_day = weekly_hours(today) is not None or date_status['status'] == DATE_STATUS_OPEN_OVERRIDE
+        # Opening calendar: weekly hours, Coventry holidays and admin overrides
+        from .opening_hours import day_status
+        today_info = day_status(today)
 
         return {
             'date': str(today),
-            'is_open': is_open and normal_operating_day and not date_status['blocks_normal_bookings'],
+            'is_open': today_info['sessions_open'],
+            'open': today_info['open'],
+            'close': today_info['close'],
             'status': date_status['status'],
             'closure_reason': date_status['closure_reason'],
             'override_active': date_status['override_type'] is not None,

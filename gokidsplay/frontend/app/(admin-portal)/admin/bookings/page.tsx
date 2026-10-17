@@ -1,5 +1,6 @@
 "use client";
 
+import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getSessionBookings, toggleBookingArrival } from "@/app/actions/admin";
 import { formatDate, formatCurrency, getInitials } from "@/lib/format-utils";
@@ -97,16 +98,7 @@ export default function AdminBookings() {
 
         // Search filter
         if (searchTerm) {
-            const search = searchTerm.toLowerCase();
-            filtered = filtered.filter(booking =>
-                booking.customerName?.toLowerCase().includes(search) ||
-                booking.customerEmail?.toLowerCase().includes(search) ||
-                booking.name?.toLowerCase().includes(search) ||
-                booking.email?.toLowerCase().includes(search) ||
-                booking.phone?.toLowerCase().includes(search) ||
-                booking.booking_number?.toLowerCase().includes(search) ||
-                booking.id?.toString().includes(search)
-            );
+            filtered = filtered.filter(booking => matchesBookingSearch(booking, searchTerm));
         }
 
         // Status filter
@@ -186,7 +178,7 @@ export default function AdminBookings() {
                         <label className="text-sm font-medium text-slate-700">Search</label>
                         <input
                             type="text"
-                            placeholder="Name, email or booking #"
+                            placeholder="Booking number (GK…), name, email or phone"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm outline-none focus:ring-2 focus:ring-blue-500"
@@ -312,7 +304,7 @@ export default function AdminBookings() {
                                         <td className="px-6 py-4">
                                             <Link href={`/admin/bookings/${booking.id}`} className="block hover:text-blue-600">
                                                 <span className="text-xs font-bold text-primary font-mono">
-                                                    {booking.booking_number || `SP-${booking.id}`}
+                                                    {booking.booking_number || `#${booking.id}`}
                                                 </span>
                                                 <span className="text-xs text-slate-400 block">ID: {booking.id}</span>
                                             </Link>

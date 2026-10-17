@@ -220,7 +220,7 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                                     <tr key={`${booking._isParty ? 'p' : 's'}-${booking.id}`} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <p className="text-xs font-bold text-primary font-mono">
-                                                {booking.booking_number || (booking._isParty ? `SPPARTY-${booking.id}` : `SP-${booking.id}`)}
+                                                {booking.booking_number || `#${booking.id}`}
                                             </p>
                                             <p className="text-xs text-slate-400">ID: {booking.id}</p>
                                         </td>

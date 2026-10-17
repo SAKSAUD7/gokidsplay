@@ -89,10 +89,10 @@ function SortBtn({ col, sort, dir }: { col: SortKey; sort: SortKey; dir: SortDir
     );
 }
 
-export default function PaymentsListPage() {
+export default function PaymentsListPage({ initialSearch = "" }: { initialSearch?: string }) {
     const [payments, setPayments] = useState<Payment[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
     const [filterStatus, setFilterStatus] = useState("all");
     const [filterProvider, setFilterProvider] = useState("all");
     const [sort, setSort] = useState<SortKey>("created_at");
@@ -107,7 +107,7 @@ export default function PaymentsListPage() {
             await fetch('/api/payments/auto-verify', { method: 'POST', cache: 'no-store' }).catch(() => {});
 
             // Use the admin proxy route — forwards admin_token cookie automatically
-            const response = await fetch(`/api/payments/list`, { 
+            const response = await fetch(`/api/payments/list?limit=2000`, { 
                 credentials: "include", 
                 cache: "no-store" 
             });
@@ -174,8 +174,11 @@ export default function PaymentsListPage() {
         let list = [...payments];
 
         if (searchTerm) {
-            const q = searchTerm.toLowerCase();
+            const q = searchTerm.trim().toLowerCase();
+            // Booking numbers can be typed loosely: "gk 482-913", "#GK482913"
+            const ref = q.replace(/[\s#-]/g, "");
             list = list.filter(p =>
+                (ref && (p.booking_number || "").toLowerCase().replace(/[\s#-]/g, "").includes(ref)) ||
                 p.order_id.toLowerCase().includes(q) ||
                 (p.payment_id?.toLowerCase() ?? "").includes(q) ||
                 (p.customer_name?.toLowerCase() ?? "").includes(q) ||
@@ -285,7 +288,7 @@ export default function PaymentsListPage() {
                     <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                         type="text"
-                        placeholder="Search by name, email, order ID…"
+                        placeholder="Search by booking number (GK…/GP…), name, email or order ID…"
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                         className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-slate-900 placeholder:text-slate-400 transition-all text-sm"
@@ -415,7 +418,7 @@ export default function PaymentsListPage() {
                                             {/* Booking */}
                                             <td className="px-6 py-4">
                                                 {payment.booking_id ? (
-                                                    <Link href={`/admin/session-bookings/${payment.booking_id}`}
+                                                    <Link href={`/admin/bookings/${payment.booking_id}`}
                                                         className="text-blue-600 hover:text-blue-700 font-mono text-xs font-bold hover:underline transition-colors bg-blue-50 px-2 py-1 rounded">
                                                         {payment.booking_number || `#${payment.booking_id}`}
                                                     </Link>

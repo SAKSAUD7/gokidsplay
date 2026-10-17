@@ -4,16 +4,23 @@ import { getPageSections } from "../../actions/page-sections";
 import { getBookingInformation } from "../../actions/booking-information";
 import { getMetadata } from "@/seo/seo.config";
 import { getPublicSessionSettings, onlineFeeNote } from "@/lib/public-api";
+import { fillHours, hoursPlaceholdersFromConfig } from "@/lib/hours-text";
 
-export const metadata = getMetadata(
-    "Book a Play Session",
-    "Book your 2-hour play session at Go Kids Play Coventry online. Soft play, laser arena, go karts, inflatable park & more. Open Wednesday to Sunday and school & bank holidays."
-);
+export async function generateMetadata() {
+    const hours = hoursPlaceholdersFromConfig(await getPublicSessionSettings());
+    return getMetadata(
+        "Book a Play Session",
+        `Book your 2-hour play session at Go Kids Play Coventry online. Soft play, laser arena, go karts, inflatable park & more. Open ${hours.days} and school & bank holidays, ${hours.hours}.`
+    );
+}
 
 export default async function BookingPage() {
-    const cmsContent = await getPageSections('booking-session');
-    const sessionInfo = await getBookingInformation('SESSION');
-    const feeNote = onlineFeeNote(await getPublicSessionSettings());
+    const sessionSettings = await getPublicSessionSettings();
+    // {open}, {close}, {days}… in the CMS text come from the Session Booking opening hours
+    const hours = hoursPlaceholdersFromConfig(sessionSettings);
+    const cmsContent = fillHours(await getPageSections('booking-session'), hours);
+    const sessionInfo = fillHours(await getBookingInformation('SESSION'), hours);
+    const feeNote = onlineFeeNote(sessionSettings);
 
     return (
         <main className="bg-background min-h-screen pt-24 pb-16 px-4">
