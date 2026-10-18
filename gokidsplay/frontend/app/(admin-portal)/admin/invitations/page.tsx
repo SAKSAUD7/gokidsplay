@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Edit, Trash2, Image as ImageIcon } from "lucide-react";
 // import { fetchAPI } from "@/lib/api"; // Removed unused import causing build error in client component
 import { toast } from "sonner";
+import { deleteInvitationTemplate } from "@/app/actions/invitation-templates";
 
 interface Template {
     id: number;
@@ -46,38 +47,10 @@ export default function InvitationTemplatesPage() {
         if (!confirm("Are you sure you want to delete this template?")) return;
 
         try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-
-            // Get auth token from cookies
-            const getCookie = (name: string) => {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop()?.split(';').shift();
-            };
-
-            const token = getCookie('admin_token');
-            const headers: HeadersInit = {
-                'Content-Type': 'application/json',
-            };
-
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
-            const res = await fetch(`${API_URL}/invitations/templates/${id}/`, {
-                method: "DELETE",
-                headers,
-                credentials: 'include',
-            });
-
-            if (res.ok) {
-                toast.success("Template deleted successfully");
-                loadTemplates();
-            } else {
-                const errorText = await res.text();
-                console.error('Delete failed:', errorText);
-                toast.error("Failed to delete template");
-            }
+            // Server action: sends the admin's (httpOnly) sign-in with the request
+            await deleteInvitationTemplate(id);
+            toast.success("Template deleted successfully");
+            loadTemplates();
         } catch (error) {
             console.error("Error deleting template:", error);
             toast.error("Error deleting template");

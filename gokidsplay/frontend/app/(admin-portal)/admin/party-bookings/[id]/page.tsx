@@ -1,5 +1,6 @@
 "use client";
 
+import { resendConfirmationEmail } from "@/app/actions/admin";
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -61,8 +62,8 @@ export default function PartyBookingDetailPage({ params }: { params: { id: strin
     const handleResendEmail = async () => {
         setResending(true);
         try {
-            const res = await fetch(`/api/bookings/${params.id}/resend-email`, { method: 'POST', credentials: 'include' });
-            alert(res.ok ? 'Confirmation email resent!' : 'Email resend failed — check SMTP settings in backend/.env');
+            const result = await resendConfirmationEmail('party', params.id);
+            alert(result.success ? (result.message || 'Confirmation email sent') : `Email not sent: ${result.message}`);
         } catch { alert('Email resend failed.'); }
         finally { setResending(false); }
     };

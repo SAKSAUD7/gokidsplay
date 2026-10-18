@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { Loader2, BookOpen, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { updateBookingInformation } from '@/app/actions/booking-information';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1';
 
-export function BookingInformationEditor() {
+/** The information box under the booking wizard on /book. bookingType fixes which one is edited. */
+export function BookingInformationEditor({ bookingType }: { bookingType?: 'SESSION' | 'PARTY' } = {}) {
     const [bookingInfo, setBookingInfo] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [selectedType, setSelectedType] = useState<'SESSION' | 'PARTY'>('SESSION');
+    const [selectedType, setSelectedType] = useState<'SESSION' | 'PARTY'>(bookingType || 'SESSION');
 
     useEffect(() => {
         loadBookingInfo();
@@ -38,17 +40,13 @@ export function BookingInformationEditor() {
 
         setSaving(true);
         try {
-            const response = await fetch(`${API_URL}/cms/booking-information/${current.id}/`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(current)
-            });
-
-            if (response.ok) {
+            const { id, created_at, updated_at, ...data } = current;
+            const result = await updateBookingInformation(id, data);
+            if (result.success) {
                 toast.success('Booking information updated!');
                 await loadBookingInfo();
             } else {
-                toast.error('Failed to update');
+                toast.error(result.error || 'Failed to update');
             }
         } catch (error) {
             toast.error('Failed to save changes');
@@ -145,12 +143,15 @@ export function BookingInformationEditor() {
                         <BookOpen className="w-5 h-5 text-primary" />
                         Booking Information
                     </h2>
-                    <p className="text-sm text-slate-500">Manage session and party booking details</p>
+                    <p className="text-sm text-slate-500">
+                        The information box under the booking wizard on the Book page.
+                        Use {'{open}'}, {'{close}'}, {'{hours}'} and {'{days}'} to show the opening hours.
+                    </p>
                 </div>
             </div>
 
             {/* Type Selector */}
-            <div className="flex gap-2 mb-6">
+            <div className={`flex gap-2 mb-6 ${bookingType ? 'hidden' : ''}`}>
                 <button
                     onClick={() => setSelectedType('SESSION')}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors ${selectedType === 'SESSION'

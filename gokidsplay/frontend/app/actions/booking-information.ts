@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { fetchAPI } from "../lib/server-api";
 
 export async function getBookingInformation(bookingType?: 'SESSION' | 'PARTY') {
@@ -36,4 +37,15 @@ export async function getAllBookingInformation() {
         console.error('Failed to fetch all booking information:', error);
         return [];
     }
+}
+
+/** Save the booking information box (Admin → Website Content → Session Booking). */
+export async function updateBookingInformation(id: number, data: Record<string, any>) {
+    const res = await fetchAPI(`/cms/booking-information/${id}/`, { method: "PATCH", body: JSON.stringify(data) });
+    if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        return { success: false, error: body.detail || Object.values(body).flat().join(" ") || "Could not save" };
+    }
+    revalidatePath("/book");
+    return { success: true };
 }

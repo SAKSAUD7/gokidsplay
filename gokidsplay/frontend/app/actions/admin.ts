@@ -318,17 +318,19 @@ export async function deletePartyBooking(id: string) {
     return res?.ok;
 }
 
-export async function resendPartyBookingEmail(id: string) {
-    const res = await fetchAPI(`/bookings/party-bookings/${id}/resend_confirmation_email/`, {
-        method: "POST"
+/** Send a booking's confirmation e-mail again (session or party). */
+export async function resendConfirmationEmail(type: "session" | "party", id: string | number) {
+    const res = await fetchAPI(`/emails/resend-confirmation/`, {
+        method: "POST",
+        body: JSON.stringify({ type, id }),
     });
+    const data = res ? await res.json().catch(() => ({})) : {};
+    if (res && res.ok) return { success: true, message: data.message as string };
+    return { success: false, message: (data.error as string) || "Failed to send email" };
+}
 
-    if (res && res.ok) {
-        const data = await res.json();
-        return { success: true, message: data.message };
-    }
-
-    return { success: false, message: "Failed to send email" };
+export async function resendPartyBookingEmail(id: string) {
+    return resendConfirmationEmail("party", id);
 }
 
 export async function updatePartyBooking(id: string, data: any) {

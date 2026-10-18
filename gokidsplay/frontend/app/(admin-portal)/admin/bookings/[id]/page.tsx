@@ -1,5 +1,6 @@
 "use client";
 
+import { resendConfirmationEmail } from "@/app/actions/admin";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -71,18 +72,9 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
     const handleResendEmail = async () => {
         setActionLoading(true);
         try {
-            const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000/api/v1';
-            const response = await fetch(`${API_URL}/emails/send-booking-confirmation/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ booking_id: params.id }),
-            });
-            if (response.ok) {
-                toast.success('Confirmation email resent successfully!');
-            } else {
-                toast.error('Failed to resend email. Please try again.');
-            }
+            const result = await resendConfirmationEmail('session', params.id);
+            if (result.success) toast.success(result.message || 'Confirmation email sent');
+            else toast.error(result.message);
         } catch (error) {
             toast.error('Could not connect to email service.');
         } finally {
