@@ -2,10 +2,8 @@
 Payment Gateway Factory.
 
 Reads PAYMENT_MODE from settings:
-  - 'sumup'  → SumUpGateway  (live online payments)
-  - anything else → MockPaymentGateway  (pay at venue, auto-confirms)
-
-Set PAYMENT_MODE=sumup in .env when SumUp API keys are configured.
+  - 'sumup' (default) → SumUpGateway (live card payments)
+  - 'mock'            → MockPaymentGateway (test checkout page; DEBUG only)
 """
 
 import logging
@@ -17,8 +15,16 @@ logger = logging.getLogger(__name__)
 
 def get_payment_gateway() -> BasePaymentGateway:
     """
-    Get the SumUp payment gateway.
+    SumUp (live card payments), or the mock gateway for testing when
+    PAYMENT_MODE=mock — which only works while DEBUG is on, never on the live site.
     """
+    mode = str(getattr(settings, 'PAYMENT_MODE', 'sumup') or 'sumup').lower()
+    if mode == 'mock':
+        if getattr(settings, 'DEBUG', False):
+            from .mock import MockPaymentGateway
+            logger.warning("Payment gateway: MOCK (test payments — no money is taken)")
+            return MockPaymentGateway()
+        logger.error("PAYMENT_MODE=mock ignored because DEBUG is off — using SumUp")
     logger.info("Payment gateway: SumUp (live online payments)")
     return SumUpGateway()
 

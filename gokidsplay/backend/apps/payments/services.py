@@ -92,32 +92,21 @@ class PaymentService:
         # Get booking
         booking = self.get_booking(booking_id, booking_type)
 
-        # Calculate amount if not provided
-        if amount is None:
-            amount = booking.remaining_balance
-        else:
-            amount = Decimal(str(amount))
-
-        # Validate amount is positive
+        # The server decides what is charged (never the amount the browser sends):
+        #   session → the balance due; party → the deposit (first payment) or the balance
+        status_field = 'status' if booking_type == 'party' else 'booking_status'
+        if getattr(booking, status_field, '') == 'CANCELLED':
+            raise ValueError("This booking has been cancelled or has expired. Please make a new booking.")
+        if booking.payment_status == 'PAID' or booking.remaining_balance <= 0:
+            raise ValueError("This booking has already been paid in full.")
+        requested = Decimal(str(amount)) if amount is not None else None
+        amount = booking.remaining_balance
+        if booking_type == 'party' and requested is not None and (booking.paid_amount or 0) <= 0:
+            deposit = Decimal(str(booking.deposit_amount or 0))
+            if deposit > 0 and abs(requested - deposit) < Decimal('0.01'):
+                amount = deposit
         if amount <= 0:
             raise ValueError("Payment amount must be positive")
-
-        # Prevent duplicate payments if booking is already fully paid
-        if booking.payment_status == 'PAID':
-            raise ValueError("This booking has already been paid in full.")
-
-        # If the requested amount exceeds what is stored on the booking (e.g. the
-        # online booking fee was added to the checkout but the DB row predates that
-        # change), update the booking amount so remaining_balance matches the real
-        # charge.  This is safe: the frontend always derives the amount from the
-        # same price tables the user saw on screen.
-        if amount > booking.remaining_balance:
-            booking.amount = booking.paid_amount + amount
-            booking.save(update_fields=["amount"])
-            logger.info(
-                f"Updated {booking_type} booking {booking_id} amount to "
-                f"{booking.amount} to match requested payment of {amount}"
-            )
 
         logger.info(f"Creating payment order for {booking_type} booking {booking_id}: £{amount}")
 
@@ -157,10 +146,13 @@ class PaymentService:
         success, payment_id, response = self.gateway.verify_payment(payment_data)
         
         if not success:
-            logger.error(f"Payment verification failed for order {order_id}")
+            failed = str(response.get('status', '')).upper() in ('FAILED', 'EXPIRED')
+            logger.info(f"Payment {order_id} not paid ({response.get('status', 'unknown')})")
             return {
                 'success': False,
                 'error': response.get('error', 'Payment verification failed'),
+                # The success page shows "payment failed" straight away instead of waiting
+                **({'payment_status': 'FAILED'} if failed else {'payment_status': 'PENDING'}),
                 'response': response,
             }
         

@@ -1,0 +1,5 @@
+# Test tools (CI and local) — not needed on the server
+-r requirements.txt
+pytest==7.3.2
+pytest-django==4.8.0
+pytest-cov==7.0.0

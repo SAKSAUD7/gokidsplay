@@ -19,4 +19,5 @@ urlpatterns = [
     # Auto-sweep: verify all SUMUP payments that are still CREATED/PENDING
     path('auto-verify/', views.auto_verify_pending_payments, name='auto-verify-payments'),
     path('<int:payment_id>/', views.get_payment, name='get-payment'),
+    path('mock-checkout/<str:order_id>/', views.mock_checkout, name='mock-checkout'),  # PAYMENT_MODE=mock only
 ]

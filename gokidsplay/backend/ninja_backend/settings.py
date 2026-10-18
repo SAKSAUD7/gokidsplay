@@ -203,7 +203,12 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Whitenoise configuration for serving static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# File storage (Django 5.1 removed DEFAULT_FILE_STORAGE / STATICFILES_STORAGE — use STORAGES).
+# Uploads go to Azure Blob Storage when AZURE_STORAGE_CONNECTION_STRING is set (see below).
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -313,10 +318,13 @@ TRUSTED_PROXY_COUNT = int(os.getenv('TRUSTED_PROXY_COUNT', '1' if 'WEBSITE_SITE_
 # ====================================================
 
 if 'AZURE_STORAGE_CONNECTION_STRING' in os.environ:
-    # Use Azure Blob Storage in production
-    DEFAULT_FILE_STORAGE = 'storages.backends.azure_storage.AzureStorage'
+    # Uploads (images, videos) in Azure Blob Storage; served through /media/ (serve_media.py)
     AZURE_CONNECTION_STRING = os.environ['AZURE_STORAGE_CONNECTION_STRING']
     AZURE_CONTAINER = os.environ.get('AZURE_STORAGE_CONTAINER', 'media')
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.azure_storage.AzureStorage',
+        'OPTIONS': {'connection_string': AZURE_CONNECTION_STRING, 'azure_container': AZURE_CONTAINER},
+    }
 
 # Always use relative MEDIA_URL to force django-storages to return local paths,
 # which will then be proxied through the backend server.
@@ -390,6 +398,9 @@ PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
 
 # ── Frontend URL (used for email links and payment return URLs) ─────────────
 # Set FRONTEND_URL to https://www.gokidsplay.co.uk when the new site goes live.
+# Shared secret for POST /api/v1/core/cron/ (scheduled jobs, see apps/core/cron_views.py)
+CRON_SECRET = os.getenv('CRON_SECRET', '')
+
 # Google Places API (New) key — shows the Go Kids Play Google reviews on /testimonies
 GOOGLE_PLACES_API_KEY = os.getenv('GOOGLE_PLACES_API_KEY', '')
 
@@ -399,6 +410,10 @@ FRONTEND_URL = os.getenv(
 )
 
 # ── SumUp (one Go Kids Play merchant account) ───────────────────────────────
+# 'sumup' = live card payments; 'mock' = test checkout page, no money taken (only when DEBUG=True)
+PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
+# Public address of this backend (used by the mock checkout page); Azure sets WEBSITE_HOSTNAME
+BACKEND_URL = os.getenv('BACKEND_URL', f"https://{os.environ['WEBSITE_HOSTNAME']}" if os.environ.get('WEBSITE_HOSTNAME') else 'http://localhost:9000')
 SUMUP_API_KEY       = os.getenv('SUMUP_API_KEY', '') or os.getenv('SUMUP_SKATING_API_KEY', '')
 SUMUP_MERCHANT_CODE = os.getenv('SUMUP_MERCHANT_CODE', '') or os.getenv('SUMUP_SKATING_MERCHANT_CODE', '')
 

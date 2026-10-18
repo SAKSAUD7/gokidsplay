@@ -113,3 +113,6 @@ azure_seed_data.json
 spinpin_data.json
 webapp_logs*.zip
 debug_*output*.txt
+
+# Archives (deploy packages, logs)
+*.zip

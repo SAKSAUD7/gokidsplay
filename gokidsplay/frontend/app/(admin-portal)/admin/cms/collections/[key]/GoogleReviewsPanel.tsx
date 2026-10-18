@@ -21,6 +21,7 @@ export default function GoogleReviewsPanel({ initial }: { initial: GoogleReviews
     const [mapsUrl, setMapsUrl] = useState(initial?.maps_url || "");
     const [minRating, setMinRating] = useState(initial?.min_rating_to_show ?? 4);
     const [autoSync, setAutoSync] = useState(initial?.auto_sync ?? true);
+    const [showPhotos, setShowPhotos] = useState(initial?.show_photos ?? true);
 
     if (!status) return null;
     const input = "w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm text-slate-900";
@@ -31,7 +32,7 @@ export default function GoogleReviewsPanel({ initial }: { initial: GoogleReviews
         setSyncing(false);
         setStatus(result.status);
         if (result.success) {
-            toast.success(`Synced from Google — ${result.created} new, ${result.updated} updated`);
+            toast.success(`Synced from Google — ${result.created} new, ${result.updated} updated, ${result.status.photo_count ?? 0} photos`);
             setPlaceId(result.status.place_id || "");
             setMapsUrl(result.status.maps_url || "");
             router.refresh();
@@ -43,7 +44,7 @@ export default function GoogleReviewsPanel({ initial }: { initial: GoogleReviews
     const save = async () => {
         setSaving(true);
         const result = await saveGoogleReviewsSettings({ place_id: placeId, search_query: query, maps_url: mapsUrl,
-            min_rating_to_show: minRating, auto_sync: autoSync });
+            min_rating_to_show: minRating, auto_sync: autoSync, show_photos: showPhotos });
         setSaving(false);
         if (result.success) { setStatus(result.status); toast.success("Google review settings saved"); }
         else toast.error(result.error);
@@ -56,7 +57,7 @@ export default function GoogleReviewsPanel({ initial }: { initial: GoogleReviews
                     <h2 className="font-bold text-slate-900 text-lg">Google Reviews</h2>
                     <p className="text-sm text-slate-600">
                         {status.rating != null
-                            ? <>Rated <strong>{status.rating.toFixed(1)}★</strong> from <strong>{status.review_count?.toLocaleString("en-GB")}</strong> Google reviews</>
+                            ? <>Rated <strong>{status.rating.toFixed(1)}★</strong> from <strong>{status.review_count?.toLocaleString("en-GB")}</strong> Google reviews · <strong>{status.photo_count ?? 0}</strong> photos</>
                             : "Not synced yet"}
                         {status.last_synced && <> · last synced {new Date(status.last_synced).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</>}
                     </p>
@@ -110,6 +111,9 @@ export default function GoogleReviewsPanel({ initial }: { initial: GoogleReviews
                         </label>
                         <label className="text-sm text-slate-700 flex items-center gap-2 mt-6">
                             <input type="checkbox" checked={autoSync} onChange={e => setAutoSync(e.target.checked)} /> Refresh from Google automatically (twice a day)
+                        </label>
+                        <label className="text-sm text-slate-700 flex items-center gap-2">
+                            <input type="checkbox" checked={showPhotos} onChange={e => setShowPhotos(e.target.checked)} /> Show Google photos on the Gallery and Reviews pages
                         </label>
                     </div>
                     <button onClick={save} disabled={saving}

@@ -1,0 +1,30 @@
+# Background jobs for the live site (apps/core/cron_views.py):
+#   every 15 minutes — release unpaid online bookings, re-check SumUp payments
+#   daily 06:00 UTC  — refresh Google reviews and photos, send thank-you e-mails
+# Needs: secret CRON_SECRET (same value as the backend app setting CRON_SECRET)
+#        variable BACKEND_URL (e.g. https://api.gokidsplay.co.uk)
+name: Scheduled jobs
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'frequent or daily'
+        default: 'frequent'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    if: vars.BACKEND_URL != ''
+    steps:
+      - name: Run jobs
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          JOB: ${{ github.event_name == 'workflow_dispatch' && inputs.job || (github.event.schedule == '0 6 * * *' && 'daily' || 'frequent') }}
+        run: |
+          curl -fsS --max-time 120 -X POST \
+            -H "X-Cron-Secret: $CRON_SECRET" \
+            "${{ vars.BACKEND_URL }}/api/v1/core/cron/?job=$JOB"

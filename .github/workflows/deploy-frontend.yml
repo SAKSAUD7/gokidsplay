@@ -1,0 +1,70 @@
+# Frontend (Next.js website + admin portal) → Azure App Service (Linux, Node 20)
+#
+# Runs on every push to main that changes the frontend.
+# Needs (GitHub → Settings → Secrets and variables → Actions):
+#   secret   AZURE_FRONTEND_PUBLISH_PROFILE — Azure portal → frontend web app → Download publish profile
+#   variable AZURE_FRONTEND_APP_NAME        — e.g. gokidsplay-web
+#   variable NEXT_PUBLIC_API_URL            — e.g. https://api.gokidsplay.co.uk/api/v1
+#   variable NEXT_PUBLIC_FRONTEND_URL       — e.g. https://www.gokidsplay.co.uk
+#   variable NEXT_PUBLIC_GA_MEASUREMENT_ID  — optional (Google Analytics)
+# NEXT_PUBLIC_* values are built into the site, so change them here (not only in Azure) and redeploy.
+# Azure startup command: `node server.js` (see gokidsplay/DEPLOYMENT_GUIDE.md).
+name: Deploy frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gokidsplay/frontend/**'
+      - 'gokidsplay/packages/**'
+      - 'gokidsplay/package.json'
+      - 'gokidsplay/package-lock.json'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+      NEXT_PUBLIC_FRONTEND_URL: ${{ vars.NEXT_PUBLIC_FRONTEND_URL }}
+      NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: gokidsplay/package-lock.json
+      - name: Install
+        working-directory: gokidsplay
+        run: npm ci
+      - name: Type check and build
+        working-directory: gokidsplay/frontend
+        run: |
+          npx tsc --noEmit
+          npx next build
+      - name: Package the standalone server
+        working-directory: gokidsplay/frontend
+        run: |
+          cp -r public .next/standalone/frontend/public
+          cp -r .next/static .next/standalone/frontend/.next/static
+          # Azure starts `node server.js` in the package root
+          cat > .next/standalone/server.js <<'JS'
+          process.env.PORT = process.env.PORT || '8080';
+          process.env.HOSTNAME = '0.0.0.0';
+          require('./frontend/server.js');
+          JS
+          cd .next/standalone && zip -qr ../../../../frontend.zip .
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_FRONTEND_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_FRONTEND_PUBLISH_PROFILE }}
+          package: frontend.zip

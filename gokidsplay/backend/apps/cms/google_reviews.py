@@ -3,6 +3,8 @@ Google reviews for the Testimonies page, from the official Google Places API (Ne
 
 Set GOOGLE_PLACES_API_KEY in backend/.env (a Google Cloud key with the
 "Places API (New)" enabled). Then:
+  - up to 10 Google Business photos are shown on the Gallery and Reviews pages
+    (with the photographer's name, as Google requires)
   - the first sync finds the Go Kids Play Place ID from GoogleReviewsProfile.search_query
   - every sync stores the overall rating + number of reviews and imports the
     reviews Google returns (up to 5, its "most relevant") as Customer Reviews
@@ -36,8 +38,10 @@ def api_key() -> str:
 
 
 def _get(url, field_mask, **kwargs):
-    response = requests.get(url, headers={'X-Goog-Api-Key': api_key(), 'X-Goog-FieldMask': field_mask},
-                            timeout=TIMEOUT, **kwargs)
+    headers = {'X-Goog-Api-Key': api_key()}
+    if field_mask:
+        headers['X-Goog-FieldMask'] = field_mask
+    response = requests.get(url, headers=headers, timeout=TIMEOUT, **kwargs)
     return _json(response)
 
 
@@ -71,6 +75,36 @@ def _review_date(iso: str):
         return None
 
 
+MAX_PHOTOS = 10
+
+
+def _photos(items) -> list:
+    """
+    Up to 10 Google Business photos as image links, with the photographer's name
+    (Google asks for this attribution). Links are refreshed on every sync.
+    """
+    photos = []
+    for item in items[:MAX_PHOTOS]:
+        name = item.get('name')
+        if not name:
+            continue
+        try:
+            media = _get(f'{PLACES_URL}/{name}/media', '', params={'maxWidthPx': 1600, 'skipHttpRedirect': 'true'})
+        except (GoogleReviewsError, requests.RequestException) as exc:
+            logger.warning('Google photo %s skipped: %s', name, exc)
+            continue
+        author = (item.get('authorAttributions') or [{}])[0]
+        if media.get('photoUri'):
+            photos.append({
+                'url': media['photoUri'],
+                'width': item.get('widthPx'),
+                'height': item.get('heightPx'),
+                'author': author.get('displayName', ''),
+                'author_url': author.get('uri', ''),
+            })
+    return photos
+
+
 def sync_google_reviews() -> dict:
     """Fetch the rating and reviews from Google. Raises GoogleReviewsError on failure."""
     from .models import GoogleReviewsProfile, Testimonial
@@ -83,8 +117,9 @@ def sync_google_reviews() -> dict:
             profile.place_id, maps_url = find_place_id(profile.search_query)
             profile.maps_url = profile.maps_url or maps_url
         place = _get(f'{PLACES_URL}/places/{profile.place_id}',
-                     'id,displayName,rating,userRatingCount,googleMapsUri,reviews',
+                     'id,displayName,rating,userRatingCount,googleMapsUri,reviews,photos',
                      params={'languageCode': 'en-GB'})
+        photos = _photos(place.get('photos') or [])
     except requests.RequestException as exc:
         profile.last_error = f'Could not reach Google: {exc}'
         profile.save(update_fields=['last_error', 'place_id', 'maps_url', 'updated_at'])
@@ -123,6 +158,7 @@ def sync_google_reviews() -> dict:
             Testimonial.objects.create(external_id=review_id, active=rating >= profile.min_rating_to_show, **values)
             created += 1
 
+    profile.photos = photos
     profile.rating = place.get('rating')
     profile.review_count = place.get('userRatingCount')
     profile.maps_url = place.get('googleMapsUri') or profile.maps_url
@@ -130,7 +166,8 @@ def sync_google_reviews() -> dict:
     profile.last_error = ''
     profile.save()
     logger.info('Google reviews synced: %s new, %s updated, rating %s (%s)', created, updated, profile.rating, profile.review_count)
-    return {'created': created, 'updated': updated, 'rating': profile.rating, 'review_count': profile.review_count}
+    return {'created': created, 'updated': updated, 'rating': profile.rating, 'review_count': profile.review_count,
+            'photos': len(photos)}
 
 
 def sync_if_stale():

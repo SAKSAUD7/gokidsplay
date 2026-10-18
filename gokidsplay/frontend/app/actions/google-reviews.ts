@@ -15,6 +15,8 @@ export interface GoogleReviewsStatus {
     maps_url?: string;
     min_rating_to_show?: number;
     auto_sync?: boolean;
+    show_photos?: boolean;
+    photo_count?: number;
     last_error?: string;
 }
 

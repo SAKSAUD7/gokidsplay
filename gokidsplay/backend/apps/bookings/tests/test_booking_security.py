@@ -332,7 +332,8 @@ class TestEventBooking:
 
     def test_past_events_cannot_be_booked(self):
         event = self.make_event()
-        event.date = date.today() - timedelta(days=1)
+        from django.utils import timezone
+        event.date = timezone.localdate() - timedelta(days=1)   # UK date, like the server
         event.save()
         assert self.book(event).status_code == 400
 
@@ -788,7 +789,15 @@ GOOGLE_PLACE = {
          'text': {'text': 'Too busy on Saturday.'}, 'authorAttribution': {'displayName': 'Tom'}},
         {'name': 'places/ChIJgkp/reviews/ccc', 'rating': 5, 'publishTime': '2026-07-01T10:00:00Z'},  # stars only
     ],
+    'photos': [{'name': 'places/ChIJgkp/photos/p1', 'widthPx': 1600, 'heightPx': 1200,
+                'authorAttributions': [{'displayName': 'Go Kids Play', 'uri': 'https://maps.google.com/u/1'}]}],
 }
+
+
+def _fake_google_get(url, *args, **kwargs):
+    if url.endswith('/media'):
+        return _FakeResponse({'photoUri': 'https://lh3.googleusercontent.com/p/photo1=w1600'})
+    return _FakeResponse(GOOGLE_PLACE)
 
 
 @pytest.fixture
@@ -808,7 +817,7 @@ class TestGoogleReviews:
         settings.GOOGLE_PLACES_API_KEY = 'test-key'
         monkeypatch.setattr(google_reviews.requests, 'post', lambda *a, **k: _FakeResponse(
             {'places': [{'id': 'ChIJgkp', 'googleMapsUri': 'https://maps.google.com/?cid=123'}]}))
-        monkeypatch.setattr(google_reviews.requests, 'get', lambda *a, **k: _FakeResponse(GOOGLE_PLACE))
+        monkeypatch.setattr(google_reviews.requests, 'get', _fake_google_get)
 
         response = admin_client.post('/api/v1/cms/google-reviews/sync/')
         assert response.status_code == 200, response.data
@@ -829,6 +838,8 @@ class TestGoogleReviews:
         assert public['rating'] == 4.6 and public['review_count'] == 812
         assert public['write_review_url'] == 'https://search.google.com/local/writereview?placeid=ChIJgkp'
         assert 'last_error' not in public and 'place_id' not in public
+        assert public['photos'] == [{'url': 'https://lh3.googleusercontent.com/p/photo1=w1600', 'width': 1600,
+                                     'height': 1200, 'author': 'Go Kids Play', 'author_url': 'https://maps.google.com/u/1'}]
 
     def test_without_a_key_the_page_still_links_to_google(self, settings, admin_client):
         settings.GOOGLE_PLACES_API_KEY = ''
@@ -939,3 +950,119 @@ class TestActivityLog:
     def test_only_managers_read_the_log(self, staff_client, admin_client):
         assert staff_client.get('/api/v1/core/activity-logs/').status_code == 403
         assert admin_client.get('/api/v1/core/activity-logs/').status_code == 200
+
+
+
+@pytest.mark.django_db
+class TestScheduledJobs:
+    URL = '/api/v1/core/cron/'
+
+    def test_needs_the_secret(self, settings):
+        settings.CRON_SECRET = 'cron-secret-for-tests'
+        assert APIClient().post(self.URL).status_code == 403
+        assert APIClient().post(self.URL, HTTP_X_CRON_SECRET='wrong').status_code == 403
+        settings.CRON_SECRET = ''
+        assert APIClient().post(self.URL, HTTP_X_CRON_SECRET='').status_code == 403   # never open without a secret
+
+    def test_frequent_job_releases_unpaid_bookings(self, settings, config, plans):
+        from datetime import timedelta
+        from django.utils import timezone
+        settings.CRON_SECRET = 'cron-secret-for-tests'
+        booking_id = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['id']
+        Booking.objects.filter(pk=booking_id).update(created_at=timezone.now() - timedelta(hours=1))
+        response = APIClient().post(self.URL + '?job=frequent', HTTP_X_CRON_SECRET='cron-secret-for-tests')
+        assert response.status_code == 200, response.data
+        assert Booking.objects.get(pk=booking_id).booking_status == 'CANCELLED'
+
+    def test_daily_job_runs(self, settings, db):
+        settings.CRON_SECRET = 'cron-secret-for-tests'
+        settings.GOOGLE_PLACES_API_KEY = ''
+        response = APIClient().post(self.URL + '?job=daily', HTTP_X_CRON_SECRET='cron-secret-for-tests')
+        assert response.status_code == 200 and 'send_post_visit_emails' in response.data['results']
+
+
+# ── Payments end to end with the mock gateway (PAYMENT_MODE=mock) ───────────
+
+@pytest.fixture
+def mock_payments(settings, monkeypatch):
+    from apps.payments.gateways.mock import MockPaymentGateway
+    from apps.payments.services import payment_service
+    settings.DEBUG = True
+    settings.PAYMENT_MODE = 'mock'
+    settings.FRONTEND_URL = 'http://localhost:5000'
+    monkeypatch.setattr(payment_service, 'gateway', MockPaymentGateway())
+    return payment_service
+
+
+@pytest.mark.django_db
+class TestMockPayments:
+    def checkout(self, booking_id, booking_type='session', amount=None):
+        body = {'booking_id': booking_id, 'booking_type': booking_type}
+        if amount is not None:
+            body['amount'] = amount
+        return APIClient().post('/api/v1/payments/create-order/', body, format='json')
+
+    def pay(self, order, result='pay'):
+        path = order['checkout_url'].split('localhost:9000')[-1]
+        client = APIClient(enforce_csrf_checks=False)
+        assert client.get(path).status_code == 200            # the test checkout page
+        redirect = client.post(path, {'result': result})
+        assert redirect.status_code == 302 and redirect['Location'].startswith('http://localhost:5000/book/success?')
+        return APIClient().post('/api/v1/payments/verify/', {'order_id': order['order_id']}, format='json').data
+
+    def test_session_booking_paid_in_full(self, config, plans, mock_payments):
+        from apps.payments.models import Payment
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data
+        order = self.checkout(booking['id'], amount='0.01').data      # the browser can't choose the amount
+        assert Decimal(str(order['amount'])) == Decimal(booking['amount'])
+        result = self.pay(order)
+        assert result['payment_status'] == 'PAID'
+        saved = Booking.objects.get(pk=booking['id'])
+        assert (saved.payment_status, saved.booking_status, saved.paid_amount) == ('PAID', 'CONFIRMED', saved.amount)
+        # Verifying again (success page + webhook) doesn't count the money twice
+        APIClient().post('/api/v1/payments/verify/', {'order_id': order['order_id']}, format='json')
+        assert Booking.objects.get(pk=booking['id']).paid_amount == saved.amount
+        assert Payment.objects.get(order_id=order['order_id']).status == 'SUCCESS'
+        assert self.checkout(booking['id']).status_code == 400          # can't pay twice
+
+    def test_declined_payment_is_reported_straight_away(self, config, plans, mock_payments):
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data
+        result = self.pay(self.checkout(booking['id']).data, result='decline')
+        assert result['payment_status'] == 'FAILED'
+        assert Booking.objects.get(pk=booking['id']).payment_status == 'PENDING'
+
+    def test_party_deposit_then_balance(self, config, mock_payments):
+        party = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': next_saturday().isoformat()}, format='json').data
+        saved = PartyBooking.objects.get(pk=party['id'])
+        deposit = self.checkout(party['id'], 'party', amount=str(saved.deposit_amount)).data
+        assert Decimal(str(deposit['amount'])) == saved.deposit_amount
+        assert self.pay(deposit)['payment_status'] == 'PARTIAL'
+        saved.refresh_from_db()
+        assert (saved.status, saved.paid_amount) == ('DEPOSIT_PAID', saved.deposit_amount)
+        balance = self.checkout(party['id'], 'party', amount='1.00').data      # always the balance due
+        assert Decimal(str(balance['amount'])) == saved.amount - saved.deposit_amount
+        assert self.pay(balance)['payment_status'] == 'PAID'
+        saved.refresh_from_db()
+        assert (saved.status, saved.payment_status, saved.paid_amount) == ('CONFIRMED', 'PAID', saved.amount)
+
+    def test_cancelled_booking_cannot_be_paid(self, config, plans, mock_payments):
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data
+        Booking.objects.filter(pk=booking['id']).update(booking_status='CANCELLED')
+        response = self.checkout(booking['id'])
+        assert response.status_code == 400 and 'cancelled' in str(response.data).lower()
+
+    def test_refund_goes_back_to_the_booking(self, config, plans, mock_payments, admin_client):
+        from apps.payments.models import Payment
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data
+        order = self.checkout(booking['id']).data
+        self.pay(order)
+        payment = Payment.objects.get(order_id=order['order_id'])
+        response = admin_client.post('/api/v1/payments/refund/', {'payment_id': payment.id, 'reason': 'Test'}, format='json')
+        assert response.status_code == 200, response.data
+        assert Booking.objects.get(pk=booking['id']).payment_status == 'REFUNDED'
+
+    def test_mock_checkout_is_off_on_the_live_site(self, settings, config, plans, mock_payments):
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data
+        order = self.checkout(booking['id']).data
+        settings.DEBUG = False
+        assert APIClient().get(order['checkout_url'].split('localhost:9000')[-1]).status_code == 404

@@ -574,6 +574,7 @@ def _google_reviews_summary(profile, staff=False):
         'reviews_url': profile.reviews_url,
         'write_review_url': profile.write_review_url,
         'last_synced': profile.last_synced.isoformat() if profile.last_synced else None,
+        'photos': profile.photos if profile.show_photos else [],
     }
     if staff:
         data.update({
@@ -583,6 +584,8 @@ def _google_reviews_summary(profile, staff=False):
             'maps_url': profile.maps_url,
             'min_rating_to_show': profile.min_rating_to_show,
             'auto_sync': profile.auto_sync,
+            'show_photos': profile.show_photos,
+            'photo_count': len(profile.photos or []),
             'last_error': profile.last_error,
         })
     return data
@@ -614,6 +617,8 @@ def google_reviews_view(request):
                 return Response({'error': 'Minimum rating must be 1–5'}, status=status.HTTP_400_BAD_REQUEST)
         if 'auto_sync' in request.data:
             profile.auto_sync = bool(request.data['auto_sync'])
+        if 'show_photos' in request.data:
+            profile.show_photos = bool(request.data['show_photos'])
         if profile.maps_url and not profile.maps_url.startswith('https://'):
             return Response({'error': 'The Google Maps link must start with https://'}, status=status.HTTP_400_BAD_REQUEST)
         profile.save()

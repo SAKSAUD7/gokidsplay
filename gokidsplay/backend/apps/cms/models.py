@@ -107,6 +107,9 @@ class GoogleReviewsProfile(models.Model):
     min_rating_to_show = models.PositiveSmallIntegerField(default=4,
                                                           help_text="New Google reviews below this many stars start hidden")
     auto_sync = models.BooleanField(default=True, help_text="Refresh from Google twice a day")
+    show_photos = models.BooleanField(default=True, help_text="Show the Google Business photos on the Gallery and Reviews pages")
+    photos = models.JSONField(default=list, blank=True,
+                              help_text="Google Business photos from the last sync: [{url, width, height, author, author_url}]")
     last_synced = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True, default='')
     updated_at = models.DateTimeField(auto_now=True)

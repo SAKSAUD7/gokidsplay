@@ -1,0 +1,58 @@
+# Backend (Django API) → Azure App Service (Linux, Python 3.11)
+#
+# Runs on every push to main that changes the backend: tests first, then deploy.
+# Needs (GitHub → Settings → Secrets and variables → Actions):
+#   secret   AZURE_BACKEND_PUBLISH_PROFILE  — Azure portal → backend web app → Download publish profile
+#   variable AZURE_BACKEND_APP_NAME         — e.g. gokidsplay-api
+# Azure app settings: SCM_DO_BUILD_DURING_DEPLOYMENT=true, startup command `bash startup.sh`
+# (see gokidsplay/DEPLOYMENT_GUIDE.md).
+name: Deploy backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gokidsplay/backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: gokidsplay/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: gokidsplay/backend/requirements*.txt
+      - run: pip install -r requirements-dev.txt
+      - name: Tests
+        run: python -m pytest apps -q --no-cov
+        env:
+          SECRET_KEY: ci-only-not-secret
+          DEBUG: 'False'
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package the backend
+        run: |
+          cd gokidsplay/backend
+          zip -qr ../../backend.zip . -x '*__pycache__*' 'htmlcov/*' 'media/*' '*.sqlite3' '.env'
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_BACKEND_APP_NAME }}
+          publish-profile: ${{ secrets.AZURE_BACKEND_PUBLISH_PROFILE }}
+          package: backend.zip

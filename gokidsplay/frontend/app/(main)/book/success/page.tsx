@@ -132,12 +132,9 @@ function SuccessPageContent() {
                 // If our backend verification loop ran out of retries but SumUp
                 // says PAID in the URL, honour that and show success.
                 if (!verified_paid) {
-                    if (sumupSaysOk) {
-                        setUiStatus('paid');
-                    } else {
-                        // Default to paid — SumUp redirected here, so payment was processed
-                        setUiStatus('paid');
-                    }
+                    // Not confirmed yet: only SumUp's own "PAID" counts as paid; otherwise say it is
+                    // still being confirmed (the booking updates as soon as SumUp reports it)
+                    setUiStatus(sumupSaysOk ? 'paid' : 'pending');
                 }
             } else {
                 // No verifyId — fall back to SumUp URL status or default to paid
@@ -146,7 +143,7 @@ function SuccessPageContent() {
                 } else if ((sumupStatus || '').toUpperCase() === 'FAILED') {
                     setUiStatus('failed');
                 } else {
-                    setUiStatus('paid'); // SumUp redirected here → payment was done
+                    setUiStatus('pending'); // no confirmation yet
                 }
             }
 
@@ -249,12 +246,12 @@ function SuccessPageContent() {
                             </span>
                         )}
                         <h1 className="text-4xl md:text-5xl font-black text-white mb-3">
-                            {isPaid ? "Here is your Ticket!" : "Booking Confirmed!"}
+                            {isPaid ? "Here is your Ticket!" : "Confirming your payment…"}
                         </h1>
                         <p className="text-white/60 text-lg">
                             {isPaid
                                 ? "Your payment is confirmed. Please show this digital ticket at reception."
-                                : "Your booking is confirmed. Payment may take a moment to process."}
+                                : "We haven't had confirmation from the card payment yet. If you paid, your booking will confirm automatically and we'll e-mail your ticket — no need to pay again. If you didn't finish paying, please book again."}
                         </p>
                     </div>
 

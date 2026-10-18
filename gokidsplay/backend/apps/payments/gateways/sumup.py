@@ -21,7 +21,7 @@ from typing import Tuple, Dict, Any, Optional
 
 from django.conf import settings  # type: ignore[import-untyped]
 
-from .base import BasePaymentGateway
+from .base import BasePaymentGateway, apply_refund, apply_successful_payment
 from ..models import Payment
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class SumUpGateway(BasePaymentGateway):
             frontend_url = (
                 getattr(settings, "FRONTEND_URL", "")
                 or getattr(settings, "NEXT_PUBLIC_FRONTEND_URL", "")
-                or "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net"
+                or "http://localhost:5000"
             )
             self.return_url = f"{frontend_url.rstrip('/')}/book/success"
         logger.info(f"SumUp gateway initialized. Return URL: {self.return_url}")
@@ -131,7 +131,7 @@ class SumUpGateway(BasePaymentGateway):
         kids = getattr(booking, 'kids', 0) or 0
         total_people = adults + kids
         
-        description = f"SP #{booking.id} | {date_formatted} | {total_people}P | {booking_time}"
+        description = f"{booking.booking_number or booking.id} | {date_formatted} | {total_people}P | {booking_time}"
         return_url_str = (
             f"{self.return_url}"
             f"?booking_id={booking.id}"
@@ -139,9 +139,8 @@ class SumUpGateway(BasePaymentGateway):
             f"&reference={reference}"
         )
 
-        import os
-        webhook_base = f"https://{os.environ.get('WEBSITE_HOSTNAME')}" if os.environ.get('WEBSITE_HOSTNAME') else "https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net"
-        webhook_url = f"{webhook_base}/api/v1/payments/sumup-webhook/"
+        # SumUp tells this backend about the payment here (BACKEND_URL, e.g. https://api.gokidsplay.co.uk)
+        webhook_url = f"{getattr(settings, 'BACKEND_URL', '').rstrip('/')}/api/v1/payments/sumup-webhook/"
 
         payload = {
             "checkout_reference": reference,
@@ -250,47 +249,10 @@ class SumUpGateway(BasePaymentGateway):
             tx_id = transactions[0].get("id") if transactions else checkout_id
 
             try:
-                from apps.bookings.models import PartyBooking as _PartyBooking
-                from decimal import Decimal
-
                 payment = Payment.objects.get(order_id=checkout_id)  # type: ignore[attr-defined]
-
-                # --- IDEMPOTENCY CHECK ---
-                # Only accumulate paid_amount if this payment was NOT already marked SUCCESS.
-                # This prevents double-counting when verify is called multiple times
-                # (e.g. from the success page redirect AND from the SumUp webhook).
-                already_processed = payment.status == "SUCCESS"
-
-                payment.mark_success(payment_id=tx_id, provider_response=data)
-
-                booking = payment.get_booking()
-                is_party = isinstance(booking, _PartyBooking)
-
-                if not already_processed:
-                    # Only add to paid_amount on first successful verification
-                    booking.paid_amount = (booking.paid_amount or Decimal("0")) + payment.amount
-
-                # Always enforce correct status based on current paid_amount
-                if (booking.paid_amount or Decimal("0")) >= booking.amount:
-                    booking.payment_status = "PAID"
-                    if is_party:
-                        booking.status = "CONFIRMED"  # type: ignore[assignment]
-                    else:
-                        booking.booking_status = "CONFIRMED"
-                else:
-                    booking.payment_status = "PARTIAL"
-                    if is_party:
-                        booking.status = "DEPOSIT_PAID"  # type: ignore[assignment]
-
-                if is_party:
-                    booking.save(update_fields=["paid_amount", "payment_status", "status"])  # type: ignore[attr-defined]
-                else:
-                    booking.save(update_fields=["paid_amount", "payment_status", "booking_status"])  # type: ignore[attr-defined]
-
-                logger.info(
-                    f"Booking {booking.id} updated: payment_status={booking.payment_status}, "
-                    f"paid_amount={booking.paid_amount}, already_processed={already_processed}"
-                )
+                booking = apply_successful_payment(payment, tx_id, data)
+                logger.info(f"Booking {booking.id} updated: payment_status={booking.payment_status}, "
+                            f"paid_amount={booking.paid_amount}")
             except Payment.DoesNotExist:  # type: ignore[attr-defined]
                 logger.warning(f"Payment record not found for checkout {checkout_id}")
 
@@ -344,19 +306,7 @@ class SumUpGateway(BasePaymentGateway):
             logger.error(f"SumUp refund failed: {e}")
             raise Exception(f"SumUp refund failed: {e}")
 
-        payment.status = "REFUNDED"  # type: ignore[assignment]
-        payment.notes  = f"Refunded £{refund_amount}"  # type: ignore[assignment]
-        payment.save(update_fields=["status", "notes"])
-
-        booking = payment.get_booking()
-        booking.paid_amount = max(  # type: ignore[attr-defined]
-            Decimal("0"), booking.paid_amount - Decimal(str(refund_amount))  # type: ignore[attr-defined]
-        )
-        if booking.paid_amount <= 0:  # type: ignore[attr-defined]
-            booking.payment_status = "REFUNDED"  # type: ignore[attr-defined]
-        else:
-            booking.payment_status = "PARTIAL"  # type: ignore[attr-defined]
-        booking.save(update_fields=["paid_amount", "payment_status"])  # type: ignore[attr-defined]
+        apply_refund(payment, Decimal(str(refund_amount)))
 
         logger.info(
             f"SumUp refund processed: £{refund_amount} for transaction {tx_id}"

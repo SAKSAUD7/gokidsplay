@@ -212,6 +212,7 @@ export async function getPublicPageContent(page: string) {
 /** Google rating, number of reviews and the links to read / write reviews on Google. */
 export async function getPublicGoogleReviews(): Promise<{
     rating: number | null; review_count: number | null; reviews_url: string; write_review_url: string;
+    photos?: { url: string; width?: number; height?: number; author?: string; author_url?: string }[];
 } | null> {
     const data = await fetchFromAPI('/cms/google-reviews/');
     return data && !Array.isArray(data) && data.reviews_url ? data : null;

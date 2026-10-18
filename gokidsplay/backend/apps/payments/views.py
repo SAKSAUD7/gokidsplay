@@ -666,3 +666,54 @@ def get_payment(request, payment_id):
             {'error': str(e)},
             status=status.HTTP_404_NOT_FOUND
         )
+
+
+def mock_checkout(request, order_id):
+    """
+    Test checkout page for PAYMENT_MODE=mock (DEBUG only) — stands in for SumUp's
+    hosted checkout. "Pay" or "Decline", then back to the website like SumUp.
+    """
+    from html import escape
+    from urllib.parse import urlencode
+    from django.conf import settings
+    from django.http import Http404, HttpResponse, HttpResponseRedirect
+    from .gateways.mock import frontend_return_url
+    from .models import Payment
+
+    if str(getattr(settings, 'PAYMENT_MODE', '')).lower() != 'mock' or not settings.DEBUG:
+        raise Http404()
+    try:
+        payment = Payment.objects.get(order_id=order_id, provider='MOCK')
+    except Payment.DoesNotExist:
+        raise Http404()
+    data = payment.provider_response or {}
+    booking = payment.get_booking()
+
+    if request.method == 'POST':
+        result = 'PAID' if request.POST.get('result') == 'pay' else 'FAILED'
+        payment.provider_response = {**data, 'mock_status': result}
+        payment.save(update_fields=['provider_response'])
+        params = urlencode({'booking_id': booking.id, 'booking_type': data.get('booking_type', 'session'),
+                            'reference': data.get('checkout_reference', ''), 'order_id': order_id,
+                            'mock': 'true', 'status': result})
+        return HttpResponseRedirect(f"{frontend_return_url()}?{params}")
+
+    from django.middleware.csrf import get_token
+    token = get_token(request)
+    page = f"""<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test payment</title><style>
+body{{font-family:system-ui,sans-serif;background:#f1f5f9;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}}
+.card{{background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);padding:32px;max-width:420px;width:90%}}
+.tag{{background:#fef3c7;color:#92400e;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;display:inline-block}}
+h1{{font-size:22px;margin:14px 0 4px}} .amount{{font-size:36px;font-weight:800;margin:12px 0}}
+button{{width:100%;padding:14px;border:0;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;margin-top:10px}}
+.pay{{background:#16a34a;color:#fff}} .decline{{background:#e2e8f0;color:#334155}} p{{color:#64748b;font-size:14px}}
+</style></head><body><div class="card">
+<span class="tag">TEST MODE — no money is taken</span>
+<h1>Go Kids Play</h1><p>Booking {escape(str(booking.booking_number or booking.id))} · {escape(booking.name)}</p>
+<div class="amount">£{payment.amount:,.2f}</div>
+<form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="{token}">
+<button class="pay" name="result" value="pay" type="submit">Pay £{payment.amount:,.2f}</button>
+<button class="decline" name="result" value="decline" type="submit">Decline (test a failed payment)</button>
+</form><p>This page replaces SumUp while PAYMENT_MODE=mock.</p></div></body></html>"""
+    return HttpResponse(page)
