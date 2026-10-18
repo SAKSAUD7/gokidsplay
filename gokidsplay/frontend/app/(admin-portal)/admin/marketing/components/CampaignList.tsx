@@ -1,5 +1,7 @@
 "use client";
 
+import { ListFilterBox, matchesText } from "@/components/admin/ListFilterBox";
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
@@ -34,6 +36,7 @@ interface Campaign {
 export default function CampaignList() {
     const [campaigns, setCampaigns] = useState<Campaign[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useUrlSearch();
 
     const loadCampaigns = async () => {
         try {
@@ -84,7 +87,10 @@ export default function CampaignList() {
         );
     }
 
+    const shown = campaigns.filter(c => matchesText(search, c.title, c.subject, c.status_display));
     return (
+        <div>
+        <ListFilterBox value={search} onChange={setSearch} placeholder="Search campaigns…" shown={shown.length} total={campaigns.length} />
         <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
             <table className="w-full text-left text-sm">
                 <thead>
@@ -97,7 +103,7 @@ export default function CampaignList() {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                    {campaigns.map((campaign) => (
+                    {shown.map((campaign) => (
                         <tr key={campaign.id} className="hover:bg-slate-50/50 transition-colors">
                             <td className="px-6 py-4">
                                 <div className="font-medium text-slate-900">{campaign.title}</div>
@@ -163,6 +169,7 @@ export default function CampaignList() {
                     ))}
                 </tbody>
             </table>
+        </div>
         </div>
     );
 }

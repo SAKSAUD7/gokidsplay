@@ -1,5 +1,6 @@
 "use client";
 
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getAllBookings } from "@/app/actions/admin";
@@ -29,7 +30,7 @@ export default function AllBookingsPage() {
     const [allBookings, setAllBookings] = useState<any[]>([]);
     const [filteredBookings, setFilteredBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useUrlSearch();
     const [typeFilter, setTypeFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [dateFilter, setDateFilter] = useState("all");

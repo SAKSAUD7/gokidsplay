@@ -134,6 +134,9 @@ class BookingViewSet(viewsets.ModelViewSet):
                 Q(booking_number__icontains=normalise_reference(search)) |
                 Q(uuid__icontains=search)
             )
+            digits = ''.join(ch for ch in search if ch.isdigit())
+            if len(digits) >= 6:  # phone typed with or without spaces
+                query |= Q(phone__icontains=digits[-6:])
             if search.isdigit():
                 query |= Q(id=int(search))
             queryset = queryset.filter(query)
@@ -683,6 +686,7 @@ def _party_booking_summary(booking):
     return {
         'id': booking.id,
         'uuid': str(booking.uuid),
+        'booking_number': booking.booking_number,
         'name': booking.name,
         'email': booking.email,
         'phone': booking.phone,
@@ -692,12 +696,17 @@ def _party_booking_summary(booking):
         'kids': booking.kids,
         'adults': booking.adults,
         'amount': float(booking.amount),
+        'paid_amount': float(booking.paid_amount or 0),
+        'remaining_balance': float(booking.amount - (booking.paid_amount or 0)),
         'deposit_amount': float(booking.deposit_amount),
         'payment_type': booking.payment_type,
         'payment_status': booking.payment_status,
         'birthday_child_name': booking.birthday_child_name,
         'birthday_child_age': booking.birthday_child_age,
         'status': booking.status,
+        'booking_status': booking.status,
+        'arrived': booking.arrived,
+        'arrived_at': booking.arrived_at.isoformat() if booking.arrived_at else None,
         'created_at': booking.created_at.isoformat(),
         'updated_at': booking.updated_at.isoformat(),
     }
@@ -716,8 +725,27 @@ def create_party_booking_view(request):
         if not is_staff:
             return Response({'detail': 'Authentication credentials were not provided.'},
                             status=status.HTTP_401_UNAUTHORIZED)
+        # ?search= (name, email, phone, booking number GP…, child), ?status=, ?date=, ?page_size=
         bookings = PartyBooking.objects.select_related('customer').order_by('-created_at')
-        return Response([_party_booking_summary(b) for b in bookings])
+        search = (request.query_params.get('search') or '').strip()
+        if search:
+            query = (Q(name__icontains=search) | Q(email__icontains=search) | Q(phone__icontains=search)
+                     | Q(booking_number__icontains=normalise_reference(search)) | Q(birthday_child_name__icontains=search))
+            digits = ''.join(ch for ch in search if ch.isdigit())
+            if len(digits) >= 6:
+                query |= Q(phone__icontains=digits[-6:])
+            if search.isdigit():
+                query |= Q(id=int(search))
+            bookings = bookings.filter(query)
+        if request.query_params.get('status'):
+            bookings = bookings.filter(status=request.query_params['status'])
+        if request.query_params.get('date'):
+            bookings = bookings.filter(date=request.query_params['date'])
+        try:
+            limit = min(2000, max(1, int(request.query_params.get('page_size') or 1000)))
+        except ValueError:
+            limit = 1000
+        return Response([_party_booking_summary(b) for b in bookings[:limit]])
 
     data = request.data
 

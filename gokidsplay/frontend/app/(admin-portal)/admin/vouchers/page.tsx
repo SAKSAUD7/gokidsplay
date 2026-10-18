@@ -1,9 +1,16 @@
 ﻿import { getVouchers, deleteVoucher } from "@/app/actions/vouchers";
 import Link from "next/link";
 import { Plus, Ticket, Trash2, Edit } from "lucide-react";
+import { Suspense } from "react";
+import { ListSearchInput } from "@/components/admin/ListSearchInput";
 
-export default async function VouchersPage() {
-    const vouchers = await getVouchers();
+export default async function VouchersPage({ searchParams }: { searchParams?: { search?: string } }) {
+    const allVouchers = await getVouchers();
+    // ?search= code or description
+    const q = (searchParams?.search || "").trim().toLowerCase();
+    const vouchers = q
+        ? allVouchers.filter((v: any) => [v.code, v.description].some((x: any) => String(x || "").toLowerCase().includes(q)))
+        : allVouchers;
 
     return (
         <div className="p-8">
@@ -16,6 +23,11 @@ export default async function VouchersPage() {
                     <Plus size={20} />
                     Create Voucher
                 </Link>
+            </div>
+
+            <div className="flex items-center gap-4 mb-4">
+                <Suspense fallback={null}><ListSearchInput placeholder="Search voucher codes…" /></Suspense>
+                {q && <span className="text-sm text-slate-500">{vouchers.length} of {allVouchers.length} vouchers</span>}
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">

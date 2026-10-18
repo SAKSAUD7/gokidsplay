@@ -1,5 +1,7 @@
 "use client";
 
+import { ListFilterBox, matchesText } from "@/components/admin/ListFilterBox";
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { useState, useEffect } from "react";
 import { getFreeEntries } from "@/app/actions/cms";
 import { Mail, Phone, Calendar, CheckCircle, XCircle, Clock, Plus, Ticket, FileText } from "lucide-react";
@@ -9,6 +11,7 @@ import { FreeEntryActions } from "../components/FreeEntryActions";
 import { CreateFreeEntryModal } from "../components/CreateFreeEntryModal";
 
 function StatCard({ label, value, color, icon }: { label: string; value: string | number; color: string; icon: React.ReactNode }) {
+
     return (
         <div className={`relative overflow-hidden rounded-xl border p-5 bg-white shadow-sm flex flex-col gap-3 ${color}`}>
             <div className="flex items-center justify-between">
@@ -27,6 +30,7 @@ function StatCard({ label, value, color, icon }: { label: string; value: string 
 export default function FreeEntriesPage() {
     const [entries, setEntries] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useUrlSearch();
     const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
@@ -50,6 +54,8 @@ export default function FreeEntriesPage() {
         approved: entries.filter(e => e.status === "APPROVED").length,
         rejected: entries.filter(e => e.status === "REJECTED").length
     };
+
+    const shownEntries = entries.filter(e => matchesText(search, e.name, e.email, e.phone, e.reason, e.status));
 
     return (
         <div className="p-8 space-y-6">
@@ -100,6 +106,8 @@ export default function FreeEntriesPage() {
             </div>
 
             {/* Entries Table */}
+            <ListFilterBox value={search} onChange={setSearch} placeholder="Search name, email, phone or reason…"
+                shown={shownEntries.length} total={entries.length} />
             <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -123,7 +131,7 @@ export default function FreeEntriesPage() {
                                         ))}
                                     </tr>
                                 ))
-                            ) : entries.length === 0 ? (
+                            ) : shownEntries.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-16 text-center">
                                         <Ticket className="w-12 h-12 text-slate-300 mx-auto mb-4" />
@@ -131,7 +139,7 @@ export default function FreeEntriesPage() {
                                     </td>
                                 </tr>
                             ) : (
-                                entries.map((entry, i) => (
+                                shownEntries.map((entry, i) => (
                                     <tr 
                                         key={entry.id} 
                                         className="hover:bg-slate-50 transition-colors"

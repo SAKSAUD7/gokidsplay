@@ -42,7 +42,7 @@ const navigation: NavGroup[] = [
             { name: "Session Bookings", href: "/admin/bookings", icon: "Users", permission: { entity: 'bookings', action: 'read' } },
             { name: "Manual Session Booking", href: "/admin/session-bookings/new", icon: "Plus", permission: { entity: 'bookings', action: 'write' } },
             { name: "Session History", href: "/admin/bookings/history", icon: "Clock", permission: { entity: 'bookings', action: 'read' } },
-            { name: "Booking Blocks", href: "/admin/booking-blocks", icon: "Ban", permission: { entity: 'bookings', action: 'read' } },
+            { name: "Date Changes (list)", href: "/admin/booking-blocks", icon: "ListChecks", permission: { entity: 'bookings', action: 'read' } },
             { name: "Payments", href: "/admin/payments", icon: "CreditCard", permission: { entity: 'payments', action: 'read' } },
         ]
     },

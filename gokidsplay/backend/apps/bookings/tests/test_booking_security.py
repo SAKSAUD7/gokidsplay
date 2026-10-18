@@ -853,3 +853,89 @@ def test_party_must_start_at_a_party_time(config):
     assert bad.status_code == 400 and bad.data['code'] == 'INVALID_TIME'
     assert bad.data['times'] == ['12:00', '14:00', '16:00']     # 6pm would end after closing
     assert APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': saturday, 'time': '2:00 PM'}, format='json').status_code == 201
+
+
+# ── Admin global search (header search box) ──────────────────────────────────
+
+@pytest.mark.django_db
+class TestGlobalSearch:
+    URL = '/api/v1/core/admin/search/'
+
+    def types(self, client, q):
+        response = client.get(self.URL, {'q': q})
+        assert response.status_code == 200, response.data
+        return response.data['results']
+
+    def test_finds_bookings_by_number_phone_and_date(self, config, plans, admin_client):
+        booking = APIClient().post(SESSIONS_URL, session_payload(plans, phone='07700 900123'), format='json').data
+        number = booking['booking_number']
+        for q in (number.lower(), f'{number[:2]} {number[2:5]} {number[5:]}', '07700900123', '900 123'):
+            results = self.types(admin_client, q)
+            assert any(r['type'] == 'booking' and number in r['title'] for r in results), q
+        day = date.fromisoformat(booking['date'])
+        results = self.types(admin_client, f'{day.day}/{day.month}')
+        assert any(r['type'] == 'booking' for r in results)
+
+    def test_finds_customers_screens_and_events(self, config, plans, admin_client):
+        APIClient().post(SESSIONS_URL, session_payload(plans, name='Priya Sharma', email='priya@example.com'), format='json')
+        assert any(r['type'] == 'customer' for r in self.types(admin_client, 'priya'))
+        screens = [r for r in self.types(admin_client, 'opening hours') if r['type'] == 'screen']
+        assert any(r['route'] == '/admin/cms/session-booking' for r in screens)
+
+    def test_routes_point_at_real_admin_pages(self, config, admin_client):
+        from apps.cms.models import ContactMessage
+        ContactMessage.objects.create(name='Search Test', email='search@example.com', message='Are you open on Monday?')
+        result = next(r for r in self.types(admin_client, 'search test') if r['type'] == 'message')
+        assert result['route'].startswith('/admin/cms/contact-messages/')
+
+    def test_search_needs_a_signed_in_admin(self, db):
+        assert APIClient().get(self.URL, {'q': 'GK'}).status_code in (401, 403)
+
+
+# ── Admin activity log ───────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+class TestActivityLog:
+    def test_admin_changes_are_recorded(self, config, admin_client):
+        from apps.core.models import AdminActivity
+        saturday = next_saturday().isoformat()
+        created = admin_client.post('/api/v1/bookings/booking-blocks/', {
+            'start_date': saturday, 'end_date': saturday, 'type': 'CLOSED', 'reason': 'Private hire',
+            'blocks_normal_bookings': True, 'blocks_party_bookings': True}, format='json')
+        assert created.status_code == 201
+        admin_client.patch(f"/api/v1/bookings/booking-blocks/{created.data['id']}/", {'reason': 'Private party'}, format='json')
+        admin_client.delete(f"/api/v1/bookings/booking-blocks/{created.data['id']}/")
+        log = list(AdminActivity.objects.order_by('id').values_list('action', 'entity', 'entity_id'))
+        assert log == [('CREATE', 'Opening day change', str(created.data['id'])),
+                       ('UPDATE', 'Opening day change', str(created.data['id'])),
+                       ('DELETE', 'Opening day change', str(created.data['id']))]
+        update = AdminActivity.objects.get(action='UPDATE')
+        assert update.user_email == 'admin-test@example.com' and update.details['fields'] == {'reason': 'Private party'}
+
+    def test_actions_and_booking_numbers_are_described(self, config, admin_client):
+        from apps.core.models import AdminActivity
+        party = PartyBooking.objects.create(name='P', email='p@example.com', phone='1', date=next_saturday(),
+                                            time='12:00', kids=10, adults=2, amount=Decimal('299.90'))
+        admin_client.post(f'/api/v1/bookings/party-bookings/{party.id}/update_status/', {'payment_status': 'PAID'}, format='json')
+        entry = AdminActivity.objects.get()
+        assert (entry.action, entry.entity) == ('ACTION', 'Party booking')
+        assert entry.summary.startswith('Update status party booking')
+
+    def test_customer_bookings_and_failed_logins(self, config, plans):
+        from apps.core.models import AdminActivity
+        APIClient().post(SESSIONS_URL, session_payload(plans), format='json')     # a customer, not an admin change
+        assert not AdminActivity.objects.exists()
+        APIClient().post('/api/token/', {'email': 'nobody@example.com', 'password': 'wrong'}, format='json')
+        failed = AdminActivity.objects.get()
+        assert (failed.action, failed.user_email) == ('LOGIN_FAILED', 'nobody@example.com')
+
+    def test_passwords_are_never_stored(self, admin_client):
+        from apps.core.models import AdminActivity
+        admin_client.post('/api/v1/core/users/', {'email': 'new@example.com', 'username': 'new', 'name': 'New',
+                                                  'password': 'Secret-123456', 'role': 'STAFF'}, format='json')
+        for entry in AdminActivity.objects.all():
+            assert 'Secret-123456' not in str(entry.details)
+
+    def test_only_managers_read_the_log(self, staff_client, admin_client):
+        assert staff_client.get('/api/v1/core/activity-logs/').status_code == 403
+        assert admin_client.get('/api/v1/core/activity-logs/').status_code == 200

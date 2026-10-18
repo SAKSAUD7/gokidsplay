@@ -1,5 +1,8 @@
 ﻿"use client";
 
+import { ListFilterBox, matchesText } from "@/components/admin/ListFilterBox";
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
+import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getPartyBookingHistory, restorePartyBooking } from "@/app/actions/admin";
 import { RestoreConfirmationModal } from "../../components/RestoreConfirmationModal";
@@ -10,6 +13,7 @@ import Link from "next/link";
 export default function PartyBookingHistoryPage() {
     const [history, setHistory] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useUrlSearch();
     const [restoring, setRestoring] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [showModal, setShowModal] = useState(false);
@@ -67,6 +71,8 @@ export default function PartyBookingHistoryPage() {
             </div>
         );
     }
+
+    const shownHistory = history.filter(b => matchesBookingSearch(b, search));
 
     return (
         <div className="p-8 space-y-6">
@@ -128,6 +134,8 @@ export default function PartyBookingHistoryPage() {
             </div>
 
             {/* Table */}
+            <ListFilterBox value={search} onChange={setSearch} placeholder="Search name, email, phone, booking number or date…"
+                shown={shownHistory.length} total={history.length} />
             <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -157,14 +165,14 @@ export default function PartyBookingHistoryPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {history.length === 0 ? (
+                            {shownHistory.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
                                         No party booking history found
                                     </td>
                                 </tr>
                             ) : (
-                                history.slice(0, displayCount).map((booking) => (
+                                shownHistory.slice(0, displayCount).map((booking) => (
                                     <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4 text-sm font-medium text-slate-900">
                                             {booking.id}

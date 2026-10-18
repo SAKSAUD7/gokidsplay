@@ -1,5 +1,6 @@
 'use client';
 
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { Loader2, Search, Filter, Calendar, Mail, Phone, MessageSquare, Trash2, Eye, Download } from 'lucide-react';
 import { useEffect, useState, useMemo } from 'react';
 import { getContactMessages, deleteContactMessage } from '@/app/actions/contact-messages';
@@ -13,7 +14,7 @@ export default function ContactMessagesPage() {
     const [error, setError] = useState<string | null>(null);
 
     // Filter states
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useUrlSearch();
     const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
     const [readFilter, setReadFilter] = useState<'all' | 'read' | 'unread'>('all');
 

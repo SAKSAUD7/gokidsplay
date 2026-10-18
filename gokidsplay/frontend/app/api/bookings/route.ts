@@ -56,6 +56,9 @@ export async function GET(request: NextRequest) {
         let apiUrl: string;
         if (type === 'PARTY') {
             apiUrl = `${API_URL}/bookings/party-bookings/?ordering=-created_at&page=${page}&page_size=${pageSize}`;
+            if (status) apiUrl += `&status=${encodeURIComponent(status)}`;
+            if (date) apiUrl += `&date=${encodeURIComponent(date)}`;
+            if (search) apiUrl += `&search=${encodeURIComponent(search)}`;
         } else if (type === 'SESSION') {
             apiUrl = `${API_URL}/bookings/bookings/?type=SESSION&ordering=-created_at&page=${page}&page_size=${pageSize}`;
             if (activity) apiUrl += `&activity=${encodeURIComponent(activity)}`;

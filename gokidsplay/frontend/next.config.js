@@ -174,6 +174,11 @@ const nextConfig = {
             { source: '/admin/skating-bookings', destination: '/admin/session-bookings', permanent: false },
             { source: '/memberships', destination: '/pricing', permanent: true },
             { source: '/admin/cms/collections/products', destination: '/admin/cms', permanent: false },
+            // Old opening/closing and availability screens → Opening Days; duplicate invitation screens
+            { source: '/admin/holidays/:path*', destination: '/admin/calendar/opening', permanent: false },
+            { source: '/admin/availability', destination: '/admin/calendar/opening', permanent: false },
+            { source: '/admin/invitation-templates/:path*', destination: '/admin/invitations/:path*', permanent: false },
+            { source: '/admin/invitation-templates', destination: '/admin/invitations', permanent: false },
             { source: '/admin/cms/collections/memberships', destination: '/admin/cms', permanent: false },
             {
                 source: '/information/disclaimer',

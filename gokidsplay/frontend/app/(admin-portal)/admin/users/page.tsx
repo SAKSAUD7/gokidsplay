@@ -2,17 +2,24 @@ import { getAdminUsers, getUserStats, getRecentActivity } from "@/app/actions/us
 import { getAdminSession } from "../../../lib/admin-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
+import { ListSearchInput } from "@/components/admin/ListSearchInput";
 import { Plus, Search, Shield, Mail, Calendar, User, Users, UserCheck, UserX, Clock, TrendingUp } from "lucide-react";
 
-export default async function UsersPage() {
+export default async function UsersPage({ searchParams }: { searchParams?: { search?: string } }) {
     const session = await getAdminSession();
     if (!session) redirect("/admin/login");
 
-    const [users, stats, recentActivity] = await Promise.all([
+    const [allUsers, stats, recentActivity] = await Promise.all([
         getAdminUsers(),
         getUserStats(),
         getRecentActivity(5)
     ]);
+    // ?search= name, email or role
+    const q = (searchParams?.search || "").trim().toLowerCase();
+    const users = q
+        ? allUsers.filter((u: any) => [u.name, u.email, u.role].some((v: any) => String(v || "").toLowerCase().includes(q)))
+        : allUsers;
 
     return (
         <div className="p-8 space-y-8">
@@ -135,14 +142,8 @@ export default async function UsersPage() {
 
             {/* Search */}
             <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Search users..."
-                        className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                    />
-                </div>
+                <Suspense fallback={null}><ListSearchInput placeholder="Search users by name, email or role…" /></Suspense>
+                {q && <span className="text-sm text-slate-500">{users.length} of {allUsers.length} users</span>}
             </div>
 
             {/* Users Table */}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useDebounced, useUrlSearch } from "@/lib/hooks/use-url-search";
 import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getPartyBookings, toggleBookingArrival } from "@/app/actions/admin";
@@ -33,27 +34,30 @@ export default function PartyBookingsPage() {
     const [bookings, setBookings] = useState<any[]>([]);
     const [filteredBookings, setFilteredBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useUrlSearch();
     const [statusFilter, setStatusFilter] = useState("all");
     const [dateFilter, setDateFilter] = useState("all");
     const [hasArrivedFilter, setHasArrivedFilter] = useState("all");
     const [displayCount, setDisplayCount] = useState(25);
     const router = useRouter();
 
+    // Searching asks the server, so every booking is found — not only the latest 100
+    const serverSearch = useDebounced(searchTerm.trim(), 400);
     useEffect(() => {
-        loadBookings();
-    }, []);
+        loadBookings(serverSearch);
+    }, [serverSearch]);
 
     useEffect(() => {
         filterBookings();
     }, [searchTerm, statusFilter, dateFilter, hasArrivedFilter, bookings]);
 
-    async function loadBookings() {
+    async function loadBookings(search = "") {
         try {
             setLoading(true);
 
             // Use API route proxy instead of client-side fetch, and limit to recent bookings
-            const response = await fetch('/api/bookings?type=PARTY&page_size=100', {
+            const query = search ? `&search=${encodeURIComponent(search)}&page_size=500` : '&page_size=100';
+            const response = await fetch(`/api/bookings?type=PARTY${query}`, {
                 credentials: 'include',
                 cache: 'no-store',
             });

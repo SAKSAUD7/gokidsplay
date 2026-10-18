@@ -1,17 +1,19 @@
 ﻿"use client";
 
 /**
- * Global Search Component for Admin Portal
- * 
- * Provides unified search across all admin modules with:
- * - Debounced search (300ms)
- * - Keyboard navigation (↑↓ Enter Escape)
- * - RBAC-filtered results
- * - Grouped display by type
+ * Admin header search — one box for everything (Ctrl+K or / to focus).
+ *
+ * Finds bookings by number (GK…, GP…, EV…, ER…), name, email, phone or date
+ * ("24/10"), plus customers, events, payments, vouchers, messages, campaigns,
+ * users and admin screens ("opening hours", "refund"…). Results come from
+ * GET /api/admin/search (backend apps/core/search_service.py), grouped by type,
+ * with "View all" links that open the full list already filtered.
  */
-
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Search, Loader2, FileText, User, CreditCard, Tag, FileCheck, Mail, Calendar, X } from "lucide-react";
+import {
+    Search, Loader2, FileText, User, CreditCard, Tag, Mail, Calendar, X, PartyPopper,
+    Sparkles, ClipboardList, Users, LayoutGrid, Megaphone, ArrowRight,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,42 +22,22 @@ interface SearchResult {
     title: string;
     subtitle: string;
     route: string;
+    view_all?: string;
 }
 
-const TYPE_ICONS: Record<string, any> = {
-    booking: Calendar,
-    party_booking: Calendar,
-    user: User,
-    payment: CreditCard,
-    voucher: Tag,
-    waiver: FileCheck,
-    campaign: Mail,
-    message: Mail,
-    cms: FileText,
-};
-
-const TYPE_LABELS: Record<string, string> = {
-    booking: "Session Bookings",
-    party_booking: "Party Bookings",
-    user: "Users",
-    payment: "Payments",
-    voucher: "Vouchers",
-    waiver: "Waivers",
-    campaign: "Campaigns",
-    message: "Messages",
-    cms: "CMS Pages",
-};
-
-const TYPE_COLORS: Record<string, string> = {
-    booking: "text-blue-600 bg-blue-50",
-    party_booking: "text-purple-600 bg-purple-50",
-    user: "text-green-600 bg-green-50",
-    payment: "text-emerald-600 bg-emerald-50",
-    voucher: "text-orange-600 bg-orange-50",
-    waiver: "text-indigo-600 bg-indigo-50",
-    campaign: "text-pink-600 bg-pink-50",
-    message: "text-cyan-600 bg-cyan-50",
-    cms: "text-slate-600 bg-slate-50",
+const TYPES: Record<string, { label: string; icon: any; color: string }> = {
+    screen: { label: "Admin screens", icon: LayoutGrid, color: "text-slate-700 bg-slate-100" },
+    booking: { label: "Session bookings", icon: Calendar, color: "text-blue-600 bg-blue-50" },
+    party_booking: { label: "Party bookings", icon: PartyPopper, color: "text-purple-600 bg-purple-50" },
+    event_booking: { label: "Event reservations", icon: Sparkles, color: "text-fuchsia-600 bg-fuchsia-50" },
+    event_request: { label: "Event requests", icon: ClipboardList, color: "text-amber-600 bg-amber-50" },
+    event: { label: "Special events", icon: Sparkles, color: "text-pink-600 bg-pink-50" },
+    customer: { label: "Customers", icon: Users, color: "text-teal-600 bg-teal-50" },
+    payment: { label: "Payments", icon: CreditCard, color: "text-emerald-600 bg-emerald-50" },
+    voucher: { label: "Vouchers", icon: Tag, color: "text-orange-600 bg-orange-50" },
+    message: { label: "Messages", icon: Mail, color: "text-cyan-600 bg-cyan-50" },
+    campaign: { label: "Campaigns", icon: Megaphone, color: "text-rose-600 bg-rose-50" },
+    user: { label: "Admin users", icon: User, color: "text-green-600 bg-green-50" },
 };
 
 export function GlobalSearch() {
@@ -63,6 +45,7 @@ export function GlobalSearch() {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [error, setError] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(0);
     const inputRef = useRef<HTMLInputElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -70,158 +53,113 @@ export function GlobalSearch() {
 
     // Debounced search
     useEffect(() => {
-        if (query.length < 2) {
+        if (query.trim().length < 2) {
             setResults([]);
             setShowResults(false);
             return;
         }
-
         setIsSearching(true);
+        const controller = new AbortController();
         const timer = setTimeout(async () => {
             try {
-                const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-                const searchUrl = `${API_URL}/core/admin/search/?q=${encodeURIComponent(query)}`;
-
-                console.log('[GlobalSearch] Searching for:', query);
-                console.log('[GlobalSearch] API URL:', searchUrl);
-
-                const response = await fetch(searchUrl, {
-                    credentials: "include",
+                const response = await fetch(`/api/admin/search?q=${encodeURIComponent(query.trim())}`, {
                     cache: "no-store",
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    signal: controller.signal,
                 });
-
-                console.log('[GlobalSearch] Response status:', response.status);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('[GlobalSearch] Results:', data);
-                    setResults(data.results || []);
-                    setShowResults(true);
-                    setSelectedIndex(0);
-                } else {
-                    const errorText = await response.text();
-                    console.error('[GlobalSearch] Search failed:', response.status, errorText);
+                const data = await response.json().catch(() => ({}));
+                setResults(response.ok ? data.results || [] : []);
+                setError(response.ok ? "" : response.status === 401 ? "Please sign in again" : "Search is unavailable right now");
+                setShowResults(true);
+                setSelectedIndex(0);
+            } catch (e: any) {
+                if (e?.name !== "AbortError") {
                     setResults([]);
-                    setShowResults(true); // Show "No results" message
+                    setError("Search is unavailable right now");
+                    setShowResults(true);
                 }
-            } catch (error) {
-                console.error('[GlobalSearch] Search error:', error);
-                setResults([]);
-                setShowResults(true); // Show error state
             } finally {
                 setIsSearching(false);
             }
-        }, 300); // 300ms debounce
-
-        return () => clearTimeout(timer);
+        }, 250);
+        return () => { clearTimeout(timer); controller.abort(); };
     }, [query]);
 
-    // Group results by type
+    // Group results by type (in the order the server sends them)
     const groupedResults = useMemo(() => {
         const groups: Record<string, SearchResult[]> = {};
-        results.forEach((result) => {
-            if (!groups[result.type]) {
-                groups[result.type] = [];
-            }
-            groups[result.type].push(result);
-        });
+        results.forEach((r) => { (groups[r.type] ||= []).push(r); });
         return groups;
     }, [results]);
 
-    // Keyboard navigation
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (!showResults || results.length === 0) return;
+    const open = (route: string) => {
+        router.push(route);
+        setShowResults(false);
+        setQuery("");
+        inputRef.current?.blur();
+    };
 
-            switch (e.key) {
-                case "ArrowDown":
-                    e.preventDefault();
-                    setSelectedIndex((i) => Math.min(i + 1, results.length - 1));
-                    break;
-                case "ArrowUp":
-                    e.preventDefault();
-                    setSelectedIndex((i) => Math.max(i - 1, 0));
-                    break;
-                case "Enter":
-                    e.preventDefault();
-                    if (results[selectedIndex]) {
-                        router.push(results[selectedIndex].route);
-                        setShowResults(false);
-                        setQuery("");
-                    }
-                    break;
-                case "Escape":
-                    setShowResults(false);
-                    inputRef.current?.blur();
-                    break;
+    // Ctrl+K / Cmd+K or "/" focuses the search box from anywhere in the admin
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const typing = ["INPUT", "TEXTAREA", "SELECT"].includes((e.target as HTMLElement)?.tagName) || (e.target as HTMLElement)?.isContentEditable;
+            if ((e.key === "k" && (e.ctrlKey || e.metaKey)) || (e.key === "/" && !typing)) {
+                e.preventDefault();
+                inputRef.current?.focus();
+                inputRef.current?.select();
             }
         };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, []);
 
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [showResults, results, selectedIndex, router]);
+    // Keyboard navigation inside the results
+    const onInputKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Escape") { setShowResults(false); inputRef.current?.blur(); return; }
+        if (!showResults || results.length === 0) return;
+        if (e.key === "ArrowDown") { e.preventDefault(); setSelectedIndex(i => Math.min(i + 1, results.length - 1)); }
+        if (e.key === "ArrowUp") { e.preventDefault(); setSelectedIndex(i => Math.max(i - 1, 0)); }
+        if (e.key === "Enter" && results[selectedIndex]) { e.preventDefault(); open(results[selectedIndex].route); }
+    };
 
     // Click outside to close
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (
-                dropdownRef.current &&
-                !dropdownRef.current.contains(e.target as Node) &&
-                inputRef.current &&
-                !inputRef.current.contains(e.target as Node)
-            ) {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
+                && inputRef.current && !inputRef.current.contains(e.target as Node)) {
                 setShowResults(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const handleResultClick = (route: string) => {
-        router.push(route);
-        setShowResults(false);
-        setQuery("");
-    };
-
-    const handleClear = () => {
-        setQuery("");
-        setResults([]);
-        setShowResults(false);
-        inputRef.current?.focus();
-    };
-
     return (
-        <div className="relative">
-            {/* Search Input */}
+        <div className="relative" data-testid="global-search">
             <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                     ref={inputRef}
-                    type="text"
+                    type="search"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    onFocus={() => query.length >= 2 && setShowResults(true)}
-                    placeholder="Search..."
-                    className="pl-10 pr-10 py-2.5 w-64 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-slate-400"
+                    onFocus={() => query.trim().length >= 2 && setShowResults(true)}
+                    onKeyDown={onInputKey}
+                    placeholder="Search bookings, customers, pages…"
+                    aria-label="Search the admin portal"
+                    className="pl-10 pr-16 py-2.5 w-72 lg:w-96 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-slate-400"
                 />
-                {isSearching && (
+                {isSearching ? (
                     <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-500 animate-spin" />
-                )}
-                {!isSearching && query && (
-                    <button
-                        onClick={handleClear}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
+                ) : query ? (
+                    <button onClick={() => { setQuery(""); inputRef.current?.focus(); }} aria-label="Clear search"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                         <X className="w-4 h-4" />
                     </button>
+                ) : (
+                    <kbd className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5">Ctrl K</kbd>
                 )}
             </div>
 
-            {/* Results Dropdown */}
             <AnimatePresence>
                 {showResults && (
                     <motion.div
@@ -230,60 +168,44 @@ export function GlobalSearch() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full mt-2 w-96 max-h-96 overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-200 z-50"
+                        className="absolute top-full mt-2 right-0 w-[min(32rem,calc(100vw-2rem))] max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-2xl border border-slate-200 z-50"
                     >
                         {results.length === 0 ? (
-                            <div className="p-8 text-center text-slate-500">
-                                {query.length < 2 ? (
-                                    "Type at least 2 characters to search"
-                                ) : (
-                                    "No results found"
-                                )}
+                            <div className="p-6 text-center text-sm text-slate-500">
+                                {error || <>No results for &quot;{query}&quot;.<br /><span className="text-xs">Try a booking number (GK…, GP…), name, email, phone or date like 24/10.</span></>}
                             </div>
                         ) : (
-                            <div className="py-2">
+                            <div className="py-1">
                                 {Object.entries(groupedResults).map(([type, items], groupIndex) => {
-                                    const Icon = TYPE_ICONS[type] || FileText;
-                                    const label = TYPE_LABELS[type] || type;
-                                    const colorClass = TYPE_COLORS[type] || "text-slate-600 bg-slate-50";
-
+                                    const meta = TYPES[type] || { label: type, icon: FileText, color: "text-slate-600 bg-slate-50" };
+                                    const Icon = meta.icon;
+                                    const viewAll = items.find(i => i.view_all)?.view_all;
                                     return (
                                         <div key={type} className={groupIndex > 0 ? "border-t border-slate-100" : ""}>
-                                            {/* Group Header */}
-                                            <div className="px-4 py-2 bg-slate-50/50">
-                                                <div className="flex items-center gap-2">
-                                                    <Icon className="w-4 h-4 text-slate-400" />
-                                                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wide">
-                                                        {label} ({items.length})
-                                                    </span>
-                                                </div>
+                                            <div className="px-4 py-2 bg-slate-50/60 flex items-center justify-between">
+                                                <span className="flex items-center gap-2 text-xs font-bold text-slate-600 uppercase tracking-wide">
+                                                    <Icon className="w-4 h-4 text-slate-400" /> {meta.label}
+                                                </span>
+                                                {viewAll && (
+                                                    <button onClick={() => open(viewAll)} className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+                                                        View all <ArrowRight className="w-3 h-3" />
+                                                    </button>
+                                                )}
                                             </div>
-
-                                            {/* Results */}
                                             {items.map((result, index) => {
-                                                const globalIndex = results.indexOf(result);
-                                                const isSelected = globalIndex === selectedIndex;
-
+                                                const isSelected = results.indexOf(result) === selectedIndex;
                                                 return (
                                                     <button
                                                         key={`${result.type}-${index}`}
-                                                        onClick={() => handleResultClick(result.route)}
-                                                        className={`w-full px-4 py-3 text-left transition-colors ${isSelected
-                                                            ? "bg-blue-50 border-l-2 border-blue-500"
-                                                            : "hover:bg-slate-50 border-l-2 border-transparent"
-                                                            }`}
+                                                        onClick={() => open(result.route)}
+                                                        onMouseEnter={() => setSelectedIndex(results.indexOf(result))}
+                                                        className={`w-full px-4 py-2.5 text-left transition-colors border-l-2 ${isSelected ? "bg-blue-50 border-blue-500" : "hover:bg-slate-50 border-transparent"}`}
                                                     >
                                                         <div className="flex items-start gap-3">
-                                                            <div className={`p-2 rounded-lg ${colorClass}`}>
-                                                                <Icon className="w-4 h-4" />
-                                                            </div>
+                                                            <div className={`p-1.5 rounded-lg ${meta.color}`}><Icon className="w-4 h-4" /></div>
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="text-sm font-medium text-slate-900 truncate">
-                                                                    {result.title}
-                                                                </p>
-                                                                <p className="text-xs text-slate-500 truncate mt-0.5">
-                                                                    {result.subtitle}
-                                                                </p>
+                                                                <p className="text-sm font-medium text-slate-900 truncate">{result.title}</p>
+                                                                <p className="text-xs text-slate-500 truncate mt-0.5">{result.subtitle}</p>
                                                             </div>
                                                         </div>
                                                     </button>
@@ -294,15 +216,9 @@ export function GlobalSearch() {
                                 })}
                             </div>
                         )}
-
-                        {/* Footer Hint */}
-                        {results.length > 0 && (
-                            <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/50">
-                                <p className="text-xs text-slate-500 text-center">
-                                    Use ↑↓ to navigate, Enter to select, Esc to close
-                                </p>
-                            </div>
-                        )}
+                        <div className="px-4 py-2 border-t border-slate-100 bg-slate-50/60">
+                            <p className="text-[11px] text-slate-500 text-center">↑↓ to move · Enter to open · Esc to close · Ctrl K to search from anywhere</p>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

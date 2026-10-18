@@ -1,5 +1,7 @@
 "use client";
 
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
+import { matchesBookingSearch } from "@/lib/booking-search";
 import { useState, useEffect } from "react";
 import { getCustomers } from "@/app/actions/admin";
 import { exportCustomersToCSV } from "../../../../lib/export-csv";
@@ -17,7 +19,7 @@ export default function AdminCustomers() {
     const [allCustomers, setAllCustomers] = useState<any[]>([]);
     const [filteredCustomers, setFilteredCustomers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useUrlSearch();
 
     useEffect(() => {
         loadCustomers();
@@ -44,13 +46,8 @@ export default function AdminCustomers() {
 
         // Search filter
         if (searchTerm) {
-            const search = searchTerm.toLowerCase();
-            filtered = filtered.filter(customer =>
-                customer.name?.toLowerCase().includes(search) ||
-                customer.email?.toLowerCase().includes(search) ||
-                customer.phone?.toLowerCase().includes(search) ||
-                customer.id?.toString().includes(search)
-            );
+            // name, email, phone with or without spaces, id
+            filtered = filtered.filter(customer => matchesBookingSearch(customer, searchTerm));
         }
 
         setFilteredCustomers(filtered);

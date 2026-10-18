@@ -9,7 +9,7 @@ export default async function ActivityLogsPage() {
     if (!session) redirect("/admin/login");
 
     const [logs, stats] = await Promise.all([
-        getAuditLogs({ limit: 100 }),
+        getAuditLogs({ limit: 500 }),
         getLogStats()
     ]);
 
@@ -17,7 +17,7 @@ export default async function ActivityLogsPage() {
         <div className="p-8">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-slate-900">Activity Logs</h1>
-                <p className="text-slate-500 mt-1">Audit trail of all admin actions</p>
+                <p className="text-slate-500 mt-1">Every change made in the admin portal and every sign-in — who, what and when</p>
             </div>
 
             {/* Stats Cards */}
@@ -28,8 +28,8 @@ export default async function ActivityLogsPage() {
                             <Activity size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Total Actions</p>
-                            <p className="text-2xl font-bold text-slate-900">{stats.totalLogs}</p>
+                            <p className="text-sm text-slate-500 font-medium">Last 7 days</p>
+                            <p className="text-2xl font-bold text-slate-900">{stats.last7Days ?? 0}</p>
                         </div>
                     </div>
                 </div>
@@ -50,10 +50,8 @@ export default async function ActivityLogsPage() {
                             <Shield size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-slate-500 font-medium">Security Events</p>
-                            <p className="text-2xl font-bold text-slate-900">
-                                {stats.actionsByType.find((a: any) => a.action === 'LOGIN')?._count || 0}
-                            </p>
+                            <p className="text-sm text-slate-500 font-medium">Failed sign-ins (7 days)</p>
+                            <p className="text-2xl font-bold text-slate-900">{stats.failedLogins7Days ?? 0}</p>
                         </div>
                     </div>
                 </div>

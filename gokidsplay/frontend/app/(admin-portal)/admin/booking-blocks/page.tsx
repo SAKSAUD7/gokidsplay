@@ -1,5 +1,7 @@
 "use client";
 
+import { ListFilterBox, matchesText } from "@/components/admin/ListFilterBox";
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { useState, useEffect } from "react";
 import { getBookingBlocks, deleteBookingBlock } from "@/app/actions/admin";
 import Link from "next/link";
@@ -9,6 +11,7 @@ import { format } from "date-fns";
 export default function BookingBlocksPage() {
     const [blocks, setBlocks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useUrlSearch();
 
     useEffect(() => {
         loadBlocks();
@@ -45,6 +48,8 @@ export default function BookingBlocksPage() {
         );
     }
 
+    const shownBlocks = blocks.filter(b => matchesText(search, b.reason, b.type, b.startDate, b.endDate));
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -61,6 +66,8 @@ export default function BookingBlocksPage() {
                 </Link>
             </div>
 
+            <ListFilterBox value={search} onChange={setSearch} placeholder="Search by reason, type or date (2026-11-07)…"
+                shown={shownBlocks.length} total={blocks.length} />
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <table className="w-full text-left text-sm">
                     <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
@@ -73,7 +80,7 @@ export default function BookingBlocksPage() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200">
-                        {blocks.length === 0 ? (
+                        {shownBlocks.length === 0 ? (
                             <tr>
                                 <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
                                     <div className="flex flex-col items-center gap-2">
@@ -83,7 +90,7 @@ export default function BookingBlocksPage() {
                                 </td>
                             </tr>
                         ) : (
-                            blocks.map((block) => (
+                            shownBlocks.map((block) => (
                                 <tr key={block.id} className="hover:bg-slate-50 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="font-medium text-slate-900">

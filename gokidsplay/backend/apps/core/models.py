@@ -117,3 +117,39 @@ class Notification(models.Model):
     def __str__(self):
         return f"{self.type}: {self.title}"
 
+
+
+class AdminActivity(models.Model):
+    """
+    Audit trail for Admin → Activity Logs: every change an admin makes through
+    the API (and every admin sign-in), recorded by apps/core/activity.py.
+    """
+    ACTION_CHOICES = [
+        ('LOGIN', 'Signed in'),
+        ('LOGIN_FAILED', 'Sign-in failed'),
+        ('CREATE', 'Created'),
+        ('UPDATE', 'Updated'),
+        ('DELETE', 'Deleted'),
+        ('ACTION', 'Action'),
+    ]
+    user = models.ForeignKey('core.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='activities')
+    user_email = models.CharField(max_length=255, blank=True, default='')
+    user_name = models.CharField(max_length=255, blank=True, default='')
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES, db_index=True)
+    entity = models.CharField(max_length=100, db_index=True, help_text="What was changed, e.g. Party booking")
+    entity_id = models.CharField(max_length=100, blank=True, default='')
+    summary = models.CharField(max_length=500, blank=True, default='')
+    method = models.CharField(max_length=10, blank=True, default='')
+    path = models.CharField(max_length=500, blank=True, default='')
+    status_code = models.PositiveSmallIntegerField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=300, blank=True, default='')
+    details = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = 'Admin activity'
+
+    def __str__(self):
+        return f"{self.created_at:%Y-%m-%d %H:%M} {self.user_email} {self.action} {self.entity} {self.entity_id}"

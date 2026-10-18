@@ -1,5 +1,6 @@
 "use client";
 
+import { useUrlSearch } from "@/lib/hooks/use-url-search";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -29,7 +30,7 @@ interface SpecialEvent {
 export default function AdminEventsPage() {
     const [events, setEvents] = useState<SpecialEvent[]>([]);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useUrlSearch();
     const [statusFilter, setStatusFilter] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
     const [when, setWhen] = useState<"upcoming" | "past" | "all">("upcoming");
