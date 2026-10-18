@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
 from datetime import datetime, timedelta
 from ..bookings.models import Booking, PartyBooking, BookingBlock
@@ -174,6 +174,7 @@ def date_availability(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def today_status(request):
     """
     Public endpoint: today's open/closed status for the homepage banner.

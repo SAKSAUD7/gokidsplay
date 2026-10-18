@@ -17,6 +17,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.db import transaction
 import json
+from decimal import Decimal
 
 from django.db.models import Sum, Count, Max, Q
 
@@ -273,8 +274,12 @@ class BookingViewSet(viewsets.ModelViewSet):
                         serializer.instance, serializer.instance.paid_amount,
                         recorded_by=getattr(request.user, 'email', '') or 'admin', note='Walk-in paid at the desk')
                 if voucher_to_count is not None:
-                    from django.db.models import F
-                    type(voucher_to_count).objects.filter(pk=voucher_to_count.pk).update(used_count=F('used_count') + 1)
+                    from apps.shop.services import VoucherUnavailable, redeem_voucher
+                    try:
+                        redeem_voucher(voucher_to_count, booking=serializer.instance, email=data.get('email') or '',
+                                       discount=serializer.instance.discount_amount or 0)
+                    except VoucherUnavailable as exc:
+                        raise drf_serializers.ValidationError({'detail': str(exc), 'code': 'INVALID_VOUCHER'})
                 response = Response(serializer.data, status=status.HTTP_201_CREATED)
 
         except drf_serializers.ValidationError:
@@ -321,6 +326,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             voucher_code=raw.get('voucher_code'),
             booking_datetime=booking_datetime,
             include_online_fee=True,
+            email=raw.get('email'),
         )
         if price.error:
             return None, price.error, None
@@ -763,6 +769,7 @@ def create_party_booking_view(request):
     adults = as_int(data.get('adults'))
     payment_type = 'FULL' if data.get('payment_type') == 'FULL' else 'DEPOSIT'
     voucher_to_count = None
+    voucher_discount = Decimal('0')
 
     # Public party bookings only on dates open for parties (opening calendar)
     if not is_staff:
@@ -811,10 +818,14 @@ def create_party_booking_view(request):
     else:
         # Public bookings: price is always calculated server-side
         from .pricing import price_party_booking
-        price = price_party_booking(kids=kids, adults=adults, voucher_code=data.get('voucher_code'))
+        price = price_party_booking(kids=kids, adults=adults, voucher_code=data.get('voucher_code'), email=data.get('email'),
+                                    booking_datetime=f"{party_date}T{str(data.get('time'))[:5]}")
+        if price.error:
+            return Response({'detail': price.error, 'code': 'INVALID_VOUCHER'}, status=status.HTTP_400_BAD_REQUEST)
         amount, package_price, deposit_amount = price.amount, price.package_price, price.deposit
         booking_status = 'PENDING'
         voucher_to_count = price.voucher
+        voucher_discount = price.discount
 
     try:
         with transaction.atomic():
@@ -861,11 +872,18 @@ def create_party_booking_view(request):
                 payment_status='PENDING',
                 customer=customer,
                 online_checkout=not is_staff,  # released if left unpaid (unpaid.py)
+                voucher=voucher_to_count,
+                voucher_code=voucher_to_count.code if voucher_to_count else None,
+                discount_amount=voucher_discount,
             )
             if voucher_to_count is not None:
-                from django.db.models import F
-                type(voucher_to_count).objects.filter(pk=voucher_to_count.pk).update(used_count=F('used_count') + 1)
-    except Exception:
+                from apps.shop.services import redeem_voucher
+                redeem_voucher(voucher_to_count, party_booking=booking, email=data.get('email') or '',
+                               discount=voucher_discount)
+    except Exception as exc:
+        from apps.shop.services import VoucherUnavailable
+        if isinstance(exc, VoucherUnavailable):
+            return Response({'detail': str(exc), 'code': 'INVALID_VOUCHER'}, status=status.HTTP_400_BAD_REQUEST)
         logger.exception('Party booking creation failed')
         return Response({'detail': 'Failed to create party booking. Please check your details and try again.'},
                         status=status.HTTP_400_BAD_REQUEST)

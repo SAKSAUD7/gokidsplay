@@ -7,7 +7,7 @@ from apps.bookings.permissions import IsStaffUser
 from apps.core.permissions import IsContentManagerOrAdmin
 from .models import (
     Banner, Activity, Faq, SocialLink, GalleryItem,
-    StatCard, InstagramReel, MenuSection, GroupPackage, GuidelineCategory, LegalDocument,
+    StatCard, InstagramReel, MenuSection, GuidelineCategory, LegalDocument,
     PageSection, PricingPlan, ContactInfo, PartyPackage, TimelineItem, ValueItem, FacilityItem,
     Page, ContactMessage, FreeEntry, SessionBookingConfig, PartyBookingConfig, PricingCarouselImage,
     BookingInformation, TimingCard, CustomerAccountConfig
@@ -15,7 +15,7 @@ from .models import (
 from .serializers import (
     BannerSerializer, ActivitySerializer, FaqSerializer, 
     SocialLinkSerializer, GalleryItemSerializer,
-    StatCardSerializer, InstagramReelSerializer, MenuSectionSerializer, GroupPackageSerializer,
+    StatCardSerializer, InstagramReelSerializer, MenuSectionSerializer,
     GuidelineCategorySerializer, LegalDocumentSerializer,
     PageSectionSerializer, PricingPlanSerializer, ContactInfoSerializer, PartyPackageSerializer,
     TimelineItemSerializer, ValueItemSerializer, FacilityItemSerializer,
@@ -92,13 +92,6 @@ class MenuSectionViewSet(BaseCmsViewSet):
     queryset = MenuSection.objects.all()
     serializer_class = MenuSectionSerializer
     filterset_fields = ['active']
-    ordering_fields = ['order']
-    ordering = ['order']
-
-class GroupPackageViewSet(BaseCmsViewSet):
-    queryset = GroupPackage.objects.all()
-    serializer_class = GroupPackageSerializer
-    filterset_fields = ['active', 'popular']
     ordering_fields = ['order']
     ordering = ['order']
 
@@ -302,8 +295,9 @@ class UploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     
     # Configuration
-    MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB
-    # Trigger deployment for consistency check
+    MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB (videos)
+    MAX_IMAGE_SIZE = 20 * 1024 * 1024  # 20MB
+    IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
     ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp', 'mp4', 'mov', 'webm'}
     ALLOWED_MIME_TYPES = {
         'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
@@ -336,6 +330,18 @@ class UploadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        if file_ext in self.IMAGE_EXTENSIONS:
+            if file_obj.size > self.MAX_IMAGE_SIZE:
+                return Response({'error': 'Images can be at most 20MB.'}, status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE)
+            # The file must really be an image (not something renamed to .jpg)
+            try:
+                from PIL import Image
+                with Image.open(file_obj) as img:
+                    img.verify()
+                file_obj.seek(0)
+            except Exception:
+                return Response({'error': 'This file is not a valid image.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Validate MIME type
         content_type = file_obj.content_type
         if content_type not in self.ALLOWED_MIME_TYPES:
@@ -358,14 +364,13 @@ class UploadView(APIView):
             # Generate unique filename to prevent overwrites
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             unique_id = str(uuid.uuid4())[:8]
-            safe_filename = f"{timestamp}_{unique_id}_{file_obj.name}"
-            
-            # Save to uploads directory
+            from django.utils.text import get_valid_filename
+            original = get_valid_filename(file_obj.name.replace('\\', '/').rsplit('/', 1)[-1])[-80:] or f"file.{file_ext}"
+            safe_filename = f"{timestamp}_{unique_id}_{original}"
+
+            # Save to uploads directory (streamed, so large videos don't fill the memory)
             try:
-                path = default_storage.save(
-                    f"uploads/{safe_filename}", 
-                    ContentFile(file_obj.read())
-                )
+                path = default_storage.save(f"uploads/{safe_filename}", file_obj)
                 logger.info(f"File saved successfully to: {path}")
             except Exception as storage_error:
                 logger.error(f"Azure storage error: {str(storage_error)}")
@@ -424,7 +429,6 @@ class ReorderView(APIView):
             'stat-card': StatCard,
             'instagram-reel': InstagramReel,
             'menu-section': MenuSection,
-            'group-package': GroupPackage,
             'guideline-category': GuidelineCategory,
             'page-section': PageSection,
             'pricing-plan': PricingPlan,

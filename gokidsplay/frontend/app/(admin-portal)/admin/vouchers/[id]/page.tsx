@@ -1,220 +1,120 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { getVoucher, updateVoucher } from "@/app/actions/vouchers";
+import { useEffect, useState } from "react";
+import { getVoucher, getVoucherRedemptions, updateVoucher } from "@/app/actions/vouchers";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Loader2, Ticket, Percent, DollarSign, Calendar, Hash } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { VoucherForm } from "../VoucherForm";
+import { VoucherStatusBadge } from "../VoucherStatusBadge";
+
+const gbp = (n: any) => `£${Number(n || 0).toFixed(2)}`;
 
 export default function EditVoucherPage() {
     const router = useRouter();
     const params = useParams();
-    const [loading, setLoading] = useState(false);
+    const id = params.id as string;
     const [voucher, setVoucher] = useState<any>(null);
-    const formRef = useRef<HTMLFormElement>(null);
+    const [uses, setUses] = useState<any[]>([]);
 
     useEffect(() => {
-        loadVoucher();
-    }, []);
-
-    async function loadVoucher() {
-        try {
-            const data = await getVoucher(params.id as string);
-            setVoucher(data);
-        } catch (error) {
-            toast.error("Failed to load voucher");
-            router.push("/admin/vouchers");
-        }
-    }
-
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData(formRef.current!);
-        setLoading(true);
-        try {
-            const data: any = {
-                code: formData.get("code") as string,
-                discountType: formData.get("discountType") as string,
-                discountValue: Number(formData.get("discountValue")),
-                minOrderAmount: Number(formData.get("minOrderAmount")) || undefined,
-                usageLimit: Number(formData.get("usageLimit")) || undefined,
-                description: formData.get("description") as string || undefined,
-                isActive: formData.get("isActive") === "true"
-            };
-
-            const expiryDate = formData.get("expiryDate") as string;
-            if (expiryDate) {
-                data.expiryDate = new Date(expiryDate);
+        getVoucher(id).then(data => {
+            if (!data) {
+                toast.error("Voucher not found");
+                router.push("/admin/vouchers");
+                return;
             }
-
-            await updateVoucher(params.id as string, data);
-            toast.success("Voucher updated successfully");
-            router.push("/admin/vouchers");
-        } catch (error: any) {
-            toast.error(error.message || "Failed to update voucher");
-        } finally {
-            setLoading(false);
-        }
-    }
+            setVoucher(data);
+        }).catch(() => router.push("/admin/vouchers"));
+        getVoucherRedemptions(id).then(setUses).catch(() => setUses([]));
+    }, [id, router]);
 
     if (!voucher) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
         );
     }
 
+    const counted = uses.filter(u => !u.released);
+
     return (
-        <div className="p-8 max-w-2xl mx-auto">
-            <div className="mb-8">
-                <Link href="/admin/vouchers" className="text-slate-500 hover:text-slate-700 flex items-center gap-2 mb-4 transition-colors">
-                    <ArrowLeft size={16} />
-                    Back to Vouchers
+        <div className="p-8 max-w-4xl mx-auto space-y-8">
+            <div>
+                <Link href="/admin/vouchers" className="text-slate-500 hover:text-slate-700 flex items-center gap-2 mb-4">
+                    <ArrowLeft size={16} /> Back to Vouchers
                 </Link>
-                <h1 className="text-3xl font-bold text-slate-900">Edit Voucher</h1>
-                <p className="text-slate-500 mt-1">Update voucher details and settings</p>
+                <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-3xl font-bold text-slate-900 font-mono">{voucher.code}</h1>
+                    <VoucherStatusBadge status={voucher.status} />
+                    {voucher.batch && <span className="text-xs text-slate-500 bg-slate-100 rounded-full px-2 py-1">Batch {voucher.batch}</span>}
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                    <div className="bg-white border border-slate-200 rounded-xl p-4">
+                        <p className="text-xs text-slate-500 uppercase font-bold">Used</p>
+                        <p className="text-2xl font-bold text-slate-900">{voucher.usedCount} / {voucher.usageLimit || "∞"}</p>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-xl p-4">
+                        <p className="text-xs text-slate-500 uppercase font-bold">Discount given</p>
+                        <p className="text-2xl font-bold text-slate-900">{gbp(voucher.totalDiscountGiven)}</p>
+                    </div>
+                    <div className="bg-white border border-slate-200 rounded-xl p-4">
+                        <p className="text-xs text-slate-500 uppercase font-bold">Given back</p>
+                        <p className="text-2xl font-bold text-slate-900">{uses.length - counted.length}</p>
+                        <p className="text-xs text-slate-500">cancelled bookings</p>
+                    </div>
+                </div>
             </div>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-                {/* Code */}
-                <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                        <Ticket size={16} className="inline mr-1" />
-                        Voucher Code
-                    </label>
-                    <input
-                        name="code"
-                        type="text"
-                        required
-                        defaultValue={voucher.code}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none uppercase text-slate-900"
-                        placeholder="DISCOUNT20"
-                    />
-                </div>
+            <VoucherForm mode="edit" initial={voucher} onSubmit={async values => {
+                const result = await updateVoucher(id, values);
+                if (!result.ok) return result.error;
+                toast.success("Voucher saved");
+                router.push("/admin/vouchers");
+                return null;
+            }} />
 
-                {/* Discount Type & Value */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">Discount Type</label>
-                        <select
-                            name="discountType"
-                            required
-                            defaultValue={voucher.discountType}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                        >
-                            <option value="PERCENTAGE">Percentage (%)</option>
-                            <option value="FLAT">Flat Amount (£)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                            {voucher.discountType === "PERCENTAGE" ? <Percent size={16} className="inline mr-1" /> : <DollarSign size={16} className="inline mr-1" />}
-                            Discount Value
-                        </label>
-                        <input
-                            name="discountValue"
-                            type="number"
-                            required
-                            min="0"
-                            step="0.01"
-                            defaultValue={voucher.discountValue}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                        />
-                    </div>
+            <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="px-6 py-4 border-b border-slate-200">
+                    <h2 className="text-lg font-bold text-slate-900">Bookings that used this code</h2>
+                    <p className="text-sm text-slate-500">A use is given back automatically if its booking is cancelled.</p>
                 </div>
-
-                {/* Min Order & Usage Limit */}
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                            <DollarSign size={16} className="inline mr-1" />
-                            Min Order Amount (£)
-                        </label>
-                        <input
-                            name="minOrderAmount"
-                            type="number"
-                            min="0"
-                            defaultValue={voucher.minOrderAmount || ""}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                            placeholder="Optional"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold text-slate-700 mb-2">
-                            <Hash size={16} className="inline mr-1" />
-                            Usage Limit
-                        </label>
-                        <input
-                            name="usageLimit"
-                            type="number"
-                            min="0"
-                            defaultValue={voucher.usageLimit || ""}
-                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                            placeholder="Unlimited"
-                        />
-                    </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                        <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase">
+                            <tr>
+                                <th className="px-6 py-3">Booking</th>
+                                <th className="px-6 py-3">Customer</th>
+                                <th className="px-6 py-3">Booking date</th>
+                                <th className="px-6 py-3">Discount</th>
+                                <th className="px-6 py-3">Used on</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {uses.length === 0 ? (
+                                <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-500">Not used yet.</td></tr>
+                            ) : uses.map(u => (
+                                <tr key={u.id} className={u.released ? "text-slate-400" : ""}>
+                                    <td className="px-6 py-3">
+                                        <Link className="font-mono font-bold text-blue-600 hover:underline"
+                                            href={u.booking_type === "party" ? `/admin/party-bookings/${u.booking_id}` : `/admin/session-bookings/${u.booking_id}`}>
+                                            {u.booking_number || `#${u.booking_id}`}
+                                        </Link>
+                                        <span className="ml-2 text-xs text-slate-500">{u.booking_type === "party" ? "Party" : "Session"}</span>
+                                        {u.released && <span className="ml-2 text-xs bg-slate-100 rounded-full px-2 py-0.5">Given back</span>}
+                                    </td>
+                                    <td className="px-6 py-3">{u.customer_name}<div className="text-xs text-slate-500">{u.email}</div></td>
+                                    <td className="px-6 py-3">{u.booking_date ? new Date(u.booking_date).toLocaleDateString("en-GB") : "—"}</td>
+                                    <td className="px-6 py-3 font-bold">{gbp(u.discount_amount)}</td>
+                                    <td className="px-6 py-3">{new Date(u.created_at).toLocaleString("en-GB", { timeZone: "Europe/London", dateStyle: "medium", timeStyle: "short" })}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-
-                {/* Expiry Date */}
-                <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                        <Calendar size={16} className="inline mr-1" />
-                        Expiry Date
-                    </label>
-                    <input
-                        name="expiryDate"
-                        type="date"
-                        defaultValue={voucher.expiryDate ? new Date(voucher.expiryDate).toISOString().split('T')[0] : ""}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                    />
-                </div>
-
-                {/* Description */}
-                <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">Description</label>
-                    <textarea
-                        name="description"
-                        rows={3}
-                        defaultValue={voucher.description || ""}
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-slate-900"
-                        placeholder="Internal notes about this voucher"
-                    ></textarea>
-                </div>
-
-                {/* Active Status */}
-                <div className="flex items-center gap-3">
-                    <input
-                        type="checkbox"
-                        name="isActive"
-                        value="true"
-                        defaultChecked={voucher.isActive}
-                        className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-primary"
-                    />
-                    <label className="text-sm font-medium text-slate-700">
-                        Active (voucher can be used)
-                    </label>
-                </div>
-
-                {/* Submit */}
-                <div className="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                    <Link
-                        href="/admin/vouchers"
-                        className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
-                    >
-                        Cancel
-                    </Link>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                        Update Voucher
-                    </button>
-                </div>
-            </form>
+            </section>
         </div>
     );
 }

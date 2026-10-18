@@ -32,6 +32,7 @@ import { useToast } from "./ToastProvider";
 import { PaymentStep } from "./PaymentStep";
 import { useAccount } from "../state/account/AccountContext";
 import { validateVoucher } from "../app/actions/validateVoucher";
+import { createBooking } from "../app/actions/createBooking";
 import { PageSection } from "../lib/cms/types";
 import { SmartCalendar } from "./SmartCalendar";
 
@@ -143,7 +144,7 @@ type ActivityId = typeof ACTIVITIES[number]["id"];
 
 interface BookingWizardProps {
 
-    onSubmit: (data: any) => Promise<{ success: boolean; bookingId?: string; bookingIntId?: number; bookingNumber?: string; error?: string }>;
+    onSubmit?: (data: any) => Promise<{ success: boolean; bookingId?: string; bookingIntId?: number; bookingNumber?: string; error?: string }>;
 
     cmsContent?: PageSection[];
 
@@ -151,7 +152,9 @@ interface BookingWizardProps {
 
 
 
-export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps) => {
+// The wizard calls the createBooking server action itself (passing it down from the
+// /book server page hit a Next.js 14.1 bundling bug: "e[o] is not a function").
+export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: BookingWizardProps) => {
 
     const [step, setStep] = useState(0); // 0=activity, 1=date/time, 2=guests, 3=details, 4=waiver, 5=summary, 6=payment
 
@@ -558,15 +561,15 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
         try {
 
-            const result = await validateVoucher(voucher, totals.subtotal, bookingDateTime);
+            const result = await validateVoucher(voucher, totals.subtotal, bookingDateTime, "session", formData.email);
 
             if (result.success && result.discount) {
 
-                setDiscount(result.discount);
+                setDiscount(Math.round(result.discount * 100)); // the wizard keeps money in pence
 
                 setAppliedVoucher(result.code || voucher);
 
-                setVoucherMessage(`✅ Voucher applied: £${(result.discount / 100).toFixed(2)} off`);
+                setVoucherMessage(`✅ Voucher applied: £${Number(result.discount).toFixed(2)} off`);
 
                 setValue("voucherCode", result.code);
 
@@ -1941,7 +1944,7 @@ export const BookingWizard = ({ onSubmit, cmsContent = [] }: BookingWizardProps)
 
                                             {voucherMessage && (
 
-                                                <p className={`text-sm ${voucherMessage.startsWith("?") ? "text-green-400" : "text-red-400"}`}>
+                                                <p className={`text-sm ${appliedVoucher ? "text-green-400" : "text-red-400"}`}>
 
                                                     {voucherMessage}
 

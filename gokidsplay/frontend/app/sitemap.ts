@@ -37,7 +37,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         '/attractions/go-karts',
         '/attractions/inflatable-park',
         '/facilities',
-        '/groups',
         '/gallery',
         '/testimonies',
         '/contact',

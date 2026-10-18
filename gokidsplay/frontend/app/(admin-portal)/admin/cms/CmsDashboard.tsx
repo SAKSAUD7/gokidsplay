@@ -35,7 +35,7 @@ const QUICK_ACTIONS: Card[] = [
 ];
 
 const PAGE_GROUPS: { title: string; match: (key: string) => boolean }[] = [
-    { title: "Main pages", match: k => ["home", "about", "pricing", "party-booking", "events", "contact", "groups", "gallery", "testimonies"].includes(k) },
+    { title: "Main pages", match: k => ["home", "about", "pricing", "party-booking", "events", "contact", "gallery", "testimonies"].includes(k) },
     { title: "Attractions & facilities", match: k => k === "attractions" || k.startsWith("attraction-") || k === "facilities" },
     { title: "Information & help", match: k => ["information", "faq", "guidelines"].includes(k) },
     { title: "Legal", match: k => k.startsWith("legal-") },
@@ -62,7 +62,6 @@ export default function CmsDashboard({ data }: { data: DashboardData }) {
                 { name: "Party Booking", href: "/admin/cms/party-booking", icon: "PartyPopper", description: "Party prices, times and wizard steps" },
                 { name: "Party Invitations", href: "/admin/invitations", icon: "Mail", description: "E-invitation designs for party guests", count: c("invitations", "design") },
                 { name: "Special Events", href: "/admin/events", icon: "Sparkles", description: "Events, reservations and requests", count: c("events", "event") },
-                { name: "Group Bookings", href: "/admin/cms/groups", icon: "Users", description: "School & group packages", count: c("groups", "package") },
                 { name: "Café Menu", href: "/admin/cms/menu-sections", icon: "Utensils", description: "Menu pop-up on the Parties page", count: c("menu", "section") },
                 { name: "Customer Account Page", href: "/admin/cms/account-config", icon: "User", description: "Text on My Bookings" },
             ],

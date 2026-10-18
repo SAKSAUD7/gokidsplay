@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientIpHeaders } from "@/app/lib/client-ip";
 
 const BACKEND = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1').replace('localhost', '127.0.0.1');
 
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
 
         const res = await fetch(`${BACKEND}/payments/create-order/`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...clientIpHeaders() },
             body: JSON.stringify(body),
             cache: 'no-store',
         });
@@ -30,8 +31,7 @@ export async function POST(request: NextRequest) {
         // For SumUp: the backend returns checkout_url pointing to SumUp's hosted payment page
         // For Mock: generate a local success URL (mock still requires verify step)
         if (data.mock && !data.checkout_url) {
-            const frontendBase = process.env.NEXT_PUBLIC_FRONTEND_URL
-                || 'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net';
+            const frontendBase = process.env.NEXT_PUBLIC_FRONTEND_URL || request.nextUrl.origin;
             // Mock: go to a "confirm payment" step, not directly to success
             // The success page will call verify, which actually marks the booking CONFIRMED
             data.checkout_url = `${frontendBase}/book/success?order_id=${data.order_id}&booking_id=${body.booking_id}&booking_type=${body.booking_type}&mock=true`;

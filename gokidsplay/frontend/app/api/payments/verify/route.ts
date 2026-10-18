@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { clientIpHeaders } from "@/app/lib/client-ip";
 
 const BACKEND = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1').replace('localhost', '127.0.0.1');
 
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
         try {
             res = await fetch(`${BACKEND}/payments/verify/`, {
                 method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', ...clientIpHeaders() },
                 body:    JSON.stringify(body),
                 cache:   'no-store',
                 signal:  controller.signal,

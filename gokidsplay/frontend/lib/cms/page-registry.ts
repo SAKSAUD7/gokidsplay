@@ -718,61 +718,6 @@ export const PAGES: PageDef[] = [
         ],
     },
     {
-        key: 'groups',
-        label: 'Group Bookings',
-        path: '/groups',
-        description: 'Groups hero, package heading, how-it-works steps and help line. Packages and benefits are managed as lists.',
-        sections: [
-            {
-                key: 'hero',
-                label: 'Hero',
-                fields: [
-                    text('badge', 'Badge text', 'Special Group Rates'),
-                    text('title', 'Heading', 'Group Bookings', 'title'),
-                    area('subtitle', 'Subheading', 'Bring your team, class, or friends for an unforgettable adventure! Enjoy exclusive group rates and dedicated support.', 'content'),
-                    image('image', 'Background image', '/images/gallery-1.jpg', 'image_url'),
-                ],
-            },
-            {
-                key: 'packages',
-                label: 'Packages heading',
-                description: 'Shown only when at least one Group Package is active.',
-                fields: [
-                    text('title', 'Heading', 'Choose Your Package', 'title'),
-                    area('subtitle', 'Intro text', 'Select the perfect package for your group and let us handle the rest!', 'subtitle'),
-                    text('popular_label', '"Most popular" ribbon text', 'MOST POPULAR'),
-                    text('button_text', 'Package button text', 'Enquire Now', 'cta_text'),
-                    link('button_link', 'Package button link', '/contact#contactForm', 'cta_link'),
-                ],
-            },
-            {
-                key: 'how',
-                label: 'How it works',
-                fields: [
-                    text('title', 'Heading', 'How It Works', 'title'),
-                    list('steps', 'Steps', [
-                        'Contact Us | Fill out the enquiry form with your group details',
-                        "Get Quote | We'll send you a customized quote within 24 hours",
-                        'Book & Enjoy | Confirm your booking and have an amazing time!',
-                    ].join('\n'), 'One step per line: title | description'),
-                ],
-            },
-            {
-                key: 'help',
-                label: 'Help line',
-                fields: [
-                    text('title', 'Text', 'Have questions? Our team is here to help!', 'title'),
-                    text('button_text', 'Button text', 'Contact Us Now', 'cta_text'),
-                    link('button_link', 'Button link', '/contact#contactForm', 'cta_link'),
-                ],
-            },
-        ],
-        collections: [
-            { label: 'Group Packages', href: '/admin/cms/group-packages', description: 'Packages, prices and features' },
-            { label: 'Group Benefits', href: '/admin/cms/groups', description: 'Benefit cards under the hero' },
-        ],
-    },
-    {
         key: 'gallery',
         label: 'Gallery',
         path: '/gallery',

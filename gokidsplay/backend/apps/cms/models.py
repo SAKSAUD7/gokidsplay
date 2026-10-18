@@ -219,28 +219,6 @@ class MenuSection(models.Model):
     def __str__(self):
         return self.category
 
-class GroupPackage(models.Model):
-    """Group booking packages for schools, corporates, etc."""
-    name = models.CharField(max_length=255)
-    subtitle = models.TextField()
-    min_size = models.CharField(max_length=100, help_text="e.g., '15+ Students'")
-    icon = models.CharField(max_length=50, help_text="Icon name")
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    price_note = models.CharField(max_length=50, help_text="e.g., 'per student'")
-    features = models.JSONField(default=list, help_text="List of features")
-    color = models.CharField(max_length=20, default="primary", help_text="Color variant")
-    popular = models.BooleanField(default=False)
-    active = models.BooleanField(default=True)
-    order = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['order']
-
-    def __str__(self):
-        return self.name
-
 class GuidelineCategory(models.Model):
     """Safety guideline categories"""
     title = models.CharField(max_length=255)
@@ -451,22 +429,6 @@ class FacilityItem(models.Model):
     icon = models.CharField(max_length=50, help_text="Icon name")
     image_url = models.URLField(null=True, blank=True)
     items = models.JSONField(default=list, help_text="List of specific items/features")
-    order = models.IntegerField(default=0)
-    active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['order']
-
-    def __str__(self):
-        return self.title
-
-class GroupBenefit(models.Model):
-    """Benefits for group bookings page"""
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    icon = models.CharField(max_length=50, help_text="Lucide icon name")
     order = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

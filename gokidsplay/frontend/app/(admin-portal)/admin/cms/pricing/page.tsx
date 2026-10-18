@@ -2,22 +2,19 @@ import React from 'react';
 import { getPricingPlans } from '@/app/actions/pricing-plans';
 import { getPageSections } from '@/app/actions/page-sections';
 import { getPartyPackages } from '@/app/actions/party-packages';
-import { getGroupPackages } from '@/app/actions/group-packages';
 import { PricingPlansManager } from '@/components/admin/cms/pricing/PricingPlansManager';
 import { PartyPackagesManager } from '@/components/admin/cms/pricing/PartyPackagesManager';
-import { GroupPackagesManager } from '@/components/admin/cms/pricing/GroupPackagesManager';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
 import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 
 export default async function PricingAdminPage() {
-    // Fetch all data in parallel: Page Sections, Pricing Plans, Party Packages, Group Packages
-    const [sections, plans, partyPackages, groupPackages] = await Promise.all([
+    // Fetch all data in parallel: Page Sections, Pricing Plans, Party Packages
+    const [sections, plans, partyPackages] = await Promise.all([
         getPageSections('pricing'),
         getPricingPlans(),
         getPartyPackages(),
-        getGroupPackages()
-    ]) as [any[], any[], any[], any[]];
+    ]) as [any[], any[], any[]];
 
     const heroSection = sections.find((s: any) => s.section_key === 'hero');
 
@@ -45,11 +42,6 @@ export default async function PricingAdminPage() {
                 {/* Party Packages */}
                 <section>
                     <PartyPackagesManager items={partyPackages} />
-                </section>
-
-                {/* Group Packages Manager */}
-                <section>
-                    <GroupPackagesManager items={groupPackages} />
                 </section>
             </div>
         </div>

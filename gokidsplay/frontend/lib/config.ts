@@ -49,7 +49,6 @@ export const footerLinks: { title: string; items: { title: string; href: string;
         items: [
             { title: "Book Tickets", href: "/book" },
             { title: "Birthday Parties", href: "/parties" },
-            { title: "Group Bookings", href: "/groups" },
             { title: "Pricing", href: "/pricing" },
             { title: "Information", href: "/information" },
             { title: "Facilities", href: "/facilities" },

@@ -36,6 +36,15 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key-fallback')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = get_env_bool('DEBUG', False)  # SAFETY: defaults to False; set DEBUG=True in local .env
 
+# On Azure (WEBSITE_HOSTNAME is set there) refuse to start with the public
+# development key: anyone could forge sign-in tokens with it.
+if os.environ.get('WEBSITE_HOSTNAME') and (not os.getenv('SECRET_KEY') or SECRET_KEY.startswith('django-insecure')):
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('Set a long random SECRET_KEY in the App Service settings (see DEPLOYMENT_GUIDE.md).')
+
+# Django's own /admin/ screens are off on the server unless switched on here
+DJANGO_ADMIN_ENABLED = get_env_bool('DJANGO_ADMIN_ENABLED', False)
+
 # Hosts this API answers for. The defaults cover local development, the live
 # domain and Azure App Service; add more with ALLOWED_HOSTS=host1,host2 in .env.
 ALLOWED_HOSTS = [
@@ -129,9 +138,12 @@ WSGI_APPLICATION = 'ninja_backend.wsgi.application'
 
 
 # Upload Constraints
-# Limit to 500MB as requested
-DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500 MB
+# Request bodies other than files (JSON, form fields) up to 10 MB. Uploaded files
+# are not limited by this: anything over 10 MB is streamed to a temporary file
+# instead of memory (per-type size limits are checked by the upload views).
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
 
 # Database
@@ -227,6 +239,8 @@ REST_FRAMEWORK = {
     # ── Rate Limiting (no extra package needed — built into DRF) ──────────
     # Public reads (site content) are generous, public writes (bookings,
     # logins, contact form) are strict — see apps/core/throttling.py
+    # Private by default: every public endpoint says AllowAny on purpose
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
     'DEFAULT_THROTTLE_CLASSES': [
         'apps.core.throttling.AnonReadThrottle',
         'apps.core.throttling.AnonWriteThrottle',
@@ -235,6 +249,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon_read': '600/minute',  # page content, slot availability
         'anon_write': '30/minute',  # booking, login, register, contact
+        'voucher_check': '10/minute',  # voucher code checks (stops guessing codes)
+        'login': '10/minute',       # sign-in / sign-up / password reset (stops password guessing)
         'user': '3000/minute',      # signed-in staff (each admin page makes several calls)
     },
     # Never trust a client-sent X-Forwarded-For directly (see TRUSTED_PROXY_COUNT)
@@ -398,6 +414,10 @@ PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
 
 # ── Frontend URL (used for email links and payment return URLs) ─────────────
 # Set FRONTEND_URL to https://www.gokidsplay.co.uk when the new site goes live.
+# Shared with the website server: lets it pass each customer's IP for rate limits
+# (apps/core/throttling.py). Same value in the frontend's INTERNAL_PROXY_SECRET.
+INTERNAL_PROXY_SECRET = os.getenv('INTERNAL_PROXY_SECRET', '')
+
 # Shared secret for POST /api/v1/core/cron/ (scheduled jobs, see apps/core/cron_views.py)
 CRON_SECRET = os.getenv('CRON_SECRET', '')
 

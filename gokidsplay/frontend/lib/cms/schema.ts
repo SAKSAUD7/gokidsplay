@@ -88,22 +88,6 @@ export const schemas: SchemaMap = {
             { name: "order", label: "Order", type: "number", defaultValue: 0 },
         ],
     },
-    group_package: {
-        name: "Group Package",
-        fields: [
-            { name: "name", label: "Package Name", type: "text", required: true },
-            { name: "subtitle", label: "Subtitle", type: "textarea", required: true },
-            { name: "min_size", label: "Min Group Size", type: "text", required: true },
-            { name: "icon", label: "Icon Name", type: "text", required: true },
-            { name: "price", label: "Price", type: "number", required: true },
-            { name: "price_note", label: "Price Note", type: "text", required: true },
-            { name: "features", label: "Features", type: "json_list" },
-            { name: "color", label: "Color", type: "text", defaultValue: "primary" },
-            { name: "popular", label: "Popular", type: "boolean", defaultValue: false },
-            { name: "active", label: "Active", type: "boolean", defaultValue: true },
-            { name: "order", label: "Order", type: "number", defaultValue: 0 },
-        ],
-    },
     guideline_category: {
         name: "Guideline Category",
         fields: [
@@ -270,16 +254,6 @@ export const schemas: SchemaMap = {
         ],
     },
 
-    group_benefit: {
-        name: "Group Benefit",
-        fields: [
-            { name: "title", label: "Benefit Title", type: "text", required: true },
-            { name: "description", label: "Description", type: "textarea", required: true },
-            { name: "icon", label: "Icon Name (Lucide)", type: "text", required: true },
-            { name: "order", label: "Order", type: "number", defaultValue: 0 },
-            { name: "active", label: "Active", type: "boolean", defaultValue: true },
-        ],
-    },
     contact_message: {
         name: "Contact Message",
         fields: [

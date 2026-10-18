@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { clientIpHeaders } from "@/app/lib/client-ip";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
@@ -46,35 +47,11 @@ export async function createPartyBooking(formData: any) {
         // No GST for UK — price is VAT-inclusive
         const gstRate = 0;
         const gst = subtotal * (gstRate / 100);
-        let totalAmount = subtotal + gst;
-        let discountAmount = 0;
-        let voucherCode = null;
-
-        // Apply voucher if provided
-        if (formData.voucherCode) {
-            try {
-                const voucherRes = await fetch(`${API_URL}/shop/vouchers/validate/`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        code: formData.voucherCode.toUpperCase(),
-                        order_amount: subtotal
-                    }),
-                    cache: "no-store"
-                });
-
-                if (voucherRes.ok) {
-                    const voucherData = await voucherRes.json();
-                    if (voucherData.valid) {
-                        discountAmount = voucherData.discount_amount;
-                        totalAmount = voucherData.final_amount;
-                        voucherCode = formData.voucherCode.toUpperCase();
-                    }
-                }
-            } catch {
-                // Voucher validation failed silently — continue without discount
-            }
-        }
+        const totalAmount = subtotal + gst;
+        const discountAmount = 0;
+        // The API checks the voucher and applies the discount when it prices the
+        // booking; an invalid code comes back as an error the customer sees.
+        const voucherCode = String(formData.voucherCode || "").trim().toUpperCase() || null;
 
         // Convert time to 24-hour HH:MM:SS format for backend
         const convertTo24Hour = (timeStr: string) => {
@@ -142,6 +119,7 @@ export async function createPartyBooking(formData: any) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                ...clientIpHeaders(),
                 ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
             },
             body: JSON.stringify(partyBookingPayload)

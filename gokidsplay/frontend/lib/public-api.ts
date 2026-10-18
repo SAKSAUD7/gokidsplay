@@ -154,11 +154,6 @@ export async function getPublicMenuSections() {
     return menus.filter((m: any) => m.active);
 }
 
-export async function getPublicGroupPackages() {
-    const packages = await fetchFromAPI('/cms/group-packages/');
-    return packages.filter((g: any) => g.active);
-}
-
 export async function getPublicTimelineItems() {
     const items = await fetchFromAPI('/cms/timeline-items/');
     return items.filter((i: any) => i.active);

@@ -2,7 +2,7 @@ from django.apps import apps
 from rest_framework import serializers
 from .models import (
     Banner, Activity, Faq, SocialLink, GalleryItem,
-    StatCard, InstagramReel, MenuSection, GroupPackage, GuidelineCategory, LegalDocument,
+    StatCard, InstagramReel, MenuSection, GuidelineCategory, LegalDocument,
     PageSection, PricingPlan, ContactInfo, PartyPackage, TimelineItem, ValueItem, FacilityItem,
     Page, ContactMessage, FreeEntry, SessionBookingConfig, PartyBookingConfig, PricingCarouselImage,
     BookingInformation, TimingCard, CustomerAccountConfig
@@ -63,11 +63,6 @@ class InstagramReelSerializer(serializers.ModelSerializer):
 class MenuSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MenuSection
-        fields = '__all__'
-
-class GroupPackageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GroupPackage
         fields = '__all__'
 
 class GuidelineCategorySerializer(serializers.ModelSerializer):

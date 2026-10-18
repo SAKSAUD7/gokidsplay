@@ -6,12 +6,15 @@ from rest_framework.response import Response
 from .models import EmailTemplate, MarketingCampaign, EmailSendLog, EmailEngagement, EmailUnsubscribe
 from .serializers import EmailTemplateSerializer, MarketingCampaignSerializer
 from .services import marketing_service
+from apps.core.permissions import IsManagerOrAdmin
+from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
 import base64
 
+@require_http_methods(['GET', 'POST'])
 def unsubscribe_view(request):
     """
     Public unsubscribe view.
@@ -35,6 +38,7 @@ def unsubscribe_view(request):
     return render(request, 'marketing/unsubscribe_confirm.html', {'email': email})
 
 class EmailTemplateViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsManagerOrAdmin]
     queryset = EmailTemplate.objects.all().order_by('-created_at')
     serializer_class = EmailTemplateSerializer
     filterset_fields = ['is_active', 'type']
@@ -43,6 +47,7 @@ class EmailTemplateViewSet(viewsets.ModelViewSet):
         return EmailTemplate.objects.all().order_by('-created_at')
 
 class MarketingCampaignViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsManagerOrAdmin]
     queryset = MarketingCampaign.objects.all().order_by('-created_at')
     serializer_class = MarketingCampaignSerializer
     filterset_fields = ['status', 'recipient_type']

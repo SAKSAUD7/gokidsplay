@@ -179,6 +179,9 @@ class PartyBooking(models.Model):
     
     package_price = models.DecimalField(max_digits=10, decimal_places=2, default=250.00, help_text="Base package price")
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Deposit amount required/paid")
+    voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True, related_name='party_bookings')
+    voucher_code = models.CharField(max_length=50, null=True, blank=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Voucher discount taken off")
     payment_type = models.CharField(max_length=20, default='FULL', choices=[('DEPOSIT', 'Deposit (50%)'), ('FULL', 'Full Payment (100%)')])
     
     reschedule_count = models.IntegerField(default=0, help_text="Number of times this party was rescheduled")

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { bookingSchema, formatPhoneNumber } from "@repo/types";
+import { clientIpHeaders } from "@/app/lib/client-ip";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
@@ -39,6 +40,7 @@ export async function createBooking(formData: any) {
         const adminToken = isAdminBooking ? (await import("next/headers")).cookies().get("admin_token")?.value : undefined;
         const apiHeaders: Record<string, string> = {
             "Content-Type": "application/json",
+            ...clientIpHeaders(),
             ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
         };
 
@@ -187,11 +189,13 @@ export async function createBooking(formData: any) {
             // (it checks active/expiry/usage-limit/min-order and computes the discount)
             const voucherRes = await fetch(`${API_URL}/shop/vouchers/validate/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: apiHeaders,
                 body: JSON.stringify({
                     code: data.voucherCode,
                     order_amount: subtotal,
                     booking_datetime: data.date && data.time ? `${data.date}T${data.time}` : undefined,
+                    booking_type: "session",
+                    email: sanitizedEmail,
                 }),
                 cache: "no-store",
             });

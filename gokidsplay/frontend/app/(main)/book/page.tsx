@@ -1,5 +1,4 @@
 import { BookingWizard } from "../../../components/BookingWizard";
-import { createBooking } from "../../actions/createBooking";
 import { getPageSections } from "../../actions/page-sections";
 import { getBookingInformation } from "../../actions/booking-information";
 import { getMetadata } from "@/seo/seo.config";
@@ -56,7 +55,7 @@ export default async function BookingPage() {
                 {/* Booking Wizard First */}
                 {site && site.onlineBookingEnabled === false
                     ? <BookingPaused what="booking" phone={site.contactPhone} />
-                    : <BookingWizard onSubmit={createBooking} cmsContent={cmsContent} />}
+                    : <BookingWizard cmsContent={cmsContent} />}
 
                 {/* Session Information Section Below */}
                 {sessionInfo && (

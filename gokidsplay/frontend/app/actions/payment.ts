@@ -11,6 +11,8 @@
  * mixed-content (HTTPS→HTTP) issues in production on Azure.
  */
 
+import { clientIpHeaders } from "@/app/lib/client-ip";
+
 // Internal proxy routes — always relative, always same-origin, always HTTPS
 const PROXY_BASE = "/api/payments";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
@@ -59,7 +61,7 @@ export async function createPaymentOrder(
 
         const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...clientIpHeaders() },
             body: JSON.stringify({
                 booking_id:   data.booking_id,
                 booking_type: data.booking_type,
@@ -113,7 +115,7 @@ export async function verifyPayment(data: PaymentVerificationData) {
 
         const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", ...clientIpHeaders() },
             body: JSON.stringify({ order_id: data.order_id }),
             cache: "no-store",
         });

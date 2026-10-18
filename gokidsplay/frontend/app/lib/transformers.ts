@@ -19,7 +19,13 @@ export function transformCmsItem(item: any) {
         expiryDate: item.expiry_date,
         usageLimit: item.usage_limit,
         usedCount: item.used_count,
-        isActive: item.is_active
+        isActive: item.is_active,
+        validFrom: item.valid_from,
+        appliesTo: item.applies_to,
+        maxUsesPerCustomer: item.max_uses_per_customer,
+        maxDiscountAmount: item.max_discount_amount,
+        minHoursBeforeSlot: item.min_hours_before_slot,
+        totalDiscountGiven: item.total_discount_given,
     };
 }
 

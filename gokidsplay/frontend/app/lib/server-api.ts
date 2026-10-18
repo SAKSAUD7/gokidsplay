@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { clientIpHeaders } from "./client-ip";
 
 // Use 127.0.0.1 for server-side requests to avoid Node.js 18+ IPv6 resolution issues
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:9000/api/v1").replace('localhost', '127.0.0.1');
@@ -10,6 +11,7 @@ export function getAuthHeader(): Record<string, string> {
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const headers: Record<string, string> = {
+        ...clientIpHeaders(),
         ...getAuthHeader(),
     };
 
@@ -47,6 +49,7 @@ export async function postAPI(endpoint: string, data: any) {
     const isFormData = data instanceof FormData;
 
     const headers: Record<string, string> = {
+        ...clientIpHeaders(),
         ...getAuthHeader(),
     };
 
@@ -76,6 +79,7 @@ export async function putAPI(endpoint: string, data: any) {
     const isFormData = data instanceof FormData;
 
     const headers: Record<string, string> = {
+        ...clientIpHeaders(),
         ...getAuthHeader(),
     };
 

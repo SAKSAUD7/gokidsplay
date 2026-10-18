@@ -28,13 +28,19 @@ class JWTCookieAuthentication(JWTAuthentication):
     
     def enforce_csrf(self, request):
         """
-        Enforce CSRF validation for cookie-based authentication.
+        A browser sends cookies automatically, so a change made with the cookie
+        (POST, PATCH, DELETE…) must carry a CSRF token, as Django's own forms do.
+        The website's server calls the API with an Authorization header instead,
+        which is not affected.
         """
-        check = CSRFCheck(request)
-        # For now, we'll skip CSRF for API requests
-        # In production, you should enable this properly
+        if request.method in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+            return
+
+        def get_response(_request):  # CSRFCheck needs a response callable (unused)
+            return None
+
+        check = CSRFCheck(get_response)
+        check.process_request(request)
         reason = check.process_view(request, None, (), {})
         if reason:
-            # CSRF failed, but we'll allow it for now
-            # raise exceptions.PermissionDenied('CSRF Failed: %s' % reason)
-            pass
+            raise exceptions.PermissionDenied('CSRF Failed: %s' % reason)

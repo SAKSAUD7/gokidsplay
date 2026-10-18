@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     Banner, Activity, Faq, SocialLink, GalleryItem,
-    StatCard, InstagramReel, MenuSection, GroupPackage, GuidelineCategory, LegalDocument,
+    StatCard, InstagramReel, MenuSection, GuidelineCategory, LegalDocument,
     PageSection, PricingPlan, ContactInfo, PartyPackage, TimelineItem, ValueItem, FacilityItem,
     Page, AttractionVideoSection
 )
@@ -81,23 +81,6 @@ class MenuSectionAdmin(admin.ModelAdmin):
     search_fields = ['category']
     ordering = ['order']
 
-@admin.register(GroupPackage)
-class GroupPackageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'min_size', 'popular', 'active', 'order']
-    list_filter = ['popular', 'active']
-    search_fields = ['name', 'subtitle']
-    ordering = ['order']
-    fieldsets = (
-        ('Basic Info', {
-            'fields': ('name', 'subtitle', 'min_size', 'icon', 'active', 'order')
-        }),
-        ('Pricing', {
-            'fields': ('price', 'price_note')
-        }),
-        ('Details', {
-            'fields': ('features', 'color', 'popular')
-        }),
-    )
 
 @admin.register(GuidelineCategory)
 class GuidelineCategoryAdmin(admin.ModelAdmin):

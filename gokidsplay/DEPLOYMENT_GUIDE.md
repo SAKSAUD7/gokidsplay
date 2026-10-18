@@ -150,8 +150,11 @@ Azure portal → `gokidsplay-api` → **Settings → Environment variables** (or
 | `SUMUP_API_KEY` | from Part 8 (leave out until you have it) |
 | `SUMUP_MERCHANT_CODE` | from Part 8 |
 | `GOOGLE_PLACES_API_KEY` | from Part 9 (leave out until you have it) |
+| `INTERNAL_PROXY_SECRET` | another long random string — the **same value** goes on the website in Part 4 |
 
 `WEBSITE_HOSTNAME` is set by Azure automatically — don't add it.
+
+The backend refuses to start on Azure without a proper `SECRET_KEY` (so sign-in tokens can't be forged). Django's own `/admin/` screens are switched off on the server (the website's Admin Portal is used instead); add `DJANGO_ADMIN_ENABLED` = `True` only if you ever need them.
 
 ## Part 4 — Website settings
 
@@ -162,8 +165,11 @@ Azure portal → `gokidsplay-api` → **Settings → Environment variables** (or
 | `NEXT_PUBLIC_API_URL` | `https://api.gokidsplay.co.uk/api/v1` (until then `https://gokidsplay-api.azurewebsites.net/api/v1`) |
 | `NEXT_PUBLIC_FRONTEND_URL` | `https://www.gokidsplay.co.uk` (until then `https://gokidsplay-web.azurewebsites.net`) |
 | `WEBSITE_NODE_DEFAULT_VERSION` | `~20` |
+| `INTERNAL_PROXY_SECRET` | the same value as the backend's `INTERNAL_PROXY_SECRET` |
 
 The `NEXT_PUBLIC_…` values are also built into the website, so set the same values as GitHub **variables** in Part 6.
+
+`INTERNAL_PROXY_SECRET` lets the website pass each customer's own IP address to the API, so the booking, voucher and sign-in limits apply per customer. Without it every customer shares the website's address and busy times could hit the limits. Keep it out of GitHub variables (it is a secret, and only the running website needs it).
 
 ---
 
@@ -288,6 +294,7 @@ Do this when the Azure address works and you are ready to switch over from the o
 
 - [ ] Repository is **private**; all admin passwords changed; old `@ninjapark.com` accounts deactivated
 - [ ] Backend: `DEBUG=False`, `SECRET_KEY`, `DATABASE_URL` set
+- [ ] `INTERNAL_PROXY_SECRET` set to the same value on backend and website
 - [ ] Content loaded (7.2) and photos uploaded (7.3); no test bookings / events
 - [ ] E-mail: a contact-form message and a booking confirmation arrive
 - [ ] SumUp: one real payment and refund work

@@ -19,7 +19,6 @@ const COUNTED: Record<string, string> = {
     timeline: '/cms/timeline-items/',
     values: '/cms/value-items/',
     facilities: '/cms/facility-items/',
-    groups: '/cms/group-packages/',
     menu: '/cms/menu-sections/',
     social: '/cms/social-links/',
     events: '/bookings/events/',

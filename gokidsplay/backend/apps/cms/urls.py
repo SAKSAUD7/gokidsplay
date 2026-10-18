@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import google_reviews_view, google_reviews_sync_view
 from .views import (
     BannerViewSet, ActivityViewSet, FaqViewSet, TestimonialViewSet, SocialLinkViewSet, GalleryItemViewSet,
-    StatCardViewSet, InstagramReelViewSet, MenuSectionViewSet, GroupPackageViewSet,
+    StatCardViewSet, InstagramReelViewSet, MenuSectionViewSet,
     GuidelineCategoryViewSet, LegalDocumentViewSet,
     PageSectionViewSet, PricingPlanViewSet, ContactInfoViewSet, PartyPackageViewSet,
     TimelineItemViewSet, ValueItemViewSet, FacilityItemViewSet,
@@ -21,7 +21,6 @@ router.register(r'gallery', GalleryItemViewSet)
 router.register(r'stat-cards', StatCardViewSet)
 router.register(r'instagram-reels', InstagramReelViewSet)
 router.register(r'menu-sections', MenuSectionViewSet)
-router.register(r'group-packages', GroupPackageViewSet)
 router.register(r'guideline-categories', GuidelineCategoryViewSet)
 router.register(r'legal-documents', LegalDocumentViewSet)
 router.register(r'page-sections', PageSectionViewSet)

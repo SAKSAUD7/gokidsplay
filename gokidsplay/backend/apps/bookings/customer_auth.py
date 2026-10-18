@@ -6,7 +6,8 @@ Provides register, login, logout, me, and my-bookings endpoints.
 Uses simple token auth stored in a separate CustomerToken table.
 No Django sessions — pure API token approach compatible with Next.js frontend.
 """
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, throttle_classes
+from apps.core.throttling import AnonReadThrottle, LoginThrottle
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
@@ -52,6 +53,7 @@ def get_customer_from_request(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle, AnonReadThrottle])
 def customer_register(request):
     """Register a new customer account."""
     data = request.data
@@ -107,6 +109,7 @@ def customer_register(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle, AnonReadThrottle])
 def customer_login(request):
     """Log in with email and password."""
     email = (request.data.get("email") or "").strip().lower()
@@ -178,6 +181,7 @@ def customer_update_profile(request):
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle, AnonReadThrottle])
 def customer_change_password(request):
     """Change customer password."""
     customer = get_customer_from_request(request)
@@ -225,6 +229,7 @@ def make_password_reset_token(token_obj) -> str:
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle, AnonReadThrottle])
 def customer_forgot_password(request):
     """Email a password reset link. The reply is the same whether or not the account exists."""
     from django.conf import settings
@@ -261,6 +266,7 @@ def customer_forgot_password(request):
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
+@throttle_classes([LoginThrottle, AnonReadThrottle])
 def customer_reset_password(request):
     """Set a new password from an emailed reset link, then sign the customer in."""
     from django.core import signing

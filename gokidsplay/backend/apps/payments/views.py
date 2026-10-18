@@ -242,8 +242,7 @@ def process_refund(request):
 
 
 @api_view(['GET'])
-@authentication_classes([])
-@permission_classes([AllowAny])
+@permission_classes([IsStaffUser])  # Admin payment history card (lists order ids)
 def get_booking_payment_status(request, booking_id, booking_type):
     """
     Get payment status for a booking.
@@ -555,8 +554,7 @@ def sumup_webhook(request):
 
 
 @api_view(['POST'])
-@authentication_classes([])
-@permission_classes([AllowAny])
+@permission_classes([IsStaffUser])  # Admin → Payments "re-check" button
 def reverify_payment(request, order_id):
     """
     Admin endpoint to manually re-verify a stuck PENDING payment.
@@ -588,10 +586,17 @@ def auto_verify_pending_payments(request):
       - The admin payments page on load (sweeps any stale records)
 
     Returns a summary of how many payments were resolved.
+
+    Anyone can call it (the success page does), so it runs at most once a
+    minute; each run can ask SumUp about up to 50 payments.
     """
     from .models import Payment
+    from django.core.cache import cache
     from django.utils import timezone
     from datetime import timedelta
+
+    if not cache.add('payments:auto-verify', True, timeout=60):
+        return Response({'success': True, 'skipped': True, 'detail': 'Checked less than a minute ago'})
 
     # Only look at SUMUP payments created in last 7 days that are still CREATED (limit to 50 to prevent timeouts)
     cutoff = timezone.now() - timedelta(days=7)

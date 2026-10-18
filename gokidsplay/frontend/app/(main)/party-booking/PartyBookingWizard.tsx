@@ -6,6 +6,7 @@ import { ScrollReveal, BouncyButton } from "@repo/ui";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Users, Mail, Phone, User, Cake, MessageSquare, PartyPopper, CheckCircle, School, Loader2, Utensils } from "lucide-react";
 import { createPartyBooking } from "../../actions/createPartyBooking";
+import { validateVoucher } from "../../actions/validateVoucher";
 import ParticipantCollection from "../../../components/ParticipantCollection";
 import { PaymentStep } from "../../../components/PaymentStep";
 import { PartyBookingPDF } from "../../../components/PartyBookingPDF";
@@ -75,6 +76,12 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     });
 
     const [paymentOption, setPaymentOption] = useState<"deposit" | "full">("deposit");
+
+    // Voucher: checked by the API now, and applied again by the API when the booking is made
+    const [voucherInput, setVoucherInput] = useState("");
+    const [voucher, setVoucher] = useState<{ code: string; discount: number } | null>(null);
+    const [voucherMessage, setVoucherMessage] = useState("");
+    const [checkingVoucher, setCheckingVoucher] = useState(false);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -183,7 +190,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         }
         setIsSubmitting(true);
         try {
-            const result = await createPartyBooking({ ...formData, customerId: customerId ?? customer?.id, paymentOption });
+            const result = await createPartyBooking({ ...formData, voucherCode: voucher?.code, customerId: customerId ?? customer?.id, paymentOption });
 
             if (result.success) {
                 setTempBookingId(result.bookingId);            // UUID string
@@ -282,9 +289,11 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         const participantCost = chargeableParticipants * extraParticipantPrice;
         const spectatorCost = chargeableSpectators * extraSpectatorPrice;
         const subtotal = basePackagePrice + participantCost + spectatorCost;
-        const total = subtotal;
+        const discount = Math.min(voucher?.discount || 0, subtotal);
+        const total = subtotal - discount;
 
         return {
+            discount,
             subtotal: Number(subtotal) || 0,
             total: Number(total) || 0,
             deposit: Number(total * (depositPercentage / 100)) || 0
@@ -292,6 +301,30 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     };
 
     const costs = calculateTotal();
+
+    const applyVoucher = async (code = voucherInput) => {
+        const clean = code.trim().toUpperCase();
+        if (!clean) return;
+        setCheckingVoucher(true);
+        setVoucherMessage("");
+        const result = await validateVoucher(clean, costs.subtotal,
+            formData.date && formData.time ? `${formData.date}T${formData.time}:00` : undefined,
+            "party", formData.email || customer?.email || undefined);
+        setCheckingVoucher(false);
+        if (result.success) {
+            setVoucher({ code: result.code!, discount: Number(result.discount) || 0 });
+            setVoucherMessage(`Voucher ${result.code} applied: £${Number(result.discount).toFixed(2)} off`);
+        } else {
+            setVoucher(null);
+            setVoucherMessage(result.error || "Invalid voucher");
+        }
+    };
+
+    // The guest count or date changed: check the voucher again (minimum spend, % off, book-ahead rules)
+    useEffect(() => {
+        if (voucher && !tempBookingId) applyVoucher(voucher.code);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [costs.subtotal, formData.date, formData.time]);
 
     if (submitted && step === 6 && bookingDetails) {
         return (
@@ -743,6 +776,35 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                                 <span className="text-white font-bold">£{((formData.spectators - includedSpectators) * extraSpectatorPrice).toFixed(2)}</span>
                                             </div>
                                         )}
+                                        <div className="pt-2">
+                                            <label className="text-xs font-bold text-white/70" htmlFor="party-voucher">Voucher code</label>
+                                            <div className="flex gap-2 mt-1">
+                                                <input id="party-voucher" value={voucherInput} maxLength={50}
+                                                    onChange={e => setVoucherInput(e.target.value.toUpperCase())}
+                                                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); applyVoucher(); } }}
+                                                    placeholder="e.g. PARTY10" disabled={!!tempBookingId}
+                                                    className="flex-1 min-w-0 bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-sm text-white uppercase focus:border-primary focus:outline-none" />
+                                                {voucher ? (
+                                                    <button type="button" disabled={!!tempBookingId}
+                                                        onClick={() => { setVoucher(null); setVoucherInput(""); setVoucherMessage(""); }}
+                                                        className="px-3 py-2 rounded-lg text-sm font-bold bg-white/10 text-white hover:bg-white/20 disabled:opacity-50">Remove</button>
+                                                ) : (
+                                                    <button type="button" onClick={() => applyVoucher()} disabled={checkingVoucher || !voucherInput.trim()}
+                                                        className="px-3 py-2 rounded-lg text-sm font-bold bg-primary text-black hover:bg-primary/90 disabled:opacity-50">
+                                                        {checkingVoucher ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {voucherMessage && (
+                                                <p className={`text-xs mt-1 ${voucher ? "text-emerald-400" : "text-red-400"}`} role="status">{voucherMessage}</p>
+                                            )}
+                                        </div>
+                                        {costs.discount > 0 && (
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-emerald-400">Discount ({voucher?.code})</span>
+                                                <span className="text-emerald-400 font-bold">- £{costs.discount.toFixed(2)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between text-sm text-white/50">
                                             <span>All prices include VAT</span>
                                         </div>
@@ -879,7 +941,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                 adultPrice: extraSpectatorPrice,
                                 kidPrice: extraParticipantPrice,
                                 onlineBookingFee: 0,
-                                discount: 0,
+                                discount: costs.discount,
                                 totalPaid: paymentOption === "deposit" ? costs.deposit : costs.total,
                             }}
                             onSuccess={() => {

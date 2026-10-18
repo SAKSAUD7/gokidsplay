@@ -107,7 +107,7 @@ def price_session_booking(
                          discount=Decimal('0.00'), amount=total, add_ons=add_on_lines)
 
     if voucher_code and str(voucher_code).strip():
-        result = evaluate_voucher(voucher_code, subtotal, booking_datetime)
+        result = evaluate_voucher(voucher_code, subtotal, booking_datetime, kind='session')
         if not result.valid:
             price.error = result.error
             return price
@@ -166,6 +166,7 @@ def price_admission(
     voucher_code: Optional[str] = None,
     booking_datetime: Optional[str] = None,
     include_online_fee: bool = True,
+    email: Optional[str] = None,
 ) -> AdmissionPrice:
     from apps.cms.models import PricingPlan, SessionBookingConfig
     from apps.shop.services import evaluate_voucher
@@ -219,7 +220,7 @@ def price_admission(
     price.amount = total
 
     if voucher_code and str(voucher_code).strip():
-        result = evaluate_voucher(voucher_code, price.subtotal, booking_datetime)
+        result = evaluate_voucher(voucher_code, price.subtotal, booking_datetime, kind='session', email=email)
         if not result.valid:
             price.error = result.error
             return price
@@ -249,6 +250,7 @@ class PartyPrice:
     package_price: Decimal = PARTY_BASE_PRICE
     voucher: Any = None
     voucher_code: Optional[str] = None
+    error: str = ''
 
 
 def party_rates() -> dict:
@@ -269,7 +271,8 @@ def party_rates() -> dict:
     }
 
 
-def price_party_booking(*, kids: int, adults: int, voucher_code: Optional[str] = None) -> PartyPrice:
+def price_party_booking(*, kids: int, adults: int, voucher_code: Optional[str] = None,
+                        email: Optional[str] = None, booking_datetime: Optional[str] = None) -> PartyPrice:
     from apps.shop.services import evaluate_voucher
 
     rates = party_rates()
@@ -281,10 +284,11 @@ def price_party_booking(*, kids: int, adults: int, voucher_code: Optional[str] =
     price = PartyPrice(subtotal=subtotal, discount=Decimal('0.00'), amount=subtotal,
                        deposit=_money(subtotal * deposit_rate), package_price=rates['base'])
 
-    # Same behaviour as the wizard: an invalid voucher is simply ignored for parties
     if voucher_code and str(voucher_code).strip():
-        result = evaluate_voucher(voucher_code, subtotal)
-        if result.valid:
+        result = evaluate_voucher(voucher_code, subtotal, booking_datetime, kind='party', email=email)
+        if not result.valid:
+            price.error = result.error
+        else:
             price.discount = result.discount
             price.amount = _money(subtotal - result.discount)
             price.deposit = _money(price.amount * deposit_rate)

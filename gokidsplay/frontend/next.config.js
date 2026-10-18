@@ -161,6 +161,10 @@ const nextConfig = {
             },
             // The shop and memberships were removed — send old links to the prices page
             { source: '/shop', destination: '/pricing', permanent: true },
+            // Group bookings were removed (October 2026)
+            { source: '/groups', destination: '/', permanent: true },
+            { source: '/admin/cms/group-:rest*', destination: '/admin/cms', permanent: false },
+            { source: '/admin/cms/groups', destination: '/admin/cms', permanent: false },
             // Waivers were removed; the old waiver/kiosk pages go to the play rules / terms
             { source: '/waiver', destination: '/guidelines', permanent: true },
             { source: '/waiver-terms', destination: '/terms', permanent: true },

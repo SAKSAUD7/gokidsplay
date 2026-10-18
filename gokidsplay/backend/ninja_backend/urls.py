@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
 
@@ -13,9 +14,15 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'
 
 class EmailTokenObtainPairView(TokenObtainPairView):
+    """Admin portal sign-in (10 tries a minute per visitor)."""
     serializer_class = EmailTokenObtainPairSerializer
 
+    def get_throttles(self):
+        from apps.core.throttling import LoginThrottle
+        return [LoginThrottle()]
 
+
+@require_http_methods(['GET', 'HEAD'])
 def health_check(request):
     """Health check for the root URL and load balancer probes (also checks the database)."""
     from django.db import connection
@@ -35,7 +42,6 @@ def health_check(request):
 urlpatterns = [
     path('', health_check),                         # Root health check
     path('api/health/', health_check),              # Load balancer health probe
-    path('admin/', admin.site.urls),
 
     # API V1
     path('api/v1/core/', include('apps.core.urls')),
@@ -51,6 +57,11 @@ urlpatterns = [
     path('api/token/', EmailTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
+
+# Django's built-in admin (the website has its own admin portal): local development,
+# or on the server only when DJANGO_ADMIN_ENABLED=True
+if settings.DEBUG or getattr(settings, 'DJANGO_ADMIN_ENABLED', False):
+    urlpatterns.insert(2, path('admin/', admin.site.urls))
 
 # API documentation lists every endpoint, so it is only served in local development
 if settings.DEBUG:

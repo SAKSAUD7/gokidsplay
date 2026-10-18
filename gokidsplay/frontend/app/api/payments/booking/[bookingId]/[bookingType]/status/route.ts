@@ -10,13 +10,16 @@ export async function GET(
     try {
         const { bookingId, bookingType } = params;
         
-        // Pass cookies along for authentication
-        const cookieStore = cookies();
-        const authCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+        // Staff only: send the admin's token
+        const token = cookies().get("admin_token")?.value;
+        if (!token) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+        if (!/^\d+$/.test(bookingId) || !["session", "party"].includes(bookingType)) {
+            return NextResponse.json({ error: "Not found" }, { status: 404 });
+        }
 
         const response = await fetch(`${API_BASE_URL}/payments/booking/${bookingId}/${bookingType}/status/`, {
             headers: {
-                'Cookie': authCookies,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
             cache: 'no-store'
