@@ -122,13 +122,13 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, con
                         <ScrollReveal animation="slideRight">
                             <div className="relative rounded-3xl overflow-hidden aspect-square">
                                 <Image
-                                    src={getMediaUrl(story.image) || "/images/gokidsplay/unnamed (11).webp"}
+                                    src={getMediaUrl(story.image) || "/images/gokidsplay/entrance-reception.jpg"}
                                     alt="Kids having fun at Go Kids Play Coventry"
                                     fill
                                     className="object-cover rounded-3xl"
                                     onError={(e) => {
                                         e.currentTarget.srcset = "";
-                                        e.currentTarget.src = "/images/gokidsplay/unnamed (11).webp";
+                                        e.currentTarget.src = "/images/gokidsplay/entrance-reception.jpg";
                                     }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
@@ -261,7 +261,7 @@ export default function AboutContent({ values, stats, timeline, faqs, reels, con
                                         className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[9/16]"
                                     >
                                         <Image
-                                            src={getMediaUrl(item.thumbnail_url || item.img) || "/images/instagram/reel-1.jpg"}
+                                            src={getMediaUrl(item.thumbnail_url || item.img) || "/images/gokidsplay/soft-play-wave-slide.jpg"}
                                             alt="Instagram Reel"
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-60"

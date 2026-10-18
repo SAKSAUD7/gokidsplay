@@ -18,7 +18,7 @@ export function AboutEditor({ section: initialSection, pageSlug }: AboutEditorPr
         section_key: 'about',
         title: "Leicester's Premier Entertainment Venue",
         content: "Go Kids Play Leicester was born from a simple idea: create a space where people of all ages can enjoy roller skating, bowling, and arcade games together – all under one roof at Navigation Street, Leicester City Centre.",
-        image_url: '/images/gokidsplay/unnamed (4).webp',
+        image_url: '/images/gokidsplay/soft-play-overview.jpg',
         active: true,
         order: 1
     });

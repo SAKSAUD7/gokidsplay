@@ -68,7 +68,7 @@ export function AttractionDetail({ slug, content }: AttractionDetailProps) {
             {hero && (
                 <section className="relative h-[55vh] min-h-[380px] overflow-hidden mb-16">
                     <Image
-                        src={getMediaUrl(hero.image) || "/images/gokidsplay/unnamed.webp"}
+                        src={getMediaUrl(hero.image) || "/images/gokidsplay/inflatable-obstacle-course.jpg"}
                         alt={`${hero.title} at Go Kids Play Coventry`}
                         fill
                         priority

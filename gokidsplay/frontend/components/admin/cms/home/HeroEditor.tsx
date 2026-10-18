@@ -17,7 +17,7 @@ export function HeroEditor({ section: initialSection, pageSlug }: HeroEditorProp
         section_key: 'hero',
         title: 'GO KIDS PLAY LEICESTER',
         content: 'Roller Skating, Ten Pin Bowling, Arcade Games and more — the ultimate entertainment destination in Leicester City Centre!',
-        image_url: '/images/gokidsplay/unnamed.webp',
+        image_url: '/images/gokidsplay/inflatable-obstacle-course.jpg',
         active: true,
         order: 0
     });

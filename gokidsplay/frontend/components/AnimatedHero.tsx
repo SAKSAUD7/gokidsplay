@@ -13,7 +13,7 @@ interface AnimatedHeroProps {
 }
 
 export function AnimatedHero({ content: c }: AnimatedHeroProps) {
-    const backgroundImage = c.image || "/images/gokidsplay/unnamed.webp";
+    const backgroundImage = c.image || "/images/gokidsplay/inflatable-obstacle-course.jpg";
     const video = c.video;
 
     return (
@@ -21,7 +21,7 @@ export function AnimatedHero({ content: c }: AnimatedHeroProps) {
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
                 <Image
-                    src={getMediaUrl(backgroundImage) || "/images/gokidsplay/unnamed.webp"}
+                    src={getMediaUrl(backgroundImage) || "/images/gokidsplay/inflatable-obstacle-course.jpg"}
                     alt="Go Kids Play Coventry — Indoor Play Centre"
                     fill
                     priority

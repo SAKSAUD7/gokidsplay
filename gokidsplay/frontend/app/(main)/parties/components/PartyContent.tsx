@@ -27,7 +27,7 @@ export default function PartyContent({ menus, settings, content }: PartyContentP
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { hero, package: pkg, feast, features, terms, cta } = content;
 
-    const heroImage = getMediaUrl(hero?.image) || "/images/uploads/img-3.jpg";
+    const heroImage = getMediaUrl(hero?.image) || "/images/gokidsplay/inflatable-bounce-zone.jpg";
     const email = terms?.email || settings?.contactEmail || "info@gokidsplay.co.uk";
     const bookingLink = pkg?.button_link || "/party-booking";
     const featureCards = listItems(features?.cards).map((line) => {
@@ -47,7 +47,7 @@ export default function PartyContent({ menus, settings, content }: PartyContentP
                         alt="Party Booking"
                         className="w-full h-full object-cover opacity-30"
                         onError={(e) => {
-                            e.currentTarget.src = "/images/hero-background.jpg";
+                            e.currentTarget.src = "/images/gokidsplay/inflatable-bounce-zone.jpg";
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background" />

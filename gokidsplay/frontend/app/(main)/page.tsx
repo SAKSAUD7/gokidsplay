@@ -57,7 +57,7 @@ export default async function Home() {
         .slice(0, 8)
         .map((g: any) => ({
             id: g.id,
-            src: g.image_url || '/images/hero-background.jpg',
+            src: g.image_url || '/images/gokidsplay/inflatable-bounce-zone.jpg',
             title: g.title || '',
             desc: g.category || ''
         }));

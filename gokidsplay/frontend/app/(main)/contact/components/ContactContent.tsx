@@ -88,7 +88,7 @@ export default function ContactContent({ settings, hours, content }: ContactCont
         },
     ];
 
-    const heroImage = getMediaUrl(hero?.image) || "/images/uploads/img-7.jpg";
+    const heroImage = getMediaUrl(hero?.image) || "/images/gokidsplay/entrance-reception.jpg";
 
     return (
         <main className="min-h-screen bg-background text-white pt-24">
@@ -101,7 +101,7 @@ export default function ContactContent({ settings, hours, content }: ContactCont
                         alt={hero.title}
                         className="w-full h-full object-cover opacity-30"
                         onError={(e) => {
-                            e.currentTarget.src = "/images/hero-background.jpg";
+                            e.currentTarget.src = "/images/gokidsplay/inflatable-bounce-zone.jpg";
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/80 to-background" />

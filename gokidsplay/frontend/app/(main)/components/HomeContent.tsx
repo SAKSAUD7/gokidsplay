@@ -139,7 +139,7 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                         <ScrollReveal animation="slideRight">
                             <div className="relative rounded-3xl overflow-hidden aspect-video lg:aspect-square">
                                 <Image
-                                    src={getMediaUrl(about.image) || "/images/gokidsplay/unnamed (4).webp"}
+                                    src={getMediaUrl(about.image) || "/images/gokidsplay/soft-play-overview.jpg"}
                                     alt="Kids enjoying the park"
                                     fill
                                     sizes="(max-width: 1024px) 100vw, 50vw"
@@ -215,7 +215,7 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
                                             onError={(e) => {
                                                 e.currentTarget.srcset = "";
-                                                e.currentTarget.src = "/images/gokidsplay/unnamed.webp";
+                                                e.currentTarget.src = "/images/gokidsplay/inflatable-obstacle-course.jpg";
                                             }}
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

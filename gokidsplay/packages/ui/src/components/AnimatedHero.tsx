@@ -45,7 +45,7 @@ export const AnimatedHero = () => {
             <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-background-dark/90 z-10" />
                 <img
-                    src="/hero-background.jpg"
+                    src="/images/gokidsplay/inflatable-obstacle-course.jpg"
                     alt="Ninja Inflatable Park - Epic Adventure Awaits"
                     className="h-full w-full object-cover object-center"
                 />

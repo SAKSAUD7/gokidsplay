@@ -41,28 +41,28 @@ interface AttractionsGridProps {
 // Per-activity Go Kids Play images
 const ACTIVITY_IMAGES: Record<string, string[]> = {
     "soft play": [
-        "/images/gokidsplay/unnamed (4).webp",
-        "/images/gokidsplay/unnamed (5).webp",
-        "/images/gokidsplay/unnamed (6).webp",
-        "/images/gokidsplay/unnamed.webp",
+        "/images/gokidsplay/toddler-play-frame.jpg",
+        "/images/gokidsplay/soft-play-wave-slide.jpg",
+        "/images/gokidsplay/soft-play-frame.jpg",
+        "/images/gokidsplay/soft-play-overview.jpg",
     ],
     "laser": [
-        "/images/gokidsplay/unnamed (1).webp",
-        "/images/gokidsplay/unnamed (7).webp",
-        "/images/gokidsplay/unnamed (8).webp",
-        "/images/gokidsplay/unnamed (2).webp",
+        "/images/gokidsplay/arcade-rides.jpg",
+        "/images/gokidsplay/arcade-air-hockey.jpg",
+        "/images/gokidsplay/sports-pitch.jpg",
+        "/images/gokidsplay/soft-play-overview.jpg",
     ],
     "go kart": [
-        "/images/gokidsplay/unnamed (9).webp",
-        "/images/gokidsplay/unnamed (10).webp",
-        "/images/gokidsplay/unnamed (11).webp",
-        "/images/gokidsplay/unnamed (3).webp",
+        "/images/gokidsplay/go-kart-track.jpg",
+        "/images/gokidsplay/toddler-truck-ride.jpg",
+        "/images/gokidsplay/sports-pitch.jpg",
+        "/images/gokidsplay/soft-play-overview.jpg",
     ],
     "inflatable": [
-        "/images/gokidsplay/unnamed (12).webp",
-        "/images/gokidsplay/2025-04-15.webp",
-        "/images/gokidsplay/2025-05-01.webp",
-        "/images/gokidsplay/unnamed.webp",
+        "/images/gokidsplay/inflatable-bounce-zone.jpg",
+        "/images/gokidsplay/inflatable-obstacle-course.jpg",
+        "/images/gokidsplay/cafe-and-inflatables.jpg",
+        "/images/gokidsplay/soft-play-overview.jpg",
     ],
 };
 
@@ -163,7 +163,7 @@ function getActivityImages(activity: Activity): string[] {
     for (const [key, imgs] of Object.entries(ACTIVITY_IMAGES)) {
         if (lower.includes(key.split(" ")[0])) return imgs;
     }
-    return [activity.imageUrl || "/images/gokidsplay/unnamed.webp"];
+    return [activity.imageUrl || "/images/gokidsplay/inflatable-obstacle-course.jpg"];
 }
 
 // Image Slider Component
@@ -211,7 +211,7 @@ function ActivityImageSlider({ images, name }: { images: string[]; name: string 
                     exit={{ opacity: 0, scale: 0.97 }}
                     transition={{ duration: 0.5 }}
                     onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/gokidsplay/unnamed.webp";
+                        (e.target as HTMLImageElement).src = "/images/gokidsplay/inflatable-obstacle-course.jpg";
                     }}
                 />
             </AnimatePresence>

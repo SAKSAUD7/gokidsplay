@@ -43,18 +43,20 @@ ABOUT_STATS = [
 ]
 
 GALLERY = [
-    ("/images/gokidsplay/unnamed (4).webp", "Soft Play Fun", "soft_play"),
-    ("/images/gokidsplay/unnamed (1).webp", "Go Karts Action", "go_karts"),
-    ("/images/gokidsplay/unnamed (9).webp", "Laser Arena", "laser_arena"),
-    ("/images/gokidsplay/unnamed (12).webp", "Inflatable Park", "inflatable"),
-    ("/images/gokidsplay/unnamed (5).webp", "Kids Having Fun", "general"),
-    ("/images/gokidsplay/unnamed (7).webp", "Birthday Party", "parties"),
-    ("/images/gokidsplay/unnamed (10).webp", "Play Area", "soft_play"),
-    ("/images/gokidsplay/2025-04-15.webp", "Go Kids Play", "general"),
-    ("/images/gokidsplay/unnamed (6).webp", "Adventure Time", "general"),
-    ("/images/gokidsplay/unnamed (8).webp", "Family Fun", "general"),
-    ("/images/gokidsplay/unnamed (11).webp", "Toddler Zone", "soft_play"),
-    ("/images/gokidsplay/unnamed.webp", "Go Kids Play", "general"),
+    ("/images/gokidsplay/soft-play-wave-slide.jpg", "Giant Wave Slide", "soft_play"),
+    ("/images/gokidsplay/inflatable-obstacle-course.jpg", "Inflatable Obstacle Course", "inflatable"),
+    ("/images/gokidsplay/go-kart-track.jpg", "Go Kart Track", "go_karts"),
+    ("/images/gokidsplay/soft-play-overview.jpg", "Soft Play Area", "soft_play"),
+    ("/images/gokidsplay/inflatable-bounce-zone.jpg", "Inflatable Bounce Zone", "inflatable"),
+    ("/images/gokidsplay/sports-pitch.jpg", "Sports Pitch", "general"),
+    ("/images/gokidsplay/soft-play-frame.jpg", "Soft Play Frame", "soft_play"),
+    ("/images/gokidsplay/toddler-play-frame.jpg", "Toddler Play Frame", "soft_play"),
+    ("/images/gokidsplay/toddler-truck-ride.jpg", "Toddler Truck Ride", "soft_play"),
+    ("/images/gokidsplay/arcade-rides.jpg", "Arcade & Kiddie Rides", "general"),
+    ("/images/gokidsplay/arcade-air-hockey.jpg", "Air Hockey & Games", "general"),
+    ("/images/gokidsplay/cafe-and-inflatables.jpg", "Café & Party Seating", "parties"),
+    ("/images/gokidsplay/cafe-seating.jpg", "Café", "general"),
+    ("/images/gokidsplay/entrance-reception.jpg", "Welcome Desk", "general"),
 ]
 
 FACILITIES = [

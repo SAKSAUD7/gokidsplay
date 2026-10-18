@@ -168,13 +168,13 @@ export default function AttractionsContent({ activities, facilities, videoData, 
                                     <div className="bg-surface-800 rounded-3xl border border-white/10 hover:border-primary/30 transition-colors flex flex-col overflow-hidden group h-full">
                                         <div className="h-48 overflow-hidden relative flex-shrink-0">
                                             <Image
-                                                src={getMediaUrl(facility.image_url) || `/images/hero-background.jpg`}
+                                                src={getMediaUrl(facility.image_url) || `/images/gokidsplay/inflatable-bounce-zone.jpg`}
                                                 alt={facility.title || facility.name}
                                                 fill
                                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                                                 onError={(e) => {
                                                     e.currentTarget.srcset = "";
-                                                    e.currentTarget.src = "/images/hero-background.jpg";
+                                                    e.currentTarget.src = "/images/gokidsplay/inflatable-bounce-zone.jpg";
                                                 }}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-surface-800 to-transparent opacity-60" />

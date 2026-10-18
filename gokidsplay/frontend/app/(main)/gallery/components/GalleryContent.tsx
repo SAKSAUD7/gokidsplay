@@ -8,18 +8,20 @@ import { getMediaUrl } from "@/lib/media-utils";
 
 
 const LOCAL_FALLBACK_IMAGES = [
-    { id: "l1", src: "/images/gokidsplay/unnamed (4).webp", title: "Soft Play Fun", category: "soft_play" },
-    { id: "l2", src: "/images/gokidsplay/unnamed (1).webp", title: "Go Karts Action", category: "go_karts" },
-    { id: "l3", src: "/images/gokidsplay/unnamed (9).webp", title: "Laser Arena", category: "laser_arena" },
-    { id: "l4", src: "/images/gokidsplay/unnamed (12).webp", title: "Inflatable Park", category: "inflatable" },
-    { id: "l5", src: "/images/gokidsplay/unnamed (5).webp", title: "Kids Having Fun", category: "general" },
-    { id: "l6", src: "/images/gokidsplay/unnamed (7).webp", title: "Birthday Party", category: "parties" },
-    { id: "l7", src: "/images/gokidsplay/unnamed (10).webp", title: "Play Area", category: "soft_play" },
-    { id: "l8", src: "/images/gokidsplay/2025-04-15.webp", title: "Go Kids Play", category: "general" },
-    { id: "l9", src: "/images/gokidsplay/unnamed (6).webp", title: "Adventure Time", category: "general" },
-    { id: "l10", src: "/images/gokidsplay/unnamed (8).webp", title: "Family Fun", category: "general" },
-    { id: "l11", src: "/images/gokidsplay/unnamed (11).webp", title: "Toddler Zone", category: "soft_play" },
-    { id: "l12", src: "/images/gokidsplay/unnamed.webp", title: "Go Kids Play", category: "general" },
+    { id: "l1", src: "/images/gokidsplay/soft-play-wave-slide.jpg", title: "Giant Wave Slide", category: "soft_play" },
+    { id: "l2", src: "/images/gokidsplay/inflatable-obstacle-course.jpg", title: "Inflatable Obstacle Course", category: "inflatable" },
+    { id: "l3", src: "/images/gokidsplay/go-kart-track.jpg", title: "Go Kart Track", category: "go_karts" },
+    { id: "l4", src: "/images/gokidsplay/soft-play-overview.jpg", title: "Soft Play Area", category: "soft_play" },
+    { id: "l5", src: "/images/gokidsplay/inflatable-bounce-zone.jpg", title: "Inflatable Bounce Zone", category: "inflatable" },
+    { id: "l6", src: "/images/gokidsplay/sports-pitch.jpg", title: "Sports Pitch", category: "general" },
+    { id: "l7", src: "/images/gokidsplay/soft-play-frame.jpg", title: "Soft Play Frame", category: "soft_play" },
+    { id: "l8", src: "/images/gokidsplay/toddler-play-frame.jpg", title: "Toddler Play Frame", category: "soft_play" },
+    { id: "l9", src: "/images/gokidsplay/toddler-truck-ride.jpg", title: "Toddler Truck Ride", category: "soft_play" },
+    { id: "l10", src: "/images/gokidsplay/arcade-rides.jpg", title: "Arcade & Kiddie Rides", category: "general" },
+    { id: "l11", src: "/images/gokidsplay/arcade-air-hockey.jpg", title: "Air Hockey & Games", category: "general" },
+    { id: "l12", src: "/images/gokidsplay/cafe-and-inflatables.jpg", title: "Café & Party Seating", category: "parties" },
+    { id: "l13", src: "/images/gokidsplay/cafe-seating.jpg", title: "Café", category: "general" },
+    { id: "l14", src: "/images/gokidsplay/entrance-reception.jpg", title: "Welcome Desk", category: "general" },
 ];
 
 const CATEGORIES = [
@@ -204,7 +206,7 @@ export default function GalleryContent({
                                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                                             className="object-cover transition-all duration-500 group-hover:scale-110"
                                             onError={(e) => {
-                                                e.currentTarget.src = "/images/gokidsplay/unnamed.webp";
+                                                e.currentTarget.src = "/images/gokidsplay/inflatable-obstacle-course.jpg";
                                             }}
                                         />
 
@@ -284,7 +286,7 @@ export default function GalleryContent({
                                 alt={currentImage.title || "Gallery image"}
                                 fill
                                 className="object-contain"
-                                onError={(e) => { e.currentTarget.src = "/images/gokidsplay/unnamed.webp"; }}
+                                onError={(e) => { e.currentTarget.src = "/images/gokidsplay/inflatable-obstacle-course.jpg"; }}
                             />
                         </motion.div>
 
