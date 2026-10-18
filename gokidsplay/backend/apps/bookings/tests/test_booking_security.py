@@ -842,3 +842,14 @@ class TestGoogleReviews:
         assert APIClient().post('/api/v1/cms/google-reviews/sync/').status_code in (401, 403)
         response = admin_client.patch('/api/v1/cms/google-reviews/', {'place_id': 'ChIJabc', 'min_rating_to_show': 3}, format='json')
         assert response.status_code == 200 and response.data['place_id'] == 'ChIJabc'
+
+
+@pytest.mark.django_db
+def test_party_must_start_at_a_party_time(config):
+    from apps.cms.models import PartyBookingConfig
+    PartyBookingConfig.objects.create(available_time_slots=['12:00 PM', '2:00 PM', '4:00 PM', '6:00 PM'])
+    saturday = next_saturday().isoformat()
+    bad = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': saturday, 'time': '11:00'}, format='json')
+    assert bad.status_code == 400 and bad.data['code'] == 'INVALID_TIME'
+    assert bad.data['times'] == ['12:00', '14:00', '16:00']     # 6pm would end after closing
+    assert APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': saturday, 'time': '2:00 PM'}, format='json').status_code == 201

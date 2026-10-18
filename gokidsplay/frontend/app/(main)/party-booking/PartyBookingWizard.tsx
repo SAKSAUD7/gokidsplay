@@ -31,8 +31,8 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     );
     // Bumped when the opening calendar (holidays + admin openings / closures) has loaded
     const [, setCalendarVersion] = useState(0);
-    // Party times already full on the chosen date (from the live availability)
-    const [fullPartySlots, setFullPartySlots] = useState<string[]>([]);
+    // Places left in each party time on the chosen date (from the live availability)
+    const [partySlotSpace, setPartySlotSpace] = useState<Record<string, number>>({});
     const [config, setConfig] = useState<any>(null);
     // Minimum children for a party (Website Content → Party Booking)
     const MIN_PARTICIPANTS = Math.max(1, Number(config?.min_participants) || 10);
@@ -115,17 +115,21 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
 
     // Which party times are already full on the chosen date
     useEffect(() => {
-        setFullPartySlots([]);
+        setPartySlotSpace({});
         if (!formData.date) return;
         const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
         fetch(`${API_URL}/bookings/bookings/slot_availability/?date=${formData.date}`, { cache: "no-store" })
             .then(r => (r.ok ? r.json() : null))
             .then(data => {
                 const slots = data?.party_slots || {};
-                setFullPartySlots(Object.keys(slots).filter(t => String(slots[t]?.status).toUpperCase() === "FULL"));
+                setPartySlotSpace(Object.fromEntries(Object.keys(slots).map(t => [t, Number(slots[t]?.remaining_capacity ?? 999)])));
             })
             .catch(() => {});
     }, [formData.date]);
+
+    // A time can be chosen when it has room for this party (children + adults)
+    const partyHeadcount = (formData.participants || 0) + (formData.spectators || 0);
+    const slotFits = (slot: string) => (partySlotSpace[slot] ?? 999) >= Math.max(1, partyHeadcount);
 
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -570,7 +574,8 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                         >
                                             <option value="">{formData.date ? "Select time" : "Select a date first"}</option>
                                             {(() => {
-                                                if (!formData.date) return [];
+                                                // Wait for the party settings so only the real party times are offered
+                                                if (!formData.date || !config) return [];
                                                 // Same opening hours as session bookings; a party lasts 2 hours,
                                                 // so the last start time leaves a full party before closing.
                                                 const openSlots = getPartyStartTimes(formData.date);
@@ -589,11 +594,16 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                                 // A special opening with its own hours may not include the usual start times
                                                 return matching.length > 0 ? matching : openSlots;
                                             })().map((slot: string) => (
-                                                <option key={slot} value={slot} disabled={fullPartySlots.includes(slot)}>
-                                                    {formatClock(slot)}{fullPartySlots.includes(slot) ? " — fully booked" : ""}
+                                                <option key={slot} value={slot} disabled={!slotFits(slot)}>
+                                                    {formatClock(slot)}{(partySlotSpace[slot] ?? 999) <= 0 ? " — fully booked" : !slotFits(slot) ? ` — only ${partySlotSpace[slot]} places left` : ""}
                                                 </option>
                                             ))}
                                         </select>
+                                        {formData.time && !slotFits(formData.time) && (
+                                            <p className="mt-2 text-red-400 text-xs">
+                                                This time only has {partySlotSpace[formData.time]} places left for {partyHeadcount} guests — please choose another time.
+                                            </p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -679,7 +689,7 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
 
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || formData.participants < MIN_PARTICIPANTS}
+                                    disabled={isSubmitting || formData.participants < MIN_PARTICIPANTS || (!!formData.time && !slotFits(formData.time))}
                                     className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? (

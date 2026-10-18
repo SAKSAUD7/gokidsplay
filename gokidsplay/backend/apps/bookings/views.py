@@ -761,6 +761,18 @@ def create_party_booking_view(request):
         if not day['parties_open']:
             return Response({'detail': f"We're not taking party bookings on this date ({day['reason'] or 'closed'}). Please choose another date.",
                              'code': 'DATE_CLOSED'}, status=status.HTTP_400_BAD_REQUEST)
+        # Start time: one of the party times (Website Content → Party Booking) that leaves
+        # a full 2-hour party before closing (same rule as the wizard)
+        from .availability_service import _to_24h
+        requested = _to_24h(str(data.get('time')))
+        configured = [t for t in (_to_24h(x) for x in (getattr(party_config, 'available_time_slots', None) or [])) if t]
+        def fits(t):
+            return day['open'] <= t and f"{int(t[:2]) + 2:02d}{t[2:]}" <= day['close']
+        allowed = [t for t in configured if fits(t)] or [t for t in (f'{h:02d}:00' for h in range(24)) if fits(t)]
+        if requested not in allowed:
+            return Response({'detail': 'Please choose one of the available party times.', 'code': 'INVALID_TIME',
+                             'times': allowed}, status=status.HTTP_400_BAD_REQUEST)
+        data = {**{k: data.get(k) for k in data.keys()}, 'time': requested}  # saved as HH:MM
 
     if is_staff:
         # Staff/admin bookings may set custom amounts and statuses

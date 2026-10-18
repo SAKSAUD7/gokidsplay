@@ -58,8 +58,8 @@ def session_capacity() -> int:
 
 
 def _to_24h(value) -> str:
-    """Normalise "2:00 PM" / "14:00" to "14:00" ("" when unreadable)."""
-    m = re.match(r'^\s*(\d{1,2}):(\d{2})\s*(AM|PM)?\s*$', str(value), re.I)
+    """Normalise "2:00 PM" / "14:00" / "14:00:00" to "14:00" ("" when unreadable)."""
+    m = re.match(r'^\s*(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?\s*$', str(value), re.I)
     if not m:
         return ''
     hour = int(m.group(1))
