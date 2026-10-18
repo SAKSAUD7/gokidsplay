@@ -507,50 +507,33 @@ def list_payments(request):
 @permission_classes([AllowAny])  # SumUp calls this server-to-server
 def sumup_webhook(request):
     """
-    SumUp webhook — called server-to-server by SumUp after payment.
-    SumUp sends: { "id": "<checkout_id>", "status": "PAID"|"FAILED" }
-    This updates the booking status WITHOUT requiring a browser redirect.
-    Register this URL in your SumUp merchant dashboard as the webhook endpoint.
+    SumUp webhook — called server-to-server by SumUp when a checkout changes.
+    SumUp sends {"event_type": "CHECKOUT_STATUS_CHANGED", "id": "<checkout_id>"}.
+
+    Anyone can post here, so nothing in the message is trusted: the checkout must
+    be one of ours, and its status is always fetched from SumUp's API.
     """
+    from .models import Payment
+
+    checkout_id = str(request.data.get('id') or request.data.get('checkout_id') or '')[:100]
+    logger.info(f"SumUp webhook received: checkout={checkout_id} event={request.data.get('event_type')}")
+    if not checkout_id:
+        return Response({'error': 'Missing checkout id'}, status=status.HTTP_400_BAD_REQUEST)
+
+    payment = Payment.objects.filter(order_id=checkout_id, provider='SUMUP').first()  # type: ignore[attr-defined]
+    if payment is None:
+        return Response({'received': True})          # not ours: ignore quietly
+    if payment.status in ('SUCCESS', 'REFUNDED', 'PARTIALLY_REFUNDED'):
+        return Response({'received': True})          # already final
+
     try:
-        data = request.data
-        # SumUp may send the checkout id in different fields depending on event type
-        checkout_id = data.get('id') or data.get('checkout_id')
-        sumup_status = (data.get('status') or '').upper()
-
-        logger.info(f"SumUp webhook received: checkout={checkout_id} status={sumup_status} data={data}")
-
-        if not checkout_id:
-            return Response({'error': 'Missing checkout id'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if sumup_status in ('PAID', 'SUCCESSFUL'):
-            # Verify by polling SumUp API to confirm the status is authentic
-            result = payment_service.verify_and_complete_payment(
-                order_id=checkout_id,
-                payment_data={'order_id': checkout_id}
-            )
-            logger.info(f"Webhook verify result for {checkout_id}: {result}")
-            return Response({'received': True, 'result': result})
-
-        elif sumup_status in ('FAILED', 'EXPIRED'):
-            # Mark payment as failed
-            try:
-                from .models import Payment
-                payment = Payment.objects.get(order_id=checkout_id)  # type: ignore[attr-defined]
-                if payment.status not in ('SUCCESS', 'REFUNDED'):
-                    payment.mark_failed(f'SumUp webhook: {sumup_status}')
-                    logger.info(f"Payment {checkout_id} marked FAILED via webhook")
-            except Payment.DoesNotExist:  # type: ignore[attr-defined, misc]
-                logger.warning(f"Webhook: payment record not found for checkout {checkout_id}")
-            return Response({'received': True})
-
-        # Unknown status — just acknowledge receipt
-        return Response({'received': True, 'status': sumup_status})
-
+        result = payment_service.verify_and_complete_payment(order_id=checkout_id,
+                                                             payment_data={'order_id': checkout_id})
+        logger.info(f"Webhook verify result for {checkout_id}: {result.get('payment_status')}")
     except Exception as e:
-        logger.error(f"SumUp webhook error: {e}")
-        # Always return 200 to SumUp so it does not keep retrying
-        return Response({'received': True, 'error': str(e)})
+        logger.error(f"SumUp webhook error for {checkout_id}: {e}")
+    # Always 200 so SumUp does not keep retrying
+    return Response({'received': True})
 
 
 @api_view(['POST'])

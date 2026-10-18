@@ -139,8 +139,10 @@ class SumUpGateway(BasePaymentGateway):
             f"&reference={reference}"
         )
 
-        # SumUp tells this backend about the payment here (BACKEND_URL, e.g. https://api.gokidsplay.co.uk)
-        webhook_url = f"{getattr(settings, 'BACKEND_URL', '').rstrip('/')}/api/v1/payments/sumup-webhook/"
+        # SumUp tells this backend about the payment here (BACKEND_URL, e.g. https://api.gokidsplay.co.uk).
+        # Only a public https address can receive it; on a PC the success page checks the payment instead.
+        backend_url = str(getattr(settings, 'BACKEND_URL', '') or '').rstrip('/')
+        webhook_url = f"{backend_url}/api/v1/payments/sumup-webhook/"             if backend_url.startswith('https://') and 'localhost' not in backend_url else None
 
         payload = {
             "checkout_reference": reference,
@@ -148,7 +150,7 @@ class SumUpGateway(BasePaymentGateway):
             "currency":          "GBP",
             "merchant_code":     merchant_code,
             "description":       description,
-            "return_url":        webhook_url, # Webhook sent here
+            **({"return_url": webhook_url} if webhook_url else {}),  # webhook
             "hosted_checkout": {
                 "enabled": True,
                 "redirect_url": return_url_str # User redirected here

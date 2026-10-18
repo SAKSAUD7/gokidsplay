@@ -243,14 +243,18 @@ Open `https://gokidsplay-web.azurewebsites.net` — browse, open the booking wiz
 
 ## Part 8 — SumUp (card payments)
 
-1. Sign in to the SumUp dashboard (<https://me.sumup.com>) with the business account.
-2. Find your **merchant code** (Profile / Account details — looks like `MXXXXXXX`).
-3. Create an **API key**: SumUp dashboard → **Developers** (or <https://developer.sumup.com> → API keys) → create a **secret key** (starts `sk_…`). The public key (`pk_…`) is **not** needed — the website uses SumUp's hosted checkout from the server.
-4. Make sure online payments are enabled on the account (if the first test checkout is refused, ask SumUp support to enable "online payments / hosted checkout").
-5. Put them in Azure → `gokidsplay-api` → Environment variables: `SUMUP_API_KEY`, `SUMUP_MERCHANT_CODE`, `PAYMENT_MODE=sumup` → Save (the app restarts).
-6. Test: book one ticket on the live site, pay with a real card, check **Admin → Payments** shows it as SumUp / Success, then **Refund** it from the payment page.
+**Status: connected and tested (October 2026).** The SumUp account is **Go Kids Go Coventry Ltd**, merchant code **`M99XCC94`**. A test booking opened SumUp's real checkout page with the right amount and booking number (no payment was made).
 
-To try SumUp on this PC first, put the same two values in `gokidsplay/backend/.env` (never commit that file) and set `PAYMENT_MODE=sumup`. While `PAYMENT_MODE=mock` (local only) a **test checkout page** replaces SumUp — no money is taken.
+1. **Make a fresh API key before going live.** The first key was shared in a chat, so replace it: SumUp dashboard → **Developers → API keys** → create a new **secret key** (`sup_sk_…`) → then delete the old one. (The public key is not needed.)
+2. Azure → `gokidsplay-api` → Environment variables:
+   - `SUMUP_API_KEY` = the new secret key
+   - `SUMUP_MERCHANT_CODE` = `M99XCC94`
+   - `PAYMENT_MODE` = `sumup`
+   → Save (the app restarts).
+3. Payment updates arrive automatically: each checkout tells SumUp to notify `BACKEND_URL/api/v1/payments/sumup-webhook/` (nothing to set up in the SumUp dashboard). The website never trusts that message on its own; it always asks SumUp for the real status. The success page and a check every 15 minutes (scheduled jobs) also catch any payment the message missed.
+4. Test on the live site: book one ticket, pay with a real card, check **Admin → Payments** shows it as SumUp / Success, then **Refund** it from the payment page.
+
+On this PC the key is in `gokidsplay/backend/.env` (never committed) with `PAYMENT_MODE=sumup`, so a payment made locally is **real**. For practice bookings set `PAYMENT_MODE=mock` (a test checkout page, no money taken) and restart the backend.
 
 ---
 
