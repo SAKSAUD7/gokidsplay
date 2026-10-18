@@ -23,6 +23,7 @@ class Payment(models.Model):
     
     PROVIDER_CHOICES = [
         ('SUMUP', 'SumUp'),
+        ('VENUE', 'Paid at venue'),  # cash / card at the desk, recorded by staff
         ('MOCK', 'Mock Gateway'),
         ('RAZORPAY', 'Razorpay'),
     ]

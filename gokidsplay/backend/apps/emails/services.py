@@ -78,9 +78,14 @@ class EmailService:
         """
         
         # Values every template can use (links back to the site, footer year)
+        from apps.core.models import GlobalSettings
+        site = GlobalSettings.objects.first()
         context = {
             'site_url': getattr(settings, 'FRONTEND_URL', '').rstrip('/'),
             'current_year': timezone.now().year,
+            # Contact details from Admin → Settings
+            'contact_email': getattr(site, 'contact_email', '') or 'info@gokidsplay.co.uk',
+            'contact_phone': getattr(site, 'contact_phone', '') or '',
             **context,
         }
 

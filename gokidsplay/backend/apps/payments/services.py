@@ -195,6 +195,30 @@ class PaymentService:
             'response': response,
         }
     
+    @staticmethod
+    def record_venue_payment(booking, amount, recorded_by: str = '', note: str = ''):
+        """
+        Staff took the money at the desk (cash or card). Saved as a Payment so it shows in
+        Admin → Payments and the revenue figures next to the online (SumUp) payments.
+        """
+        import uuid
+        from apps.bookings.models import PartyBooking as _PartyBooking
+        amount = Decimal(str(amount or 0))
+        if amount <= 0:
+            return None
+        link = {'party_booking': booking} if isinstance(booking, _PartyBooking) else {'booking': booking}
+        reference = booking.booking_number or f"#{booking.id}"
+        return Payment.objects.create(
+            **link,
+            provider='VENUE',
+            order_id=f"VENUE-{reference}-{uuid.uuid4().hex[:6].upper()}",
+            payment_id=f"VENUE-{uuid.uuid4().hex[:10].upper()}",
+            amount=amount,
+            currency='GBP',
+            status='SUCCESS',
+            notes=' · '.join(filter(None, [note or 'Paid at the venue', f'recorded by {recorded_by}' if recorded_by else ''])),
+        )
+
     @transaction.atomic
     def process_refund(
         self,

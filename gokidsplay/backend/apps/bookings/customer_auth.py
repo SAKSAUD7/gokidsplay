@@ -423,14 +423,34 @@ def customer_booking_detail(request, booking_type, booking_id):
             else:  # party
                 booking.status = "CANCELLED"
             booking.save()
+            # Let staff know (refunds are handled by the team, see the cancellation policy)
+            from apps.core.models import Notification
+            Notification.objects.create(
+                type='SYSTEM', title='Booking cancelled by customer',
+                message=f"{booking.name} cancelled {booking.booking_number or booking.id} for {booking.date}"
+                        f" (paid £{booking.paid_amount or 0})",
+                link=f"/admin/{'party-bookings' if booking_type == 'party' else 'bookings'}/{booking.id}")
         else:
-            # --- Normal field-level update ---
-            allowed = ["date", "time", "adults", "kids", "spectators",
-                       "special_requests", "dietary_restrictions", "notes", "payment_type"]
-            for field in allowed:
-                if field in request.data:
-                    setattr(booking, field, request.data[field])
-            booking.save()
+            # Date, time and numbers change the price and need a free place, so the team
+            # handles them; customers can update their notes and the party guest list.
+            locked = [f for f in ("date", "time", "adults", "kids", "spectators", "payment_type", "amount")
+                      if f in request.data]
+            if locked:
+                return Response({"error": "To change the date, time or number of guests please contact us "
+                                          "and we'll sort it out for you."}, status=400)
+            allowed = ["special_requests", "dietary_restrictions", "notes"]
+            changed = [f for f in allowed if f in request.data and hasattr(booking, f)]
+            for field in changed:
+                setattr(booking, field, str(request.data[field] or "")[:2000])
+            if booking_type == "party" and isinstance(request.data.get("participants"), dict):
+                participants = request.data["participants"]
+                booking.participants = {
+                    "adults": list(participants.get("adults") or [])[:100],
+                    "minors": list(participants.get("minors") or [])[:100],
+                }
+                changed.append("participants")
+            if changed:
+                booking.save(update_fields=changed)
 
     if booking_type == "session":
         b = booking

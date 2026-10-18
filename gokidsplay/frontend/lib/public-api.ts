@@ -209,6 +209,14 @@ export async function getPublicPageContent(page: string) {
     return fillHours(resolveSections(page, Array.isArray(rows) ? rows : []), await hoursText);
 }
 
+/** Google rating, number of reviews and the links to read / write reviews on Google. */
+export async function getPublicGoogleReviews(): Promise<{
+    rating: number | null; review_count: number | null; reviews_url: string; write_review_url: string;
+} | null> {
+    const data = await fetchFromAPI('/cms/google-reviews/');
+    return data && !Array.isArray(data) && data.reviews_url ? data : null;
+}
+
 export async function getPublicTestimonials() {
     const reviews = await fetchFromAPI('/cms/testimonials/');
     return Array.isArray(reviews) ? reviews.filter((r: any) => r.active) : [];

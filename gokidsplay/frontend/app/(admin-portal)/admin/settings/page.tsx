@@ -252,13 +252,13 @@ function FeatureSettings({ settings, onUpdate }: { settings: any; onUpdate: (s: 
             <div className="space-y-4">
                 <ToggleItem
                     title="Online Booking System"
-                    description="Enable or disable the public booking flow."
+                    description="Allow customers to book play sessions online (the booking page shows a &quot;call us&quot; message when off)."
                     enabled={settings.onlineBookingEnabled}
                     onChange={(val) => handleToggle("onlineBookingEnabled", val)}
                 />
                 <ToggleItem
                     title="Party Bookings"
-                    description="Allow customers to submit party inquiries."
+                    description="Allow customers to book parties online (the party wizard shows a &quot;call us&quot; message when off)."
                     enabled={settings.partyBookingsEnabled}
                     onChange={(val) => handleToggle("partyBookingsEnabled", val)}
                 />

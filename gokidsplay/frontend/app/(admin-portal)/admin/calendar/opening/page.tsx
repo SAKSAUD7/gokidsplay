@@ -111,12 +111,12 @@ function OpeningDays() {
     const overrides = monthDays.filter(d => d.override_id).length;
 
     return (
-        <div className="p-6 md:p-8 space-y-6">
+        <div className="p-3 sm:p-6 md:p-8 space-y-6">
             <div className="flex items-start gap-4">
                 <Link href="/admin/calendar" className="p-2 hover:bg-slate-100 rounded-full text-slate-500 mt-1"><ArrowLeft size={20} /></Link>
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Opening Days</h1>
-                    <p className="text-slate-500 mt-1 max-w-3xl">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Opening Days</h1>
+                    <p className="text-slate-500 mt-1 max-w-3xl text-sm sm:text-base">
                         When customers can book online. Normal opening comes from the weekly hours in{" "}
                         <Link href="/admin/cms/session-booking" className="text-blue-700 font-semibold underline">Website Content → Session Booking</Link>{" "}
                         plus every Coventry school &amp; bank holiday. Click a date to open it specially or close it — the session and
@@ -127,12 +127,12 @@ function OpeningDays() {
 
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3 p-4 border-b border-slate-100">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                         <button onClick={() => move(-1)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" aria-label="Previous month"><ChevronLeft size={18} /></button>
-                        <h2 className="text-lg font-bold text-slate-900 w-44 text-center">{MONTHS[month]} {year}</h2>
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900 w-32 sm:w-44 text-center">{MONTHS[month]} {year}</h2>
                         <button onClick={() => move(1)} className="p-2 rounded-lg hover:bg-slate-100 text-slate-600" aria-label="Next month"><ChevronRight size={18} /></button>
                         <button onClick={() => { setYear(Number(today.slice(0, 4))); setMonth(Number(today.slice(5, 7)) - 1); }}
-                            className="ml-2 text-xs font-semibold border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50">Today</button>
+                            className="ml-1 sm:ml-2 text-xs font-semibold border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50">Today</button>
                         {loading && <Loader2 className="w-4 h-4 animate-spin text-slate-400" />}
                     </div>
                     <div className="text-sm text-slate-500">
@@ -143,11 +143,11 @@ function OpeningDays() {
 
                 {error && <p className="m-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">{error}</p>}
 
-                <div className="p-4">
-                    <div className="grid grid-cols-7 gap-1.5 mb-1.5">
-                        {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-bold uppercase text-slate-400 py-1">{d}</div>)}
+                <div className="p-2 sm:p-4">
+                    <div className="grid grid-cols-7 gap-1 sm:gap-1.5 mb-1.5">
+                        {WEEKDAYS.map(d => <div key={d} className="text-center text-[10px] sm:text-xs font-bold uppercase text-slate-400 py-1">{d}</div>)}
                     </div>
-                    <div className="grid grid-cols-7 gap-1.5">
+                    <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
                         {cells.map((date, i) => {
                             if (!date) return <div key={`blank-${i}`} />;
                             const day = days[date];
@@ -156,14 +156,15 @@ function OpeningDays() {
                             return (
                                 <button key={date} onClick={() => setSelected(date)} data-date={date}
                                     data-open={day?.sessions_open ? "true" : "false"}
-                                    className={`text-left min-h-[88px] rounded-lg border p-2 transition hover:shadow-md hover:-translate-y-px ${look.cell}
+                                    className={`text-left min-h-[52px] sm:min-h-[88px] rounded-lg border p-1 sm:p-2 transition hover:shadow-md hover:-translate-y-px ${look.cell}
                                         ${selected === date ? "ring-2 ring-blue-500" : ""} ${date === today ? "outline outline-2 outline-offset-1 outline-blue-300" : ""}`}>
                                     <div className="flex items-start justify-between gap-1">
                                         <span className="font-bold text-sm">{Number(date.slice(8))}</span>
-                                        {count > 0 && <span className="text-[10px] font-bold bg-blue-600 text-white rounded-full px-1.5">{count}</span>}
+                                        {count > 0 && <span className="text-[9px] sm:text-[10px] font-bold bg-blue-600 text-white rounded-full px-1 sm:px-1.5">{count}</span>}
                                     </div>
-                                    {look.tag && <div className="text-[10px] font-bold uppercase tracking-wide mt-1 opacity-80">{look.tag}</div>}
-                                    <div className="text-[11px] mt-0.5 leading-tight line-clamp-2">{look.label}</div>
+                                    {/* On phones the colour shows the status; tap the day for details */}
+                                    {look.tag && <div className="hidden sm:block text-[10px] font-bold uppercase tracking-wide mt-1 opacity-80">{look.tag}</div>}
+                                    <div className="hidden sm:block text-[11px] mt-0.5 leading-tight line-clamp-2">{look.label}</div>
                                 </button>
                             );
                         })}

@@ -9,14 +9,13 @@ import { BouncyButton } from "../../components/BouncyButton";
 import { useEffect, useState, useRef } from "react";
 import { useAccount } from "../../state/account/AccountContext";
 
+// Main pages only — every page is listed in the footer
 const navLinks = [
     { href: "/", label: "Home" },
     { href: "/attractions", label: "Attractions" },
     { href: "/parties", label: "Parties" },
     { href: "/events", label: "Events 🎉" },
     { href: "/pricing", label: "Pricing" },
-    { href: "/information", label: "Information" },
-    { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact" },
 ];
 

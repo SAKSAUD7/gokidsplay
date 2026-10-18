@@ -67,6 +67,23 @@ class BookingPagination(PageNumberPagination):
     max_page_size = 200
     page_query_param = 'page'
 
+def _online_booking_paused(kind: str):
+    """
+    Admin → Settings switches: maintenance mode, or online session / party booking
+    turned off. Returns an error Response for public bookings, or None.
+    """
+    from apps.core.models import GlobalSettings
+    site = GlobalSettings.objects.first()
+    if not site:
+        return None
+    enabled = site.party_bookings_enabled if kind == 'party' else site.online_booking_enabled
+    if site.maintenance_mode or not enabled:
+        what = 'party booking' if kind == 'party' else 'online booking'
+        return Response({'detail': f"Sorry, {what} is paused at the moment. Please call us on {site.contact_phone} to book.",
+                         'code': 'BOOKINGS_PAUSED'}, status=status.HTTP_400_BAD_REQUEST)
+    return None
+
+
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
@@ -178,6 +195,11 @@ class BookingViewSet(viewsets.ModelViewSet):
         if is_staff:
             data = request.data
         else:
+            paused = _online_booking_paused('session')
+            if paused:
+                return paused
+            from .unpaid import release_unpaid_bookings
+            release_unpaid_bookings()  # abandoned checkouts free their places first
             data, pricing_error, voucher_to_count = self._sanitize_public_booking(request.data)
             if pricing_error:
                 return Response({'detail': pricing_error, 'code': 'INVALID_VOUCHER'},
@@ -238,6 +260,15 @@ class BookingViewSet(viewsets.ModelViewSet):
                 serializer = self.get_serializer(data=data)
                 serializer.is_valid(raise_exception=True)
                 self.perform_create(serializer)
+                if not is_staff:
+                    # Paid through SumUp next; released if left unpaid (unpaid.py)
+                    Booking.objects.filter(pk=serializer.instance.pk).update(online_checkout=True)
+                elif serializer.instance.paid_amount and serializer.instance.paid_amount > 0:
+                    # Walk-in paid at the desk: keep it in Admin → Payments
+                    from apps.payments.services import PaymentService
+                    PaymentService.record_venue_payment(
+                        serializer.instance, serializer.instance.paid_amount,
+                        recorded_by=getattr(request.user, 'email', '') or 'admin', note='Walk-in paid at the desk')
                 if voucher_to_count is not None:
                     from django.db.models import F
                     type(voucher_to_count).objects.filter(pk=voucher_to_count.pk).update(used_count=F('used_count') + 1)
@@ -368,8 +399,10 @@ class BookingViewSet(viewsets.ModelViewSet):
                 changed_by=changed_by,
             )
 
-            # Auto-update paid_amount if marked as PAID manually (e.g., cash)
+            # Marked PAID by staff (cash / card at the desk): record the outstanding amount
             if new_payment_status == 'PAID' and booking.paid_amount < booking.amount:
+                from apps.payments.services import PaymentService
+                PaymentService.record_venue_payment(booking, booking.amount - booking.paid_amount, recorded_by=changed_by)
                 booking.paid_amount = booking.amount
                 update_fields.append('paid_amount')
 
@@ -520,8 +553,15 @@ class BookingViewSet(viewsets.ModelViewSet):
         except (ValueError, TypeError):
             return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=400)
 
+        from .unpaid import release_unpaid_bookings
+        release_unpaid_bookings()  # abandoned checkouts don't count as taken
+
         svc = GKPAvailabilityService()
         availability = svc.get_full_availability(check_date)
+        if not (request.user and request.user.is_authenticated and request.user.is_staff):
+            # Who booked which party is for staff only
+            for slot in (availability.get('party_slots') or {}).values():
+                slot.pop('party_bookings', None)
         return Response(availability)
 
     @action(detail=False, methods=['get'], url_path='ticket/(?P<uuid>[^/.]+)')
@@ -698,6 +738,11 @@ def create_party_booking_view(request):
 
     # Public party bookings only on dates open for parties (opening calendar)
     if not is_staff:
+        paused = _online_booking_paused('party')
+        if paused:
+            return paused
+        from .unpaid import release_unpaid_bookings
+        release_unpaid_bookings()  # abandoned checkouts free their places first
         from datetime import date as date_cls
         from .opening_hours import day_status
         try:
@@ -706,6 +751,12 @@ def create_party_booking_view(request):
             return Response({'detail': 'Invalid date.'}, status=status.HTTP_400_BAD_REQUEST)
         if party_date < timezone.localdate():
             return Response({'detail': 'Please choose a date in the future.'}, status=status.HTTP_400_BAD_REQUEST)
+        from apps.cms.models import PartyBookingConfig
+        party_config = PartyBookingConfig.objects.filter(active=True).order_by('id').first()
+        min_kids = max(1, int(getattr(party_config, 'min_participants', 0) or 10))
+        if kids < min_kids:
+            return Response({'detail': f'A party needs at least {min_kids} children.', 'code': 'TOO_FEW_GUESTS'},
+                            status=status.HTTP_400_BAD_REQUEST)
         day = day_status(party_date)
         if not day['parties_open']:
             return Response({'detail': f"We're not taking party bookings on this date ({day['reason'] or 'closed'}). Please choose another date.",
@@ -727,6 +778,16 @@ def create_party_booking_view(request):
 
     try:
         with transaction.atomic():
+            # Public bookings: the party slot must still have room (rows locked to avoid double booking)
+            if not is_staff:
+                from .availability_service import GKPAvailabilityService
+                capacity = GKPAvailabilityService().check_party_capacity(
+                    party_date, str(data.get('time'))[:5], kids + adults)
+                if not capacity['allowed']:
+                    return Response({'detail': 'Sorry, that party time is now fully booked. Please choose another time.'
+                                     if capacity['code'] == 'CAPACITY_EXCEEDED' else capacity['reason'],
+                                     'code': capacity['code']}, status=status.HTTP_409_CONFLICT)
+
             customer = None
             if data.get('email'):
                 customer, created = Customer.objects.get_or_create(
@@ -759,6 +820,7 @@ def create_party_booking_view(request):
                 status=booking_status,
                 payment_status='PENDING',
                 customer=customer,
+                online_checkout=not is_staff,  # released if left unpaid (unpaid.py)
             )
             if voucher_to_count is not None:
                 from django.db.models import F
@@ -775,12 +837,13 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
     serializer_class = PartyBookingSerializer
     
     def get_permissions(self):
-        if self.action in ['create', 'ticket']:
+        # Only the e-ticket (looked up by its private uuid) is public. Website party
+        # bookings go through create_party_booking_view, which prices and checks
+        # the date server-side — creating through this viewset is staff-only.
+        if self.action == 'ticket':
             return [permissions.AllowAny()]
-        if self.action in ['retrieve', 'update', 'partial_update', 'list', 'participants']:
-            return [permissions.IsAuthenticated()]
         return [IsStaffUser()]
-        
+
     def get_queryset(self):
         queryset = PartyBooking.objects.all()
         
@@ -835,12 +898,6 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
             queryset = queryset.order_by('-created_at')
         
         return queryset
-    
-    def get_permissions(self):
-        # Allow public access for create, list (for duplicate checking), ticket retrieval, and add_participants (which has internal auth checks)
-        if self.action in ['create', 'list', 'ticket', 'add_participants']:
-            return [permissions.AllowAny()]
-        return [IsStaffUser()]  # Allow employees to access party bookings
     
     def create(self, request, *args, **kwargs):
         """Override create to trigger confirmation email after party booking is saved."""
@@ -1141,17 +1198,48 @@ def party_booking_detail_view(request, id):
 @api_view(['POST'])
 @permission_classes([IsStaffUser])
 def party_booking_update_status_view(request, id):
-    """Admin-only: directly update party booking status."""
+    """
+    Admin-only: update a party booking's status and/or payment status.
+    payment_status=PAID records the outstanding balance as paid at the venue.
+    """
     try:
         party_booking = PartyBooking.objects.get(pk=id)
+        changed_by = getattr(request.user, 'email', None) or 'admin'
+        valid_statuses = {choice for choice, _ in PartyBooking.STATUS_CHOICES}
         new_status = request.data.get('booking_status') or request.data.get('status')
-        if new_status:
-            party_booking.status = new_status
-            party_booking.save(update_fields=['status'])
+        new_payment_status = request.data.get('payment_status')
+        if new_status and new_status not in valid_statuses:
+            return Response({'error': f'Invalid status. Must be one of: {sorted(valid_statuses)}'}, status=400)
+        if new_payment_status and new_payment_status not in ('PENDING', 'PARTIAL', 'PAID', 'REFUNDED', 'FAILED'):
+            return Response({'error': 'Invalid payment_status.'}, status=400)
+
+        update_fields = []
+        with transaction.atomic():
+            if new_status and new_status != party_booking.status:
+                BookingAuditLog.objects.create(booking_id=party_booking.id, booking_type='PARTY', field_changed='status',
+                                               old_value=party_booking.status, new_value=new_status, changed_by=changed_by)
+                party_booking.status = new_status
+                update_fields.append('status')
+            if new_payment_status and new_payment_status != party_booking.payment_status:
+                BookingAuditLog.objects.create(booking_id=party_booking.id, booking_type='PARTY', field_changed='payment_status',
+                                               old_value=party_booking.payment_status, new_value=new_payment_status,
+                                               changed_by=changed_by)
+                if new_payment_status == 'PAID' and party_booking.paid_amount < party_booking.amount:
+                    from apps.payments.services import PaymentService
+                    PaymentService.record_venue_payment(party_booking, party_booking.amount - party_booking.paid_amount,
+                                                        recorded_by=changed_by, note='Party balance paid at the venue')
+                    party_booking.paid_amount = party_booking.amount
+                    update_fields.append('paid_amount')
+                party_booking.payment_status = new_payment_status
+                update_fields.append('payment_status')
+            if update_fields:
+                party_booking.save(update_fields=update_fields)
         return Response({
             'id': party_booking.id,
             'status': party_booking.status,
             'booking_status': party_booking.status,
+            'payment_status': party_booking.payment_status,
+            'paid_amount': str(party_booking.paid_amount),
         })
     except PartyBooking.DoesNotExist:
         return Response({'error': 'Party booking not found'}, status=404)

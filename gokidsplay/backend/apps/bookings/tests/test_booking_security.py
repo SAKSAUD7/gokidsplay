@@ -602,3 +602,243 @@ class TestBookingNumbers:
         for url in ('/api/v1/payments/', '/api/v1/payments/stats/', '/api/v1/payments/1/'):
             assert client.get(url).status_code in (401, 403), url
         assert client.post('/api/v1/payments/refund/', {'payment_id': 1, 'amount': 1}, format='json').status_code in (401, 403)
+
+
+# ── Audit fixes (Oct 2026) ───────────────────────────────────────────────────
+
+PARTY_PAYLOAD = {'name': 'Party Parent', 'email': 'party@example.com', 'phone': '07700900123',
+                 'time': '12:00:00', 'kids': 10, 'adults': 2}
+
+
+@pytest.mark.django_db
+class TestAuditFixes:
+    def test_old_party_endpoint_cannot_create_bookings(self, config):
+        response = APIClient().post('/api/v1/bookings/party-bookings-old/', {
+            **PARTY_PAYLOAD, 'date': next_saturday().isoformat(), 'package_name': 'x',
+            'amount': '0.01', 'paid_amount': '999'}, format='json')
+        assert response.status_code == 401
+        assert not PartyBooking.objects.exists()
+
+    def test_party_slot_capacity_is_enforced(self, config):
+        saturday = next_saturday().isoformat()
+        big = {**PARTY_PAYLOAD, 'date': saturday, 'kids': 20, 'adults': 5}
+        assert APIClient().post(PARTIES_URL, big, format='json').status_code == 201
+        response = APIClient().post(PARTIES_URL, {**big, 'email': 'other@example.com'}, format='json')
+        assert response.status_code == 409          # 25 + 25 > 30 guests in the 12:00 slot
+
+    def test_public_availability_hides_party_names(self, config, staff_client):
+        saturday = next_saturday().isoformat()
+        APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': saturday}, format='json')
+        url = SESSIONS_URL + 'slot_availability/'
+        public = APIClient().get(url, {'date': saturday}).data['party_slots']['12:00']
+        assert 'party_bookings' not in public and public['booked_count'] == 12
+        assert staff_client.get(url, {'date': saturday}).data['party_slots']['12:00']['party_bookings']
+
+    def test_unpaid_online_bookings_are_released(self, config, plans):
+        from datetime import timedelta
+        from django.utils import timezone
+        from apps.bookings.unpaid import release_unpaid_bookings
+        booking = Booking.objects.get(pk=APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['id'])
+        assert booking.online_checkout and booking.booking_status != 'CANCELLED'
+        assert release_unpaid_bookings() == {'sessions': 0, 'parties': 0}       # still within 30 minutes
+        Booking.objects.filter(pk=booking.pk).update(created_at=timezone.now() - timedelta(minutes=31))
+        assert release_unpaid_bookings()['sessions'] == 1
+        booking.refresh_from_db()
+        assert booking.booking_status == 'CANCELLED'
+
+    def test_paid_and_staff_bookings_are_never_released(self, config, plans, staff_client):
+        from datetime import timedelta
+        from django.utils import timezone
+        from apps.bookings.unpaid import release_unpaid_bookings
+        paid = Booking.objects.get(pk=APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['id'])
+        Booking.objects.filter(pk=paid.pk).update(paid_amount=paid.amount, payment_status='PAID')
+        staff = staff_client.post(SESSIONS_URL, session_payload(plans, email='walkin@example.com', amount='12.95'), format='json')
+        assert staff.status_code == 201, (staff.status_code, getattr(staff, 'data', None))
+        Booking.objects.update(created_at=timezone.now() - timedelta(hours=2))
+        assert release_unpaid_bookings()['sessions'] == 0
+        assert not Booking.objects.get(pk=staff.data['id']).online_checkout
+
+    def test_settings_can_pause_online_booking(self, config, plans):
+        from apps.core.models import GlobalSettings
+        site = GlobalSettings.objects.create(online_booking_enabled=False)
+        response = APIClient().post(SESSIONS_URL, session_payload(plans), format='json')
+        assert response.status_code == 400 and response.data['code'] == 'BOOKINGS_PAUSED'
+        site.online_booking_enabled, site.party_bookings_enabled = True, False
+        site.save()
+        assert APIClient().post(SESSIONS_URL, session_payload(plans), format='json').status_code == 201
+        party = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': next_saturday().isoformat()}, format='json')
+        assert party.data['code'] == 'BOOKINGS_PAUSED'
+
+    def test_maintenance_mode_pauses_all_online_booking(self, config, plans):
+        from apps.core.models import GlobalSettings
+        GlobalSettings.objects.create(maintenance_mode=True)
+        assert APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['code'] == 'BOOKINGS_PAUSED'
+
+    def test_migrations_endpoint_is_not_public(self, db):
+        assert APIClient().post('/api/v1/core/settings/fix_db_schema/').status_code in (401, 403)
+        assert APIClient().get('/api/v1/core/settings/fix_db_schema/').status_code in (401, 403, 405)
+
+
+@pytest.mark.django_db
+class TestInvitations:
+    def make_party(self):
+        return PartyBooking.objects.create(name='P', email='p@example.com', phone='07700900123',
+                                           date=next_saturday(), time='12:00', kids=10, adults=2, amount=0)
+
+    def test_invitations_are_not_listable_or_editable_publicly(self):
+        from apps.invitations.models import BookingInvitation
+        invitation = BookingInvitation.objects.create(booking=self.make_party(), child_name='Amélie')
+        client = APIClient()
+        assert client.get('/api/v1/invitations/invitations/').status_code == 401
+        assert client.delete(f'/api/v1/invitations/invitations/{invitation.id}/').status_code == 401
+        assert client.get(f'/api/v1/invitations/invitations/public/{invitation.uuid}/').status_code == 200
+
+    def test_booker_creates_invitation_with_the_private_booking_reference(self):
+        party = self.make_party()
+        url = '/api/v1/invitations/invitations/create-or-update/'
+        assert APIClient().post(url, {'booking_id': party.id, 'child_name': 'X'}, format='json').status_code == 400
+        response = APIClient().post(url, {'booking_uuid': str(party.uuid), 'child_name': 'Amélie'}, format='json')
+        assert response.status_code == 200 and response.data['child_name'] == 'Amélie'
+
+
+@pytest.mark.django_db
+class TestPaidAtVenue:
+    def test_marking_a_party_paid_records_the_balance(self, config, staff_client):
+        from apps.payments.models import Payment
+        party = PartyBooking.objects.create(name='P', email='p@example.com', phone='07700900123', date=next_saturday(),
+                                            time='12:00', kids=10, adults=2, amount=Decimal('299.90'),
+                                            paid_amount=Decimal('149.95'), payment_status='PARTIAL')
+        response = staff_client.post(f'/api/v1/bookings/party-bookings/{party.id}/update_status/',
+                                     {'payment_status': 'PAID', 'booking_status': 'CONFIRMED'}, format='json')
+        assert response.status_code == 200
+        party.refresh_from_db()
+        assert (party.paid_amount, party.payment_status, party.status) == (Decimal('299.90'), 'PAID', 'CONFIRMED')
+        payment = Payment.objects.get(party_booking=party)
+        assert (payment.provider, payment.status, payment.amount) == ('VENUE', 'SUCCESS', Decimal('149.95'))
+
+    def test_invalid_party_status_is_rejected(self, staff_client):
+        party = PartyBooking.objects.create(name='P', email='p@example.com', phone='1', date=next_saturday(),
+                                            time='12:00', kids=10, adults=2, amount=0)
+        assert staff_client.post(f'/api/v1/bookings/party-bookings/{party.id}/update_status/',
+                                 {'status': 'NONSENSE'}, format='json').status_code == 400
+
+    def test_walk_in_paid_at_desk_shows_in_payments(self, config, plans, staff_client):
+        from apps.payments.models import Payment
+        response = staff_client.post(SESSIONS_URL, session_payload(plans, amount='12.95', paid_amount='12.95',
+                                                                   payment_status='PAID'), format='json')
+        assert response.status_code == 201
+        payment = Payment.objects.get(booking_id=response.data['id'])
+        assert (payment.provider, payment.amount) == ('VENUE', Decimal('12.95'))
+
+
+@pytest.mark.django_db
+class TestCustomerSelfService:
+    def signed_in(self, email):
+        client = APIClient()
+        token = client.post('/api/v1/bookings/customer-auth/register/',
+                            {'name': 'Cust', 'email': email, 'password': 'secret-pass'}, format='json').data['token']
+        client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+        return client
+
+    def test_customer_cannot_change_date_or_numbers(self, config, plans):
+        client = self.signed_in('cust@example.com')
+        booking_id = APIClient().post(SESSIONS_URL, session_payload(plans, email='cust@example.com'), format='json').data['id']
+        url = f'/api/v1/bookings/customer-auth/booking/session/{booking_id}/'
+        assert client.patch(url, {'kids': 20}, format='json').status_code == 400
+        assert client.patch(url, {'date': '2026-11-04'}, format='json').status_code == 400
+        booking = Booking.objects.get(pk=booking_id)
+        assert booking.kids != 20
+
+    def test_customer_updates_party_guest_list_and_cancels(self, config):
+        from apps.core.models import Notification
+        client = self.signed_in('party@example.com')
+        party_id = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': next_saturday().isoformat()}, format='json').data['id']
+        url = f'/api/v1/bookings/customer-auth/booking/party/{party_id}/'
+        guests = {'adults': [{'name': 'Mum'}], 'minors': [{'name': 'Amélie'}]}
+        response = client.patch(url, {'participants': guests}, format='json')
+        assert response.status_code == 200 and response.data['participants'] == guests
+        assert client.patch(url, {'action': 'cancel'}, format='json').data['status'] == 'CANCELLED'
+        assert Notification.objects.filter(title='Booking cancelled by customer').exists()
+
+    def test_customer_cannot_open_someone_elses_booking(self, config, plans):
+        booking_id = APIClient().post(SESSIONS_URL, session_payload(plans, email='owner@example.com'), format='json').data['id']
+        intruder = self.signed_in('intruder@example.com')
+        assert intruder.get(f'/api/v1/bookings/customer-auth/booking/session/{booking_id}/').status_code == 404
+
+
+# ── Google reviews (Testimonies page) ────────────────────────────────────────
+
+class _FakeResponse:
+    def __init__(self, data, status=200):
+        self.status_code, self._data = status, data
+
+    def json(self):
+        return self._data
+
+
+GOOGLE_PLACE = {
+    'id': 'ChIJgkp', 'rating': 4.6, 'userRatingCount': 812, 'googleMapsUri': 'https://maps.google.com/?cid=123',
+    'reviews': [
+        {'name': 'places/ChIJgkp/reviews/aaa', 'rating': 5, 'publishTime': '2026-09-14T10:00:00Z',
+         'text': {'text': 'Brilliant soft play, the kids loved the go karts!'},
+         'authorAttribution': {'displayName': 'Priya S', 'photoUri': 'https://lh3.googleusercontent.com/a/p.jpg',
+                               'uri': 'https://www.google.com/maps/contrib/1'},
+         'googleMapsUri': 'https://www.google.com/maps/reviews/aaa'},
+        {'name': 'places/ChIJgkp/reviews/bbb', 'rating': 2, 'publishTime': '2026-08-01T10:00:00Z',
+         'text': {'text': 'Too busy on Saturday.'}, 'authorAttribution': {'displayName': 'Tom'}},
+        {'name': 'places/ChIJgkp/reviews/ccc', 'rating': 5, 'publishTime': '2026-07-01T10:00:00Z'},  # stars only
+    ],
+}
+
+
+@pytest.fixture
+def admin_client(db):
+    user = get_user_model().objects.create_user(username='admin-test', email='admin-test@example.com',
+                                                password='x-Test-12345', role='ADMIN')
+    client = APIClient()
+    client.force_authenticate(user=user)
+    return client
+
+
+@pytest.mark.django_db
+class TestGoogleReviews:
+    def test_sync_imports_rating_and_reviews(self, settings, monkeypatch, admin_client):
+        from apps.cms import google_reviews
+        from apps.cms.models import GoogleReviewsProfile, Testimonial
+        settings.GOOGLE_PLACES_API_KEY = 'test-key'
+        monkeypatch.setattr(google_reviews.requests, 'post', lambda *a, **k: _FakeResponse(
+            {'places': [{'id': 'ChIJgkp', 'googleMapsUri': 'https://maps.google.com/?cid=123'}]}))
+        monkeypatch.setattr(google_reviews.requests, 'get', lambda *a, **k: _FakeResponse(GOOGLE_PLACE))
+
+        response = admin_client.post('/api/v1/cms/google-reviews/sync/')
+        assert response.status_code == 200, response.data
+        assert response.data['created'] == 2                       # the stars-only review is skipped
+        profile = GoogleReviewsProfile.get()
+        assert (profile.place_id, float(profile.rating), profile.review_count) == ('ChIJgkp', 4.6, 812)
+        priya = Testimonial.objects.get(external_id='places/ChIJgkp/reviews/aaa')
+        assert priya.active and priya.platform == 'Google' and priya.review_date == 'September 2026'
+        assert not Testimonial.objects.get(external_id='places/ChIJgkp/reviews/bbb').active   # below 4★ starts hidden
+
+        # Staff hide a review; a re-sync keeps it hidden and doesn't duplicate
+        Testimonial.objects.filter(pk=priya.pk).update(active=False)
+        admin_client.post('/api/v1/cms/google-reviews/sync/')
+        assert Testimonial.objects.filter(platform='Google').count() == 2
+        assert not Testimonial.objects.get(pk=priya.pk).active
+
+        public = APIClient().get('/api/v1/cms/google-reviews/').data
+        assert public['rating'] == 4.6 and public['review_count'] == 812
+        assert public['write_review_url'] == 'https://search.google.com/local/writereview?placeid=ChIJgkp'
+        assert 'last_error' not in public and 'place_id' not in public
+
+    def test_without_a_key_the_page_still_links_to_google(self, settings, admin_client):
+        settings.GOOGLE_PLACES_API_KEY = ''
+        assert admin_client.post('/api/v1/cms/google-reviews/sync/').status_code == 400
+        public = APIClient().get('/api/v1/cms/google-reviews/').data
+        assert public['rating'] is None and public['reviews_url'].startswith('https://www.google.com/maps/search/')
+
+    def test_only_content_managers_change_settings(self, admin_client, staff_client):
+        assert staff_client.post('/api/v1/cms/google-reviews/sync/').status_code == 403   # plain staff
+        assert APIClient().patch('/api/v1/cms/google-reviews/', {'place_id': 'x'}, format='json').status_code == 403
+        assert APIClient().post('/api/v1/cms/google-reviews/sync/').status_code in (401, 403)
+        response = admin_client.patch('/api/v1/cms/google-reviews/', {'place_id': 'ChIJabc', 'min_rating_to_show': 3}, format='json')
+        assert response.status_code == 200 and response.data['place_id'] == 'ChIJabc'

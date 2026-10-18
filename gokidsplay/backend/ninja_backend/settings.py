@@ -389,6 +389,9 @@ PAYMENT_MODE = os.getenv('PAYMENT_MODE', 'sumup')
 
 # ── Frontend URL (used for email links and payment return URLs) ─────────────
 # Set FRONTEND_URL to https://www.gokidsplay.co.uk when the new site goes live.
+# Google Places API (New) key — shows the Go Kids Play Google reviews on /testimonies
+GOOGLE_PLACES_API_KEY = os.getenv('GOOGLE_PLACES_API_KEY', '')
+
 FRONTEND_URL = os.getenv(
     'FRONTEND_URL',
     'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net'

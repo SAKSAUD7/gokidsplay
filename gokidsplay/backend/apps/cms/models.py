@@ -67,12 +67,17 @@ class Testimonial(models.Model):
     role = models.CharField(max_length=100, null=True, blank=True)
     content = models.TextField()
     rating = models.IntegerField(default=5)
-    image_url = models.URLField(null=True, blank=True)
+    image_url = models.URLField(max_length=1000, null=True, blank=True)
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='TEXT')
     video_url = models.URLField(null=True, blank=True)
     thumbnail_url = models.URLField(null=True, blank=True)
     platform = models.CharField(max_length=50, blank=True, default='Google', help_text="Where the review was left (Google, Facebook, …)")
     review_date = models.CharField(max_length=50, blank=True, default='', help_text="Shown as written, e.g. 'August 2026'")
+    # Reviews imported from Google (google_reviews.py); manual reviews leave these empty
+    external_id = models.CharField(max_length=255, unique=True, null=True, blank=True,
+                                   help_text="Google review id — set by the Google sync")
+    review_url = models.URLField(max_length=1000, blank=True, default='', help_text="Link to the original review")
+    published_at = models.DateTimeField(null=True, blank=True)
     order = models.IntegerField(default=0)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -83,6 +88,54 @@ class Testimonial(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class GoogleReviewsProfile(models.Model):
+    """
+    The Go Kids Play Google Business Profile: overall rating, number of reviews and
+    the links customers use to read or write reviews. Kept up to date by the
+    Google Places API sync (apps/cms/google_reviews.py) when GOOGLE_PLACES_API_KEY is set.
+    """
+    place_id = models.CharField(max_length=255, blank=True, default='',
+                                help_text="Google Place ID (found automatically on the first sync)")
+    search_query = models.CharField(max_length=255, default='Go Kids Play, 310 Kingfield Road, Coventry CV1 4LD',
+                                    help_text="Used to find the Place ID")
+    maps_url = models.URLField(max_length=1000, blank=True, default='',
+                               help_text="Link to the business on Google Maps (all reviews)")
+    rating = models.DecimalField(max_digits=2, decimal_places=1, null=True, blank=True)
+    review_count = models.PositiveIntegerField(null=True, blank=True)
+    min_rating_to_show = models.PositiveSmallIntegerField(default=4,
+                                                          help_text="New Google reviews below this many stars start hidden")
+    auto_sync = models.BooleanField(default=True, help_text="Refresh from Google twice a day")
+    last_synced = models.DateTimeField(null=True, blank=True)
+    last_error = models.TextField(blank=True, default='')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Google reviews profile"
+
+    def __str__(self):
+        return f"Google reviews ({self.rating or '–'}★, {self.review_count or 0})"
+
+    @classmethod
+    def get(cls):
+        profile, _ = cls.objects.get_or_create(id=1)
+        return profile
+
+    @property
+    def reviews_url(self) -> str:
+        if self.maps_url:
+            return self.maps_url
+        if self.place_id:
+            return f"https://www.google.com/maps/place/?q=place_id:{self.place_id}"
+        from urllib.parse import quote_plus
+        return f"https://www.google.com/maps/search/?api=1&query={quote_plus(self.search_query)}"
+
+    @property
+    def write_review_url(self) -> str:
+        if self.place_id:
+            return f"https://search.google.com/local/writereview?placeid={self.place_id}"
+        return self.reviews_url
 
 class SocialLink(models.Model):
     platform = models.CharField(max_length=50)

@@ -1,7 +1,24 @@
 import { MetadataRoute } from 'next';
 import { SEO_CONFIG } from '@/seo/seo.config';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Rebuilt hourly so new special events appear without a redeploy
+export const revalidate = 3600;
+
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:9000/api/v1').replace('localhost', '127.0.0.1');
+
+/** Published special events (/events/[slug]) */
+async function eventRoutes(): Promise<string[]> {
+    try {
+        const res = await fetch(`${API_URL}/bookings/public/events/`, { next: { revalidate: 3600 } } as any);
+        if (!res.ok) return [];
+        const events = await res.json();
+        return (Array.isArray(events) ? events : []).filter((e: any) => e?.slug).map((e: any) => `/events/${e.slug}`);
+    } catch {
+        return [];
+    }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const highPriority = [
         { route: '', priority: 1.0, freq: 'daily' as const },
         { route: '/book', priority: 0.95, freq: 'daily' as const },
@@ -9,32 +26,38 @@ export default function sitemap(): MetadataRoute.Sitemap {
         { route: '/parties', priority: 0.9, freq: 'weekly' as const },
         { route: '/events', priority: 0.9, freq: 'daily' as const },
         { route: '/pricing', priority: 0.9, freq: 'weekly' as const },
+        { route: '/information', priority: 0.85, freq: 'weekly' as const },
     ];
 
     const normalPriority = [
         '/about',
         '/attractions',
-        '/contact',
+        '/attractions/soft-play',
+        '/attractions/laser-arena',
+        '/attractions/go-karts',
+        '/attractions/inflatable-park',
         '/facilities',
+        '/groups',
+        '/gallery',
+        '/testimonies',
+        '/contact',
         '/faq',
         '/guidelines',
-        '/privacy',
-        '/terms',
     ];
 
-    const highEntries = highPriority.map(({ route, priority, freq }) => ({
+    const legal = ['/privacy', '/terms', '/cookies', '/disclaimer', '/rights', '/security'];
+
+    const entry = (route: string, priority: number, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']) => ({
         url: `${SEO_CONFIG.baseUrl}${route}`,
         lastModified: new Date(),
-        changeFrequency: freq,
+        changeFrequency,
         priority,
-    }));
+    });
 
-    const normalEntries = normalPriority.map((route) => ({
-        url: `${SEO_CONFIG.baseUrl}${route}`,
-        lastModified: new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-    }));
-
-    return [...highEntries, ...normalEntries];
+    return [
+        ...highPriority.map(({ route, priority, freq }) => entry(route, priority, freq)),
+        ...normalPriority.map(route => entry(route, 0.7, 'monthly')),
+        ...(await eventRoutes()).map(route => entry(route, 0.8, 'weekly')),
+        ...legal.map(route => entry(route, 0.3, 'yearly')),
+    ];
 }

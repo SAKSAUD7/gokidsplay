@@ -24,8 +24,6 @@ export function CustomerBookingModal({
     const [saveSuccess, setSaveSuccess] = useState(false);
     
     // Edit mode state for pending bookings
-    const [isEditing, setIsEditing] = useState(false);
-    const [editData, setEditData] = useState({ date: "", time: "", adults: 0, kids: 0 });
 
     // Cancellation state
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
@@ -56,13 +54,6 @@ export function CustomerBookingModal({
                 }
                 const data = await res.json();
                 setBooking(data);
-                // Initialize edit data
-                setEditData({
-                    date: data.date || "",
-                    time: data.time || "",
-                    adults: data.adults || 0,
-                    kids: data.kids || 0
-                });
             } catch (err: any) {
                 setError(err.message);
             } finally {
@@ -75,62 +66,15 @@ export function CustomerBookingModal({
     const handleParticipantSubmit = async (data: { adults: any[]; minors: any[]; waiverSigned: boolean }) => {
         setSaving(true);
         setSaveSuccess(false);
-
-        try {
-            const response = await fetch(`/api/party-bookings/${bookingId}/participants`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-                },
-                body: JSON.stringify({
-                    participants: { adults: data.adults, minors: data.minors },
-                    waiver_signed: data.waiverSigned
-                }),
-                cache: 'no-store',
-            });
-
-            if (response.ok) {
-                setSaveSuccess(true);
-                // Reload fresh data
-                const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-                const res = await fetch(`${API}/bookings/party-bookings/${bookingId}/`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                if (res.ok) setBooking(await res.json());
-                
-                setTimeout(() => setSaveSuccess(false), 5000);
-            } else {
-                throw new Error("Failed to save participants");
-            }
-        } catch (error: any) {
-            alert(error.message || "An error occurred");
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const handleUpdateBooking = async () => {
-        setSaving(true);
         try {
             const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
-            const type = bookingType === "PARTY" ? "party" : "session";
-            const endpoint = `/bookings/customer-auth/booking/${type}/${bookingId}/`;
-                
-            const res = await fetch(`${API}${endpoint}`, {
+            const res = await fetch(`${API}/bookings/customer-auth/booking/party/${bookingId}/`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(editData),
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ participants: { adults: data.adults, minors: data.minors } }),
             });
-            
-            if (!res.ok) throw new Error("Failed to update booking details.");
-            
-            const data = await res.json();
-            setBooking(data);
-            setIsEditing(false);
+            if (!res.ok) throw new Error("Failed to save the guest list");
+            setBooking(await res.json());
             setSaveSuccess(true);
             setTimeout(() => setSaveSuccess(false), 5000);
         } catch (error: any) {
@@ -218,55 +162,35 @@ export function CustomerBookingModal({
                                 <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="font-bold text-white/80">Booking Details</h3>
-                                        {(booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') && (
-                                            <button 
-                                                onClick={() => isEditing ? handleUpdateBooking() : setIsEditing(true)}
-                                                disabled={saving}
-                                                className="text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors disabled:opacity-50"
-                                            >
-                                                {saving ? "Saving..." : isEditing ? "Save Changes" : "Edit Details"}
-                                            </button>
-                                        )}
+                                        {/* Date, time and numbers change the price, so the team makes those changes */}
+                                        <a href="/contact" className="text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
+                                            Need a change? Contact us
+                                        </a>
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1"><Calendar size={12}/> Date</p>
-                                            {isEditing ? (
-                                                <input type="date" value={editData.date} onChange={e => setEditData({...editData, date: e.target.value})} className="bg-black/20 border border-white/20 rounded px-2 py-1 text-white w-full text-sm" />
-                                            ) : (
-                                                <p className="text-white font-semibold">{new Date(booking.date).toLocaleDateString("en-GB")}</p>
-                                            )}
+                                            <p className="text-white font-semibold">{new Date(booking.date).toLocaleDateString("en-GB")}</p>
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1"><Clock size={12}/> Time</p>
-                                            {isEditing ? (
-                                                <input type="time" value={editData.time} onChange={e => setEditData({...editData, time: e.target.value})} className="bg-black/20 border border-white/20 rounded px-2 py-1 text-white w-full text-sm" />
-                                            ) : (
-                                                <p className="text-white font-semibold">{booking.time || 'N/A'}</p>
-                                            )}
+                                            <p className="text-white font-semibold">{booking.time || 'N/A'}</p>
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1"><Users size={12}/> Guests</p>
-                                            {isEditing ? (
-                                                <div className="flex gap-2">
-                                                    <input type="number" min="0" value={editData.adults} onChange={e => setEditData({...editData, adults: parseInt(e.target.value) || 0})} className="bg-black/20 border border-white/20 rounded px-2 py-1 text-white w-full text-sm" placeholder="Adults" title="Adults" />
-                                                    <input type="number" min="0" value={editData.kids} onChange={e => setEditData({...editData, kids: parseInt(e.target.value) || 0})} className="bg-black/20 border border-white/20 rounded px-2 py-1 text-white w-full text-sm" placeholder="Kids" title="Kids" />
-                                                </div>
-                                            ) : (
-                                                <p className="text-white font-semibold">{(booking.adults || 0) + (booking.kids || 0)}</p>
-                                            )}
+                                            <p className="text-white font-semibold">{(booking.adults || 0) + (booking.kids || 0)}</p>
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1">Status</p>
-                                            <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' : booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-                                                {booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING' ? 'Payment Pending' : (booking.status || booking.booking_status)}
+                                            <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : (booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
+                                                {(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') ? 'Cancelled' : (booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') ? 'Payment Pending' : (booking.status || booking.booking_status)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 {/* Complete Payment CTA for Pending Bookings */}
-                                {(booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') && !isEditing && (
+                                {(booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') && !(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') && (
                                     <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-6 mt-6">
                                         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                                             <div>

@@ -68,9 +68,9 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-8 gap-y-12 mb-12">
                     {/* Brand Column */}
-                    <div className="lg:col-span-2">
+                    <div className="col-span-2 md:col-span-4 lg:col-span-2">
                         <Link href="/" className="inline-block mb-4">
                             <img
                                 src={logoUrl}
@@ -120,6 +120,7 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
                                     <li key={link.title}>
                                         <Link
                                             href={link.href}
+                                            rel={link.nofollow ? "nofollow" : undefined}
                                             className="text-white/70 hover:text-primary transition-colors inline-block hover:translate-x-1 transform duration-200"
                                         >
                                             {link.title}

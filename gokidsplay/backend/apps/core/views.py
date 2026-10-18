@@ -90,11 +90,11 @@ class GlobalSettingsViewSet(viewsets.ModelViewSet):
     serializer_class = GlobalSettingsSerializer
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'fix_db_schema']:
+        if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
-        return [IsSuperAdminOnly()]
+        return [IsSuperAdminOnly()]  # includes fix_db_schema (runs migrations)
 
-    @action(detail=False, methods=['post', 'get'])
+    @action(detail=False, methods=['post'])
     def fix_db_schema(self, request):
         """Force run all migrations manually"""
         from django.core.management import call_command

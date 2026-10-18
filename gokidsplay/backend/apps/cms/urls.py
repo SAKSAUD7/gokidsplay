@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from .views import google_reviews_view, google_reviews_sync_view
 from .views import (
     BannerViewSet, ActivityViewSet, FaqViewSet, TestimonialViewSet, SocialLinkViewSet, GalleryItemViewSet,
     StatCardViewSet, InstagramReelViewSet, MenuSectionViewSet, GroupPackageViewSet,
@@ -45,4 +46,6 @@ urlpatterns = [
     path('upload/', UploadView.as_view(), name='cms-upload'),
     path('reorder/', ReorderView.as_view(), name='cms-reorder'),
     path('attraction-video/', attraction_video_view, name='attraction-video'),
+    path('google-reviews/', google_reviews_view, name='google-reviews'),
+    path('google-reviews/sync/', google_reviews_sync_view, name='google-reviews-sync'),
 ]

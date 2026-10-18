@@ -48,6 +48,8 @@ const STATUS_CONFIG: Record<string, { label: string; cls: string; dot: string; i
 };
 
 const PROVIDER_CONFIG: Record<string, { label: string; cls: string }> = {
+    SUMUP:    { label: "SumUp",    cls: "text-blue-700 bg-blue-100 border-blue-200" },
+    VENUE:    { label: "At venue", cls: "text-emerald-700 bg-emerald-100 border-emerald-200" },
     MOCK:     { label: "Mock",     cls: "text-sky-700 bg-sky-100 border-sky-200"         },
     RAZORPAY: { label: "Razorpay", cls: "text-violet-700 bg-violet-100 border-violet-200"},
     STRIPE:   { label: "Stripe",   cls: "text-indigo-700 bg-indigo-100 border-indigo-200"},
@@ -321,9 +323,8 @@ export default function PaymentsListPage({ initialSearch = "" }: { initialSearch
                             className="pl-9 pr-8 py-2.5 rounded-lg border border-slate-300 bg-white text-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm appearance-none cursor-pointer transition-all min-w-[150px]"
                         >
                             <option value="all">All Providers</option>
-                            <option value="MOCK">Mock</option>
-                            <option value="RAZORPAY">Razorpay</option>
-                            <option value="STRIPE">Stripe</option>
+                            <option value="SUMUP">SumUp (online)</option>
+                            <option value="VENUE">Paid at venue</option>
                         </select>
                     </div>
                 </div>

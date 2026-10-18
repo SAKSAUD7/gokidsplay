@@ -21,6 +21,28 @@ export interface Review {
     platform?: string;
     review_date?: string;
     image_url?: string;
+    /** Link to the original review (Google reviews) */
+    review_url?: string;
+}
+
+/** Google rating and links from the Google Business Profile (see backend apps/cms/google_reviews.py) */
+export interface GoogleSummary {
+    rating: number | null;
+    review_count: number | null;
+    reviews_url: string;
+    write_review_url: string;
+}
+
+/** The Google "G" — shown with Google ratings and reviews, as Google asks for attribution */
+function GoogleG({ className = "w-5 h-5" }: { className?: string }) {
+    return (
+        <svg viewBox="0 0 48 48" className={className} aria-hidden="true">
+            <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z" />
+            <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+            <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
+            <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-3.5z" />
+        </svg>
+    );
 }
 
 const AVATAR_COLORS = [
@@ -38,14 +60,20 @@ const AVATAR_COLORS = [
 export default function TestimoniesContent({
     reviews,
     content,
+    google,
 }: {
-    /** Genuine reviews from the CMS (Customer Reviews) */
+    /** Genuine reviews from the CMS (Customer Reviews), including those synced from Google */
     reviews: Review[];
     /** Resolved "testimonies" page content — see lib/cms/page-registry.ts */
     content: Record<string, Record<string, string> | null>;
+    /** Overall Google rating and review links (null when unavailable) */
+    google?: GoogleSummary | null;
 }) {
     const { hero, summary, cta } = content;
     const hasReviews = reviews.length > 0;
+    const googleRating = google?.rating ?? null;
+    // "Leave a review" opens Google's write-a-review box once the business is connected
+    const reviewLink = google?.write_review_url?.includes("writereview") ? google.write_review_url : (summary?.review_link || google?.write_review_url);
     const avgRating = hasReviews ? (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1) : "0";
     const ratingDist = [5, 4, 3, 2, 1].map((r) => ({
         stars: r,
@@ -102,8 +130,28 @@ export default function TestimoniesContent({
                 <div className="max-w-4xl mx-auto">
                     <ScrollReveal animation="scale">
                         <div className="bg-surface-800/50 backdrop-blur-md border border-white/10 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row gap-10 items-center">
-                            {/* Big Score */}
-                            {hasReviews && (
+                            {/* Google rating (all Google reviews) */}
+                            {googleRating !== null && (
+                            <div className="text-center shrink-0">
+                                <div className="flex items-center justify-center gap-2 mb-1 text-white/70 text-sm font-semibold">
+                                    <GoogleG /> Google rating
+                                </div>
+                                <div className="text-8xl font-black text-white mb-2">{googleRating.toFixed(1)}</div>
+                                <div className="flex justify-center gap-1 mb-2" aria-label={`${googleRating} out of 5 stars`}>
+                                    {[1, 2, 3, 4, 5].map((s) => (
+                                        <Star key={s} className={`w-6 h-6 ${s <= Math.round(googleRating) ? "fill-yellow-400 text-yellow-400" : "text-white/20"}`} />
+                                    ))}
+                                </div>
+                                {google?.review_count != null && (
+                                    <a href={google.reviews_url} target="_blank" rel="noopener noreferrer" className="text-white/60 text-sm underline hover:text-white">
+                                        Based on {google.review_count.toLocaleString("en-GB")} Google reviews
+                                    </a>
+                                )}
+                            </div>
+                            )}
+
+                            {/* Big Score (reviews on this page) */}
+                            {googleRating === null && hasReviews && (
                             <div className="text-center shrink-0">
                                 <div className="text-8xl font-black text-white mb-2">{avgRating}</div>
                                 <div className="flex justify-center gap-1 mb-2">
@@ -116,7 +164,19 @@ export default function TestimoniesContent({
                             )}
 
                             {/* Distribution bars */}
-                            {hasReviews ? (
+                            {googleRating !== null ? (
+                            <div className="flex-1 w-full text-center md:text-left">
+                                <p className="text-white/70 mb-4">
+                                    Here are some of the latest reviews families have left us on Google.
+                                </p>
+                                {google?.reviews_url && (
+                                    <a href={google.reviews_url} target="_blank" rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/10 border border-white/20 text-white font-bold text-sm hover:bg-white/20 transition-colors">
+                                        <GoogleG className="w-4 h-4" /> Read all reviews on Google <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                )}
+                            </div>
+                            ) : hasReviews ? (
                             <div className="flex-1 w-full space-y-2">
                                 {ratingDist.map(({ stars, count, pct }) => (
                                     <div key={stars} className="flex items-center gap-3">
@@ -147,7 +207,7 @@ export default function TestimoniesContent({
                             <div className="text-center shrink-0">
                                 <p className="text-white/60 text-sm mb-4 whitespace-pre-line">{summary.prompt}</p>
                                 <a
-                                    href={summary.review_link}
+                                    href={reviewLink}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-black font-black rounded-full text-sm hover:shadow-lg hover:shadow-primary/30 hover:scale-105 transition-all duration-200"
@@ -156,6 +216,12 @@ export default function TestimoniesContent({
                                     {summary.button_text}
                                     <ExternalLink className="w-3 h-3" />
                                 </a>
+                                {googleRating === null && google?.reviews_url && (
+                                    <a href={google.reviews_url} target="_blank" rel="noopener noreferrer"
+                                        className="mt-3 flex items-center justify-center gap-1.5 text-sm text-white/60 underline hover:text-white">
+                                        <GoogleG className="w-4 h-4" /> Read our reviews on Google
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </ScrollReveal>
@@ -197,9 +263,10 @@ export default function TestimoniesContent({
                                     transition={{ delay: i * 0.07 }}
                                     className="bg-surface-800/50 backdrop-blur-md border border-white/8 rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors duration-300 group"
                                 >
-                                    {/* Quote icon */}
-                                    <div className="mb-4 text-white/10 group-hover:text-primary/20 transition-colors">
-                                        <Quote className="w-8 h-8" />
+                                    {/* Quote icon (Google "G" for Google reviews) */}
+                                    <div className="mb-4 flex items-start justify-between">
+                                        <Quote className="w-8 h-8 text-white/10 group-hover:text-primary/20 transition-colors" />
+                                        {review.platform === "Google" && <GoogleG className="w-5 h-5 opacity-90" />}
                                     </div>
 
                                     {/* Stars */}
@@ -222,7 +289,7 @@ export default function TestimoniesContent({
                                         <div className="flex items-center gap-3">
                                             {/* Avatar */}
                                             {review.image_url ? (
-                                                <img src={getMediaUrl(review.image_url)} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                                                <img src={getMediaUrl(review.image_url)} alt="" referrerPolicy="no-referrer" loading="lazy" className="w-10 h-10 rounded-full object-cover shrink-0" />
                                             ) : (
                                                 <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center text-black font-black text-sm shrink-0`}>
                                                     {review.name.trim().charAt(0).toUpperCase()}
@@ -231,7 +298,11 @@ export default function TestimoniesContent({
                                             <div>
                                                 <div className="font-bold text-white text-sm">{review.name}</div>
                                                 <div className={`text-xs ${PLATFORM_COLORS[review.platform ?? ""] || "text-white/50"}`}>
-                                                    {[review.platform, review.review_date].filter(Boolean).join(" · ")}
+                                                    {review.review_url ? (
+                                                        <a href={review.review_url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                                            {[review.platform && `Posted on ${review.platform}`, review.review_date].filter(Boolean).join(" · ")}
+                                                        </a>
+                                                    ) : [review.platform, review.review_date].filter(Boolean).join(" · ")}
                                                 </div>
                                             </div>
                                         </div>
@@ -240,6 +311,13 @@ export default function TestimoniesContent({
                             ))}
                         </motion.div>
                     </AnimatePresence>
+
+                    {reviews.some((r) => r.platform === "Google" && r.review_url) && (
+                        <p className="mt-6 text-center text-xs text-white/40 flex items-center justify-center gap-1.5">
+                            <GoogleG className="w-3.5 h-3.5" /> Google reviews are shown as posted on Google
+                            {google?.reviews_url && <> · <a href={google.reviews_url} target="_blank" rel="noopener noreferrer" className="underline hover:text-white/70">see them all</a></>}
+                        </p>
+                    )}
 
                     {/* Pagination */}
                     {pages > 1 && (

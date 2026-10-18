@@ -22,7 +22,6 @@ interface PartyBookingWizardProps {
 export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWizardProps) {
     const router = useRouter();
     const { customer, token, login, register: registerUser } = useAccount();
-    const MIN_PARTICIPANTS = 10;
 
     // 1: Basic Info, 2: Auth Gate (if not logged in), 3: Participants, 4: Payment, 5: Confirmation
     const [step, setStep] = useState(1);
@@ -32,7 +31,11 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
     );
     // Bumped when the opening calendar (holidays + admin openings / closures) has loaded
     const [, setCalendarVersion] = useState(0);
+    // Party times already full on the chosen date (from the live availability)
+    const [fullPartySlots, setFullPartySlots] = useState<string[]>([]);
     const [config, setConfig] = useState<any>(null);
+    // Minimum children for a party (Website Content → Party Booking)
+    const MIN_PARTICIPANTS = Math.max(1, Number(config?.min_participants) || 10);
     const [submitted, setSubmitted] = useState(false);
     const [tempBookingId, setTempBookingId] = useState<string | null>(null);
     const [tempBookingIntId, setTempBookingIntId] = useState<number | null>(null);
@@ -110,7 +113,20 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
         loadConfigAndBlocks();
     }, []);
 
-    // ...
+    // Which party times are already full on the chosen date
+    useEffect(() => {
+        setFullPartySlots([]);
+        if (!formData.date) return;
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
+        fetch(`${API_URL}/bookings/bookings/slot_availability/?date=${formData.date}`, { cache: "no-store" })
+            .then(r => (r.ok ? r.json() : null))
+            .then(data => {
+                const slots = data?.party_slots || {};
+                setFullPartySlots(Object.keys(slots).filter(t => String(slots[t]?.status).toUpperCase() === "FULL"));
+            })
+            .catch(() => {});
+    }, [formData.date]);
+
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newDate = e.target.value;
@@ -573,7 +589,9 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                                 // A special opening with its own hours may not include the usual start times
                                                 return matching.length > 0 ? matching : openSlots;
                                             })().map((slot: string) => (
-                                                <option key={slot} value={slot}>{formatClock(slot)}</option>
+                                                <option key={slot} value={slot} disabled={fullPartySlots.includes(slot)}>
+                                                    {formatClock(slot)}{fullPartySlots.includes(slot) ? " — fully booked" : ""}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>

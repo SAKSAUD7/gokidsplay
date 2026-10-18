@@ -39,7 +39,7 @@
         <table width="100%" cellpadding="0" cellspacing="0" style="background:#fff7ed;border:2px solid #f59e0b;border-radius:12px;margin-bottom:28px;">
           <tr><td style="padding:20px 24px;text-align:center;">
             <p style="margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#b45309;font-weight:600;">Party Booking Reference</p>
-            <p style="margin:0;font-size:24px;font-weight:800;color:#92400e;letter-spacing:2px;">{{ booking_uuid }}</p>
+            <p style="margin:0;font-size:24px;font-weight:800;color:#92400e;letter-spacing:2px;">{{ party_booking.booking_number|default:booking_uuid }}</p>
           </td></tr>
         </table>
 
@@ -68,7 +68,7 @@
           </tr>
           <tr style="border-top:2px solid #f59e0b;background:#fffbeb;">
             <td style="padding:16px 20px;font-size:15px;color:#1a1a2e;font-weight:700;">Total</td>
-            <td style="padding:16px 20px;font-size:20px;color:#d97706;font-weight:800;text-align:right;">£{{ amount }}</td>
+            <td style="padding:16px 20px;font-size:20px;color:#d97706;font-weight:800;text-align:right;">£{{ amount|floatformat:2 }}</td>
           </tr>
         </table>
 
@@ -95,7 +95,7 @@
 
         <!-- CTA -->
         <div style="text-align:center;">
-          <a href="{{ site_url }}/party-booking/{{ booking_uuid }}" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:50px;">View Party Details →</a>
+          <a href="{{ site_url }}/tickets/{{ booking_uuid }}" style="display:inline-block;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:50px;">View Party Details →</a>
         </div>
       </td></tr>
 
@@ -103,7 +103,7 @@
       <tr><td style="background:#1a1a2e;border-radius:0 0 16px 16px;padding:28px 32px;text-align:center;">
         <p style="margin:0 0 6px;font-size:15px;font-weight:700;color:#ffffff;">Go Kids Play</p>
         <p style="margin:0 0 12px;font-size:13px;color:rgba(255,255,255,0.6);">Indoor Soft Play · Toddler Zone · Party Packages · Special Events</p>
-        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">📧 hello@gokidsplay.co.uk &nbsp;|&nbsp; 📍 Coventry, United Kingdom</p>
+        <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.4);">📧 {{ contact_email|default:"info@gokidsplay.co.uk" }} &nbsp;|&nbsp; 📍 Coventry, United Kingdom</p>
         <p style="margin:12px 0 0;font-size:11px;color:rgba(255,255,255,0.25);">This is an automated confirmation. Please do not reply directly to this email.</p>
       </td></tr>
 

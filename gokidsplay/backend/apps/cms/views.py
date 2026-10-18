@@ -562,3 +562,77 @@ class TimingCardViewSet(BaseCmsViewSet):
     filterset_fields = ['active']
     ordering_fields = ['order']
     ordering = ['order']
+
+
+# ── Google reviews (Testimonies page) ────────────────────────────────────────
+
+def _google_reviews_summary(profile, staff=False):
+    from .google_reviews import api_key
+    data = {
+        'rating': float(profile.rating) if profile.rating is not None else None,
+        'review_count': profile.review_count,
+        'reviews_url': profile.reviews_url,
+        'write_review_url': profile.write_review_url,
+        'last_synced': profile.last_synced.isoformat() if profile.last_synced else None,
+    }
+    if staff:
+        data.update({
+            'connected': bool(api_key()),
+            'place_id': profile.place_id,
+            'search_query': profile.search_query,
+            'maps_url': profile.maps_url,
+            'min_rating_to_show': profile.min_rating_to_show,
+            'auto_sync': profile.auto_sync,
+            'last_error': profile.last_error,
+        })
+    return data
+
+
+@api_view(['GET', 'PATCH'])
+@permission_classes([AllowAny])
+def google_reviews_view(request):
+    """
+    GET: the Google rating, number of reviews and review links (public; refreshes
+    from Google when the data is over 12 hours old).
+    PATCH (content managers): place_id, search_query, maps_url, min_rating_to_show, auto_sync.
+    """
+    from .models import GoogleReviewsProfile
+    from .google_reviews import sync_if_stale
+    is_manager = IsContentManagerOrAdmin().has_permission(request, None)
+
+    if request.method == 'PATCH':
+        if not is_manager:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+        profile = GoogleReviewsProfile.get()
+        for field in ('place_id', 'search_query', 'maps_url'):
+            if field in request.data:
+                setattr(profile, field, str(request.data[field] or '').strip())
+        if 'min_rating_to_show' in request.data:
+            try:
+                profile.min_rating_to_show = min(5, max(1, int(request.data['min_rating_to_show'])))
+            except (TypeError, ValueError):
+                return Response({'error': 'Minimum rating must be 1–5'}, status=status.HTTP_400_BAD_REQUEST)
+        if 'auto_sync' in request.data:
+            profile.auto_sync = bool(request.data['auto_sync'])
+        if profile.maps_url and not profile.maps_url.startswith('https://'):
+            return Response({'error': 'The Google Maps link must start with https://'}, status=status.HTTP_400_BAD_REQUEST)
+        profile.save()
+        return Response(_google_reviews_summary(profile, staff=True))
+
+    sync_if_stale()
+    return Response(_google_reviews_summary(GoogleReviewsProfile.get(), staff=is_manager))
+
+
+@api_view(['POST'])
+@permission_classes([IsContentManagerOrAdmin])
+def google_reviews_sync_view(request):
+    """Fetch the latest rating and reviews from Google now."""
+    from .models import GoogleReviewsProfile
+    from .google_reviews import GoogleReviewsError, sync_google_reviews
+    try:
+        result = sync_google_reviews()
+    except GoogleReviewsError as exc:
+        return Response({'error': str(exc), **_google_reviews_summary(GoogleReviewsProfile.get(), staff=True)},
+                        status=status.HTTP_400_BAD_REQUEST)
+    return Response({'created': result['created'], 'updated': result['updated'],
+                     **_google_reviews_summary(GoogleReviewsProfile.get(), staff=True)})

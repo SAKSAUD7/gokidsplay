@@ -94,6 +94,7 @@ class Booking(models.Model):
     parking_plates = models.JSONField(null=True, blank=True, help_text="Car registration plates for pre-booked parking: ['LE21 ABC', ...]")
     qr_code = models.CharField(max_length=255, unique=True, null=True, blank=True)
     booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Booking number, e.g. GK482913 (see references.py)")
+    online_checkout = models.BooleanField(default=False, help_text="Booked on the website and paid online (released if left unpaid, see unpaid.py)")
     
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
@@ -207,6 +208,7 @@ class PartyBooking(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='PENDING')
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='party_bookings')
     booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Booking number, e.g. GP105377 (see references.py)")
+    online_checkout = models.BooleanField(default=False, help_text="Booked on the website and paid online (released if left unpaid, see unpaid.py)")
     
     # Arrival tracking (matching Booking model)
     arrived = models.BooleanField(default=False)

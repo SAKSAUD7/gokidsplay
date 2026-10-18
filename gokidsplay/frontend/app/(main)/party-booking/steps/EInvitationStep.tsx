@@ -101,17 +101,12 @@ export default function EInvitationStep({ bookingId, bookingDetails, onNext, onS
         try {
             const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
-            // Backend expects integer ID, not UUID
-            const bookingIntegerId = bookingDetails.id;
-
-            console.log('[EInvitation] Submitting with booking ID:', bookingIntegerId);
-            console.log('[EInvitation] Full booking details:', bookingDetails);
 
             const res = await fetch(`${API_URL}/invitations/invitations/create-or-update/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    booking_id: bookingIntegerId, // Must be integer ID
+                    booking_uuid: bookingDetails.uuid, // the booking's private reference
                     template: selectedTemplate.id,
                     child_name: childName,
                     custom_message: customMessage,

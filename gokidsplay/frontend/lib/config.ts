@@ -28,28 +28,42 @@ export const navLinks = [
     { title: "Contact", href: "/contact" },
 ];
 
-export const footerLinks = [
+// Every page of the site is listed here (the navbar shows only the main ones)
+export const footerLinks: { title: string; items: { title: string; href: string; nofollow?: boolean }[] }[] = [
     {
         title: "Explore",
         items: [
             { title: "Home", href: "/" },
-            { title: "Activities", href: "/attractions" },
+            { title: "Attractions", href: "/attractions" },
+            { title: "Soft Play", href: "/attractions/soft-play" },
+            { title: "Laser Arena", href: "/attractions/laser-arena" },
+            { title: "Go Karts", href: "/attractions/go-karts" },
+            { title: "Inflatable Park", href: "/attractions/inflatable-park" },
             { title: "Gallery", href: "/gallery" },
             { title: "Events", href: "/events" },
             { title: "Testimonies", href: "/testimonies" },
-            { title: "About Us", href: "/about" },
         ],
     },
     {
-        title: "Book & Info",
+        title: "Visit & Book",
         items: [
             { title: "Book Tickets", href: "/book" },
             { title: "Birthday Parties", href: "/parties" },
             { title: "Group Bookings", href: "/groups" },
             { title: "Pricing", href: "/pricing" },
+            { title: "Information", href: "/information" },
             { title: "Facilities", href: "/facilities" },
+            { title: "Guidelines", href: "/guidelines" },
             { title: "FAQ's", href: "/faq" },
+        ],
+    },
+    {
+        title: "About",
+        items: [
+            { title: "About Us", href: "/about" },
             { title: "Contact Us", href: "/contact" },
+            { title: "My Account", href: "/account/login" },
+            { title: "Admin Portal", href: "/admin/login", nofollow: true },
         ],
     },
     {
@@ -62,5 +76,5 @@ export const footerLinks = [
             { title: "Disclaimer", href: "/disclaimer" },
             { title: "Terms", href: "/terms" },
         ],
-    }
+    },
 ];

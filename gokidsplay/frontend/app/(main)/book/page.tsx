@@ -5,6 +5,8 @@ import { getBookingInformation } from "../../actions/booking-information";
 import { getMetadata } from "@/seo/seo.config";
 import { getPublicSessionSettings, onlineFeeNote } from "@/lib/public-api";
 import { fillHours, hoursPlaceholdersFromConfig } from "@/lib/hours-text";
+import { getSettings } from "../../actions/settings";
+import { BookingPaused } from "@/components/BookingPaused";
 
 export async function generateMetadata() {
     const hours = hoursPlaceholdersFromConfig(await getPublicSessionSettings());
@@ -21,6 +23,7 @@ export default async function BookingPage() {
     const cmsContent = fillHours(await getPageSections('booking-session'), hours);
     const sessionInfo = fillHours(await getBookingInformation('SESSION'), hours);
     const feeNote = onlineFeeNote(sessionSettings);
+    const site: any = await getSettings();
 
     return (
         <main className="bg-background min-h-screen pt-24 pb-16 px-4">
@@ -51,7 +54,9 @@ export default async function BookingPage() {
                 </div>
 
                 {/* Booking Wizard First */}
-                <BookingWizard onSubmit={createBooking} cmsContent={cmsContent} />
+                {site && site.onlineBookingEnabled === false
+                    ? <BookingPaused what="booking" phone={site.contactPhone} />
+                    : <BookingWizard onSubmit={createBooking} cmsContent={cmsContent} />}
 
                 {/* Session Information Section Below */}
                 {sessionInfo && (
