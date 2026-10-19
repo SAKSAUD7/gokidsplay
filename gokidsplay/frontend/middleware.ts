@@ -43,9 +43,15 @@ export function middleware(request: NextRequest) {
     });
 
     // ── 5. Canonical domain redirects ─────────────────────────────────────────
-    const targetSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.gokidsplay.uk';
+    // Only when the site's own address is a real domain (NEXT_PUBLIC_SITE_URL, or
+    // NEXT_PUBLIC_FRONTEND_URL, e.g. https://www.gokidsplay.co.uk). Until the custom
+    // domain is connected the site must stay usable on its *.azurewebsites.net address.
+    const targetSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_FRONTEND_URL || '';
     const targetHost = targetSiteUrl.replace(/^https?:\/\//, '').split('/')[0];
     const lowercaseHost = host.toLowerCase();
+    if (!targetHost || /localhost|127\.0\.0\.1|azurewebsites\.net/i.test(targetHost)) {
+        return response;
+    }
 
     // 5a. Redirect Azure default domain → custom domain
     if (lowercaseHost.includes('.azurewebsites.net')) {

@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "uk.co.gokidsplay.app",
+      "sha256_cert_fingerprints": ["83:21:D4:C3:5C:DC:AF:0B:71:D2:8E:80:88:4F:D1:81:00:BF:17:AB:6D:97:DC:8F:4A:6A:D5:7E:C2:EF:F9:D7"]
+    }
+  }
+]

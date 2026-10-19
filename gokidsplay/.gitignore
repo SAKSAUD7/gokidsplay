@@ -11,6 +11,7 @@ htmlcov/
 # Next.js
 .next/
 .next-check/
+.next-prod/
 out/
 build/
 dist/

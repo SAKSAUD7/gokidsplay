@@ -1,0 +1,11 @@
+# Build outputs (the published APK lives in frontend/public/downloads/)
+*.apk
+*.aab
+*.idsig
+build/
+app/build/
+.gradle/
+local.properties
+# The signing key is NEVER committed (kept in C:\Users\saksa\.gokidsplay-android\keystore)
+*.keystore
+*.jks

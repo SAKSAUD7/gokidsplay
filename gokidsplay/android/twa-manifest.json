@@ -1,0 +1,69 @@
+{
+  "packageId": "uk.co.gokidsplay.app",
+  "host": "www.gokidsplay.co.uk",
+  "name": "Go Kids Play Coventry",
+  "launcherName": "Go Kids Play",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#0A0118",
+  "themeColorDark": "#0A0118",
+  "navigationColor": "#0A0118",
+  "navigationColorDark": "#0A0118",
+  "navigationDividerColor": "#0A0118",
+  "navigationDividerColorDark": "#0A0118",
+  "backgroundColor": "#0A0118",
+  "enableNotifications": false,
+  "startUrl": "/?source=android-app",
+  "iconUrl": "https://www.gokidsplay.co.uk/icons/icon-512.png",
+  "maskableIconUrl": "https://www.gokidsplay.co.uk/icons/maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "C:/Users/saksa/.gokidsplay-android/keystore/gokidsplay-release.keystore",
+    "alias": "gokidsplay"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Book a play session",
+      "shortName": "Book",
+      "url": "/book?source=android-app",
+      "chosenIconUrl": "https://www.gokidsplay.co.uk/icons/icon-192.png"
+    },
+    {
+      "name": "Book a birthday party",
+      "shortName": "Parties",
+      "url": "/party-booking?source=android-app",
+      "chosenIconUrl": "https://www.gokidsplay.co.uk/icons/icon-192.png"
+    },
+    {
+      "name": "My bookings",
+      "shortName": "My bookings",
+      "url": "/account/bookings?source=android-app",
+      "chosenIconUrl": "https://www.gokidsplay.co.uk/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://www.gokidsplay.co.uk/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://www.gokidsplay.co.uk/",
+  "minSdkVersion": 24,
+  "fingerprints": [
+    {
+      "name": "release",
+      "value": "83:21:D4:C3:5C:DC:AF:0B:71:D2:8E:80:88:4F:D1:81:00:BF:17:AB:6D:97:DC:8F:4A:6A:D5:7E:C2:EF:F9:D7"
+    }
+  ],
+  "additionalTrustedOrigins": [
+    "gokidsplay.co.uk"
+  ],
+  "retainedBundles": [],
+  "appVersion": "1.0.0"
+}

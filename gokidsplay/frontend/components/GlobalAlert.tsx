@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { fetchSiteAlerts, BookingBlock } from "../lib/api/booking-blocks";
 import { AlertCircle, Calendar, Info, X } from "lucide-react";
 import { formatClock } from "../lib/api/types";
@@ -10,6 +11,9 @@ export const GlobalAlert = () => {
     const [alerts, setAlerts] = useState<BookingBlock[]>([]);
     const [isVisible, setIsVisible] = useState(false);
     const [activeAlert, setActiveAlert] = useState<BookingBlock | null>(null);
+    const pathname = usePathname() || "";
+    // Private browsing can block storage: treat as "not dismissed" instead of crashing
+    const seen = (id: number | string) => { try { return !!sessionStorage.getItem(`dismissed_alert_${id}`); } catch { return false; } };
 
     useEffect(() => {
         const loadAlerts = async () => {
@@ -24,8 +28,7 @@ export const GlobalAlert = () => {
 
                 // Check if user dismissed this specific alert session-wise?
                 // User req: "Dismissible per session"
-                const dismissedId = sessionStorage.getItem(`dismissed_alert_${current.id}`);
-                if (!dismissedId) {
+                if (!seen(current.id)) {
                     setActiveAlert(current);
                     setIsVisible(true);
                 }
@@ -38,11 +41,12 @@ export const GlobalAlert = () => {
     const handleDismiss = () => {
         setIsVisible(false);
         if (activeAlert) {
-            sessionStorage.setItem(`dismissed_alert_${activeAlert.id}`, 'true');
+            try { sessionStorage.setItem(`dismissed_alert_${activeAlert.id}`, 'true'); } catch { /* private mode */ }
         }
     };
 
-    if (!activeAlert || !isVisible) return null;
+    // Customer notices only (the admin portal has its own screens)
+    if (!activeAlert || !isVisible || pathname.startsWith('/admin')) return null;
 
     // Closures win over a special opening (backend sends both kinds for today)
     const isClosed = activeAlert.type !== 'OPEN_TODAY';

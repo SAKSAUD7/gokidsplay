@@ -127,7 +127,12 @@ export function getMetadata(
       follow: true,
     },
     icons: icons || {
-      icon: "/favicon.png",
+      icon: [{ url: "/favicon.ico", sizes: "any" }, { url: "/favicon.png", type: "image/png" }],
+      apple: "/apple-touch-icon.png",
     },
+    applicationName: "Go Kids Play",
+    // Installed on an iPhone: opens full screen with the site's own title
+    appleWebApp: { capable: true, title: "Go Kids Play", statusBarStyle: "black-translucent" },
+    formatDetection: { telephone: false },
   };
 }

@@ -62,7 +62,8 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
     const mapUrl = settings?.mapUrl || siteConfig.contact.mapUrl;
 
     return (
-        <footer className="relative bg-background-dark text-white pt-20 pb-10">
+        <footer className="relative bg-background-dark text-white pt-20 pb-[calc(6.5rem+env(safe-area-inset-bottom))] md:pb-10">
+            {/* Extra bottom space on phones so the last lines clear the fixed bottom menu */}
             {/* Decorative Top Border */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent" />
 
@@ -75,7 +76,7 @@ export const Footer = ({ settings, socialLinks }: { settings?: any; socialLinks?
                             <img
                                 src={logoUrl}
                                 alt="Go Kids Play"
-                                className="h-16 w-auto drop-shadow-neon-blue"
+                                className="h-8 sm:h-10 w-auto drop-shadow-neon-blue"
                                 onError={(e) => {
                                     // Fall back to the bundled logo (once) if the CMS logo file is missing
                                     const img = e.currentTarget;

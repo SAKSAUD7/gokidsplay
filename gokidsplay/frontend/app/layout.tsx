@@ -10,6 +10,7 @@ import { getMetadata } from "@/seo/seo.config";
 import { getPublicSessionSettings } from "@/lib/public-api";
 import { openingHoursSpecification } from "@/lib/hours-text";
 import { readSessionRules } from "@/lib/api/types";
+import { PWA_BOOT_SCRIPT } from "@/lib/pwa-boot";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
@@ -34,10 +35,10 @@ export default async function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
-                <link rel="icon" href="/favicon.ico" sizes="any" />
-                <link rel="icon" href="/favicon.png" type="image/png" />
                 <link rel="manifest" href="/manifest.json" />
-                <link rel="apple-touch-icon" href="/gokidsplay-logo.png" />
+                <meta name="mobile-web-app-capable" content="yes" />
+                {/* Web app: keep the install offer and register the service worker (lib/pwa.ts) */}
+                <script dangerouslySetInnerHTML={{ __html: PWA_BOOT_SCRIPT }} />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
@@ -116,17 +117,6 @@ export default async function RootLayout({
                     </>
                 )}
                 <UIProvider>
-                    <Script id="register-sw" strategy="afterInteractive">{`
-                        if ('serviceWorker' in navigator) {
-                            window.addEventListener('load', function() {
-                                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                                    console.log('ServiceWorker registration successful');
-                                }, function(err) {
-                                    console.log('ServiceWorker registration failed: ', err);
-                                });
-                            });
-                        }
-                    `}</Script>
                     <GlobalAlert />
                     {children}
                 </UIProvider>

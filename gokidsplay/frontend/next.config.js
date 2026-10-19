@@ -108,6 +108,25 @@ const nextConfig = {
                 },
             ] : []),
             {
+                // Web app files: always check for a new version (the service worker updates itself)
+                source: '/:file(sw.js|manifest.json)',
+                headers: [{ key: 'Cache-Control', value: 'no-cache' }],
+            },
+            {
+                // Android app download (frontend/public/downloads/gokidsplay.apk)
+                source: '/downloads/:file*.apk',
+                headers: [
+                    { key: 'Content-Type', value: 'application/vnd.android.package-archive' },
+                    { key: 'Content-Disposition', value: 'attachment; filename="GoKidsPlay.apk"' },
+                    { key: 'Cache-Control', value: 'no-cache' },
+                ],
+            },
+            {
+                // Proves the Android app belongs to this site (opens full screen, no browser bar)
+                source: '/.well-known/assetlinks.json',
+                headers: [{ key: 'Content-Type', value: 'application/json' }],
+            },
+            {
                 // Security headers for all pages
                 source: '/(.*)',
                 headers: [

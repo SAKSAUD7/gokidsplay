@@ -720,10 +720,30 @@ export default function PartyBookingWizard({ cmsContent = [] }: PartyBookingWiza
                                     />
                                 </div>
 
+                                {/* Phones: the Price Summary is below the form, so show the total (and the voucher link) before Continue */}
+                                <div className="lg:hidden mt-8 rounded-2xl border border-primary/30 bg-surface-800/60 p-4 space-y-1">
+                                    {costs.discount > 0 && (
+                                        <div className="flex justify-between text-sm text-emerald-400">
+                                            <span>Voucher {voucher?.code}</span><span>- £{costs.discount.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-baseline">
+                                        <span className="font-bold text-white">Total</span>
+                                        <span className="font-black text-xl text-primary">£{costs.total.toFixed(2)}</span>
+                                    </div>
+                                    <p className="text-xs text-white/60">Deposit £{costs.deposit.toFixed(2)} due now · balance on the day</p>
+                                    {!voucher && (
+                                        <button type="button" className="text-sm font-semibold text-primary underline underline-offset-2"
+                                            onClick={() => { const el = document.getElementById("party-voucher"); el?.scrollIntoView({ behavior: "smooth", block: "center" }); setTimeout(() => el?.focus(), 400); }}>
+                                            Have a voucher code?
+                                        </button>
+                                    )}
+                                </div>
+
                                 <button
                                     type="submit"
                                     disabled={isSubmitting || formData.participants < MIN_PARTICIPANTS || (!!formData.time && !slotFits(formData.time))}
-                                    className="w-full mt-8 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="w-full mt-4 lg:mt-8 px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {isSubmitting ? (
                                         <>

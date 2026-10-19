@@ -307,6 +307,16 @@ Do this when the Azure address works and you are ready to switch over from the o
 - [ ] Opening Days shows the right open / closed dates; Settings → online booking is on
 - [ ] Custom domains with HTTPS on website and API
 
+## Part 12 — The app (phones)
+
+- **Web app:** every phone can install the site from the browser (Android: *Install app*; iPhone: Share → *Add to Home Screen*). The home page, the install pop-up and **/app** guide people through it. Nothing to set up.
+- **Android app (APK):** the website offers `GoKidsPlay.apk` on **/app**. It opens www.gokidsplay.co.uk full screen once the site is live there, because `/.well-known/assetlinks.json` (deployed with the website) proves the app belongs to the site.
+- After the domain is connected: on an Android phone open https://www.gokidsplay.co.uk/app, download and install the app, and check it opens **without an address bar**.
+- How to rebuild, the signing key (keep it backed up, never in git) and publishing on **Google Play** are in `gokidsplay/android/README.md`.
+- The website only redirects the Azure address to your domain once `NEXT_PUBLIC_FRONTEND_URL` is your real domain (Part 10), so the Azure address keeps working for testing before that.
+
+---
+
 ## If something goes wrong
 - **Backend logs:** Azure → `gokidsplay-api` → **Monitoring → Log stream**.
 - **Website logs:** `gokidsplay-web` → **Log stream**.

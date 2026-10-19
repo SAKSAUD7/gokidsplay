@@ -62,6 +62,7 @@ export const footerLinks: { title: string; items: { title: string; href: string;
             { title: "About Us", href: "/about" },
             { title: "Contact Us", href: "/contact" },
             { title: "My Account", href: "/account/login" },
+            { title: "Get the App", href: "/app" },
             { title: "Admin Portal", href: "/admin/login", nofollow: true },
         ],
     },

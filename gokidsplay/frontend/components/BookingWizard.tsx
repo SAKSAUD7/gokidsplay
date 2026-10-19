@@ -1348,31 +1348,32 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
                                             const qty = ticketQty[plan.id] || 0;
                                             const label = plan.name;
                                             return (
-                                            <div key={plan.id} className="flex items-center justify-between bg-white/5 rounded-2xl p-5 border border-white/10">
+                                            <div key={plan.id} className="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10">
+                                            {/* Name, price and +/- on one line; the description gets the full width below (phones) */}
+                                            <div className="flex items-center justify-between gap-3">
 
-                                                <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
 
-                                                    <span className="text-3xl">{plan.is_spectator ? "\u{1F440}" : "\u{1F9D2}"}</span>
+                                                    <span className="text-2xl sm:text-3xl shrink-0">{plan.is_spectator ? "\u{1F440}" : "\u{1F9D2}"}</span>
 
-                                                    <div>
+                                                    <div className="min-w-0">
 
-                                                        <div className="font-bold text-white">{label}</div>
+                                                        <div className="font-bold text-white leading-tight">{label}</div>
 
-                                                        <div className="text-white/50 text-sm">
+                                                        <div className="text-white/60 text-sm">
                                                             £{parseFloat(plan.price).toFixed(2)} {plan.is_spectator ? "each \u2014 doesn\u2019t play" : "per ticket"}
-                                                            {plan.description ? ` \u00b7 ${plan.description}` : ""}
                                                         </div>
 
                                                     </div>
 
                                                 </div>
 
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
                                                     <button type="button"
                                                         aria-label={`Remove one: ${label}`}
                                                         onClick={() => setTicket(plan, qty - 1)}
-                                                        className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all font-bold text-lg">
+                                                        className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all font-bold text-lg">
 
                                                         <Minus className="w-4 h-4" />
 
@@ -1383,7 +1384,7 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
                                                     <button type="button"
                                                         aria-label={`Add one: ${label}`}
                                                         onClick={() => setTicket(plan, qty + 1)}
-                                                        className="w-9 h-9 rounded-full bg-primary/80 hover:bg-primary text-black flex items-center justify-center transition-all">
+                                                        className="w-10 h-10 sm:w-9 sm:h-9 rounded-full bg-primary/80 hover:bg-primary text-black flex items-center justify-center transition-all">
 
                                                         <Plus className="w-4 h-4" />
 
@@ -1391,6 +1392,8 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
                                                 </div>
 
+                                            </div>
+                                            {plan.description && <p className="mt-2 text-white/50 text-sm">{plan.description}</p>}
                                             </div>
                                             );
                                         })}

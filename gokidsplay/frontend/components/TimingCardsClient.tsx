@@ -123,8 +123,9 @@ export function TimingCardsClient() {
     return (
         <div className="relative z-20 w-full bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-y border-white/10 py-3 px-3">
             <div className="max-w-7xl mx-auto">
-                <div className="overflow-x-auto scrollbar-hide">
-                    <div className="flex items-center gap-2 md:gap-4 min-w-max md:min-w-0 md:flex-wrap md:justify-center px-1">
+                <div>
+                    {/* Wraps onto two lines on a phone instead of running off the screen */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 px-1">
 
                         <div className="flex items-center gap-1.5 text-white/60 text-xs font-semibold uppercase tracking-widest shrink-0">
                             <Clock className="w-3.5 h-3.5" />
