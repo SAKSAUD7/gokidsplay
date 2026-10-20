@@ -62,10 +62,27 @@ export default function AdminEventsPage() {
     }), [events, when, statusFilter, typeFilter, search, today]);
 
     async function doAction(ev: SpecialEvent, action: "publish" | "cancel") {
-        if (action === "cancel" && !confirm(`Cancel "${ev.title}"? Customers with reservations will need to be contacted.`)) return;
-        const res = await fetch(`/api/events?id=${ev.id}&action=${action}`, { method: "POST", credentials: "include" });
-        if (res.ok) { toast.success(action === "publish" ? "Event published" : "Event cancelled"); load(); }
-        else toast.error("Action failed");
+        let reason = "";
+        if (action === "cancel") {
+            const answer = prompt(`Cancel "${ev.title}"?\n\nEvery reservation is cancelled and each customer gets an e-mail.\nReason to tell customers (optional):`, "");
+            if (answer === null) return;   // pressed Cancel
+            reason = answer.trim();
+        }
+        const res = await fetch(`/api/events?id=${ev.id}&action=${action}`, {
+            method: "POST", credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(action === "cancel" ? { reason } : {}),
+        });
+        if (!res.ok) { toast.error("Action failed"); return; }
+        if (action === "publish") toast.success("Event published");
+        else {
+            const r = await res.json().catch(() => ({}));
+            const n = Number(r.bookings_cancelled || 0);
+            toast.success(n ? `Event cancelled · ${n} reservation${n === 1 ? "" : "s"} cancelled, ${r.customers_emailed ?? 0} customer${r.customers_emailed === 1 ? "" : "s"} e-mailed`
+                : "Event cancelled (no reservations)");
+            if (Number(r.bookings_to_refund) > 0) toast.warning(`${r.bookings_to_refund} reservation(s) had paid: refund them from Payments.`);
+        }
+        load();
     }
 
     const stats = [

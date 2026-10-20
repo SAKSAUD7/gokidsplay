@@ -16,7 +16,7 @@ from django.utils import timezone
 import secrets
 import re
 
-from apps.bookings.models import Customer, Booking, PartyBooking
+from apps.bookings.models import Customer, Booking, PartyBooking, EventBooking
 from .models import CustomerToken
 
 
@@ -71,14 +71,28 @@ def customer_register(request):
         return Response({"error": "Password must be at least 6 characters."}, status=400)
 
     # Check if customer already has an account
-    if CustomerToken.objects.filter(customer__email=email).exists():
+    if CustomerToken.objects.filter(customer__email__iexact=email).exists():
         return Response({"error": "An account already exists with this email. Please log in."}, status=400)
 
     # Get-or-create the Customer record
     customer, created = Customer.objects.get_or_create(
-        email=email,
-        defaults={"name": name, "phone": phone}
+        email__iexact=email,
+        defaults={"email": email, "name": name, "phone": phone}
     )
+
+    # Bookings were already made with this e-mail (e.g. at the desk). Signing up must not
+    # hand them to whoever types the address: the owner sets a password from the inbox.
+    if not created and _has_bookings(customer):
+        token_obj = CustomerToken.objects.create(
+            customer=customer, token=secrets.token_urlsafe(40),
+            password_hash=make_password(None),          # unusable until they set one
+            expires_at=timezone.now() + timezone.timedelta(days=30))
+        _send_set_password_email(token_obj)
+        return Response({
+            "error": "You already have bookings with us under this email. We've emailed you a link to set your "
+                     "password, so only you can see them. Please check your inbox, then sign in.",
+            "code": "CHECK_EMAIL",
+        }, status=409)
     if not created:
         # Update existing customer record with name/phone if blank
         if not customer.name:
@@ -119,9 +133,10 @@ def customer_login(request):
         return Response({"error": "Email and password are required."}, status=400)
 
     # Find customer
-    try:
-        customer = Customer.objects.get(email=email)
-    except Customer.DoesNotExist:
+    # The account's customer record (e-mail matched whatever the capitals)
+    token_match = CustomerToken.objects.select_related("customer").filter(customer__email__iexact=email).first()
+    customer = token_match.customer if token_match else Customer.objects.filter(email__iexact=email).first()
+    if customer is None:
         return Response({"error": "No account found with this email. Please register first."}, status=404)
 
     # Find token record (which stores the password hash)
@@ -226,6 +241,30 @@ def make_password_reset_token(token_obj) -> str:
     return signing.dumps({"c": token_obj.customer_id, "f": _password_fingerprint(token_obj)}, salt=RESET_SALT)
 
 
+def _has_bookings(customer) -> bool:
+    from apps.bookings.models import EventBooking
+    email = customer.email
+    return (Booking.objects.filter(customer=customer).exists() or Booking.objects.filter(email__iexact=email).exists()
+            or PartyBooking.objects.filter(customer=customer).exists() or PartyBooking.objects.filter(email__iexact=email).exists()
+            or EventBooking.objects.filter(customer=customer).exists() or EventBooking.objects.filter(email__iexact=email).exists())
+
+
+def _send_set_password_email(token_obj):
+    from django.conf import settings
+    from apps.emails.services import EmailService
+    site_url = getattr(settings, "FRONTEND_URL", "").rstrip("/")
+    EmailService().send_email(
+        email_type="ACCOUNT_PASSWORD_RESET",
+        recipient_email=token_obj.customer.email,
+        recipient_name=token_obj.customer.name,
+        subject="Set your Go Kids Play password",
+        template_name="emails/account/password_reset.html",
+        context={"customer_name": token_obj.customer.name,
+                 "reset_url": f"{site_url}/account/reset-password?token={make_password_reset_token(token_obj)}",
+                 "is_new_account": True},
+    )
+
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -247,7 +286,7 @@ def customer_forgot_password(request):
         return reply
     cache.set(cooldown_key, True, RESET_EMAIL_COOLDOWN_SECONDS)
 
-    token_obj = CustomerToken.objects.select_related("customer").filter(customer__email=email).first()
+    token_obj = CustomerToken.objects.select_related("customer").filter(customer__email__iexact=email).first()
     if token_obj:
         from apps.emails.services import EmailService
         site_url = getattr(settings, "FRONTEND_URL", "").rstrip("/")
@@ -304,7 +343,7 @@ def customer_reset_password(request):
 @authentication_classes([])
 @permission_classes([AllowAny])
 def customer_my_bookings(request):
-    """Get all bookings (session + party) for the logged-in customer."""
+    """All bookings for the signed-in customer: play sessions, parties and event reservations."""
     customer = get_customer_from_request(request)
     if not customer:
         return Response({"error": "Not authenticated."}, status=401)
@@ -316,8 +355,8 @@ def customer_my_bookings(request):
 
     # Also search by email if no FK link
     session_by_email = Booking.objects.filter(
-        email=customer.email, customer__isnull=True
-    ).order_by("-created_at")
+        email__iexact=customer.email
+    ).exclude(customer=customer).order_by("-created_at")
 
     # Party bookings
     party_qs = PartyBooking.objects.filter(
@@ -325,24 +364,24 @@ def customer_my_bookings(request):
     ).order_by("-created_at")
 
     party_by_email = PartyBooking.objects.filter(
-        email=customer.email, customer__isnull=True
-    ).order_by("-created_at")
+        email__iexact=customer.email
+    ).exclude(customer=customer).order_by("-created_at")
 
     session_bookings = []
     for b in list(session_qs) + list(session_by_email):
-        activity_emoji = "🛼" if "skating" in (b.activity or "").lower() else "🎳" if "bowling" in (b.activity or "").lower() else "🎮"
         session_bookings.append({
             "id": b.id,
             "booking_number": b.booking_number,
             "type": "SESSION",
-            "activity": b.activity,
-            "activity_emoji": activity_emoji,
+            "activity": b.activity or "All-Access Play Session",
+            "activity_emoji": "🎟️",
             "date": str(b.date),
             "time": str(b.time) if b.time else None,
             "duration": b.duration,
             "adults": b.adults,
             "kids": b.kids,
             "amount": float(b.amount) if b.amount else 0,
+            "paid_amount": float(b.paid_amount or 0),
             "status": b.booking_status or b.status,
             "booking_status": b.booking_status,
             "payment_status": b.payment_status,
@@ -375,8 +414,32 @@ def customer_my_bookings(request):
             "admin_fee_charged": float(b.admin_fee_charged) if b.admin_fee_charged else 0,
         })
 
+    # Special-event reservations (paid at the venue)
+    from django.db.models import Q
+    event_bookings = []
+    for b in (EventBooking.objects.filter(Q(customer=customer) | Q(email__iexact=customer.email))
+              .select_related("event").order_by("-created_at")):
+        event_bookings.append({
+            "id": b.id,
+            "booking_number": b.booking_reference,
+            "type": "EVENT",
+            "activity": b.event.title,
+            "activity_emoji": b.event.emoji or "🎉",
+            "event_slug": b.event.slug,
+            "date": str(b.event.date),
+            "time": b.event.start_time.strftime("%H:%M") if b.event.start_time else None,
+            "adults": b.num_adults,
+            "kids": b.num_children,
+            "amount": float(b.subtotal or 0),
+            "paid_amount": float(b.amount_paid or 0),
+            "status": b.status,
+            "booking_status": b.status,
+            "payment_status": b.payment_status,
+            "created_at": b.created_at.isoformat(),
+        })
+
     all_bookings = sorted(
-        session_bookings + party_bookings,
+        session_bookings + party_bookings + event_bookings,
         key=lambda x: x["created_at"],
         reverse=True
     )

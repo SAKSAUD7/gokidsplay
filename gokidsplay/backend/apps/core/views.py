@@ -1,9 +1,12 @@
+import logging
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Sum, Count, Avg, Q
 from datetime import timedelta
+
+logger = logging.getLogger(__name__)
 
 from .models import User, GlobalSettings, Logo, Notification
 from .serializers import UserSerializer, GlobalSettingsSerializer, LogoSerializer, NotificationSerializer
@@ -417,7 +420,7 @@ class DashboardViewSet(viewsets.ViewSet):
                             } if booking.customer or booking.name else None
                         })
                     except Exception as e:
-                        print(f"Error serializing session booking {booking.id}: {e}")
+                        logger.warning(f"Error serializing session booking {booking.id}: {e}")
             
             # Fetch party bookings
             if booking_type != 'session':
@@ -460,7 +463,7 @@ class DashboardViewSet(viewsets.ViewSet):
                             } if booking.customer or booking.name else None
                         })
                     except Exception as e:
-                        print(f"Error serializing party booking {booking.id}: {e}")
+                        logger.warning(f"Error serializing party booking {booking.id}: {e}")
             
             # Sort by created_at (most recent first)
             all_bookings_data.sort(key=lambda x: x['created_at'] or '', reverse=True)
@@ -470,5 +473,5 @@ class DashboardViewSet(viewsets.ViewSet):
                 'results': all_bookings_data
             })
         except Exception as e:
-            print(f"Error in all_bookings: {e}")
+            logger.exception(f"Error in all_bookings: {e}")
             return Response({'error': str(e)}, status=500)

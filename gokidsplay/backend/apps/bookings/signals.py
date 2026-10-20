@@ -14,8 +14,9 @@ def create_customer_for_booking(sender, instance, **kwargs):
     if not instance.customer and instance.email:
         # Try to find existing customer by email
         customer, created = Customer.objects.get_or_create(
-            email=instance.email,
+            email__iexact=instance.email,
             defaults={
+                'email': instance.email.strip().lower(),
                 'name': instance.name,
                 'phone': instance.phone,
             }
@@ -38,8 +39,9 @@ def create_customer_for_party_booking(sender, instance, **kwargs):
     if not instance.customer and instance.email:
         # Try to find existing customer by email
         customer, created = Customer.objects.get_or_create(
-            email=instance.email,
+            email__iexact=instance.email,
             defaults={
+                'email': instance.email.strip().lower(),
                 'name': instance.name,
                 'phone': instance.phone,
             }

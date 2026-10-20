@@ -37,6 +37,16 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v4
+      - name: Check the site addresses are set
+        run: |
+          # These are built into the website; a missing one would point the site at the wrong server
+          for name in NEXT_PUBLIC_API_URL NEXT_PUBLIC_FRONTEND_URL; do
+            value="${!name}"
+            if [ -z "$value" ] || [[ "$value" == *localhost* ]]; then
+              echo "::error::GitHub variable $name is missing (see DEPLOYMENT_GUIDE.md Part 6)"; exit 1
+            fi
+            echo "$name = $value"
+          done
       - uses: actions/setup-node@v4
         with:
           node-version: '20'

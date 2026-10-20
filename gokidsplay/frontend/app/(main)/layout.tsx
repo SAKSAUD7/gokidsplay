@@ -34,10 +34,11 @@ export default async function MainLayout({ children }: { children: React.ReactNo
             <ToastProvider>
                 <div suppressHydrationWarning className="flex flex-col min-h-screen overflow-x-hidden">
                     <Navbar settings={settings} />
-                    <main className="flex-grow pb-16 md:pb-0">
+                    {/* Each page has its own <main> (one main landmark per page) */}
+                    <div className="flex-grow pb-16 md:pb-0">
                         {settingsData?.maintenanceMode ? (
                             // Admin → Settings → Maintenance mode
-                            <div className="min-h-[60vh] flex items-center justify-center px-4 pt-28 pb-16">
+                            <main className="min-h-[60vh] flex items-center justify-center px-4 pt-28 pb-16">
                                 <div className="max-w-xl text-center">
                                     <div className="text-6xl mb-4">🛠️</div>
                                     <h1 className="text-3xl md:text-4xl font-black text-white mb-3">We&apos;ll be back soon</h1>
@@ -47,9 +48,9 @@ export default async function MainLayout({ children }: { children: React.ReactNo
                                         {settings?.contactEmail && <> or email <a href={`mailto:${settings.contactEmail}`} className="text-primary font-bold">{settings.contactEmail}</a></>}.
                                     </p>
                                 </div>
-                            </div>
+                            </main>
                         ) : children}
-                    </main>
+                    </div>
                     <Footer settings={settings} socialLinks={socialLinks} />
                     <MobileBottomNav />
                     <InstallAppBanner />

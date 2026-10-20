@@ -842,8 +842,9 @@ def create_party_booking_view(request):
             customer = None
             if data.get('email'):
                 customer, created = Customer.objects.get_or_create(
-                    email=data['email'],
-                    defaults={'name': data.get('name', ''), 'phone': data.get('phone', '')},
+                    email__iexact=data['email'],
+                    defaults={'email': str(data['email']).strip().lower(),
+                              'name': data.get('name', ''), 'phone': data.get('phone', '')},
                 )
                 if not created and not customer.name:
                     customer.name = data.get('name', '')

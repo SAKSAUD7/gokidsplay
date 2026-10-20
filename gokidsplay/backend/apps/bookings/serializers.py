@@ -98,9 +98,11 @@ class BookingSerializer(serializers.ModelSerializer):
         
         # Get or create customer by email
         if email:
+            # One customer per e-mail address, whatever the capitals
             customer, created = Customer.objects.get_or_create(  # type: ignore[attr-defined]
-                email=email,
+                email__iexact=email,
                 defaults={
+                    'email': email.strip().lower(),
                     'name': name,
                     'phone': phone
                 }
@@ -186,9 +188,11 @@ class PartyBookingSerializer(serializers.ModelSerializer):
         
         # Get or create customer by email
         if email:
+            # One customer per e-mail address, whatever the capitals
             customer, created = Customer.objects.get_or_create(  # type: ignore[attr-defined]
-                email=email,
+                email__iexact=email,
                 defaults={
+                    'email': email.strip().lower(),
                     'name': name,
                     'phone': phone
                 }

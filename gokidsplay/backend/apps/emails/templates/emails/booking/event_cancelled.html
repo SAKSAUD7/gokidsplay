@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event cancelled — Go Kids Play</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+      <tr><td style="background:linear-gradient(135deg,#6b7280,#374151);border-radius:16px 16px 0 0;padding:36px 32px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:44px;">{{ emoji|default:'📅' }}</p>
+        <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:800;">This event has been cancelled</h1>
+        <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:15px;"><strong>{{ event_title }}</strong> · {{ event_date }}</p>
+      </td></tr>
+      <tr><td style="background:#ffffff;padding:32px;">
+        <p style="margin:0 0 16px;font-size:16px;color:#1a1a2e;">Hi <strong>{{ customer_name }}</strong>,</p>
+        <p style="margin:0 0 16px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          We're very sorry, but <strong>{{ event_title }}</strong> on {{ event_date }} has had to be cancelled.
+          Your reservation <strong>{{ booking_reference }}</strong> has been cancelled.
+        </p>
+        {% if reason %}
+        <p style="margin:0 0 16px;font-size:15px;color:#4a4a6a;line-height:1.6;"><strong>Reason:</strong> {{ reason }}</p>
+        {% endif %}
+        {% if amount_paid %}
+        <p style="margin:0 0 16px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          You paid <strong>£{{ amount_paid|floatformat:2 }}</strong>. We'll refund it to your original payment method;
+          refunds usually appear within 5–10 working days.
+        </p>
+        {% endif %}
+        <p style="margin:0 0 24px;font-size:15px;color:#4a4a6a;line-height:1.6;">
+          Have a look at our other events and play sessions — we'd love to see you soon.
+        </p>
+        <p style="margin:0;text-align:center;">
+          <a href="{{ site_url }}/events" style="display:inline-block;background:#ec4899;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 24px;border-radius:10px;">See other events</a>
+        </p>
+      </td></tr>
+      <tr><td style="background:#f8f8fc;border-radius:0 0 16px 16px;padding:20px 32px;text-align:center;font-size:13px;color:#6b6b8a;">
+        Questions? Reply to this email or call us. Go Kids Play, Coventry.
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

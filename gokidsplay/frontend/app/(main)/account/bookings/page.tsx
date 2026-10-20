@@ -12,7 +12,7 @@ import { CustomerBookingModal } from "@/components/CustomerBookingModal";
 interface Booking {
     id: number;
     booking_number: string;
-    type: "SESSION" | "PARTY";
+    type: "SESSION" | "PARTY" | "EVENT";
     activity: string;
     activity_emoji: string;
     package_name?: string;
@@ -25,7 +25,16 @@ interface Booking {
     booking_status: string;
     payment_status: string;
     created_at: string;
+    paid_amount?: number;
+    remaining_balance?: number;
+    deposit_amount?: number;
+    event_slug?: string;
 }
+
+// Bookings that no longer happen (released when unpaid, cancelled or refunded)
+const ENDED = ["CANCELLED", "EXPIRED", "REFUNDED"];
+// Today in the UK (bookings are UK dates)
+const ukToday = () => new Date().toLocaleDateString("en-CA", { timeZone: "Europe/London" });
 
 const STATUS_STYLES: Record<string, string> = {
     CONFIRMED:      "bg-green-500/20 text-green-400 border-green-500/30",
@@ -47,6 +56,7 @@ export default function AccountBookingsPage() {
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [selectedModal, setSelectedModal] = useState<{ id: string | number; type: "SESSION" | "PARTY" } | null>(null);
+    const [showAllPast, setShowAllPast] = useState(false);
     const [pageConfig, setPageConfig] = useState<any>(null);
 
     const fetchConfig = async () => {
@@ -114,8 +124,11 @@ export default function AccountBookingsPage() {
         );
     }
 
-    const upcoming = bookings.filter(b => b.date >= new Date().toISOString().slice(0, 10) && b.status !== "CANCELLED");
-    const past = bookings.filter(b => b.date < new Date().toISOString().slice(0, 10) || b.status === "CANCELLED");
+    const today = ukToday();
+    const upcoming = bookings.filter(b => b.date >= today && !ENDED.includes(b.status))
+        .sort((a, b) => (a.date + (a.time || "")).localeCompare(b.date + (b.time || "")));   // soonest first
+    const past = bookings.filter(b => b.date < today || ENDED.includes(b.status));
+    const paidTotal = bookings.filter(b => !ENDED.includes(b.status)).reduce((s, b) => s + (Number(b.paid_amount) || 0), 0);
 
     const formattedDate = (d: string) => new Date(d + "T12:00:00").toLocaleDateString("en-GB", {
         weekday: "short", day: "numeric", month: "short", year: "numeric"
@@ -153,8 +166,8 @@ export default function AccountBookingsPage() {
                         <div className="text-white/50 text-[10px] sm:text-xs mt-1">Upcoming</div>
                     </div>
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 text-center">
-                        <div className="text-2xl sm:text-3xl font-black text-blue-400">£{bookings.reduce((s, b) => s + b.amount, 0).toFixed(0)}</div>
-                        <div className="text-white/50 text-[10px] sm:text-xs mt-1">Total Spent</div>
+                        <div className="text-2xl sm:text-3xl font-black text-blue-400">£{paidTotal.toFixed(0)}</div>
+                        <div className="text-white/50 text-[10px] sm:text-xs mt-1">Paid</div>
                     </div>
                 </div>
 
@@ -195,7 +208,7 @@ export default function AccountBookingsPage() {
                                             key={`${booking.type}-${booking.id}`}
                                             booking={booking}
                                             formattedDate={formattedDate}
-                                            onOpenModal={() => setSelectedModal({ id: booking.id, type: booking.type })}
+                                            onOpenModal={() => booking.type !== "EVENT" && setSelectedModal({ id: booking.id, type: booking.type })}
                                         />
                                     ))}
                                 </div>
@@ -208,21 +221,26 @@ export default function AccountBookingsPage() {
                                     <History className="w-5 h-5" /> Past Bookings
                                 </h2>
                                 <div className="space-y-3 opacity-70">
-                                    {past.slice(0, 10).map(booking => (
+                                    {(showAllPast ? past : past.slice(0, 10)).map(booking => (
                                         <BookingCard
                                             key={`${booking.type}-${booking.id}`}
                                             booking={booking}
                                             formattedDate={formattedDate}
-                                            onOpenModal={() => setSelectedModal({ id: booking.id, type: booking.type })}
+                                            onOpenModal={() => booking.type !== "EVENT" && setSelectedModal({ id: booking.id, type: booking.type })}
                                         />
                                     ))}
                                 </div>
+                                {past.length > 10 && (
+                                    <button onClick={() => setShowAllPast(v => !v)} className="mt-4 text-sm font-semibold text-primary hover:underline">
+                                        {showAllPast ? "Show fewer" : `Show all ${past.length} past bookings`}
+                                    </button>
+                                )}
                             </div>
                         )}
 
                         {bookings.length === 0 && (
                             <div className="text-center py-20">
-                                <div className="text-5xl mb-4">🎳</div>
+                                <div className="text-5xl mb-4">🎈</div>
                                 <p className="text-white/50 text-lg font-bold">{pageConfig?.empty_state_title || "No bookings yet"}</p>
                                 <p className="text-white/30 text-sm mt-2 mb-8">{pageConfig?.empty_state_subtitle || "Book your first session at Go Kids Play!"}</p>
                                 <Link href={pageConfig?.cta_link || "/book"} className="px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white font-bold rounded-full hover:scale-105 transition-all inline-block">
@@ -259,14 +277,18 @@ function BookingCard({
     const statusStyle = STATUS_STYLES[booking.status] || "bg-white/10 text-white/60 border-white/10";
     const [paying, setPaying] = useState(false);
 
+    // The server works out the amount (what's still owed); nothing here can change the price
     const handleCompletePayment = async () => {
-        if (paying) return;
+        if (paying || booking.type === "EVENT") return;
         setPaying(true);
         try {
             const result = await createPaymentOrder({
                 booking_id: booking.id,
                 booking_type: booking.type === "SESSION" ? "session" : "party",
-                amount: booking.amount,
+                // party: the deposit first (as in the wizard), then the balance; session: the total
+                amount: booking.type === "PARTY"
+                    ? (Number(booking.paid_amount) > 0 ? Number(booking.remaining_balance) : Number(booking.deposit_amount) || booking.amount)
+                    : booking.amount,
             });
             if (result.success && result.checkout_url) {
                 window.location.href = result.checkout_url;
@@ -280,7 +302,12 @@ function BookingCard({
         }
     };
 
-    const isPendingPayment = booking.payment_status === "PENDING";
+    const ended = ENDED.includes(booking.status);
+    const upcomingVisit = booking.date >= ukToday();
+    // Online bookings waiting for payment (event reservations are paid at the venue)
+    const isPendingPayment = booking.payment_status === "PENDING" && !ended && upcomingVisit && booking.type !== "EVENT";
+    const balanceDue = booking.type === "PARTY" && !ended && upcomingVisit
+        && Number(booking.paid_amount) > 0 && Number(booking.remaining_balance) > 0;
 
     return (
         <motion.div
@@ -295,6 +322,7 @@ function BookingCard({
                         <span className="text-white font-bold">{booking.package_name || booking.activity}</span>
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${isPendingPayment ? "bg-yellow-500/20 text-yellow-500 border-yellow-500/30" : statusStyle}`}>
                             {isPendingPayment ? "Payment Pending"
+                            : booking.type === "EVENT" && booking.status === "CONFIRMED" ? "Reserved"
                             : booking.status === "DEPOSIT_PAID" ? "Deposit Paid"
                             : booking.status === "PARTIALLY_PAID" ? "Partially Paid"
                             : booking.status === "FULLY_PAID" ? "Fully Paid"
@@ -324,11 +352,26 @@ function BookingCard({
                             <p className="text-yellow-500/60 text-[10px] mt-1">Payment required to confirm your booking</p>
                         </div>
                     )}
+                    {balanceDue && (
+                        <div className="mt-3">
+                            <button onClick={handleCompletePayment} disabled={paying}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-400/40 text-blue-200 font-bold text-xs rounded-xl hover:bg-blue-500/30 transition-all disabled:opacity-60">
+                                <CreditCard className="w-3.5 h-3.5" />
+                                {paying ? "Processing..." : `Pay balance £${Number(booking.remaining_balance).toFixed(2)}`}
+                            </button>
+                            <p className="text-white/40 text-[10px] mt-1">Or pay at the venue on the day</p>
+                        </div>
+                    )}
                 </div>
                 <div className="text-right flex-shrink-0">
                     <div className="text-white font-black">£{booking.amount.toFixed(2)}</div>
-                    {/* View button — show for all statuses that have actionable detail */}
-                    {!['EXPIRED', 'CANCELLED'].includes(booking.status) && (
+                    {/* Event reservations: the event page; sessions and parties: the detail window */}
+                    {booking.type === "EVENT" ? (
+                        <Link href={`/events/${booking.event_slug || ""}`}
+                            className="text-xs flex items-center gap-0.5 mt-1 ml-auto font-bold text-primary hover:text-primary/80 justify-end">
+                            View event <ChevronRight className="w-3 h-3" />
+                        </Link>
+                    ) : !ended && (
                         <button
                             onClick={onOpenModal}
                             className={`text-xs flex items-center gap-0.5 mt-1 ml-auto font-bold transition-colors ${booking.type === "PARTY" ? "text-pink-400 hover:text-pink-300" : "text-primary hover:text-primary/80"}`}
@@ -337,9 +380,8 @@ function BookingCard({
                             <ChevronRight className="w-3 h-3" />
                         </button>
                     )}
-                    {/* Party balance due banner */}
-                    {booking.type === "PARTY" && booking.status === "DEPOSIT_PAID" && (
-                        <p className="text-blue-400/70 text-[10px] mt-1 text-right">Balance due</p>
+                    {booking.type === "EVENT" && booking.payment_status === "PENDING" && !ended && (
+                        <p className="text-white/40 text-[10px] mt-1 text-right">Pay at the venue</p>
                     )}
                 </div>
             </div>

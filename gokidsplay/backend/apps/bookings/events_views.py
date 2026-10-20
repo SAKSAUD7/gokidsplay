@@ -60,12 +60,44 @@ class SpecialEventViewSet(viewsets.ModelViewSet):
     def cancel(self, request, pk=None):
         """Cancel an event."""
         event = self.get_object()
-        reason = request.data.get('reason', '')
+        reason = str(request.data.get('reason', '') or '')[:500]
         event.status = 'CANCELLED'
         event.save()
-        # TODO: Send cancellation emails to all event_bookings
-        logger.info(f"Event {event.id} cancelled by {request.user.email}. Reason: {reason}")
-        return Response({'success': True, 'status': event.status})
+
+        # Cancel every reservation still holding a place and tell the customer
+        active = list(EventBooking.objects.filter(event=event)
+                      .exclude(status__in=EventBooking.RELEASED_STATUSES + ('COMPLETED', 'NO_SHOW')))
+        from django.conf import settings as dj_settings
+        from apps.emails.services import EmailService
+        emailed = 0
+        for booking in active:
+            booking.status = 'CANCELLED'
+            booking.save()
+            try:
+                EmailService().send_email(
+                    email_type='BOOKING_CANCELLED',
+                    recipient_email=booking.email,
+                    recipient_name=booking.name,
+                    subject=f'{event.title} has been cancelled',
+                    context={
+                        'customer_name': booking.name,
+                        'booking_reference': booking.booking_reference,
+                        'event_title': event.title,
+                        'event_date': event.date.strftime('%A %d %B %Y'),
+                        'reason': reason,
+                        'amount_paid': float(booking.amount_paid or 0),
+                        'emoji': event.emoji or '📅',
+                        'site_url': getattr(dj_settings, 'FRONTEND_URL', '').rstrip('/'),
+                    },
+                    template_name='emails/booking/event_cancelled.html',
+                )
+                emailed += 1
+            except Exception as email_err:
+                logger.warning(f"Event cancellation email failed for {booking.booking_reference}: {email_err}")
+        paid = sum(1 for b in active if (b.amount_paid or 0) > 0)
+        logger.info(f"Event {event.id} cancelled by {request.user.email}: {len(active)} bookings cancelled. Reason: {reason}")
+        return Response({'success': True, 'status': event.status, 'bookings_cancelled': len(active),
+                         'customers_emailed': emailed, 'bookings_to_refund': paid})
 
     @action(detail=True, methods=['post'], url_path='duplicate')
     def duplicate(self, request, pk=None):
@@ -317,7 +349,7 @@ def create_event_booking(request):
                 }, status=status.HTTP_400_BAD_REQUEST)
 
             subtotal = (num_children * event.price_per_child) + (num_adults * event.price_per_adult)
-            customer = Customer.objects.filter(email=contact['email']).first()
+            customer = Customer.objects.filter(email__iexact=contact['email']).first()
             booking = EventBooking.objects.create(
                 event=event,
                 customer=customer,

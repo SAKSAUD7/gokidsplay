@@ -6,7 +6,8 @@ export const getMediaUrl = (path: string | null | undefined): string => {
     if (!path) return '';
 
     // Already an absolute URL — return directly
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    // Already an absolute URL, or an image preview held in the browser (data: / blob:)
+    if (/^(https?:|data:|blob:)/i.test(path)) {
         return path;
     }
 

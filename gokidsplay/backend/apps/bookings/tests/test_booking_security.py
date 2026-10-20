@@ -308,6 +308,20 @@ class TestEventBooking:
         payload.update(overrides)
         return APIClient().post('/api/v1/bookings/public/events/book/', payload, format='json')
 
+    def test_cancelling_an_event_cancels_reservations_and_emails_customers(self, staff_client):
+        from apps.bookings.models import EventBooking
+        event = self.make_event()
+        assert self.book(event).status_code == 201
+        assert self.book(event, email='second@example.com').status_code == 201
+        EventBooking.objects.filter(email='second@example.com').update(amount_paid=Decimal('10.00'))
+        response = staff_client.post(f'/api/v1/bookings/events/{event.id}/cancel/', {'reason': 'Heating failure'},
+                                     format='json')
+        assert response.status_code == 200, response.data
+        assert response.data['bookings_cancelled'] == 2 and response.data['bookings_to_refund'] == 1
+        assert set(EventBooking.objects.values_list('status', flat=True)) == {'CANCELLED'}
+        event.refresh_from_db()
+        assert event.status == 'CANCELLED'
+
     def test_reservations_take_places_and_cancelling_frees_them(self, staff_client):
         from apps.bookings.models import EventBooking
         event = self.make_event()  # capacity 20
@@ -740,6 +754,38 @@ class TestCustomerSelfService:
                             {'name': 'Cust', 'email': email, 'password': 'secret-pass'}, format='json').data['token']
         client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
         return client
+
+    def test_my_bookings_lists_sessions_parties_and_event_reservations(self, config, plans):
+        from datetime import time
+        from apps.bookings.models import SpecialEvent
+        # booked before the account existed, with different capitals in the e-mail
+        APIClient().post(SESSIONS_URL, session_payload(plans, email='Fam@Example.com'), format='json')
+        APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'email': 'fam@example.com', 'date': next_saturday().isoformat()},
+                         format='json')
+        event = SpecialEvent.objects.create(title='Halloween', slug='halloween', date=next_saturday(), start_time=time(14, 0),
+                                            end_time=time(16, 0), status='PUBLISHED', total_capacity=20,
+                                            price_per_child=Decimal('10.00'), price_per_adult=Decimal('5.00'))
+        APIClient().post('/api/v1/bookings/public/events/book/', {'event_id': event.id, 'num_children': 1, 'num_adults': 1,
+                         'name': 'Fam', 'email': 'FAM@example.com', 'phone': '07700900123'}, format='json')
+        # those bookings exist, so signing up with the address can't simply open them
+        claim = APIClient().post('/api/v1/bookings/customer-auth/register/',
+                                 {'name': 'Someone', 'email': 'fam@example.com', 'password': 'secret-pass'}, format='json')
+        assert claim.status_code == 409 and claim.data['code'] == 'CHECK_EMAIL' and 'token' not in claim.data
+        # the owner sets a password from the e-mailed link
+        from apps.bookings.customer_auth import make_password_reset_token
+        from apps.bookings.models import CustomerToken
+        link_token = make_password_reset_token(CustomerToken.objects.get(customer__email='fam@example.com'))
+        reset = APIClient().post('/api/v1/bookings/customer-auth/reset-password/',
+                                 {'token': link_token, 'password': 'owner-pass-123'}, format='json')
+        assert reset.status_code == 200, reset.data
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {reset.data['token']}")
+        rows = client.get('/api/v1/bookings/customer-auth/my-bookings/').data['bookings']
+        assert sorted(r['type'] for r in rows) == ['EVENT', 'PARTY', 'SESSION']
+        event_row = next(r for r in rows if r['type'] == 'EVENT')
+        assert event_row['activity'] == 'Halloween' and event_row['event_slug'] == 'halloween'
+        assert all(r['booking_number'] for r in rows)
+        assert APIClient().get('/api/v1/bookings/customer-auth/my-bookings/').status_code == 401
 
     def test_customer_cannot_change_date_or_numbers(self, config, plans):
         client = self.signed_in('cust@example.com')
