@@ -117,3 +117,6 @@ debug_*output*.txt
 
 # Archives (deploy packages, logs)
 *.zip
+
+# Crash dumps from Git Bash
+*.stackdump
