@@ -51,10 +51,17 @@ const nextConfig = {
                 hostname: 'gokidsplaymedia.blob.core.windows.net',
                 pathname: '/**',
             },
-            // Go Kids Play Azure App Service (backend media)
+            // Go Kids Play Azure App Service (backend media), e.g.
+            // gokidsplay-api-xxxx.uksouth-01.azurewebsites.net (** = any number of sub-domains)
             {
                 protocol: 'https',
-                hostname: '*.azurewebsites.net',
+                hostname: '**.azurewebsites.net',
+                pathname: '/media/**',
+            },
+            // Backend on the custom domain
+            {
+                protocol: 'https',
+                hostname: 'api.gokidsplay.co.uk',
                 pathname: '/media/**',
             },
             // Local Django backend (development)

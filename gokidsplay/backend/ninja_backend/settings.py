@@ -66,8 +66,6 @@ CORS_ALLOW_HEADERS = [
 CORS_ALLOW_METHODS = ['DELETE', 'GET', 'OPTIONS', 'PATCH', 'POST', 'PUT']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net',
-    'https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net',
     'http://localhost:5000',
     'http://localhost:9000',
     'http://127.0.0.1:5000',
@@ -288,7 +286,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5000",
     "http://127.0.0.1:9000",
-    "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
     "https://gokidsplay.co.uk",
     "https://www.gokidsplay.co.uk"
 ]
@@ -297,8 +294,6 @@ CORS_ALLOWED_ORIGINS.extend(get_env_list('FRONTEND_URLS', ''))
 CORS_ALLOWED_ORIGINS.extend(get_env_list('CORS_ALLOWED_ORIGINS', ''))
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net",
-    "https://gokidsplay-backend-cfgcejczfpgyabd7.centralus-01.azurewebsites.net",
     "https://gokidsplay.co.uk",
     "https://www.gokidsplay.co.uk"
 ]
@@ -426,7 +421,6 @@ GOOGLE_PLACES_API_KEY = os.getenv('GOOGLE_PLACES_API_KEY', '')
 
 FRONTEND_URL = os.getenv(
     'FRONTEND_URL',
-    'https://gokidsplay-frontend-d7ftbvf8h8cxe9g5.centralus-01.azurewebsites.net'
 )
 
 # ── SumUp (one Go Kids Play merchant account) ───────────────────────────────
