@@ -17,7 +17,7 @@ to click, what to copy and where to paste it.
                            │                                     │
                  ┌─────────▼─────────┐               ┌───────────▼──────────┐
  GitHub (main) ──►  Web App: website ├──── calls ───►  Web App: backend API │
-  auto-deploy    │  Node 20 (Next.js) │               │  Python 3.11 (Django)│
+  auto-deploy    │  Node 22 (Next.js) │               │  Python 3.11 (Django)│
                  └───────────────────┘               └──┬────────┬────────┬─┘
                                                         │        │        │
                                             PostgreSQL ◄┘  Blob  ◄┘  Azure ◄┘
@@ -79,7 +79,7 @@ Sign in at <https://portal.azure.com>.
 
 ### 2.4 Website web app
 1. **App Services** → **Create** → **Web App** again.
-2. Name `gokidsplay-web` · Runtime **Node 20 LTS** · OS **Linux** · Region **UK South** · same plan.
+2. Name `gokidsplay-web` · Runtime **Node 22 LTS** · OS **Linux** · Region **UK South** · same plan.
 3. After creation → **Configuration → General settings**:
    - **Startup Command:** `node server.js`
    - **SCM Basic Auth Publishing Credentials:** **On** · **Always on:** On · **HTTPS Only:** On → **Save**.
@@ -164,7 +164,7 @@ The backend refuses to start on Azure without a proper `SECRET_KEY` (so sign-in 
 |---|---|
 | `NEXT_PUBLIC_API_URL` | `https://api.gokidsplay.co.uk/api/v1` (until then `https://gokidsplay-api.azurewebsites.net/api/v1`) |
 | `NEXT_PUBLIC_FRONTEND_URL` | `https://www.gokidsplay.co.uk` (until then `https://gokidsplay-web.azurewebsites.net`) |
-| `WEBSITE_NODE_DEFAULT_VERSION` | `~20` |
+| `WEBSITE_NODE_DEFAULT_VERSION` | `~22` |
 | `INTERNAL_PROXY_SECRET` | the same value as the backend's `INTERNAL_PROXY_SECRET` |
 
 The `NEXT_PUBLIC_…` values are also built into the website, so set the same values as GitHub **variables** in Part 6.

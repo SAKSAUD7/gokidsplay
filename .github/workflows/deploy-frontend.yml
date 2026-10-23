@@ -1,4 +1,4 @@
-# Frontend (Next.js website + admin portal) → Azure App Service (Linux, Node 20)
+# Frontend (Next.js website + admin portal) → Azure App Service (Linux, Node 22)
 #
 # Runs on every push to main that changes the frontend.
 # Needs (GitHub → Settings → Secrets and variables → Actions):
@@ -49,7 +49,7 @@ jobs:
           done
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: gokidsplay/package-lock.json
       - name: Install
