@@ -333,7 +333,7 @@ if 'AZURE_STORAGE_CONNECTION_STRING' in os.environ:
     AZURE_CONNECTION_STRING = os.environ['AZURE_STORAGE_CONNECTION_STRING']
     AZURE_CONTAINER = os.environ.get('AZURE_STORAGE_CONTAINER', 'media')
     STORAGES['default'] = {
-        'BACKEND': 'storages.backends.azure_storage.AzureStorage',
+        'BACKEND': 'ninja_backend.storage.ProxiedAzureStorage',  # /media/ addresses, see storage.py
         'OPTIONS': {'connection_string': AZURE_CONNECTION_STRING, 'azure_container': AZURE_CONTAINER},
     }
 
