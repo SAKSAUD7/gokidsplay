@@ -419,9 +419,10 @@ CRON_SECRET = os.getenv('CRON_SECRET', '')
 # Google Places API (New) key — shows the Go Kids Play Google reviews on /testimonies
 GOOGLE_PLACES_API_KEY = os.getenv('GOOGLE_PLACES_API_KEY', '')
 
-FRONTEND_URL = os.getenv(
-    'FRONTEND_URL',
-)
+# The public website's address (links in e-mails, SumUp return page). Set FRONTEND_URL
+# on the server; without it links point at the live domain (or this PC in development).
+FRONTEND_URL = (os.getenv('FRONTEND_URL') or
+                ('http://localhost:5000' if DEBUG else 'https://www.gokidsplay.co.uk')).rstrip('/')
 
 # ── SumUp (one Go Kids Play merchant account) ───────────────────────────────
 # 'sumup' = live card payments; 'mock' = test checkout page, no money taken (only when DEBUG=True)
