@@ -1,57 +1,47 @@
 """
-Django signals for triggering emails on booking creation.
-Uses post-save signals to send confirmation emails automatically.
-
-DISABLED: Emails are now sent AFTER payment verification.
-See apps/payments/services.py - PaymentService._send_payment_success_email()
+E-mails when a session or party booking is cancelled, whoever cancels it (customer in
+My Account, staff in the admin portal, or an unpaid online booking released after 30
+minutes). Confirmations are sent after payment: see apps/emails/notifications.py.
 """
-
 import logging
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.db import transaction
-from django.conf import settings
 
-# Import models
+from django.db import transaction
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+
 from apps.bookings.models import Booking, PartyBooking
 
 logger = logging.getLogger(__name__)
 
 
-# DISABLED: Email now sent after payment, not at booking creation
-# @receiver(post_save, sender=Booking)
-# def send_booking_confirmation_on_create(sender, instance, created, **kwargs):
-#     """
-#     Send confirmation email when a new session booking is created.
-#     
-#     Only sends if:
-#     - Booking was just created (not updated)
-#     """
-#     if not created:
-#         return
-#     
-#     from .tasks import send_booking_confirmation_email
-#     try:
-#         send_booking_confirmation_email(instance.id)
-#     except Exception as e:
-#         logger.error(f"Email failed for booking {instance.id}: {e}")
+def _status(obj):
+    return obj.booking_status if isinstance(obj, Booking) else obj.status
 
 
-# DISABLED: Email now sent after payment, not at booking creation
-# @receiver(post_save, sender=PartyBooking)
-# def send_party_booking_confirmation_on_create(sender, instance, created, **kwargs):
-#     """
-#     Send confirmation email when a new party booking is created.
-#     
-#     Only sends if:
-#     - Party booking was just created (not updated)
-#     """
-#     if not created:
-#         return
-#     
-#     from .tasks import send_party_booking_confirmation_email
-#     try:
-#         send_party_booking_confirmation_email(instance.id)
-#     except Exception as e:
-#         logger.error(f"Email failed for party booking {instance.id}: {e}")
+@receiver(pre_save, sender=Booking)
+@receiver(pre_save, sender=PartyBooking)
+def remember_old_status(sender, instance, **kwargs):
+    if instance.pk:
+        old = sender.objects.filter(pk=instance.pk).first()
+        instance._old_status = _status(old) if old else None
+    else:
+        instance._old_status = None
 
+
+@receiver(post_save, sender=Booking)
+@receiver(post_save, sender=PartyBooking)
+def email_on_cancellation(sender, instance, created, **kwargs):
+    if created or _status(instance) != 'CANCELLED' or getattr(instance, '_old_status', None) in (None, 'CANCELLED'):
+        return
+    # Never paid and booked online: it was released because the payment didn't finish
+    unpaid_release = (getattr(instance, 'online_checkout', False) and not (instance.paid_amount or 0)
+                      and instance.payment_status in ('PENDING', 'FAILED'))
+
+    def send():
+        try:
+            from .notifications import booking_cancelled
+            booking_cancelled(instance, unpaid_release=unpaid_release)
+        except Exception as exc:
+            logger.error(f"Cancellation e-mail failed for {instance}: {exc}", exc_info=True)
+
+    transaction.on_commit(send)

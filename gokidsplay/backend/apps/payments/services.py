@@ -163,14 +163,11 @@ class PaymentService:
         logger.info(f"Payment verified successfully: {order_id} → {payment_id}")
         logger.info(f"Booking {booking.id} status: {booking.payment_status} (£{booking.paid_amount}/£{booking.amount})")
         
-        # Send email notification
+        # E-mails: customer confirmation / receipt + a notice to the team. Sent once per
+        # payment even though the success page and SumUp's webhook both verify it.
         try:
-            if booking.payment_status == 'PAID':
-                # Full payment received
-                self._send_payment_success_email(booking, payment)
-            elif booking.payment_status == 'PARTIAL':
-                # Partial payment received
-                self._send_partial_payment_email(booking, payment)
+            from apps.emails.notifications import payment_received
+            payment_received(booking, payment)
         except Exception as e:
             logger.error(f"Failed to send payment email: {str(e)}")
             # Don't fail the payment if email fails
@@ -355,10 +352,9 @@ class PaymentService:
         pass
     
     def _send_refund_email(self, booking, refund_data, reason):
-        """Send refund confirmation email"""
-        logger.info(f"Sending refund email for booking {booking.id}")
-        # Will be implemented when refund email templates are ready
-        pass
+        """Tell the customer (and the team) that the refund is on its way."""
+        from apps.emails.notifications import refund_issued
+        refund_issued(booking, refund_data.get('amount') or 0, reason)
 
 
 # Singleton instance

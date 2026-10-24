@@ -1,0 +1,31 @@
+{% extends "emails/base.html" %}
+{% block title %}{{ heading }} - Go Kids Play{% endblock %}
+{% block header_subtitle %}{{ heading }}{% endblock %}
+{% block content %}
+<p class="greeting">Hi {{ customer_name }},</p>
+<p class="message">{{ intro|linebreaksbr }}</p>
+
+{% if rows %}
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e2e8f0;border-radius:10px;border-collapse:separate;margin:20px 0;">
+  {% for label, value in rows %}
+  <tr>
+    <td style="padding:10px 14px;font-size:14px;color:#64748b;width:40%;{% if not forloop.first %}border-top:1px solid #edf2f7;{% endif %}">{{ label }}</td>
+    <td style="padding:10px 14px;font-size:14px;color:#1a202c;font-weight:600;{% if not forloop.first %}border-top:1px solid #edf2f7;{% endif %}">{{ value|linebreaksbr }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if note %}<p class="message" style="background:#fffbeb;border-left:4px solid #f59e0b;padding:12px 14px;border-radius:6px;">{{ note|linebreaksbr }}</p>{% endif %}
+
+{% if button_url %}
+<p style="text-align:center;margin:28px 0;">
+  <a href="{{ button_url }}" style="display:inline-block;background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:13px 30px;border-radius:50px;">{{ button_label }}</a>
+</p>
+{% endif %}
+
+<p class="message" style="font-size:14px;color:#718096;">
+  Any questions? Reply to this e-mail{% if contact_phone %} or call us on {{ contact_phone }}{% endif %}.<br>
+  Go Kids Play · 310 Kingfield Road, Coventry CV1 4LD
+</p>
+{% endblock %}

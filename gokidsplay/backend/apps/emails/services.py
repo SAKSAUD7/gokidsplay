@@ -57,7 +57,8 @@ class EmailService:
         context: Dict[str, Any],
         booking=None,
         party_booking=None,
-        contact_message=None
+        contact_message=None,
+        reply_to: Optional[str] = None,
     ) -> EmailLog:
         """
         Send an email and create EmailLog entry.
@@ -138,12 +139,14 @@ class EmailService:
             # Render email template (use full context with model instances)
             html_content = render_to_string(template_name, context)
             
-            # Try Azure first, fall back to SMTP
+            # Replies go to the Go Kids Play inbox (Admin → Settings → contact e-mail) unless the
+            # caller says otherwise (e.g. team notices reply straight to the customer)
             message_id = self._send_with_fallback(
                 recipient_email=recipient_email,
                 recipient_name=recipient_name,
                 subject=subject,
-                html_content=html_content
+                html_content=html_content,
+                reply_to=reply_to or context.get('contact_email'),
             )
             
             # Mark as sent
@@ -163,7 +166,8 @@ class EmailService:
         recipient_email: str,
         recipient_name: str,
         subject: str,
-        html_content: str
+        html_content: str,
+        reply_to: Optional[str] = None,
     ) -> str:
         """
         Try Azure Communication Services first. If that fails (e.g. DomainNotLinked),
@@ -175,7 +179,8 @@ class EmailService:
                 return self._send_via_azure(
                     recipient_email=recipient_email,
                     subject=subject,
-                    html_content=html_content
+                    html_content=html_content,
+                    reply_to=reply_to,
                 )
             except Exception as azure_error:
                 logger.warning(
@@ -187,7 +192,8 @@ class EmailService:
             recipient_email=recipient_email,
             recipient_name=recipient_name,
             subject=subject,
-            html_content=html_content
+            html_content=html_content,
+            reply_to=reply_to,
         )
 
     def _send_via_smtp(
@@ -195,7 +201,8 @@ class EmailService:
         recipient_email: str,
         recipient_name: str,
         subject: str,
-        html_content: str
+        html_content: str,
+        reply_to: Optional[str] = None,
     ) -> str:
         """
         Send email via Django's built-in SMTP backend.
@@ -214,6 +221,7 @@ class EmailService:
             body="Please view this email in an HTML-compatible client.",
             from_email=from_header,
             to=[f"{recipient_name} <{recipient_email}>"] if recipient_name else [recipient_email],
+            reply_to=[reply_to] if reply_to else None,
         )
         msg.attach_alternative(html_content, "text/html")
         msg.send(fail_silently=False)
@@ -225,7 +233,8 @@ class EmailService:
         self,
         recipient_email: str,
         subject: str,
-        html_content: str
+        html_content: str,
+        reply_to: Optional[str] = None,
     ) -> str:
         """
         Send email via Azure Communication Services.
@@ -269,6 +278,8 @@ class EmailService:
                 },
                 "senderAddress": self.sender_address
             }
+            if reply_to:
+                message["replyTo"] = [{"address": reply_to}]
             
             # Send email
             poller = client.begin_send(message)
@@ -302,14 +313,13 @@ class EmailService:
         
         return render_to_string(template_name, context)
     
-    def send_booking_confirmation(self, booking):
+    def send_booking_confirmation(self, booking, extra_context=None):
         """
         Send session booking confirmation email.
         
         Args:
             booking: Booking instance
         """
-        logger.error(f"CREATING EMAILLOG FOR BOOKING {booking.id}")
         
         # Format activity name
         activity_name = activity_display_name(booking.activity)
@@ -326,13 +336,14 @@ class EmailService:
             'amount': booking.amount,
             'booking_uuid': str(booking.uuid),
             'activity_name': activity_name,
+            **(extra_context or {}),
         }
         
         return self.send_email(
             email_type='BOOKING_CONFIRMATION',
             recipient_email=booking.email,
             recipient_name=booking.name,
-            subject=f'Your Go Kids Play Booking Confirmation',
+            subject=f'Booking confirmed – {booking.booking_number or "Go Kids Play"}',
             template_name='emails/booking/session_confirmation.html',
             context=context,
             booking=booking
@@ -342,7 +353,6 @@ class EmailService:
         """
         Send a post-visit thank you email for a session booking.
         """
-        logger.error(f"CREATING EMAILLOG FOR POST VISIT THANK YOU {booking.id}")
         
         # Format activity name
         activity_name = activity_display_name(booking.activity)
@@ -363,10 +373,9 @@ class EmailService:
             booking=booking
         )
         
-        logger.error(f"EMAILLOG CREATED ID={email_log.id} STATUS={email_log.status}")
         return email_log
 
-    def send_party_booking_confirmation(self, party_booking):
+    def send_party_booking_confirmation(self, party_booking, extra_context=None):
         """
         Send party booking confirmation email.
         
@@ -386,13 +395,14 @@ class EmailService:
             'birthday_child_name': party_booking.birthday_child_name,
             'birthday_child_age': party_booking.birthday_child_age,
             'booking_uuid': str(party_booking.uuid),
+            **(extra_context or {}),
         }
         
         return self.send_email(
             email_type='PARTY_BOOKING_CONFIRMATION',
             recipient_email=party_booking.email,
             recipient_name=party_booking.name,
-            subject=f'Your Go Kids Play Party Booking Confirmation',
+            subject=f'Party booked – {party_booking.booking_number or "Go Kids Play"} 🎉',
             template_name='emails/booking/party_confirmation.html',
             context=context,
             party_booking=party_booking
@@ -411,21 +421,23 @@ class EmailService:
         context = {
             'contact_message': contact_message,
             'customer_name': contact_message.name,
-            'subject': contact_message.subject,
+            'reference': contact_message.ticket_id or f"#{contact_message.id}",
+            'admin_url': f"{getattr(settings, 'FRONTEND_URL', '').rstrip('/')}/admin/cms/contact-messages",
         }
         
-        admin_email = "info@gokidsplay.co.uk"
-        
-        email_log = self.send_email(
-            email_type='ADMIN_CONTACT_MESSAGE',
-            recipient_email=admin_email,
-            recipient_name="Go Kids Play Admin",
-            subject=f'New Contact Message - {contact_message.subject}',
-            template_name='emails/admin/contact_message.html',
-            context=context,
-            contact_message=contact_message
-        )
-        
+        from .notifications import staff_recipients
+        email_log = None
+        for admin_email in staff_recipients():
+            email_log = self.send_email(
+                email_type='ADMIN_CONTACT_MESSAGE',
+                recipient_email=admin_email,
+                recipient_name="Go Kids Play team",
+                subject=f'New contact message – {contact_message.name}',
+                template_name='emails/admin/contact_message.html',
+                context=context,
+                contact_message=contact_message,
+                reply_to=contact_message.email,  # press Reply to answer the customer
+            )
         return email_log
         
     def send_contact_customer_confirmation(self, contact_message):
@@ -437,7 +449,7 @@ class EmailService:
         context = {
             'contact_message': contact_message,
             'customer_name': contact_message.name,
-            'reference': f"SP-CT-{contact_message.id}",
+            'reference': contact_message.ticket_id or f"#{contact_message.id}",
         }
         
         email_log = self.send_email(

@@ -6,7 +6,7 @@ POST /api/v1/core/cron/?job=frequent|daily   header  X-Cron-Secret: <CRON_SECRET
 
 frequent — release unpaid online bookings (frees their places)
          — re-check SumUp payments still waiting for an answer
-daily    — refresh Google rating, reviews and photos
+daily    — refresh Google rating, reviews and photos; thank-you e-mails; tomorrow's reminders
          — send yesterday's visitors the thank-you e-mail
 """
 import hmac
@@ -72,6 +72,7 @@ def run_scheduled_jobs(request):
         if api_key():
             _run(results, 'sync_google_reviews', sync_google_reviews)
         _run(results, 'send_post_visit_emails', lambda: _command('send_post_visit_emails'))
+        _run(results, 'send_booking_reminders', lambda: _command('send_booking_reminders'))
     else:
         return Response({'error': 'job must be "frequent" or "daily"'}, status=400)
     logger.info('Scheduled jobs (%s): %s', job, results)

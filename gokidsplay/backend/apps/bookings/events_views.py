@@ -399,6 +399,11 @@ def create_event_booking(request):
         )
     except Exception as email_err:
         logger.warning(f"Event booking confirmation email failed: {email_err}")
+    try:
+        from apps.emails.notifications import event_reserved
+        event_reserved(booking)
+    except Exception as email_err:
+        logger.warning(f"Event reservation team notice failed: {email_err}")
 
     pay_text = 'Free entry' if event.is_free or subtotal == 0 else f'£{subtotal:.2f} to pay at the venue'
     return Response({
@@ -467,6 +472,11 @@ def create_event_request(request):
         ip_address=request.META.get('REMOTE_ADDR'),
         **contact,
     )
+    try:
+        from apps.emails.notifications import event_request_received
+        event_request_received(req)
+    except Exception as email_err:
+        logger.warning(f"Event request e-mails failed: {email_err}")
     return Response({
         'success': True,
         'reference': req.reference,

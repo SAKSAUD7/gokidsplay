@@ -20,7 +20,7 @@
         <p style="margin:0 0 25px;font-size:15px;color:#334155;"><strong>Phone:</strong> {{ contact_message.phone|default:"Not provided" }}</p>
 
         <div style="background:#f1f5f9;padding:20px;border-radius:6px;border-left:4px solid #3b82f6;">
-          <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;">Subject: {{ contact_message.subject }}</p>
+          <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;">Reference: {{ reference }} · press Reply to answer {{ contact_message.name }}</p>
           <p style="margin:0;font-size:15px;color:#1e293b;line-height:1.6;">{{ contact_message.message|linebreaksbr }}</p>
         </div>
       </td></tr>

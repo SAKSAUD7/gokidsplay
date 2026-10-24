@@ -66,6 +66,9 @@ class EmailLog(models.Model):
         ('CONTACT_CONFIRMATION', 'Contact Message Confirmation'),
         
         # Admin Notifications
+        ('ADMIN_NOTIFICATION', 'Admin: Booking Notice'),
+        ('EVENT_REQUEST_RECEIVED', 'Event Request Received'),
+        ('POST_VISIT_THANK_YOU', 'Thank You After the Visit'),
         ('ADMIN_NEW_BOOKING', 'Admin: New Booking'),
         ('ADMIN_PARTY_BOOKING', 'Admin: Party Booking'),
         ('ADMIN_MEMBERSHIP_PURCHASE', 'Admin: Membership Purchase'),
