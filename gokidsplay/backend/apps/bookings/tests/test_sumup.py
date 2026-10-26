@@ -70,7 +70,9 @@ class TestSumUp:
         assert Decimal(str(payload['amount'])) == booking.amount               # server-side price
         assert payload['checkout_reference'].startswith(booking.booking_number)
         assert payload['return_url'] == 'https://api.gokidsplay.co.uk/api/v1/payments/sumup-webhook/'
-        assert payload['hosted_checkout']['redirect_url'].startswith('https://www.gokidsplay.co.uk/book/success')
+        # top-level redirect_url (SumUp ignores it inside hosted_checkout); carries the private e-ticket id
+        assert payload['redirect_url'].startswith('https://www.gokidsplay.co.uk/book/success?booking_id=' + str(booking.uuid))
+        assert payload['hosted_checkout'] == {'enabled': True}
         assert order['checkout_url'] == 'https://checkout.sumup.com/pay/chk_123'
 
     def test_no_webhook_address_on_a_pc(self, config, plans, sumup, settings):
@@ -89,6 +91,14 @@ class TestSumUp:
         assert booking.payment_status == 'PENDING'
         # unknown checkouts are ignored
         assert APIClient().post('/api/v1/payments/sumup-webhook/', {'id': 'not-ours'}, format='json').status_code == 200
+
+    def test_coming_back_with_our_reference_finds_the_payment(self, config, plans, sumup):
+        booking, _ = create_order(plans)
+        reference = sumup['posts'][0][1]['checkout_reference']
+        sumup['status'] = 'PAID'
+        data = APIClient().post('/api/v1/payments/verify/', {'order_id': reference}, format='json').data
+        assert data['payment_status'] == 'PAID'
+        assert data['booking_uuid'] == str(booking.uuid) and data['booking_number'] == booking.booking_number
 
     def test_real_webhook_marks_paid(self, config, plans, sumup):
         booking, _ = create_order(plans)

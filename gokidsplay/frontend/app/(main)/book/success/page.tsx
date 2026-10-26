@@ -58,6 +58,10 @@ function SuccessPageContent() {
 
     useEffect(() => {
         async function verify() {
+            // The e-ticket is looked up by the booking's private id: from SumUp's return link,
+            // or from the payment confirmation below
+            let ticketId: string | null = /^[0-9a-f-]{36}$/i.test(bookingId || "") ? bookingId : null;
+            let ticketType: string = bookingType;
             // ── STEP 0: Trust SumUp's own redirect status immediately ──────────
             // SumUp only redirects to our success URL after confirming payment.
             // If the URL says PAID, we optimistically show success immediately
@@ -107,6 +111,8 @@ function SuccessPageContent() {
                             const data = await res.json();
                             setPayment(data);
                             setVerified(true);
+                            if (data.booking_uuid) ticketId = data.booking_uuid;
+                            if (data.booking_type) ticketType = data.booking_type;
                             const st = (data.payment_status || '').toUpperCase();
                             if (st === 'PAID' || st === 'SUCCESSFUL') {
                                 setUiStatus('paid');
@@ -148,11 +154,11 @@ function SuccessPageContent() {
             }
 
             // ── STEP 4: Fetch booking details ─────────────────────────────────
-            if (bookingId) {
+            if (ticketId) {
                 try {
-                    const endpoint = bookingType === 'party'
-                        ? `${BOOKING_API}/bookings/party-bookings/ticket/${bookingId}/`
-                        : `${BOOKING_API}/bookings/bookings/ticket/${bookingId}/`;
+                    const endpoint = ticketType === 'party'
+                        ? `${BOOKING_API}/bookings/party-bookings/ticket/${ticketId}/`
+                        : `${BOOKING_API}/bookings/bookings/ticket/${ticketId}/`;
                     const res = await fetch(endpoint, { cache: 'no-store' });
                     if (res.ok) {
                         setBooking(await res.json());

@@ -31,11 +31,13 @@ function isValidPhone(phone: string): boolean {
 
 export async function createBooking(formData: any) {
     try {
-        // Admin manual bookings are identified by the signed-in admin session (never by a
-        // client-supplied flag, since server actions can be called by anyone). They use a
-        // simpler schema, skip the online booking fee, and are sent to the API as staff.
+        // Staff bookings come only from the admin portal's booking forms (staffBooking: true)
+        // AND need a signed-in admin. The flag alone gives nothing (server actions can be called by
+        // anyone); and a booking made on the public site by someone who is also signed in to the
+        // admin portal in the same browser stays a normal customer booking (online fee, SumUp).
+        // Staff bookings use a simpler schema, skip the online fee and are sent to the API as staff.
         const { getAdminSession } = await import("@/app/lib/admin-auth");
-        const adminSession = await getAdminSession().catch(() => null);
+        const adminSession = formData?.staffBooking === true ? await getAdminSession().catch(() => null) : null;
         const isAdminBooking = !!adminSession;
         const adminToken = isAdminBooking ? (await import("next/headers")).cookies().get("admin_token")?.value : undefined;
         const apiHeaders: Record<string, string> = {

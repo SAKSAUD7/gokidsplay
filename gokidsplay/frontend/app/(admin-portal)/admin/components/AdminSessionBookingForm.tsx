@@ -34,7 +34,7 @@ export function AdminSessionBookingForm() {
                 activity: formData.get("activity") || "roller-skating",
             };
 
-            const result = await createBooking(data);
+            const result = await createBooking({ ...data, staffBooking: true });
 
             if (result.success) {
                 if (submitType === 'sumup' && result.bookingIntId) {

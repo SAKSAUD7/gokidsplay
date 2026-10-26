@@ -6,11 +6,15 @@
  *
  * Flow:
  *   1. Shows detailed booking breakdown table (left) + payment box (right)
- *   2. "Pay Now" → backend creates SumUp Hosted Checkout
- *   3. User redirected to SumUp → redirected back to /book/success
+ *   2. "Pay Now" → backend creates a SumUp checkout (the server decides the amount)
+ *   3. SumUp's card form opens right here (SumUp Card Widget); when SumUp says the payment
+ *      went through, the customer goes straight to /book/success, which confirms it with
+ *      SumUp on the server and shows the ticket
+ *   4. If the card form can't load, the customer is sent to SumUp's own payment page instead
+ *      (it has a "back to Go Kids Play" button); the test gateway always uses its own page
  */
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
     Loader2, AlertCircle, Shield, Lock, CreditCard, ChevronLeft
@@ -63,6 +67,24 @@ const ACTIVITY_LABELS: Record<string, string> = {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
+// SumUp Card Widget (https://developer.sumup.com/online-payments/checkouts/card-widget)
+const SUMUP_SDK = "https://gateway.sumup.com/gateway/ecom/card/v2/sdk.js";
+declare global {
+    interface Window { SumUpCard?: { mount: (config: Record<string, unknown>) => { unmount?: () => void } } }
+}
+
+function loadSumUpSdk(): Promise<void> {
+    if (typeof window !== "undefined" && window.SumUpCard) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const existing = document.querySelector<HTMLScriptElement>(`script[src="${SUMUP_SDK}"]`);
+        const script = existing || document.createElement("script");
+        const timer = window.setTimeout(() => reject(new Error("timeout")), 12000);
+        script.addEventListener("load", () => { window.clearTimeout(timer); if (window.SumUpCard) resolve(); else reject(new Error("no SDK")); });
+        script.addEventListener("error", () => { window.clearTimeout(timer); reject(new Error("blocked")); });
+        if (!existing) { script.src = SUMUP_SDK; script.async = true; document.body.appendChild(script); }
+    });
+}
+
 function fmt(amount: number) {
     return `£${amount.toFixed(2)}`;
 }
@@ -113,10 +135,14 @@ export function PaymentStep({
 }: PaymentStepProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError]     = useState<string | null>(null);
+    // The SumUp checkout being paid in the card form on this page
+    const [checkout, setCheckout] = useState<{ orderId: string; checkoutUrl: string } | null>(null);
+    const [cardStatus, setCardStatus] = useState<"loading" | "ready" | "processing">("loading");
+    const widgetRef = useRef<{ unmount?: () => void } | null>(null);
 
     const d = bookingDetails;
     const activity  = d.activity || "";
-    const merchant  = MERCHANT_LABELS[activity] || "Go Kids Play Ltd";
+    const merchant  = MERCHANT_LABELS[activity] || "Go Kids Go Coventry Ltd";   // the name on the SumUp account and card statements
     const actLabel  = ACTIVITY_LABELS[activity] || (bookingType === "party" ? "Party" : "Session");
 
     // Quantities & prices
@@ -184,12 +210,57 @@ export function PaymentStep({
             if (!res.ok || !data.checkout_url) {
                 throw new Error(data.error || "Failed to create payment. Please try again.");
             }
-            window.location.href = data.checkout_url;
+            if (data.mock || String(data.provider || "").toLowerCase() !== "sumup" || !data.order_id) {
+                window.location.href = data.checkout_url;      // test gateway: its own page
+                return;
+            }
+            setCardStatus("loading");
+            setCheckout({ orderId: data.order_id, checkoutUrl: data.checkout_url });
         } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
             setLoading(false);
         }
     };
+
+    // Show SumUp's card form once there is a checkout to pay
+    useEffect(() => {
+        if (!checkout) return;
+        let cancelled = false;
+        loadSumUpSdk().then(() => {
+            if (cancelled || !window.SumUpCard) return;
+            widgetRef.current = window.SumUpCard.mount({
+                id: "sumup-card",
+                checkoutId: checkout.orderId,
+                locale: "en-GB",
+                email: bookingDetails.email || undefined,
+                onLoad: () => setCardStatus("ready"),
+                onResponse: (type: string, body: any) => {
+                    if (type === "sent" || type === "auth-screen") setCardStatus("processing");
+                    if (type === "success") {
+                        setCardStatus("processing");
+                        // The success page confirms the payment with SumUp on the server before showing PAID
+                        window.location.href = `/book/success?checkout_id=${encodeURIComponent(checkout.orderId)}&booking_type=${bookingType}`;
+                    }
+                    if (type === "fail" || type === "error") {
+                        widgetRef.current?.unmount?.();
+                        widgetRef.current = null;
+                        setCheckout(null);
+                        setLoading(false);
+                        const message = typeof body === "object" && body ? (body.message || body.error_message) : "";
+                        setError(type === "fail"
+                            ? "The payment didn't go through. No money was taken - please check your card details or try another card."
+                            : `The payment couldn't be completed${message ? `: ${message}` : ""}. Please try again.`);
+                    }
+                },
+            });
+            setCardStatus("ready");
+        }).catch(() => {
+            // Card form couldn't load (e.g. blocked script): use SumUp's own payment page instead
+            if (!cancelled) window.location.href = checkout.checkoutUrl;
+        });
+        return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [checkout]);
 
     return (
         <motion.div
@@ -321,8 +392,8 @@ export function PaymentStep({
 
                         <h3 className="text-gray-900 font-black text-lg mb-1">Pay with Credit/Debit Card</h3>
                         <p className="text-gray-500 text-xs mb-5">
-                            You&apos;ll be securely redirected to <strong>SumUp</strong> to complete payment.
-                            No card details are stored on our servers.
+                            Card payments are handled securely by <strong>SumUp</strong>.
+                            Your card details never reach our servers.
                         </p>
 
                         {/* Booking Ref */}
@@ -351,7 +422,28 @@ export function PaymentStep({
                             </div>
                         )}
 
+                        {/* SumUp card form (after Pay Now) */}
+                        {checkout && (
+                            <div className="mb-2">
+                                {cardStatus === "loading" && (
+                                    <p className="flex items-center justify-center gap-2 text-gray-500 text-sm py-6">
+                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading secure card form…
+                                    </p>
+                                )}
+                                {cardStatus === "processing" && (
+                                    <p className="flex items-center justify-center gap-2 text-gray-700 text-sm font-semibold pb-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" /> Processing your payment… please don&apos;t close this page
+                                    </p>
+                                )}
+                                <div id="sumup-card" className="text-gray-900" />
+                                <a href={checkout.checkoutUrl} className="block text-center text-xs text-gray-500 underline mt-2">
+                                    Having trouble? Pay on SumUp&apos;s page instead
+                                </a>
+                            </div>
+                        )}
+
                         {/* Pay button */}
+                        {!checkout && (
                         <button
                             type="button"
                             onClick={handlePayNow}
@@ -370,6 +462,7 @@ export function PaymentStep({
                                 </>
                             )}
                         </button>
+                        )}
 
                         {/* SumUp branding */}
                         <div className="flex items-center justify-center gap-2 mt-4">
@@ -381,7 +474,7 @@ export function PaymentStep({
                         {/* Customer Warning */}
                         <div className="mt-4 text-center">
                             <p className="text-xs text-red-500 font-bold bg-red-50 p-2 rounded-lg border border-red-100">
-                                Please do not close the window after paying. Wait to be automatically redirected back to Go Kids Play.
+                                Please don&apos;t close this page while paying. Your ticket appears as soon as the payment goes through.
                             </p>
                         </div>
                     </div>

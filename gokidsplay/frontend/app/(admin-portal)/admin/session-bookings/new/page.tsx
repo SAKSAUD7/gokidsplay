@@ -70,6 +70,7 @@ export default function NewSessionBookingPage() {
         setLoading(true);
         try {
             const result = await createBooking({
+                staffBooking: true,
                 date: form.date,
                 time: form.time,
                 duration: String(getSessionRules().duration_minutes),

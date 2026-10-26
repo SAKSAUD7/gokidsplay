@@ -134,7 +134,7 @@ class SumUpGateway(BasePaymentGateway):
         description = f"{booking.booking_number or booking.id} | {date_formatted} | {total_people}P | {booking_time}"
         return_url_str = (
             f"{self.return_url}"
-            f"?booking_id={booking.id}"
+            f"?booking_id={booking.uuid}"   # the private e-ticket id (the ticket page looks it up by this)
             f"&booking_type={booking_type}"
             f"&reference={reference}"
         )
@@ -151,10 +151,11 @@ class SumUpGateway(BasePaymentGateway):
             "merchant_code":     merchant_code,
             "description":       description,
             **({"return_url": webhook_url} if webhook_url else {}),  # webhook
-            "hosted_checkout": {
-                "enabled": True,
-                "redirect_url": return_url_str # User redirected here
-            }
+            # Where SumUp sends the customer afterwards: the "back to Go Kids Play" button on its
+            # page, and 3-D Secure returns. Must be top-level (SumUp ignores it inside hosted_checkout).
+            "redirect_url":      return_url_str,
+            # Also a SumUp-hosted page, used if the card form on our own page can't load
+            "hosted_checkout": {"enabled": True},
         }
 
         try:
@@ -190,6 +191,7 @@ class SumUpGateway(BasePaymentGateway):
             status="CREATED",
             provider_response={
                 **data,
+                "checkout_reference": reference,   # the customer comes back from SumUp with this
                 "_merchant_account": account_name,
                 "_activity": activity,
             },

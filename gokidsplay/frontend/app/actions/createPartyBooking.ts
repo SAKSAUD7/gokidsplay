@@ -112,9 +112,10 @@ export async function createPartyBooking(formData: any) {
             customer_id: formData.customerId || null,
         };
 
-        // Staff bookings carry the admin token; public bookings are priced server-side by the API
+        // Staff bookings (admin portal form, staffBooking: true) carry the admin token; public
+        // bookings are priced server-side by the API, even if an admin is signed in in this browser
         const { cookies } = await import("next/headers");
-        const adminToken = cookies().get("admin_token")?.value;
+        const adminToken = formData?.staffBooking === true ? cookies().get("admin_token")?.value : undefined;
         const bookingRes = await fetch(`${API_URL}/bookings/party-bookings/`, {
             method: "POST",
             headers: {

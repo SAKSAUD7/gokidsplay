@@ -45,7 +45,7 @@ export function AdminPartyBookingForm({ initialData, isEditing = false }: AdminP
             if (isEditing && initialData?.id) {
                 result = await updatePartyBooking(initialData.id, data);
             } else {
-                result = await createPartyBooking(data);
+                result = await createPartyBooking({ ...data, staffBooking: true });
             }
 
             if (result.success) {

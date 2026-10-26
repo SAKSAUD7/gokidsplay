@@ -137,10 +137,17 @@ class PaymentService:
             Exception: If verification fails
         """
         logger.info(f"Verifying payment for order: {order_id}")
+
+        # Customers coming back from SumUp's page carry our own reference (GK123456-ABC123),
+        # not SumUp's checkout id: find the payment it belongs to.
+        if not Payment.objects.filter(order_id=order_id).exists():
+            match = Payment.objects.filter(provider_response__checkout_reference=order_id).order_by('-created_at').first()
+            if match:
+                order_id = match.order_id
+                payment_data = {**payment_data, 'order_id': order_id}
         
-        # Add order_id to payment_data if not present
-        if 'order_id' not in payment_data:
-            payment_data['order_id'] = order_id
+        # Always ask the gateway about the resolved checkout id (the request may carry our reference)
+        payment_data = {**payment_data, 'order_id': order_id}
         
         # Verify payment via gateway
         success, payment_id, response = self.gateway.verify_payment(payment_data)
@@ -178,6 +185,8 @@ class PaymentService:
             'order_id': order_id,
             'booking_id': booking.id,
             'booking_type': 'party' if isinstance(booking, PartyBooking) else 'session',
+            'booking_uuid': str(booking.uuid),                 # loads the e-ticket
+            'booking_number': booking.booking_number,
             'payment_status': booking.payment_status,
             'paid_amount': float(booking.paid_amount),
             'remaining_balance': float(booking.remaining_balance),
