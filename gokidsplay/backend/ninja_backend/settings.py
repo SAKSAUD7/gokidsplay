@@ -379,7 +379,7 @@ EMAIL_RETRY_DELAY_MINUTES = int(os.getenv('EMAIL_RETRY_DELAY_MINUTES', '1'))
 # AZURE COMMUNICATION SERVICES (Email)
 # ====================================================
 AZURE_COMMUNICATION_CONNECTION_STRING = os.getenv('AZURE_COMMUNICATION_CONNECTION_STRING', '')
-AZURE_EMAIL_SENDER_ADDRESS = os.getenv('AZURE_EMAIL_SENDER_ADDRESS', 'DoNotReply@838f7a9a-e201-4b80-a0ca-c1c6480f2aec.azurecomm.net')
+AZURE_EMAIL_SENDER_ADDRESS = os.getenv('AZURE_EMAIL_SENDER_ADDRESS', '')  # DoNotReply@<your domain> from Azure
 AZURE_EMAIL_SENDER_NAME = os.getenv('AZURE_EMAIL_SENDER_NAME', 'Go Kids Play')
 # Where the team's e-mails go (new bookings, cancellations, refunds, contact form, event requests).
 # Comma-separated; empty = the contact e-mail in Admin → Settings.

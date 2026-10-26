@@ -204,8 +204,12 @@ class EventBookingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='cancel')
     def cancel(self, request, pk=None):
         booking = self.get_object()
+        was_active = booking.status not in EventBooking.RELEASED_STATUSES
         booking.status = 'CANCELLED'
         booking.save()
+        if was_active:
+            from apps.emails.notifications import event_reservation_cancelled
+            event_reservation_cancelled(booking)
         return self._reply(booking)
 
     @action(detail=True, methods=['post'], url_path='reinstate')

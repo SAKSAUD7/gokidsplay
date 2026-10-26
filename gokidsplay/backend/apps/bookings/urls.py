@@ -67,6 +67,7 @@ urlpatterns = [
     path('party-bookings/<int:pk>/mark_not_arrived/', mark_party_not_arrived_view, name='party-booking-mark-not-arrived'),
     path('party-bookings/<int:id>/update_status/', party_booking_update_status_view, name='party-booking-update-status'),
     path('party-bookings/<int:pk>/audit_log/', PartyBookingViewSet.as_view({'get': 'audit_log'}), name='party-booking-audit-log'),
+    path('party-bookings/<int:pk>/reschedule/', PartyBookingViewSet.as_view({'post': 'reschedule'}), name='party-booking-reschedule'),
     path('party-bookings/<uuid:uuid>/add_participants/', add_party_participants_view, name='party-booking-add-participants'),
     path('party-bookings/ticket/<uuid:uuid>/', PartyBookingViewSet.as_view({'get': 'ticket'}), name='party-booking-ticket'),
     # ── Special Events Public API (Section 7) ──────────────────────────────────

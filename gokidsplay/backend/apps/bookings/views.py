@@ -1110,7 +1110,10 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
             party_booking.reschedule_count = (party_booking.reschedule_count or 0) + 1
             party_booking.status = 'RESCHEDULED'
             party_booking.save()
-            
+            party_booking.refresh_from_db()  # date / time back as date objects for the e-mail
+            from apps.emails.notifications import party_rescheduled
+            party_rescheduled(party_booking, fee=fee_applied)
+
             serializer = self.get_serializer(party_booking)
             return Response({
                 'success': True,

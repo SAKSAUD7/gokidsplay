@@ -12,6 +12,8 @@ team gets, for each thing that can happen to a booking.
   unpaid (released) → "not completed"       —
   event reserved    → confirmation          new event reservation
   event request     → "request received"    new event request
+  event resv. cancel→ "reservation cancelled" event reservation cancelled
+  party rescheduled → "new date"            party rescheduled
   day before visit  → reminder              —
 
 Each message is sent once: a key is stored in the e-mail log and checked first, so a
@@ -205,6 +207,31 @@ def booking_cancelled(booking, *, unpaid_release=False):
                           "in line with our booking terms. Questions? Just reply to this e-mail.",
                     key=f"{key}:customer", button=('Book again', '/party-booking' if is_party else '/book'))
     staff_notice(booking, headline='Booking cancelled', key=key)
+
+
+def party_rescheduled(booking, *, fee=0):
+    """Staff moved a party to a new date / time."""
+    when = f"{booking.date:%Y%m%d}{str(booking.time)[:5].replace(':', '')}"
+    key = f"reschedule:{booking.id}:{when}"
+    note = f"A {_money(fee)} admin fee applies, as the change was made within 14 days of the party." if fee else ''
+    customer_update(booking, email_type='PARTY_RESCHEDULED', subject='Your party has a new date',
+                    heading='Your party has been moved',
+                    intro="Your party booking has been changed. The new date and time are below. "
+                          "If anything looks wrong, just reply to this e-mail.",
+                    note=note, key=f"{key}:customer")
+    staff_notice(booking, headline='Party rescheduled', key=key,
+                 extra_rows=[('Admin fee', _money(fee))] if fee else ())
+
+
+def event_reservation_cancelled(event_booking):
+    """Staff cancelled one reservation for an event (the event itself still goes ahead)."""
+    key = f"event-cancel:{event_booking.id}"
+    customer_update(event_booking, email_type='BOOKING_CANCELLED',
+                    subject=f"Your reservation for {event_booking.event.title} has been cancelled",
+                    heading='Reservation cancelled',
+                    intro="Your reservation for this event has been cancelled. Questions? Just reply to this e-mail.",
+                    key=f"{key}:customer", button=('See our events', '/events'))
+    staff_notice(event_booking, headline='Event reservation cancelled', key=key)
 
 
 def event_reserved(event_booking):

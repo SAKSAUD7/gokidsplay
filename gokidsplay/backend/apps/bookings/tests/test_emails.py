@@ -148,6 +148,32 @@ class TestOtherEmails:
                          'name': 'Eve Parent', 'email': 'eve@example.com', 'phone': '07700900123'}, format='json')
         assert 'New event reservation' in to(outbox, TEAM)[1]['subject']
 
+    def test_staff_cancelling_one_event_reservation_tells_the_customer(self, outbox, staff_client):
+        from apps.bookings.models import EventBooking, SpecialEvent
+        event = SpecialEvent.objects.create(title='Halloween', slug='halloween', date=next_saturday(), start_time=time(14),
+                                            end_time=time(16), status='PUBLISHED', total_capacity=20,
+                                            price_per_child=Decimal('10'), price_per_adult=Decimal('5'))
+        APIClient().post('/api/v1/bookings/public/events/book/', {'event_id': event.id, 'num_children': 1, 'num_adults': 1,
+                         'name': 'Eve Parent', 'email': 'eve@example.com', 'phone': '07700900123'}, format='json')
+        outbox.clear()
+        booking = EventBooking.objects.get(email='eve@example.com')
+        for _ in range(2):                                    # cancelling twice e-mails once
+            assert staff_client.post(f'/api/v1/bookings/event-bookings/{booking.id}/cancel/').status_code == 200
+        customer = to(outbox, 'eve@example.com')
+        assert len(customer) == 1 and 'Halloween has been cancelled' in customer[0]['subject']
+        assert 'Event reservation cancelled' in to(outbox, TEAM)[0]['subject']
+
+    def test_staff_rescheduling_a_party_tells_the_customer(self, config, outbox, staff_client):
+        party = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': next_saturday().isoformat()}, format='json').data
+        new_date = next_saturday() + timedelta(days=28)
+        response = staff_client.post(f"/api/v1/bookings/party-bookings/{party['id']}/reschedule/",
+                                     {'new_date': new_date.isoformat(), 'new_time': '15:00'}, format='json')
+        assert response.status_code == 200, response.data
+        customer = to(outbox, 'party@example.com')
+        assert len(customer) == 1 and 'new date' in customer[0]['subject']
+        assert new_date.strftime('%d %B %Y') in customer[0]['html'] and '15:00' in customer[0]['html']
+        assert 'Party rescheduled' in to(outbox, TEAM)[0]['subject']
+
     def test_reminders_go_out_once_the_day_before(self, config, plans, outbox):
         tomorrow = timezone.localdate() + timedelta(days=1)
         booking = Booking.objects.get(pk=APIClient().post(SESSIONS_URL, session_payload(plans), format='json').data['id'])
@@ -174,5 +200,6 @@ class TestOtherEmails:
         monkeypatch.setattr(acs.EmailClient, 'from_connection_string', staticmethod(lambda s: FakeClient()))
         service = EmailService()
         service.connection_string = 'endpoint=https://x.communication.azure.com/;accesskey=eA=='
+        service.sender_address = 'DoNotReply@example.azurecomm.net'
         assert service._send_via_azure('a@example.com', 'Hi', '<p>Hi</p>', reply_to='info@gokidsplay.co.uk') == 'azure-1'
         assert captured['replyTo'] == [{'address': 'info@gokidsplay.co.uk'}]
