@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check, X, Printer, Mail, Users, Loader2, CreditCard } from "lucide-react";
 import { PaymentHistoryCard } from "../../components/PaymentHistoryCard";
+import { BookingHistoryCard } from "../../components/BookingHistoryCard";
 import { toast } from "sonner";
 
 export default function BookingDetailPage({ params }: { params: { id: string } }) {
@@ -148,6 +149,11 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
                             <div>
                                 <label className="text-xs text-slate-400 uppercase font-semibold">Date</label>
                                 <p className="text-slate-900 font-medium">{booking.date}</p>
+                                {booking.reschedule_count > 0 && (
+                                    <p className="text-[10px] text-amber-600 mt-1">
+                                        Moved {booking.reschedule_count}x{booking.original_date ? ` (first booked for ${booking.original_date})` : ""}
+                                    </p>
+                                )}
                             </div>
                             <div>
                                 <label className="text-xs text-slate-400 uppercase font-semibold">Time Slot</label>
@@ -178,6 +184,9 @@ export default function BookingDetailPage({ params }: { params: { id: string } }
 
                     {/* Payment History & Gateway Updates */}
                     <PaymentHistoryCard bookingId={booking.id} bookingType="session" />
+
+                    {/* Date moves (customer or staff), status and payment changes */}
+                    <BookingHistoryCard bookingId={booking.id} bookingType="session" refreshKey={booking.updated_at} />
 
                     {booking.add_ons && booking.add_ons.length > 0 && (
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

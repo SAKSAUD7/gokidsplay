@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Calendar, Clock, Users, ChevronRight, LogOut, User, History, CreditCard, AlertCircle, RefreshCw, Ticket } from "lucide-react";
+import { Calendar, CalendarClock, Clock, Users, ChevronRight, LogOut, User, History, CreditCard, AlertCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useAccount } from "@/state/account/AccountContext";
 import { createPaymentOrder } from "@/app/actions/payment";
 import { CustomerBookingModal } from "@/components/CustomerBookingModal";
+import { RescheduleBookingModal } from "@/components/RescheduleBookingModal";
 
 interface Booking {
     id: number;
@@ -29,6 +30,10 @@ interface Booking {
     remaining_balance?: number;
     deposit_amount?: number;
     event_slug?: string;
+    original_date?: string | null;
+    reschedule_count?: number;
+    // Whether the customer can change the date themselves (backend reschedule.py)
+    reschedule?: { allowed: boolean; reason: string; deadline: string | null; fee: number };
 }
 
 // Bookings that no longer happen (released when unpaid, cancelled or refunded)
@@ -47,6 +52,14 @@ const STATUS_STYLES: Record<string, string> = {
     CANCELLED:      "bg-red-500/20 text-red-400 border-red-500/30",
     COMPLETED:      "bg-blue-500/20 text-blue-400 border-blue-500/30",
     EXPIRED:        "bg-red-500/20 text-red-400 border-red-500/30",
+    REFUNDED:       "bg-red-500/20 text-red-400 border-red-500/30",
+    NO_SHOW:        "bg-red-500/20 text-red-400 border-red-500/30",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+    CONFIRMED: "Confirmed", PENDING: "Pending", PENDING_PAYMENT: "Payment Pending", DEPOSIT_PAID: "Deposit Paid",
+    PARTIALLY_PAID: "Partially Paid", FULLY_PAID: "Fully Paid", RESCHEDULED: "Rescheduled", CANCELLED: "Cancelled",
+    COMPLETED: "Completed", EXPIRED: "Not completed", REFUNDED: "Refunded", NO_SHOW: "Missed",
 };
 
 export default function AccountBookingsPage() {
@@ -56,6 +69,7 @@ export default function AccountBookingsPage() {
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState<string | null>(null);
     const [selectedModal, setSelectedModal] = useState<{ id: string | number; type: "SESSION" | "PARTY" } | null>(null);
+    const [moving, setMoving] = useState<Booking | null>(null);
     const [showAllPast, setShowAllPast] = useState(false);
     const [pageConfig, setPageConfig] = useState<any>(null);
 
@@ -209,6 +223,7 @@ export default function AccountBookingsPage() {
                                             booking={booking}
                                             formattedDate={formattedDate}
                                             onOpenModal={() => booking.type !== "EVENT" && setSelectedModal({ id: booking.id, type: booking.type })}
+                                            onChangeDate={() => setMoving(booking)}
                                         />
                                     ))}
                                 </div>
@@ -258,6 +273,19 @@ export default function AccountBookingsPage() {
                     bookingId={selectedModal.id}
                     bookingType={selectedModal.type}
                     onClose={() => setSelectedModal(null)}
+                    onChanged={fetchBookings}
+                />
+            )}
+
+            {/* Change date */}
+            {moving && moving.type !== "EVENT" && (
+                <RescheduleBookingModal
+                    bookingId={moving.id}
+                    bookingType={moving.type}
+                    currentDate={moving.date}
+                    currentTime={moving.time}
+                    onClose={() => setMoving(null)}
+                    onMoved={fetchBookings}
                 />
             )}
         </main>
@@ -268,11 +296,13 @@ export default function AccountBookingsPage() {
 function BookingCard({
     booking,
     formattedDate,
-    onOpenModal
+    onOpenModal,
+    onChangeDate,
 }: {
     booking: Booking;
     formattedDate: (d: string) => string;
     onOpenModal: () => void;
+    onChangeDate?: () => void;
 }) {
     const statusStyle = STATUS_STYLES[booking.status] || "bg-white/10 text-white/60 border-white/10";
     const [paying, setPaying] = useState(false);
@@ -323,11 +353,7 @@ function BookingCard({
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${isPendingPayment ? "bg-yellow-500/20 text-yellow-500 border-yellow-500/30" : statusStyle}`}>
                             {isPendingPayment ? "Payment Pending"
                             : booking.type === "EVENT" && booking.status === "CONFIRMED" ? "Reserved"
-                            : booking.status === "DEPOSIT_PAID" ? "Deposit Paid"
-                            : booking.status === "PARTIALLY_PAID" ? "Partially Paid"
-                            : booking.status === "FULLY_PAID" ? "Fully Paid"
-                            : booking.status === "RESCHEDULED" ? "Rescheduled"
-                            : booking.status}
+                            : STATUS_LABELS[booking.status] || booking.status}
                         </span>
                     </div>
                     <div className="flex items-center gap-4 text-white/50 text-sm flex-wrap">
@@ -337,6 +363,16 @@ function BookingCard({
                     </div>
                     {booking.booking_number && (
                         <p className="text-white/30 text-xs mt-1">#{booking.booking_number}</p>
+                    )}
+                    {booking.original_date && booking.original_date !== booking.date && !ended && (
+                        <p className="text-purple-300/70 text-xs mt-1">Moved from {formattedDate(booking.original_date)}</p>
+                    )}
+                    {/* Change date (up to 10 hours before; the server checks every rule) */}
+                    {onChangeDate && booking.type !== "EVENT" && booking.reschedule?.allowed && !ended && upcomingVisit && (
+                        <button onClick={onChangeDate}
+                            className="mt-3 flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/15 text-white font-bold text-xs rounded-xl hover:bg-white/10 transition-all">
+                            <CalendarClock className="w-3.5 h-3.5" /> Change date
+                        </button>
                     )}
                     {/* PENDING payment CTA */}
                     {isPendingPayment && (

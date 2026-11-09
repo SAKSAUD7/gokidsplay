@@ -147,6 +147,29 @@ def session_start_times(check_date: date, config: Optional[SessionBookingConfig]
     return times
 
 
+PARTY_MINUTES = 120
+
+
+def party_start_times(check_date: date, party_config=None, day: Optional[dict] = None) -> List[str]:
+    """
+    Party start times for a date: the party times from Website Content → Party Booking
+    that leave a full 2-hour party before closing (any whole hour if none are set).
+    Empty when parties can't be booked that day.
+    """
+    from .availability_service import _to_24h
+    day = day or day_status(check_date)
+    if not day['parties_open'] or not day['open'] or not day['close']:
+        return []
+    if party_config is None:
+        from apps.cms.models import PartyBookingConfig
+        party_config = PartyBookingConfig.objects.filter(active=True).order_by('id').first()
+    configured = [t for t in (_to_24h(x) for x in (getattr(party_config, 'available_time_slots', None) or [])) if t]
+
+    def fits(t):
+        return day['open'] <= t and f"{int(t[:2]) + PARTY_MINUTES // 60:02d}{t[2:]}" <= day['close']
+    return [t for t in configured if fits(t)] or [t for t in (f'{h:02d}:00' for h in range(24)) if fits(t)]
+
+
 def is_session_still_bookable(check_date: date, start_time: str, now: Optional[datetime] = None,
                               config: Optional[SessionBookingConfig] = None) -> bool:
     """

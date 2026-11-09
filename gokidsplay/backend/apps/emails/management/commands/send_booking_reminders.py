@@ -19,8 +19,9 @@ class Command(BaseCommand):
         tomorrow = timezone.localdate() + timedelta(days=1)
         bookings = list(Booking.objects.filter(date=tomorrow, booking_status='CONFIRMED', payment_status='PAID')
                         .exclude(email=''))
-        bookings += list(PartyBooking.objects.filter(date=tomorrow, status__in=('CONFIRMED', 'DEPOSIT_PAID'))
-                         .exclude(email=''))
+        bookings += list(PartyBooking.objects.filter(
+            date=tomorrow, status__in=('CONFIRMED', 'DEPOSIT_PAID', 'PARTIALLY_PAID', 'FULLY_PAID', 'RESCHEDULED'))
+            .exclude(email=''))
         bookings += list(EventBooking.objects.filter(event__date=tomorrow, status='CONFIRMED').select_related('event'))
         sent = 0
         for booking in bookings:

@@ -376,7 +376,7 @@ def customer_my_bookings(request):
             "activity": b.activity or "All-Access Play Session",
             "activity_emoji": "🎟️",
             "date": str(b.date),
-            "time": str(b.time) if b.time else None,
+            "time": _hhmm(b.time),
             "duration": b.duration,
             "adults": b.adults,
             "kids": b.kids,
@@ -386,6 +386,7 @@ def customer_my_bookings(request):
             "booking_status": b.booking_status,
             "payment_status": b.payment_status,
             "created_at": b.created_at.isoformat(),
+            **_move_info(b),
         })
 
     party_bookings = []
@@ -398,7 +399,7 @@ def customer_my_bookings(request):
             "activity_emoji": "🎉",
             "package_name": b.package_name,
             "date": str(b.date),
-            "time": str(b.time) if b.time else None,
+            "time": _hhmm(b.time),
             "adults": b.adults,
             "kids": b.kids,
             "amount": float(b.amount) if b.amount else 0,
@@ -410,8 +411,8 @@ def customer_my_bookings(request):
             "status": b.status,
             "birthday_child_name": b.birthday_child_name,
             "created_at": b.created_at.isoformat(),
-            "reschedule_count": b.reschedule_count,
             "admin_fee_charged": float(b.admin_fee_charged) if b.admin_fee_charged else 0,
+            **_move_info(b),
         })
 
     # Special-event reservations (paid at the venue)
@@ -458,24 +459,11 @@ def customer_booking_detail(request, booking_type, booking_id):
     customer = get_customer_from_request(request)
     if not customer:
         return Response({"error": "Not authenticated."}, status=401)
-
-    booking = None
-    try:
-        if booking_type == "session":
-            booking = Booking.objects.get(id=booking_id, customer=customer)
-        elif booking_type == "party":
-            booking = PartyBooking.objects.get(id=booking_id, customer=customer)
-        else:
-            return Response({"error": "Invalid booking type."}, status=400)
-    except (Booking.DoesNotExist, PartyBooking.DoesNotExist):
-        # Fallback: look up by email
-        try:
-            if booking_type == "session":
-                booking = Booking.objects.get(id=booking_id, email=customer.email)
-            else:
-                booking = PartyBooking.objects.get(id=booking_id, email=customer.email)
-        except (Booking.DoesNotExist, PartyBooking.DoesNotExist):
-            return Response({"error": "Booking not found."}, status=404)
+    if booking_type not in ("session", "party"):
+        return Response({"error": "Invalid booking type."}, status=400)
+    booking = _customer_booking(customer, booking_type, booking_id)
+    if booking is None:
+        return Response({"error": "Booking not found."}, status=404)
 
     if request.method == "PATCH":
         # --- Cancellation action ---
@@ -485,6 +473,10 @@ def customer_booking_detail(request, booking_type, booking_id):
                 return Response({"error": "Completed bookings cannot be cancelled."}, status=400)
             if current_status == "CANCELLED":
                 return Response({"error": "Booking is already cancelled."}, status=400)
+            from .reschedule import starts_at
+            if starts_at(booking) <= timezone.now():
+                return Response({"error": "This booking has already taken place. Please contact us if you need help."},
+                                status=400)
             if booking_type == "session":
                 booking.booking_status = "CANCELLED"
                 if hasattr(booking, "status"):
@@ -505,8 +497,8 @@ def customer_booking_detail(request, booking_type, booking_id):
             locked = [f for f in ("date", "time", "adults", "kids", "spectators", "payment_type", "amount")
                       if f in request.data]
             if locked:
-                return Response({"error": "To change the date, time or number of guests please contact us "
-                                          "and we'll sort it out for you."}, status=400)
+                return Response({"error": "To move your booking use \"Change date\"; to change the number of "
+                                          "guests please contact us and we'll sort it out for you."}, status=400)
             allowed = ["special_requests", "dietary_restrictions", "notes"]
             changed = [f for f in allowed if f in request.data and hasattr(booking, f)]
             for field in changed:
@@ -521,15 +513,20 @@ def customer_booking_detail(request, booking_type, booking_id):
             if changed:
                 booking.save(update_fields=changed)
 
-    if booking_type == "session":
-        b = booking
-        return Response({
+    return Response(_booking_detail(booking))
+
+
+def _booking_detail(booking):
+    """What My Account shows for one session or party booking."""
+    b = booking
+    if isinstance(b, Booking):
+        return {
             "id": b.id,
             "booking_number": b.booking_number,
             "type": "SESSION",
             "activity": b.activity,
             "date": str(b.date),
-            "time": str(b.time) if b.time else None,
+            "time": _hhmm(b.time),
             "duration": b.duration,
             "adults": b.adults,
             "kids": b.kids,
@@ -542,16 +539,16 @@ def customer_booking_detail(request, booking_type, booking_id):
             "payment_status": getattr(b, "payment_status", "PENDING"),
             "notes": getattr(b, "notes", "") or "",
             "created_at": b.created_at.isoformat(),
-        })
+            **_move_info(b),
+        }
     else:
-        b = booking
-        return Response({
+        return {
             "id": b.id,
             "booking_number": b.booking_number,
             "type": "PARTY",
             "package_name": b.package_name,
             "date": str(b.date),
-            "time": str(b.time) if b.time else None,
+            "time": _hhmm(b.time),
             "adults": b.adults,
             "kids": b.kids,
             "spectators": getattr(b, "spectators", 0),
@@ -568,7 +565,69 @@ def customer_booking_detail(request, booking_type, booking_id):
             "participants": getattr(b, "participants", {}) or {},
             "waiver_signed": getattr(b, "waiver_signed", False),
             "created_at": b.created_at.isoformat(),
-        })
+            **_move_info(b),
+        }
+
+
+def _hhmm(value):
+    return value.strftime("%H:%M") if value else None
+
+
+def _move_info(booking):
+    """Whether the customer can change the date themselves (and if not, why)."""
+    from .reschedule import eligibility
+    return {
+        "original_date": str(booking.original_date) if booking.original_date else None,
+        "reschedule_count": booking.reschedule_count or 0,
+        "reschedule": eligibility(booking).as_dict(),
+    }
+
+
+def _customer_booking(customer, booking_type, booking_id):
+    """The customer's own session / party booking (linked to their account or under their e-mail)."""
+    from django.db.models import Q
+    model = PartyBooking if booking_type == "party" else Booking
+    return model.objects.filter(Q(customer=customer) | Q(email__iexact=customer.email), id=booking_id).first()
+
+
+@api_view(["GET", "POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def customer_reschedule_booking(request, booking_type, booking_id):
+    """
+    My Account → Change date (the rules are in reschedule.py).
+    GET               → whether it can move, the change fee and the dates open for it
+    GET ?date=Y-M-D   → that day's start times and whether this booking fits
+    POST {date, time} → move it; returns the updated booking
+    """
+    from datetime import date as date_cls
+    from .reschedule import RescheduleError, eligibility, move, open_dates, times_for
+    customer = get_customer_from_request(request)
+    if not customer:
+        return Response({"error": "Not authenticated."}, status=401)
+    if booking_type not in ("session", "party"):
+        return Response({"error": "Event reservations can't be moved; please contact us."}, status=400)
+    booking = _customer_booking(customer, booking_type, booking_id)
+    if booking is None:
+        return Response({"error": "Booking not found."}, status=404)
+
+    if request.method == "GET":
+        check = eligibility(booking)
+        if not request.query_params.get("date"):
+            return Response({**check.as_dict(), "dates": open_dates(booking) if check.allowed else []})
+        try:
+            day = date_cls.fromisoformat(request.query_params["date"][:10])
+        except ValueError:
+            return Response({"error": "Invalid date."}, status=400)
+        return Response({"date": day.isoformat(), "times": times_for(booking, day) if check.allowed else []})
+
+    try:
+        move(booking, request.data.get("date"), request.data.get("time"), by_customer=True,
+             changed_by=f"Customer ({customer.email})")
+    except RescheduleError as exc:
+        return Response({"error": exc.message, "code": exc.code}, status=exc.status)
+    booking.refresh_from_db()
+    return Response(_booking_detail(booking))
 
 
 def end_customer_session(customer) -> int:

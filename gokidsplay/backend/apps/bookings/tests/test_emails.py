@@ -163,16 +163,19 @@ class TestOtherEmails:
         assert len(customer) == 1 and 'Halloween has been cancelled' in customer[0]['subject']
         assert 'Event reservation cancelled' in to(outbox, TEAM)[0]['subject']
 
-    def test_staff_rescheduling_a_party_tells_the_customer(self, config, outbox, staff_client):
+    def test_staff_rescheduling_a_party_tells_the_customer(self, config, outbox, staff_client,
+                                                           django_capture_on_commit_callbacks):
         party = APIClient().post(PARTIES_URL, {**PARTY_PAYLOAD, 'date': next_saturday().isoformat()}, format='json').data
         new_date = next_saturday() + timedelta(days=28)
-        response = staff_client.post(f"/api/v1/bookings/party-bookings/{party['id']}/reschedule/",
-                                     {'new_date': new_date.isoformat(), 'new_time': '15:00'}, format='json')
+        with django_capture_on_commit_callbacks(execute=True):
+            response = staff_client.post(f"/api/v1/bookings/party-bookings/{party['id']}/reschedule/",
+                                         {'new_date': new_date.isoformat(), 'new_time': '15:00'}, format='json')
         assert response.status_code == 200, response.data
         customer = to(outbox, 'party@example.com')
         assert len(customer) == 1 and 'new date' in customer[0]['subject']
         assert new_date.strftime('%d %B %Y') in customer[0]['html'] and '15:00' in customer[0]['html']
         assert 'Party rescheduled' in to(outbox, TEAM)[0]['subject']
+        assert 'moved from' in customer[0]['html']
 
     def test_reminders_go_out_once_the_day_before(self, config, plans, outbox):
         tomorrow = timezone.localdate() + timedelta(days=1)

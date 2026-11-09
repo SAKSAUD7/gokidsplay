@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { PartyBookingPDF } from "../../../../../components/PartyBookingPDF";
 import { PaymentHistoryCard } from "../../components/PaymentHistoryCard";
+import { BookingHistoryCard } from "../../components/BookingHistoryCard";
 import { reschedulePartyBooking } from "@/app/actions/admin";
 
 export default function PartyBookingDetailPage({ params }: { params: { id: string } }) {
@@ -187,7 +188,9 @@ export default function PartyBookingDetailPage({ params }: { params: { id: strin
                                 <label className="text-xs text-slate-400 uppercase font-semibold">Date</label>
                                 <p className="text-slate-900 font-medium">{booking.date}</p>
                                 {booking.reschedule_count > 0 && (
-                                    <p className="text-[10px] text-amber-600 mt-1">Rescheduled {booking.reschedule_count}x</p>
+                                    <p className="text-[10px] text-amber-600 mt-1">
+                                        Rescheduled {booking.reschedule_count}x{booking.original_date ? ` (first booked for ${booking.original_date})` : ""}
+                                    </p>
                                 )}
                             </div>
                             <div>
@@ -224,6 +227,9 @@ export default function PartyBookingDetailPage({ params }: { params: { id: strin
 
                     {/* Payment History & Gateway Updates */}
                     <PaymentHistoryCard bookingId={booking.id} bookingType="party" />
+
+                    {/* Date moves (customer or staff), status and payment changes */}
+                    <BookingHistoryCard bookingId={booking.id} bookingType="party" refreshKey={`${booking.date}${booking.time}`} />
 
                     {/* Celebrant / Event Name */}
                     {booking.birthday_child_name && (

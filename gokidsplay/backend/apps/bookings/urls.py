@@ -18,7 +18,7 @@ from .customer_auth import (
     customer_register, customer_login, customer_logout,
     customer_me, customer_update_profile, customer_change_password,
     customer_forgot_password, customer_reset_password,
-    customer_my_bookings, customer_booking_detail,
+    customer_my_bookings, customer_booking_detail, customer_reschedule_booking,
     admin_customer_account, admin_reset_customer_password, admin_revoke_customer_token
 )
 
@@ -52,6 +52,7 @@ urlpatterns = [
     path('customer-auth/reset-password/', customer_reset_password, name='customer-reset-password'),
     path('customer-auth/my-bookings/', customer_my_bookings, name='customer-my-bookings'),
     path('customer-auth/booking/<str:booking_type>/<int:booking_id>/', customer_booking_detail, name='customer-booking-detail'),
+    path('customer-auth/booking/<str:booking_type>/<int:booking_id>/reschedule/', customer_reschedule_booking, name='customer-booking-reschedule'),
     # ── Admin customer account management ─────────────────────────────────────
     path('customer-auth/admin/account/<int:customer_id>/', admin_customer_account, name='admin-customer-account'),
     path('customer-auth/admin/reset-password/<int:customer_id>/', admin_reset_customer_password, name='admin-reset-customer-password'),

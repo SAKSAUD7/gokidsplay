@@ -799,11 +799,9 @@ def create_party_booking_view(request):
         # Start time: one of the party times (Website Content → Party Booking) that leaves
         # a full 2-hour party before closing (same rule as the wizard)
         from .availability_service import _to_24h
+        from .opening_hours import party_start_times
         requested = _to_24h(str(data.get('time')))
-        configured = [t for t in (_to_24h(x) for x in (getattr(party_config, 'available_time_slots', None) or [])) if t]
-        def fits(t):
-            return day['open'] <= t and f"{int(t[:2]) + 2:02d}{t[2:]}" <= day['close']
-        allowed = [t for t in configured if fits(t)] or [t for t in (f'{h:02d}:00' for h in range(24)) if fits(t)]
+        allowed = party_start_times(party_date, party_config, day)
         if requested not in allowed:
             return Response({'detail': 'Please choose one of the available party times.', 'code': 'INVALID_TIME',
                              'times': allowed}, status=status.HTTP_400_BAD_REQUEST)
@@ -1073,57 +1071,30 @@ class PartyBookingViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[IsStaffUser])
     def reschedule(self, request, pk=None):
-        """Reschedule a party booking and apply 14-day rule admin fee if applicable"""
-        from datetime import datetime
-        from decimal import Decimal
+        """Move a party to a new date / time (staff). A £50 fee applies within 14 days of the party
+        (reschedule.py); the move is written to the booking's history and e-mailed."""
+        from .reschedule import RescheduleError, move
         party_booking = self.get_object()
-        
+
         # Accept both 'new_date'/'new_time' (from admin portal) and 'date'/'time'
         new_date = request.data.get('new_date') or request.data.get('date')
         new_time = request.data.get('new_time') or request.data.get('time')
-        
         if not new_date or not new_time:
             return Response({'error': 'date/new_date and time/new_time are required'}, status=400)
-            
         try:
-            # Check 14-day rule
-            current_party_date = party_booking.date
-            if isinstance(current_party_date, str):
-                current_party_date = datetime.strptime(current_party_date, '%Y-%m-%d').date()
-            today = timezone.now().date()
-            
-            # If rescheduling within 14 days of the original party date, apply fee
-            days_until_party = (current_party_date - today).days
-            
-            # Save original date if not already recorded
-            if not party_booking.original_date:
-                party_booking.original_date = party_booking.date
-                
-            fee_applied = Decimal('0')
-            if days_until_party <= 14:
-                fee_applied = Decimal('50.00')  # £50 Admin Fee
-                party_booking.admin_fee_charged = (party_booking.admin_fee_charged or Decimal('0')) + fee_applied
-                party_booking.amount = (party_booking.amount or Decimal('0')) + fee_applied
-                
-            party_booking.date = new_date
-            party_booking.time = new_time
-            party_booking.reschedule_count = (party_booking.reschedule_count or 0) + 1
-            party_booking.status = 'RESCHEDULED'
-            party_booking.save()
-            party_booking.refresh_from_db()  # date / time back as date objects for the e-mail
-            from apps.emails.notifications import party_rescheduled
-            party_rescheduled(party_booking, fee=fee_applied)
+            result = move(party_booking, new_date, new_time, by_customer=False,
+                          changed_by=getattr(request.user, 'email', '') or 'admin')
+        except RescheduleError as exc:
+            return Response({'error': exc.message, 'code': exc.code}, status=exc.status)
 
-            serializer = self.get_serializer(party_booking)
-            return Response({
-                'success': True,
-                'message': f'Party rescheduled to {new_date} at {new_time}. {"£50 admin fee applied." if fee_applied else "No admin fee charged."}',
-                'admin_fee_charged': float(fee_applied),
-                'booking': serializer.data
-            })
-            
-        except Exception as e:
-            return Response({'error': str(e)}, status=400)
+        fee_applied = result['fee']
+        serializer = self.get_serializer(result['booking'])
+        return Response({
+            'success': True,
+            'message': f'Party rescheduled to {new_date} at {new_time}. {"£50 admin fee applied." if fee_applied else "No admin fee charged."}',
+            'admin_fee_charged': float(fee_applied),
+            'booking': serializer.data
+        })
 
 
 @api_view(['POST'])

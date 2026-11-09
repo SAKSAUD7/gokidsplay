@@ -1,20 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Calendar, Clock, Users, Activity, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { X, Calendar, CalendarClock, Clock, Users, Activity, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ParticipantCollection from "@/components/ParticipantCollection";
 import { useAccount } from "@/state/account/AccountContext";
 import { createPaymentOrder } from "@/app/actions/payment";
+import { RescheduleBookingModal } from "@/components/RescheduleBookingModal";
+
+const STATUS_LABELS: Record<string, string> = {
+    CONFIRMED: "Confirmed", DEPOSIT_PAID: "Deposit Paid", PARTIALLY_PAID: "Partially Paid", FULLY_PAID: "Fully Paid",
+    RESCHEDULED: "Rescheduled", COMPLETED: "Completed", EXPIRED: "Not completed", REFUNDED: "Refunded", NO_SHOW: "Missed",
+};
 
 export function CustomerBookingModal({
     bookingId,
     bookingType,
     onClose,
+    onChanged,
 }: {
     bookingId: string | number;
     bookingType: "SESSION" | "PARTY";
     onClose: () => void;
+    /** The booking was moved or cancelled (the list behind refreshes) */
+    onChanged?: () => void;
 }) {
     const { token } = useAccount();
     const [booking, setBooking] = useState<any>(null);
@@ -29,6 +38,7 @@ export function CustomerBookingModal({
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [cancelling, setCancelling] = useState(false);
     const [cancelSuccess, setCancelSuccess] = useState(false);
+    const [moving, setMoving] = useState(false);
 
     useEffect(() => {
         if (!token) {
@@ -99,11 +109,12 @@ export function CustomerBookingModal({
                 },
                 body: JSON.stringify({ action: 'cancel' }),
             });
-            if (!res.ok) throw new Error(`Failed to cancel booking (${res.status})`);
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || `Failed to cancel booking (${res.status})`);
             setBooking(data);
             setShowCancelConfirm(false);
             setCancelSuccess(true);
+            onChanged?.();
         } catch (err: any) {
             alert(err.message || 'Could not cancel booking. Please contact us.');
         } finally {
@@ -162,15 +173,25 @@ export function CustomerBookingModal({
                                 <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="font-bold text-white/80">Booking Details</h3>
-                                        {/* Date, time and numbers change the price, so the team makes those changes */}
-                                        <a href="/contact" className="text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
-                                            Need a change? Contact us
-                                        </a>
+                                        {/* The date can be changed here up to 10 hours before; guest numbers change the price, so the team does those */}
+                                        {booking.reschedule?.allowed ? (
+                                            <button onClick={() => setMoving(true)}
+                                                className="text-xs font-bold px-3 py-1.5 bg-primary text-black hover:bg-primary/90 rounded-lg transition-colors flex items-center gap-1.5">
+                                                <CalendarClock size={14} /> Change date
+                                            </button>
+                                        ) : (
+                                            <a href="/contact" className="text-xs font-bold px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
+                                                Need a change? Contact us
+                                            </a>
+                                        )}
                                     </div>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1"><Calendar size={12}/> Date</p>
-                                            <p className="text-white font-semibold">{new Date(booking.date).toLocaleDateString("en-GB")}</p>
+                                            <p className="text-white font-semibold">{new Date(booking.date + "T12:00:00").toLocaleDateString("en-GB")}</p>
+                                            {booking.original_date && booking.original_date !== booking.date && (
+                                                <p className="text-purple-300/70 text-[10px] mt-0.5">Moved from {new Date(booking.original_date + "T12:00:00").toLocaleDateString("en-GB")}</p>
+                                            )}
                                         </div>
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1 flex items-center gap-1"><Clock size={12}/> Time</p>
@@ -183,10 +204,13 @@ export function CustomerBookingModal({
                                         <div>
                                             <p className="text-white/40 text-xs font-bold uppercase mb-1">Status</p>
                                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : (booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'}`}>
-                                                {(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') ? 'Cancelled' : (booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') ? 'Payment Pending' : (booking.status || booking.booking_status)}
+                                                {(booking.status === 'CANCELLED' || booking.booking_status === 'CANCELLED') ? 'Cancelled' : (booking.payment_status === 'PENDING' || booking.status === 'PENDING' || booking.booking_status === 'PENDING') ? 'Payment Pending' : (STATUS_LABELS[booking.status || booking.booking_status] || booking.status || booking.booking_status)}
                                             </span>
                                         </div>
                                     </div>
+                                    {!booking.reschedule?.allowed && booking.reschedule?.reason && booking.status !== 'CANCELLED' && booking.booking_status !== 'CANCELLED' && (
+                                        <p className="text-white/40 text-xs mt-4">{booking.reschedule.reason}</p>
+                                    )}
                                 </div>
                                 
                                 {/* Complete Payment CTA for Pending Bookings */}
@@ -317,8 +341,9 @@ export function CustomerBookingModal({
                                     </div>
                                 )}
 
-                                {/* Cancel Booking Section */}
-                                {booking.status !== 'CANCELLED' && booking.booking_status !== 'CANCELLED' && (
+                                {/* Cancel Booking Section (not once the visit has started) */}
+                                {booking.status !== 'CANCELLED' && booking.booking_status !== 'CANCELLED' && booking.status !== 'COMPLETED'
+                                    && new Date(`${booking.date}T${booking.time || "00:00"}:00`) > new Date() && (
                                     <div className="border border-red-500/20 rounded-2xl p-6">
                                         {cancelSuccess ? (
                                             <div className="flex items-center gap-3 text-red-400">
@@ -370,6 +395,17 @@ export function CustomerBookingModal({
                     </div>
                 </motion.div>
             </div>
+
+            {moving && booking && (
+                <RescheduleBookingModal
+                    bookingId={booking.id}
+                    bookingType={bookingType}
+                    currentDate={booking.date}
+                    currentTime={booking.time}
+                    onClose={() => setMoving(false)}
+                    onMoved={(updated) => { setBooking(updated); onChanged?.(); }}
+                />
+            )}
         </AnimatePresence>
     );
 }

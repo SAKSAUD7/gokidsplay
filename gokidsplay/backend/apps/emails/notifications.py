@@ -13,7 +13,8 @@ team gets, for each thing that can happen to a booking.
   event reserved    → confirmation          new event reservation
   event request     → "request received"    new event request
   event resv. cancel→ "reservation cancelled" event reservation cancelled
-  party rescheduled → "new date"            party rescheduled
+  moved (customer   → "new date"            session / party moved
+   or staff)
   day before visit  → reminder              —
 
 Each message is sent once: a key is stored in the e-mail log and checked first, so a
@@ -209,18 +210,23 @@ def booking_cancelled(booking, *, unpaid_release=False):
     staff_notice(booking, headline='Booking cancelled', key=key)
 
 
-def party_rescheduled(booking, *, fee=0):
-    """Staff moved a party to a new date / time."""
+def booking_rescheduled(booking, *, old_date, old_time='', fee=0, by_customer=False):
+    """A session or party was moved to a new date / time (by the customer or by staff)."""
+    d = describe(booking)
+    is_party = d['kind'] == 'party'
     when = f"{booking.date:%Y%m%d}{str(booking.time)[:5].replace(':', '')}"
-    key = f"reschedule:{booking.id}:{when}"
-    note = f"A {_money(fee)} admin fee applies, as the change was made within 14 days of the party." if fee else ''
-    customer_update(booking, email_type='PARTY_RESCHEDULED', subject='Your party has a new date',
-                    heading='Your party has been moved',
-                    intro="Your party booking has been changed. The new date and time are below. "
-                          "If anything looks wrong, just reply to this e-mail.",
+    key = f"reschedule:{d['kind']}:{booking.id}:{when}"
+    was = f"{old_date:%A %d %B %Y}" + (f" at {str(old_time)[:5]}" if old_time else '')
+    note = f"A {_money(fee)} change fee has been added to your balance, as the party was moved within 14 days." if fee else ''
+    what = 'party' if is_party else 'visit'
+    customer_update(booking, email_type='PARTY_RESCHEDULED' if is_party else 'BOOKING_RESCHEDULED',
+                    subject=f'Your {what} has a new date', heading=f'Your {what} has been moved',
+                    intro=(f"Your booking has been moved from {was}. The new date and time are below"
+                           + (" and your ticket is updated, so just bring the same booking number." if not is_party else ".")
+                           + " If anything looks wrong, just reply to this e-mail."),
                     note=note, key=f"{key}:customer")
-    staff_notice(booking, headline='Party rescheduled', key=key,
-                 extra_rows=[('Admin fee', _money(fee))] if fee else ())
+    staff_notice(booking, headline=f"{'Party' if is_party else 'Session'} {'moved by the customer' if by_customer else 'rescheduled'}",
+                 key=key, extra_rows=[('Was', was)] + ([('Change fee', _money(fee))] if fee else []))
 
 
 def event_reservation_cancelled(event_booking):
@@ -263,8 +269,11 @@ def event_request_received(req):
 
 
 def reminder(obj):
-    """The day before the visit."""
+    """The day before the visit (again for the new date if the booking is moved)."""
     d = describe(obj)
+    # Reminders sent before bookings could be moved were remembered without the date
+    if not getattr(obj, 'reschedule_count', 0) and _already_sent(f"reminder:{d['kind']}:{obj.id}"):
+        return None
     return customer_update(obj, email_type='PARTY_REMINDER' if d['kind'] == 'party' else 'BOOKING_REMINDER',
                     subject=f"See you tomorrow at Go Kids Play! ({d['reference']})",
                     heading='See you tomorrow!',
@@ -272,4 +281,4 @@ def reminder(obj):
                           "grip socks are needed in the play areas.",
                     note=(f"Balance to pay on the day: {_money(d['balance'])}"
                           if Decimal(str(d['balance'] or 0)) > 0 and d['kind'] != 'session' else ''),
-                    key=f"reminder:{d['kind']}:{obj.id}")
+                    key=f"reminder:{d['kind']}:{obj.id}:{d['date']:%Y%m%d}")

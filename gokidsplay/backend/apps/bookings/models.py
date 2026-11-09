@@ -95,7 +95,9 @@ class Booking(models.Model):
     qr_code = models.CharField(max_length=255, unique=True, null=True, blank=True)
     booking_number = models.CharField(max_length=50, unique=True, null=True, blank=True, help_text="Booking number, e.g. GK482913 (see references.py)")
     online_checkout = models.BooleanField(default=False, help_text="Booked on the website and paid online (released if left unpaid, see unpaid.py)")
-    
+    reschedule_count = models.IntegerField(default=0, help_text="Number of times the visit was moved to another date/time")
+    original_date = models.DateField(null=True, blank=True, help_text="Date first booked, before any move")
+
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     voucher = models.ForeignKey(Voucher, on_delete=models.SET_NULL, null=True, blank=True, related_name='bookings')
     
