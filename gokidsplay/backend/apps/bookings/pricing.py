@@ -15,9 +15,10 @@ TWO_PLACES = Decimal('0.01')
 # Flat fee added to online customer bookings (staff/admin bookings are exempt)
 ONLINE_BOOKING_FEE = Decimal('2.00')  # fallback; the CMS Session Booking Configuration sets the fee
 
-ADD_ON_META = {
-    'parking': {'label': 'Parking', 'emoji': '\U0001F697', 'config_field': 'parking_price', 'default': Decimal('3.00')},
-}
+# Extras that can be added to a session booking: none at the moment (parking was removed,
+# November 2026). Entries look like
+#   'id': {'label': ..., 'emoji': ..., 'config_field': <SessionBookingConfig price field>, 'default': Decimal(...)}
+ADD_ON_META: dict = {}
 
 
 def _money(value) -> Decimal:

@@ -222,7 +222,6 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
     const [capacity, setCapacity] = useState(num(initialData?.session_capacity, 150));
     const [fee, setFee] = useState(num(initialData?.online_booking_fee, 2));
     const [vat, setVat] = useState(num(initialData?.gst_rate, 0));
-    const [parking, setParking] = useState(num(initialData?.parking_price, 3));
     const [notice, setNotice] = useState(initialData?.booking_notice || "");
     const [error, setError] = useState("");
 
@@ -247,7 +246,6 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
             session_capacity: capacity,
             online_booking_fee: fee,
             gst_rate: vat,
-            parking_price: parking,
             booking_notice: notice,
         });
     };
@@ -348,14 +346,10 @@ function PricingEditor({ initialData, isSaving, onSave }: { initialData: any, is
                 </div>
 
                 {/* Fees */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Online booking fee (£)</label>
                         <input type="number" min={0} step="0.01" value={fee} onChange={e => setFee(parseFloat(e.target.value) || 0)} className={`${input} w-full`} />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Parking add-on (£)</label>
-                        <input type="number" min={0} step="0.01" value={parking} onChange={e => setParking(parseFloat(e.target.value) || 0)} className={`${input} w-full`} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Extra VAT (%): UK prices include VAT, keep 0</label>

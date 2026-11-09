@@ -36,8 +36,6 @@ interface BookingDetails {
     adultPrice?: number;
     kidPrice?: number;
     spectatorPrice?: number;
-    parkingQty?: number;
-    parkingPrice?: number;
     discount?: number;
     appliedVoucher?: string | null;
     onlineBookingFee?: number;
@@ -152,8 +150,6 @@ export function PaymentStep({
     const adultPrice   = d.adultPrice   ?? 9.95;
     const kidPrice     = d.kidPrice     ?? 9.95;
     const specPrice    = d.spectatorPrice ?? 2.95;
-    const parkingQty   = d.parkingQty    ?? 0;
-    const parkingPrice = d.parkingPrice  ?? 3.00;
     const discount     = d.discount      ?? 0;
     const onlineFee    = d.onlineBookingFee ?? 2.00;
     const notes        = d.notes || "N/a";
@@ -179,8 +175,7 @@ export function PaymentStep({
     const partyExtraKidsCost = partyExtraKids * (d.partyExtraKidPrice ?? 20.00);
     const partyExtraSpecsCost = partyExtraSpecs * (d.partyExtraSpectatorPrice ?? 4.95);
     
-    const parkingTotal     = parkingQty * parkingPrice;
-    const addOnsTotal      = parkingTotal;
+    const addOnsTotal      = 0;   // no extras are sold at the moment
     
     const subtotal         = bookingType === "party" 
                                 ? (partyBasePrice + partyExtraKidsCost + partyExtraSpecsCost + addOnsTotal) 
@@ -322,13 +317,9 @@ export function PaymentStep({
                                         </>
                                     )}
 
-                                    {/* Add-ons */}
-                                    {parkingQty > 0 && <Row label="Parking Spaces"     value={String(parkingQty)} />}
-
                                     {/* Pricing breakdown */}
                                     {!ticketLines && <Row label="Visitor Tickets" value={fmt(ticketsAdults + ticketsKids)} />}
                                     {!ticketLines && spectators > 0 && <Row label="Non-playing adult tickets" value={fmt(ticketsSpecs)} />}
-                                    {parkingQty > 0 && <Row label="Total Parking Price"    value={fmt(parkingTotal)} />}
                                 </>
                             )}
 
@@ -353,8 +344,6 @@ export function PaymentStep({
                             {discount === 0 && (
                                 <Row label="Discount Applied" value="No" accent />
                             )}
-
-                            <Row label="Pay For Parking?" value={parkingQty > 0 ? fmt(parkingTotal) : "£0"} />
 
                             <Row label="Notes" value={notes} />
 

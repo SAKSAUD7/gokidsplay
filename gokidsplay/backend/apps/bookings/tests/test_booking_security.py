@@ -81,9 +81,10 @@ class TestAdmissionPricing:
         from apps.bookings.pricing import price_admission
         price = price_admission(tickets={plans['child'].id: 3, plans['toddler'].id: 1, plans['adult'].id: 2},
                                 add_ons=[{'id': 'parking', 'qty': 1}])
-        # 3 x 12.95 + 7.95 + 2 x 4.95 + parking 3.00 = 59.70, + 2.00 online fee
-        assert price.subtotal == Decimal('59.70')
-        assert price.amount == Decimal('61.70')
+        # 3 x 12.95 + 7.95 + 2 x 4.95 = 56.70, + 2.00 online fee (parking is no longer sold, so it's ignored)
+        assert price.subtotal == Decimal('56.70')
+        assert price.amount == Decimal('58.70')
+        assert price.add_ons == []
         assert (price.players, price.spectators) == (4, 2)
 
     def test_client_prices_and_unknown_tickets_are_ignored(self, config, plans):
@@ -528,8 +529,16 @@ def test_backend_and_website_use_the_same_council_calendar():
 
 @pytest.mark.django_db
 class TestOpeningCalendar:
-    TERM_MONDAY = '2026-11-02'
     HALF_TERM_MONDAY = '2026-10-26'
+
+    @property
+    def TERM_MONDAY(self):
+        """A school-term Monday still to come (closed unless the admin opens it), so it can be booked."""
+        from apps.bookings.uk_calendar import is_bank_holiday, is_school_holiday
+        day = date.today() + timedelta(days=7 - date.today().weekday())
+        while is_school_holiday(day) or is_bank_holiday(day):
+            day += timedelta(days=7)
+        return day.isoformat()
 
     def days(self, start, end=None):
         response = APIClient().get('/api/v1/bookings/public/calendar/', {'start': start, 'end': end or start})

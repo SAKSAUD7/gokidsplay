@@ -38,7 +38,7 @@ import { SmartCalendar } from "./SmartCalendar";
 
 
 
-/** Per-activity add-on (none are currently offered — parking is a global add-on). */
+/** Per-activity add-on (none are currently offered). */
 interface ActivityAddOn {
     id: string;
     emoji: string;
@@ -106,29 +106,8 @@ interface GlobalAddOn {
 
 }
 
-const GLOBAL_ADD_ONS_BASE: GlobalAddOn[] = [
-
-    {
-
-        id: "parking",
-
-        label: "Parking",
-
-        description: "Secure car park, close to entrance. Book your space now.",
-
-        emoji: "\u{1F697}",
-
-        price: 3.00,
-
-        unit: "car",
-
-        maxQty: 5,
-
-        info: "Include car registration plate below",
-
-    },
-
-]
+// No extras are sold at the moment (parking was removed, November 2026)
+const GLOBAL_ADD_ONS_BASE: GlobalAddOn[] = [];
 
 
 
@@ -199,7 +178,6 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
     const [selectedGlobalAddOns, setSelectedGlobalAddOns] = useState<Record<string, number>>({});
 
-    const [parkingPlates, setParkingPlates] = useState<string[]>([]);
 
     // Bumped when the opening calendar (holidays + admin openings / closures) has loaded
     const [calendarVersion, setCalendarVersion] = useState(0);
@@ -443,24 +421,19 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
         kid: (config && config.kid_price) ? parseFloat(config.kid_price) : 9.95,
         spectator: (config && config.spectator_price) ? parseFloat(config.spectator_price) : 2.95,
         gstRate: (config && config.gst_rate) ? parseFloat(config.gst_rate) : 0,
-        // GKP-specific add-ons
-        parking: (config && config.parking_price) ? parseFloat(config.parking_price) : 3.00,
     };
 
 
 
     // Build activity add-ons with CMS prices applied
-    // GKP activities currently have no per-activity add-ons — only global add-ons (parking) apply.
+    // GKP activities currently have no per-activity add-ons.
     const getActivityAddOns = (_activityId: string): ActivityAddOn[] => [];
 
 
 
     // Build global add-ons with CMS prices applied
 
-    const GLOBAL_ADD_ONS = GLOBAL_ADD_ONS_BASE.map(ao => ({
-        ...ao,
-        price: ao.id === "parking" ? prices.parking : ao.price,
-    }));
+    const GLOBAL_ADD_ONS = GLOBAL_ADD_ONS_BASE;
 
 
 
@@ -621,7 +594,7 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
             }
 
-            const result = await onSubmit({ ...data, activity: selectedActivity, tickets: ticketQty, addOns: selectedAddOns, globalAddOns: selectedGlobalAddOns, parkingPlates, customerId: customer?.id });
+            const result = await onSubmit({ ...data, activity: selectedActivity, tickets: ticketQty, addOns: selectedAddOns, globalAddOns: selectedGlobalAddOns, customerId: customer?.id });
 
             if (result.success && result.bookingId) {
 
@@ -1481,79 +1454,6 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
 
 
-                                        {/* -- Parking Section (inline booking with plates) -- */}
-                                        <div className="mt-6">
-                                            <h3 className="text-white font-bold uppercase text-sm tracking-wider mb-3 flex items-center gap-2">
-                                                <span className="text-lg">🅿️</span> Parking
-                                            </h3>
-                                            <div className="bg-white/5 rounded-2xl p-5 border border-white/10">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className="text-2xl">🚗</span>
-                                                        <div>
-                                                            <div className="text-white font-semibold">Car Parking</div>
-                                                            <div className="text-white/50 text-xs">Secure car park, close to entrance</div>
-                                                            <div className="text-primary text-xs font-bold mt-0.5">£{prices.parking.toFixed(2)} / car</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <button type="button" aria-label="Remove one parking space"
-                                                            onClick={() => {
-                                                                const next = Math.max(0, (selectedGlobalAddOns['parking'] || 0) - 1);
-                                                                setSelectedGlobalAddOns(prev => ({ ...prev, parking: next }));
-                                                                setParkingPlates(prev => prev.slice(0, next));
-                                                            }}
-                                                            disabled={(selectedGlobalAddOns['parking'] || 0) === 0}
-                                                            className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center disabled:opacity-30 transition-all">
-                                                            <Minus className="w-4 h-4" />
-                                                        </button>
-                                                        <span className="text-white font-black text-xl w-6 text-center">{selectedGlobalAddOns['parking'] || 0}</span>
-                                                        <button type="button" aria-label="Add one parking space"
-                                                            onClick={() => {
-                                                                const next = Math.min(5, (selectedGlobalAddOns['parking'] || 0) + 1);
-                                                                setSelectedGlobalAddOns(prev => ({ ...prev, parking: next }));
-                                                                setParkingPlates(prev => [...prev, '']);
-                                                            }}
-                                                            disabled={(selectedGlobalAddOns['parking'] || 0) >= 5}
-                                                            className="w-9 h-9 rounded-full bg-primary/80 hover:bg-primary text-black flex items-center justify-center disabled:opacity-30 transition-all">
-                                                            <Plus className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                {/* Per-car number plate inputs */}
-                                                {(selectedGlobalAddOns['parking'] || 0) > 0 && (
-                                                    <div className="space-y-2 mt-4 pt-4 border-t border-white/10">
-                                                        <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2">🔖 Car Registration Plates</p>
-                                                        {Array.from({ length: selectedGlobalAddOns['parking'] || 0 }).map((_, i) => (
-                                                            <div key={i} className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-yellow-400 flex items-center justify-center flex-shrink-0">
-                                                                    <span className="text-black font-black text-xs">{i + 1}</span>
-                                                                </div>
-                                                                <input
-                                                                    type="text"
-                                                                    placeholder={`Car ${i + 1} plate — e.g. LE21 ABC`}
-                                                                    value={parkingPlates[i] || ''}
-                                                                    onChange={e => {
-                                                                        const updated = [...parkingPlates];
-                                                                        updated[i] = e.target.value.toUpperCase();
-                                                                        setParkingPlates(updated);
-                                                                    }}
-                                                                    maxLength={10}
-                                                                    className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-white/30 text-sm font-mono uppercase focus:outline-none focus:border-primary/60 focus:bg-white/15 transition-all"
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                        <div className="flex justify-between items-center mt-3 bg-primary/10 border border-primary/20 rounded-xl px-4 py-2">
-                                                            <span className="text-primary/80 text-xs font-semibold">{selectedGlobalAddOns['parking']} car{(selectedGlobalAddOns['parking'] || 0) > 1 ? 's' : ''} booked</span>
-                                                            <span className="text-primary font-black">£{(prices.parking * (selectedGlobalAddOns['parking'] || 0)).toFixed(2)}</span>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-
                                         {/* Running total */}
 
                                         <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4 border border-primary/20 flex justify-between items-center">
@@ -1823,7 +1723,7 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
                                             })}
 
-                                            {/* Global Add-ons: Parking + Locker */}
+                                            {/* Global add-ons (none offered at the moment) */}
 
                                             {Object.entries(selectedGlobalAddOns).filter(([, q]) => q > 0).map(([id, qty]) => {
 
@@ -1842,18 +1742,6 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
                                                             <span className="font-bold">£{(gao.price * qty).toFixed(2)}</span>
 
                                                         </div>
-
-                                                        {/* Show plates for parking */}
-                                                        {id === 'parking' && parkingPlates.filter(Boolean).length > 0 && (
-                                                            <div className="mt-1 ml-5 space-y-0.5">
-                                                                {parkingPlates.filter(Boolean).map((plate, i) => (
-                                                                    <div key={i} className="text-xs text-yellow-200/70 flex items-center gap-1.5">
-                                                                        <span className="bg-yellow-400 text-black text-[9px] font-black px-1 rounded">{i + 1}</span>
-                                                                        <span className="font-mono">{plate}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
 
                                                     </React.Fragment>
 
@@ -2000,7 +1888,6 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
                             {step === 6 && createdBookingId && (() => {
                                 const t = calculateTotal();
                                 const lockerQty = (selectedAddOns["locker"] || 0) + (selectedGlobalAddOns["locker"] || 0);
-                                const parkingQty = selectedGlobalAddOns["parking"] || 0;
                                 return (
                                     <PaymentStep
                                         bookingId={createdBookingIntId || createdBookingId}
@@ -2023,8 +1910,6 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
                                             adultPrice: prices.adult,
                                             kidPrice: prices.kid,
                                             spectatorPrice: prices.spectator,
-                                            parkingQty,
-                                            parkingPrice: prices.parking,
                                             discount: discount / 100,
                                             appliedVoucher,
                                             onlineBookingFee: t.onlineBookingFee,

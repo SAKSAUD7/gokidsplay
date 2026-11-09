@@ -147,12 +147,9 @@ export async function createBooking(formData: any) {
         }
 
         // ── Add-ons — prices also driven by CMS config ─────────────────────
-        const ADD_ON_PRICES: Record<string, number> = {
-            "parking": cmsConfig.parking_price ? parseFloat(cmsConfig.parking_price) : 3.00,
-        };
-        const ADD_ON_META: Record<string, { label: string; emoji: string }> = {
-            "parking": { label: "Parking", emoji: "\uD83D\uDE97" },
-        };
+        // No extras are sold at the moment (parking was removed, November 2026)
+        const ADD_ON_PRICES: Record<string, number> = {};
+        const ADD_ON_META: Record<string, { label: string; emoji: string }> = {};
 
         const formAddOns: Record<string, number> = (formData.addOns as Record<string, number>) || {};
         const formGlobalAddOns: Record<string, number> = (formData.globalAddOns as Record<string, number>) || {};
@@ -256,7 +253,6 @@ export async function createBooking(formData: any) {
             activity: formData.activity || null,
             add_ons: addOnsList.length > 0 ? addOnsList : null,
             tickets: hasTickets ? ticketQty : undefined,
-            parking_plates: (formData.parkingPlates as string[] || []).filter(Boolean),
             customer_id: formData.customerId || null,
         };
 
