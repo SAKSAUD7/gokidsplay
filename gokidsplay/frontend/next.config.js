@@ -210,6 +210,9 @@ const nextConfig = {
             { source: '/admin/invitation-templates/:path*', destination: '/admin/invitations/:path*', permanent: false },
             { source: '/admin/invitation-templates', destination: '/admin/invitations', permanent: false },
             { source: '/admin/cms/collections/memberships', destination: '/admin/cms', permanent: false },
+            // Banners are now the homepage promotions slider (Website Content → Home Page)
+            { source: '/admin/banners/:path*', destination: '/admin/cms/home', permanent: false },
+            { source: '/admin/banners', destination: '/admin/cms/home', permanent: false },
             {
                 source: '/information/disclaimer',
                 destination: '/disclaimer',

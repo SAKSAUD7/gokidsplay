@@ -168,7 +168,7 @@ function MediaSettings() {
                 <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                     <h3 className="font-medium text-slate-900">Quick Links</h3>
                     <div className="mt-2 flex gap-4">
-                        <a href="/admin/banners" className="text-blue-600 hover:underline">Manage Banners &rarr;</a>
+                        <a href="/admin/cms/home" className="text-blue-600 hover:underline">Homepage promotions slider &rarr;</a>
                         <a href="/admin/activities" className="text-blue-600 hover:underline">Manage Activities &rarr;</a>
                     </div>
                 </div>

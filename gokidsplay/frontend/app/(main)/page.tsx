@@ -38,6 +38,9 @@ export default async function Home() {
         getGlobalSettings()
     ]);
 
+    // Promotions show from their first day to their last (UK dates)
+    const ukToday = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/London' });
+
     // Transform stats
     const stats = statCards.length > 0 ? statCards.map((s: any) => ({
         id: s.id,
@@ -66,7 +69,8 @@ export default async function Home() {
         <HomeContent
                 stats={stats}
                 gallery={galleryItems}
-                banners={banners.filter((b: any) => b.active)}
+                banners={banners.filter((b: any) => b.active && b.image_url
+                    && (!b.start_date || b.start_date <= ukToday) && (!b.end_date || b.end_date >= ukToday))}
                 reels={reels.filter((r: any) => r.active)}
                 settings={settings}
                 activities={activities.filter((a: any) => a.active)}

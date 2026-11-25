@@ -15,9 +15,33 @@ class PageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BannerSerializer(serializers.ModelSerializer):
+    """Homepage promotions: images and links must be on this site or a web address (never javascript: etc.)."""
     class Meta:
         model = Banner
         fields = '__all__'
+
+    @staticmethod
+    def _site_or_web(value, what):
+        value = (value or '').strip()
+        if value and not (value.startswith('/') and not value.startswith('//') or value.lower().startswith(('https://', 'http://'))):
+            raise serializers.ValidationError(f'{what} must start with / (a page on this site) or https://')
+        return value
+
+    def validate_image_url(self, value):
+        value = self._site_or_web(value, 'The image address')
+        if not value:
+            raise serializers.ValidationError('Please add an image.')
+        return value
+
+    def validate_link(self, value):
+        return self._site_or_web(value, 'The link') or None
+
+    def validate(self, attrs):
+        start = attrs.get('start_date', getattr(self.instance, 'start_date', None))
+        end = attrs.get('end_date', getattr(self.instance, 'end_date', None))
+        if start and end and end < start:
+            raise serializers.ValidationError({'end_date': 'The last day must be on or after the first day.'})
+        return attrs
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:

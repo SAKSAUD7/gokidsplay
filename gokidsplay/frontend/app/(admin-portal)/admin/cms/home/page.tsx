@@ -3,15 +3,18 @@ import { getGalleryItems } from '@/app/actions/gallery';
 import { getInstagramReels } from '@/app/actions/instagram-reels';
 import { GalleryManager } from '@/components/admin/cms/home/GalleryManager';
 import { ReelsManager } from '@/components/admin/cms/home/ReelsManager';
+import { PromotionsManager } from '@/components/admin/cms/home/PromotionsManager';
+import { getBanners } from '@/app/actions/banners';
 import { CMSBackLink } from '@/components/admin/cms/CMSBackLink';
 import { PageTextLink } from '@/components/admin/cms/PageTextLink';
 
 export default async function HomeAdminPage() {
     // Fetch all data in parallel
-    const [sections, gallery, reels] = await Promise.all([
+    const [sections, gallery, reels, promotions] = await Promise.all([
         getPageSections('home'),
         getGalleryItems(),
-        getInstagramReels()
+        getInstagramReels(),
+        getBanners()
     ]);
 
     // Find specific sections or use undefined (editors will handle defaults)
@@ -32,6 +35,10 @@ export default async function HomeAdminPage() {
             <div className="grid gap-8">
                 <section>
                     <PageTextLink pageKey="home" />
+                </section>
+
+                <section>
+                    <PromotionsManager items={promotions} />
                 </section>
 
                 <section>

@@ -22,21 +22,26 @@ export async function getBanner(id: string) {
     return transformCmsItem(data);
 }
 
+// Homepage promotions slider (Website Content → Home Page). Dates are "YYYY-MM-DD" or null.
 export async function createBanner(data: {
     title: string;
     imageUrl: string;
     link?: string;
     active: boolean;
     order: number;
+    startDate?: string | null;
+    endDate?: string | null;
 }) {
     await requirePermission('cms', 'write');
 
     const payload = {
         title: data.title,
         image_url: data.imageUrl,
-        link: data.link,
+        link: data.link || null,
         active: data.active,
-        order: data.order
+        order: data.order,
+        start_date: data.startDate || null,
+        end_date: data.endDate || null,
     };
 
     const res = await fetchAPI("/cms/banners/", {
@@ -44,7 +49,7 @@ export async function createBanner(data: {
         body: JSON.stringify(payload)
     });
 
-    if (!res || !res.ok) return { success: false };
+    if (!res || !res.ok) return { success: false, error: await apiError(res) };
 
     const banner = await res.json();
 
@@ -55,31 +60,34 @@ export async function createBanner(data: {
         details: { after: banner }
     });
 
-    revalidatePath('/admin/banners');
+    revalidatePromotions();
     return { success: true, banner: transformCmsItem(banner) };
 }
 
 export async function updateBanner(id: string, data: {
     title?: string;
     imageUrl?: string;
-    link?: string;
+    link?: string | null;
     active?: boolean;
     order?: number;
+    startDate?: string | null;
+    endDate?: string | null;
 }) {
     await requirePermission('cms', 'write');
 
-    const payload: any = { ...data };
-    if (data.imageUrl) {
-        payload.image_url = data.imageUrl;
-        delete payload.imageUrl;
-    }
+    const { imageUrl, startDate, endDate, ...rest } = data;
+    const payload: any = { ...rest };
+    if (imageUrl) payload.image_url = imageUrl;
+    if (startDate !== undefined) payload.start_date = startDate || null;
+    if (endDate !== undefined) payload.end_date = endDate || null;
+    if (data.link !== undefined) payload.link = data.link || null;
 
     const res = await fetchAPI(`/cms/banners/${id}/`, {
         method: "PATCH",
         body: JSON.stringify(payload)
     });
 
-    if (!res || !res.ok) return { success: false };
+    if (!res || !res.ok) return { success: false, error: await apiError(res) };
 
     await logActivity({
         action: 'UPDATE',
@@ -88,7 +96,7 @@ export async function updateBanner(id: string, data: {
         details: { after: data }
     });
 
-    revalidatePath('/admin/banners');
+    revalidatePromotions();
     return { success: true };
 }
 
@@ -107,6 +115,20 @@ export async function deleteBanner(id: string) {
         entityId: id
     });
 
-    revalidatePath('/admin/banners');
+    revalidatePromotions();
     return { success: true };
 }
+
+function revalidatePromotions() {
+    revalidatePath('/');                // the homepage slider
+    revalidatePath('/admin/cms/home');
+    revalidatePath('/admin/banners');
+}
+
+/** The API's first field error as one readable line. */
+async function apiError(res: Response | null) {
+    const body = await res?.json().catch(() => null);
+    const first = body && Object.entries(body)[0];
+    return first ? String(Array.isArray(first[1]) ? first[1][0] : first[1]) : "Could not save. Please try again.";
+}
+

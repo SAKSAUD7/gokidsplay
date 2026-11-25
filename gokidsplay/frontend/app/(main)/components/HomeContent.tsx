@@ -14,6 +14,7 @@ import { Stat, GalleryItem, Activity } from "../../../lib/api/types";
 import dynamic from "next/dynamic";
 import { getMediaUrl } from "@/lib/media-utils";
 import { InstallAppSection } from "../../../components/InstallAppSection";
+import { PromoSlider } from "../../../components/PromoSlider";
 import { listItems } from "@/lib/cms/page-registry";
 
 const InstagramReels = dynamic(() => import("./InstagramReels"), { 
@@ -69,6 +70,9 @@ export default function HomeContent({ stats, gallery, banners, reels, settings, 
 
             {/* Timing Cards — right below hero */}
             <TimingCardsClient />
+
+            {/* Offers & vouchers slider (Website Content → Home Page); only when there are promotions */}
+            {banners.length > 0 && <PromoSlider promotions={banners} />}
 
             {/* Stats Section */}
             <section className="relative pt-12 md:pt-20 pb-16 md:pb-32 px-4 bg-background-light">

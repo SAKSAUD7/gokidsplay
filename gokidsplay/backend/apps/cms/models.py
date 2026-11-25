@@ -13,16 +13,23 @@ class Page(models.Model):
         return f"{self.title} ({self.slug})"
 
 class Banner(models.Model):
-    title = models.CharField(max_length=255)
-    image_url = models.URLField()
-    link = models.URLField(null=True, blank=True)
+    """
+    Homepage promotions slider (Website Content → Home Page → Promotions): an image for a
+    voucher or offer, optionally linking somewhere (e.g. /book). The slider only appears on
+    the homepage while at least one promotion is switched on and within its dates.
+    """
+    title = models.CharField(max_length=255, blank=True, default='', help_text="Describes the image (for screen readers)")
+    image_url = models.CharField(max_length=700, help_text="Uploaded image (/media/...) or a full image address")
+    link = models.CharField(max_length=500, null=True, blank=True, help_text="Where a click goes, e.g. /book (optional)")
+    start_date = models.DateField(null=True, blank=True, help_text="First day it shows (empty = straight away)")
+    end_date = models.DateField(null=True, blank=True, help_text="Last day it shows (empty = until switched off)")
     active = models.BooleanField(default=True)
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return self.title or self.image_url
 
 class Activity(models.Model):
     name = models.CharField(max_length=255)
