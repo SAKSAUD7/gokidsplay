@@ -122,7 +122,7 @@ export async function deleteBanner(id: string) {
 function revalidatePromotions() {
     revalidatePath('/');                // the homepage slider
     revalidatePath('/admin/cms/home');
-    revalidatePath('/admin/banners');
+    revalidatePath('/admin/cms/promotions');
 }
 
 /** The API's first field error as one readable line. */

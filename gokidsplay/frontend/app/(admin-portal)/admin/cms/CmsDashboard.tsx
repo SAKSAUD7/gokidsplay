@@ -28,6 +28,7 @@ const QUICK_ACTIONS: Card[] = [
     { name: "Party prices & times", href: "/admin/cms/party-booking", icon: "PartyPopper", description: "Package price, extras, deposit, start times" },
     { name: "Add a special event", href: "/admin/events/new", icon: "Sparkles", description: "Halloween, Christmas, toddler mornings…" },
     { name: "Add photos", href: "/admin/cms/gallery", icon: "Image", description: "Gallery and homepage photos" },
+    { name: "Homepage promotions", href: "/admin/cms/promotions", icon: "Megaphone", description: "Offer & voucher images in the homepage slider" },
     { name: "Reviews & Google", href: "/admin/cms/collections/testimonials", icon: "Star", description: "Sync Google reviews, add or hide reviews" },
     { name: "Edit the homepage", href: "/admin/cms/pages/home", icon: "Home", description: "Hero video, headings, buttons" },
     { name: "Contact details & switches", href: "/admin/settings", icon: "Settings", description: "Phone, email, address; pause bookings" },
@@ -69,6 +70,7 @@ export default function CmsDashboard({ data }: { data: DashboardData }) {
         {
             title: "Homepage, About & reviews",
             cards: [
+                { name: "Promotions slider", href: "/admin/cms/promotions", icon: "Megaphone", description: "Offer & voucher images on the homepage" },
                 { name: "Customer Reviews", href: "/admin/cms/collections/testimonials", icon: "Star", description: "Google sync and your own reviews", count: c("reviews", "review"), warn: empty("reviews", "No reviews showing yet") },
                 { name: "Gallery", href: "/admin/cms/gallery", icon: "Image", description: "Photos on the Home and Gallery pages", count: c("gallery", "photo") },
                 { name: "Instagram Reels", href: "/admin/cms/instagram-reels", icon: "Instagram", description: "Reels on the Home and About pages", count: c("reels", "reel") },

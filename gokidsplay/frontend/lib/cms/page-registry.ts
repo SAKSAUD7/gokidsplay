@@ -242,6 +242,7 @@ export const PAGES: PageDef[] = [
             },
         ],
         collections: [
+            { label: 'Promotions slider', href: '/admin/cms/promotions', description: 'Offer & voucher images under the hours bar' },
             { label: 'Gallery', href: '/admin/cms/gallery', description: 'Photos shown in "See The Action"' },
             { label: 'Stat Cards', href: '/admin/cms/stat-cards', description: 'The four numbers under the hero' },
             { label: 'Instagram Reels', href: '/admin/cms/instagram-reels', description: 'Reels carousel' },
