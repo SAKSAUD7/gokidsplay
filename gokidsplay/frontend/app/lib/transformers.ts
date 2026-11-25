@@ -26,6 +26,8 @@ export function transformCmsItem(item: any) {
         maxDiscountAmount: item.max_discount_amount,
         minHoursBeforeSlot: item.min_hours_before_slot,
         totalDiscountGiven: item.total_discount_given,
+        buyQuantity: item.buy_quantity,
+        freeQuantity: item.free_quantity,
     };
 }
 

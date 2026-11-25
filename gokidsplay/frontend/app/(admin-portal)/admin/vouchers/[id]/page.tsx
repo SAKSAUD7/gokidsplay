@@ -51,6 +51,7 @@ export default function EditVoucherPage() {
                     <VoucherStatusBadge status={voucher.status} />
                     {voucher.batch && <span className="text-xs text-slate-500 bg-slate-100 rounded-full px-2 py-1">Batch {voucher.batch}</span>}
                 </div>
+                {voucher.offer && <p className="text-lg font-bold text-blue-700 mt-1">{voucher.offer}</p>}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                     <div className="bg-white border border-slate-200 rounded-xl p-4">
                         <p className="text-xs text-slate-500 uppercase font-bold">Used</p>

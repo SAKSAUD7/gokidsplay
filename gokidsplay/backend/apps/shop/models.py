@@ -8,6 +8,7 @@ class Voucher(models.Model):
     DISCOUNT_TYPES = [
         ('PERCENTAGE', 'Percentage'),
         ('FLAT', 'Flat Amount'),
+        ('BUY_X_GET_Y', 'Buy X Get Y Free'),     # play-session tickets: buy_quantity paid, free_quantity free
     ]
     APPLIES_TO = [
         ('ALL', 'Sessions and parties'),
@@ -17,7 +18,12 @@ class Voucher(models.Model):
 
     code = models.CharField(max_length=50, unique=True)
     discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES)
-    discount_value = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2,
+                                         help_text="% or £ off (not used by Buy X Get Y Free offers)")
+    buy_quantity = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                    help_text="Buy X Get Y Free: tickets paid for in each group (X)")
+    free_quantity = models.PositiveSmallIntegerField(null=True, blank=True,
+                                                     help_text="Buy X Get Y Free: tickets free in each group (Y)")
     min_order_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
     usage_limit = models.IntegerField(null=True, blank=True)

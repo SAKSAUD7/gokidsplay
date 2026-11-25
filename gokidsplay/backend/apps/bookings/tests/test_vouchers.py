@@ -221,3 +221,88 @@ class TestVoucherApi:
 def test_staff_user_model_has_roles():
     """Guard: the admin fixture relies on the role field."""
     assert 'role' in {f.name for f in get_user_model()._meta.fields}
+
+
+# ── Buy X Get Y Free ─────────────────────────────────────────────────────────
+
+def bogo(code='B2G1', buy=2, free=1, **fields):
+    return make_voucher(code=code, discount_type='BUY_X_GET_Y', discount_value=Decimal('0'), buy_quantity=buy,
+                        free_quantity=free, **{'applies_to': 'SESSION', **fields})
+
+
+def people(*prices):
+    return [(f'Ticket {p}', Decimal(p)) for p in prices]
+
+
+@pytest.mark.django_db
+class TestBuyXGetYFree:
+    @pytest.mark.parametrize('count, free', [(2, 0), (3, 1), (4, 1), (5, 1), (6, 2), (8, 2), (9, 3)])
+    def test_every_full_group_of_three_gets_one_free(self, count, free):
+        bogo()
+        result = evaluate_voucher('B2G1', Decimal('12.95') * count, kind='session', items=people(*['12.95'] * count))
+        if free == 0:
+            assert not result.valid and 'needs at least 3 tickets' in result.error
+        else:
+            assert result.valid and result.discount == Decimal('12.95') * free
+            assert result.summary == f'Buy 2 Get 1 Free: {count} tickets, {free} free'
+            assert result.free_items == [{'label': 'Ticket 12.95', 'qty': free, 'price_each': 12.95,
+                                          'total': float(Decimal('12.95') * free)}]
+
+    def test_the_cheapest_tickets_are_the_free_ones(self):
+        bogo(code='B1G1', buy=1, free=1)
+        result = evaluate_voucher('B1G1', Decimal('41.80'), kind='session',
+                                  items=people('12.95', '12.95', '7.95', '7.95', '1.95'))
+        # 5 people, Buy 1 Get 1: 2 free, the two cheapest (1.95 and 7.95)
+        assert result.discount == Decimal('9.90')
+        assert [(i['label'], i['qty']) for i in result.free_items] == [('Ticket 1.95', 1), ('Ticket 7.95', 1)]
+
+    def test_cap_and_session_only(self):
+        bogo(max_discount_amount=Decimal('10'))
+        assert evaluate_voucher('B2G1', Decimal('77.70'), kind='session', items=people(*['12.95'] * 6)).discount == Decimal('10.00')
+        assert 'play session' in evaluate_voucher('B2G1', Decimal('250'), kind='party').error
+        assert 'choose your tickets' in evaluate_voucher('B2G1', Decimal('40'), kind='session').error
+
+    def test_booking_is_charged_with_the_free_tickets_taken_off(self, config, plans):
+        bogo()
+        response = APIClient().post(SESSIONS_URL, {**session_payload(plans), 'voucher_code': 'b2g1'}, format='json')
+        assert response.status_code == 201, response.data
+        booking = Booking.objects.get(pk=response.data['id'])
+        # 3 x 12.95 + 7.95 + 2 x 4.95 = 56.70; 6 people → 2 free, the two £4.95 adults = 9.90; + £2 fee
+        assert booking.discount_amount == Decimal('9.90') and booking.amount == Decimal('48.80')
+        free = {line['label']: line.get('free', 0) for line in booking.tickets}
+        assert free == {'24 months and above': 0, 'Under 24 months': 0, 'Non-playing Adult': 2}
+        assert VoucherRedemption.objects.get(booking=booking).discount_amount == Decimal('9.90')
+
+    def test_apply_code_check_shows_what_was_free(self, config, plans):
+        bogo()
+        check = lambda tickets: APIClient().post(VOUCHERS_URL + 'validate/', {
+            'code': 'b2g1', 'order_amount': 1, 'booking_type': 'session', 'tickets': tickets}, format='json').data
+        three_kids = check({plans['child'].id: 3})
+        assert three_kids['valid'] and three_kids['discount_amount'] == 12.95 and three_kids['final_amount'] == 25.9
+        assert three_kids['summary'] == 'Buy 2 Get 1 Free: 3 tickets, 1 free'
+        assert three_kids['free_items'][0]['label'] == '24 months and above'
+        assert check({plans['child'].id: 2})['valid'] is False
+        assert check({str(plans['child'].id): 6})['discount_amount'] == 25.9     # 4 pay, 2 free
+
+    def test_party_booking_refuses_it(self, config):
+        bogo(applies_to='ALL')
+        response = APIClient().post(PARTIES_URL, party_payload(voucher_code='B2G1'), format='json')
+        assert response.status_code == 400 and not PartyBooking.objects.exists()
+
+    def test_admin_creates_and_switches_offer_types(self, admin_client):
+        bad = admin_client.post(VOUCHERS_URL, {'code': 'B2G1', 'discount_type': 'BUY_X_GET_Y', 'buy_quantity': 2},
+                                format='json')
+        assert bad.status_code == 400 and 'free_quantity' in bad.data
+        ok = admin_client.post(VOUCHERS_URL, {'code': 'b2g1', 'discount_type': 'BUY_X_GET_Y', 'buy_quantity': 2,
+                                              'free_quantity': 1, 'applies_to': 'ALL'}, format='json')
+        assert ok.status_code == 201, ok.data
+        assert (ok.data['offer'], ok.data['applies_to'], ok.data['discount_value']) == ('Buy 2 Get 1 Free', 'SESSION', '0.00')
+        switched = admin_client.patch(f"{VOUCHERS_URL}{ok.data['id']}/", {'discount_type': 'PERCENTAGE',
+                                                                           'discount_value': '20'}, format='json')
+        assert switched.status_code == 200 and switched.data['buy_quantity'] is None and switched.data['offer'] == '20% off'
+        assert admin_client.post(VOUCHERS_URL, {'code': 'NOVALUE', 'discount_type': 'FLAT'}, format='json').status_code == 400
+        batch = admin_client.post(VOUCHERS_URL + 'generate/', {'prefix': 'fam', 'count': 3, 'discount_type': 'BUY_X_GET_Y',
+                                                               'buy_quantity': 3, 'free_quantity': 1}, format='json')
+        assert batch.status_code == 201, batch.data
+        assert {(v.buy_quantity, v.free_quantity, v.applies_to) for v in Voucher.objects.filter(batch=batch.data['batch'])} \
+            == {(3, 1, 'SESSION')}

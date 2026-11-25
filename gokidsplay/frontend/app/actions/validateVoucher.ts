@@ -4,13 +4,20 @@ import { clientIpHeaders } from "@/app/lib/client-ip";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9000/api/v1";
 
-/** Check a voucher code in the booking wizards. The discount is in pounds. */
+export interface FreeTicket { label: string; qty: number; price_each: number; total: number }
+
+/**
+ * Check a voucher code in the booking wizards. The discount is in pounds.
+ * Play sessions send their tickets ({plan id: qty}) so the server works the discount out from the
+ * real ticket prices (Buy X Get Y Free needs them to know which tickets are free).
+ */
 export async function validateVoucher(
     code: string,
     orderAmount: number,
     bookingDateTime?: string, // ISO format: "2026-01-12T15:30:00"
     bookingType?: "session" | "party",
     email?: string,
+    tickets?: Record<number, number>,
 ) {
     try {
         const clean = String(code || "").trim().toUpperCase().slice(0, 50);
@@ -27,6 +34,7 @@ export async function validateVoucher(
                 booking_datetime: bookingDateTime,
                 booking_type: bookingType,
                 email: email || undefined,
+                tickets: tickets && Object.keys(tickets).length ? tickets : undefined,
             }),
             cache: "no-store",
         });
@@ -48,6 +56,9 @@ export async function validateVoucher(
             value: result.voucher.discount_value,
             code: result.voucher.code as string,
             description: result.voucher.description,
+            offer: (result.voucher.offer || "") as string,
+            summary: (result.summary || "") as string,
+            freeItems: (result.free_items || []) as FreeTicket[],
         };
     } catch (error) {
         console.error("Voucher validation error:", error);

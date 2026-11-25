@@ -42,8 +42,13 @@ class VoucherViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def validate(self, request):
-        """Check a code for the booking wizards: {code, order_amount, booking_datetime?, booking_type?, email?}"""
-        from .services import evaluate_voucher
+        """
+        Check a code for the booking wizards: {code, order_amount, booking_datetime?, booking_type?, email?,
+        tickets?}. For play sessions, tickets ({plan_id: qty}) are priced here from the ticket types,
+        so the discount (and which tickets a Buy X Get Y Free offer makes free) is the server's.
+        """
+        from apps.bookings.pricing import price_admission
+        from .services import evaluate_voucher, offer_name
 
         code = str(request.data.get('code', '') or '')[:50]
         try:
@@ -54,13 +59,23 @@ class VoucherViewSet(viewsets.ModelViewSet):
             return Response({'valid': False, 'error': 'Voucher code is required'},
                             status=http_status.HTTP_400_BAD_REQUEST)
         kind = request.data.get('booking_type')
+        kind = kind if kind in ('session', 'party') else None
         email = str(request.data.get('email') or '')[:254] or None
-        result = evaluate_voucher(code, order_amount, request.data.get('booking_datetime'),
-                                  kind=kind if kind in ('session', 'party') else None, email=email)
-        if not result.valid:
-            return Response({'valid': False, 'error': result.error})
+        tickets = request.data.get('tickets')
+        if kind == 'session' and tickets:
+            # Exactly what the booking will be charged (the same calculation as when it is made)
+            price = price_admission(tickets=tickets, voucher_code=code, booking_datetime=request.data.get('booking_datetime'),
+                                    email=email)
+            if price.error:
+                return Response({'valid': False, 'error': price.error})
+            order_amount, discount, voucher = price.subtotal, price.discount, price.voucher
+            summary, free_items = price.offer_summary, price.free_items
+        else:
+            result = evaluate_voucher(code, order_amount, request.data.get('booking_datetime'), kind=kind, email=email)
+            if not result.valid:
+                return Response({'valid': False, 'error': result.error})
+            discount, voucher, summary, free_items = result.discount, result.voucher, result.summary, result.free_items
 
-        voucher = result.voucher
         return Response({
             'valid': True,
             'voucher': {
@@ -68,10 +83,15 @@ class VoucherViewSet(viewsets.ModelViewSet):
                 'code': voucher.code,
                 'discount_type': voucher.discount_type,
                 'discount_value': float(voucher.discount_value),
+                'buy_quantity': voucher.buy_quantity,
+                'free_quantity': voucher.free_quantity,
+                'offer': offer_name(voucher),
                 'description': voucher.description,
             },
-            'discount_amount': float(result.discount),
-            'final_amount': float(order_amount - result.discount),
+            'discount_amount': float(discount),
+            'final_amount': float(order_amount - discount),
+            'summary': summary,
+            'free_items': free_items,
         })
 
     @action(detail=True, methods=['get'])
@@ -85,8 +105,8 @@ class VoucherViewSet(viewsets.ModelViewSet):
     def generate(self, request):
         """
         Make a batch of single-use codes: {prefix, count, discount_type, discount_value,
-        expiry_date?, valid_from?, applies_to?, min_order_amount?, max_discount_amount?,
-        min_hours_before_slot?, description?}. Each code works once. Returns the codes.
+        buy_quantity?, free_quantity?, expiry_date?, valid_from?, applies_to?, min_order_amount?,
+        max_discount_amount?, min_hours_before_slot?, description?}. Each code works once. Returns the codes.
         """
         data = request.data
         prefix = ''.join(ch for ch in str(data.get('prefix') or 'GKP').upper() if ch.isascii() and ch.isalnum())[:12]
@@ -99,7 +119,7 @@ class VoucherViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Choose between 1 and 500 codes.'}, status=http_status.HTTP_400_BAD_REQUEST)
 
         keys = ('discount_type', 'discount_value', 'expiry_date', 'valid_from', 'applies_to', 'min_order_amount',
-                'description', 'max_discount_amount', 'min_hours_before_slot')
+                'description', 'max_discount_amount', 'min_hours_before_slot', 'buy_quantity', 'free_quantity')
         template = {key: data.get(key) for key in keys if data.get(key) not in (None, '')}
         template.update({'usage_limit': 1, 'is_active': True, 'code': f'{prefix}-CHECK-{secrets.token_hex(3)}'})
         check = VoucherSerializer(data=template)

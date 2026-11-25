@@ -195,6 +195,8 @@ export async function createBooking(formData: any) {
                     booking_datetime: data.date && data.time ? `${data.date}T${data.time}` : undefined,
                     booking_type: "session",
                     email: sanitizedEmail,
+                    // The tickets, so the discount is worked out from them (Buy X Get Y Free needs them)
+                    tickets: hasTickets ? ticketQty : undefined,
                 }),
                 cache: "no-store",
             });

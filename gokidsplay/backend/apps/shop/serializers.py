@@ -10,11 +10,14 @@ from .models import Voucher, VoucherRedemption
 class VoucherSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     total_discount_given = serializers.SerializerMethodField()
+    offer = serializers.SerializerMethodField()
 
     class Meta:
         model = Voucher
         fields = '__all__'
         read_only_fields = ['used_count', 'created_at', 'updated_at', 'batch']
+        # Not needed by Buy X Get Y Free offers (checked in validate for the others)
+        extra_kwargs = {'discount_value': {'required': False}}
 
     def get_status(self, voucher) -> str:
         """Active / Scheduled / Expired / Used up / Off: what staff see in the list."""
@@ -28,6 +31,10 @@ class VoucherSerializer(serializers.ModelSerializer):
         if voucher.valid_from and voucher.valid_from > now:
             return 'Scheduled'
         return 'Active'
+
+    def get_offer(self, voucher) -> str:
+        from .services import offer_name
+        return offer_name(voucher)
 
     def get_total_discount_given(self, voucher) -> float:
         total = sum((r.discount_amount for r in voucher.redemptions.all() if not r.released), Decimal('0'))
@@ -49,10 +56,27 @@ class VoucherSerializer(serializers.ModelSerializer):
             return attrs[key] if key in attrs else getattr(self.instance, key, None)
 
         value, kind = get('discount_value'), get('discount_type')
+        if kind == 'BUY_X_GET_Y':
+            # Counted on play-session tickets (a party is one package price)
+            for field, word in (('buy_quantity', 'buy'), ('free_quantity', 'get free')):
+                number = get(field)
+                if not number or not 1 <= number <= 20:
+                    raise serializers.ValidationError({field: f'Enter how many tickets to {word}, from 1 to 20.'})
+            if get('applies_to') == 'PARTY':
+                raise serializers.ValidationError({'applies_to': 'Buy X Get Y Free works on play session tickets only.'})
+            attrs['applies_to'] = 'SESSION'
+            attrs['discount_value'] = Decimal('0')
+            return self._common_checks(attrs, get)
+        if value is None and not self.instance:
+            raise serializers.ValidationError({'discount_value': 'Enter the discount.'})
         if value is not None and value <= 0:
             raise serializers.ValidationError({'discount_value': 'The discount must be more than 0.'})
         if kind == 'PERCENTAGE' and value is not None and value > 100:
             raise serializers.ValidationError({'discount_value': 'A percentage discount can be at most 100.'})
+        attrs['buy_quantity'] = attrs['free_quantity'] = None     # only used by Buy X Get Y Free
+        return self._common_checks(attrs, get)
+
+    def _common_checks(self, attrs, get):
         start, end = get('valid_from'), get('expiry_date')
         if start and end and end <= start:
             raise serializers.ValidationError({'expiry_date': 'The expiry must be after the start date.'})

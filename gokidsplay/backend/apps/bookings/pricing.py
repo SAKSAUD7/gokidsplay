@@ -108,7 +108,9 @@ def price_session_booking(
                          discount=Decimal('0.00'), amount=total, add_ons=add_on_lines)
 
     if voucher_code and str(voucher_code).strip():
-        result = evaluate_voucher(voucher_code, subtotal, booking_datetime, kind='session')
+        people = [('Adult', adult_price)] * adults + [('Child', kid_price)] * kids + \
+            [('Spectator', spectator_price)] * spectators
+        result = evaluate_voucher(voucher_code, subtotal, booking_datetime, kind='session', items=people)
         if not result.valid:
             price.error = result.error
             return price
@@ -139,6 +141,8 @@ class AdmissionPrice:
     voucher: Any = None
     voucher_code: Optional[str] = None
     error: str = ''
+    offer_summary: str = ''                                          # e.g. "Buy 2 Get 1 Free: 6 tickets, 2 free"
+    free_items: List[Dict[str, Any]] = field(default_factory=list)   # Buy X Get Y Free: the free tickets
 
 
 def _requested_ticket_quantities(raw_tickets) -> Dict[int, int]:
@@ -221,7 +225,9 @@ def price_admission(
     price.amount = total
 
     if voucher_code and str(voucher_code).strip():
-        result = evaluate_voucher(voucher_code, price.subtotal, booking_datetime, kind='session', email=email)
+        people = [(line['label'], _money(line['price_each'])) for line in lines for _ in range(line['qty'])]
+        result = evaluate_voucher(voucher_code, price.subtotal, booking_datetime, kind='session', email=email,
+                                  items=people)
         if not result.valid:
             price.error = result.error
             return price
@@ -229,6 +235,14 @@ def price_admission(
         price.amount = _money(total - price.discount)
         price.voucher = result.voucher
         price.voucher_code = result.voucher.code
+        price.offer_summary = result.summary
+        price.free_items = result.free_items
+        # Buy X Get Y Free: mark the free tickets on their lines (shown on the booking in the admin portal)
+        for free in result.free_items:
+            line = next((l for l in lines if l['label'] == free['label'] and l['price_each'] == free['price_each']
+                         and l.get('free', 0) < l['qty']), None)
+            if line is not None:
+                line['free'] = line.get('free', 0) + free['qty']
     return price
 
 

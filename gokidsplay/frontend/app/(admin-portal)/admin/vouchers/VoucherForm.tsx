@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2, Save, Wand2 } from "lucide-react";
+import { Gift, Loader2, Percent, PoundSterling, Save, Wand2 } from "lucide-react";
 import type { VoucherInput } from "@/app/actions/vouchers";
 
 /** ISO date-time → "YYYY-MM-DD" in UK time (for date inputs). */
@@ -18,6 +18,22 @@ const hint = "text-xs text-slate-500 mt-1";
 
 type Mode = "create" | "edit" | "generate";
 
+const OFFER_TYPES = [
+    { value: "PERCENTAGE", title: "Percentage off", example: "e.g. 20% off the booking", Icon: Percent },
+    { value: "FLAT", title: "Flat amount off", example: "e.g. £5 off the booking", Icon: PoundSterling },
+    { value: "BUY_X_GET_Y", title: "Buy X Get Y Free", example: "e.g. Buy 2 Get 1 Free", Icon: Gift },
+];
+
+/** How Buy X Get Y Free works out for a few group sizes (the same rule the server uses). */
+function offerExamples(buy: number, free: number) {
+    if (!(buy >= 1 && free >= 1)) return [];
+    const group = buy + free;
+    return [group, group * 2, group * 2 + 1].map(people => {
+        const freeCount = Math.floor(people / group) * free;
+        return `${people} people → ${people - freeCount} pay, ${freeCount} free`;
+    });
+}
+
 export interface VoucherFormValues extends VoucherInput {
     prefix?: string;
     count?: number;
@@ -29,6 +45,9 @@ export function VoucherForm({ mode, initial, onSubmit }: {
     onSubmit: (values: VoucherFormValues) => Promise<string | null>; // returns an error message or null
 }) {
     const [type, setType] = useState<string>(initial?.discountType || "PERCENTAGE");
+    const [buy, setBuy] = useState<number>(Number(initial?.buyQuantity) || 2);
+    const [free, setFree] = useState<number>(Number(initial?.freeQuantity) || 1);
+    const isBogo = type === "BUY_X_GET_Y";
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
 
@@ -39,10 +58,13 @@ export function VoucherForm({ mode, initial, onSubmit }: {
         const number = (k: string) => (text(k) === "" ? null : Number(text(k)));
         const values: VoucherFormValues = {
             discountType: type,
-            discountValue: Number(text("discountValue")),
-            maxDiscountAmount: type === "PERCENTAGE" ? number("maxDiscountAmount") : null,
+            // Buy X Get Y Free has no % or £ value: the free tickets are the discount
+            discountValue: isBogo ? 0 : Number(text("discountValue")),
+            buyQuantity: isBogo ? buy : null,
+            freeQuantity: isBogo ? free : null,
+            maxDiscountAmount: type === "FLAT" ? null : number("maxDiscountAmount"),
             minOrderAmount: number("minOrderAmount"),
-            appliesTo: text("appliesTo") as VoucherInput["appliesTo"],
+            appliesTo: (isBogo ? "SESSION" : text("appliesTo")) as VoucherInput["appliesTo"],
             // Dates are whole UK days: from the start of the first day to the end of the last
             validFrom: text("validFrom") ? `${text("validFrom")}T00:00:00` : null,
             expiryDate: text("expiryDate") ? `${text("expiryDate")}T23:59:59` : null,
@@ -91,36 +113,82 @@ export function VoucherForm({ mode, initial, onSubmit }: {
                 </div>
             )}
 
-            <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                    <label className={label} htmlFor="discountType">Discount type</label>
-                    <select id="discountType" value={type} onChange={e => setType(e.target.value)} className={input}>
-                        <option value="PERCENTAGE">Percentage (%)</option>
-                        <option value="FLAT">Fixed amount (£)</option>
-                    </select>
+            <fieldset>
+                <legend className={label}>Offer type</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" role="radiogroup">
+                    {OFFER_TYPES.map(({ value, title, example, Icon }) => (
+                        <button key={value} type="button" role="radio" aria-checked={type === value} onClick={() => setType(value)}
+                            className={`text-left rounded-xl border-2 p-4 transition-colors ${type === value
+                                ? "border-blue-600 bg-blue-50" : "border-slate-200 hover:border-slate-300 bg-white"}`}>
+                            <Icon size={20} className={type === value ? "text-blue-600" : "text-slate-400"} />
+                            <p className="font-bold text-slate-900 mt-2">{title}</p>
+                            <p className="text-xs text-slate-500">{example}</p>
+                        </button>
+                    ))}
                 </div>
-                <div>
-                    <label className={label} htmlFor="discountValue">{type === "PERCENTAGE" ? "Percent off" : "Pounds off"}</label>
-                    <input id="discountValue" name="discountValue" type="number" required min="0.01" step="0.01"
-                        max={type === "PERCENTAGE" ? 100 : undefined} defaultValue={initial?.discountValue ?? ""} className={input} />
-                </div>
-                {type === "PERCENTAGE" && (
+            </fieldset>
+
+            {isBogo ? (
+                <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <div>
+                        <label className={label} htmlFor="buyQuantity">Buy (tickets)</label>
+                        <input id="buyQuantity" type="number" required min={1} max={20} step={1} value={buy}
+                            onChange={e => setBuy(Math.max(0, Math.floor(Number(e.target.value))))} className={input} />
+                    </div>
+                    <div>
+                        <label className={label} htmlFor="freeQuantity">Get free (tickets)</label>
+                        <input id="freeQuantity" type="number" required min={1} max={20} step={1} value={free}
+                            onChange={e => setFree(Math.max(0, Math.floor(Number(e.target.value))))} className={input} />
+                    </div>
                     <div>
                         <label className={label} htmlFor="maxDiscountAmount">Most off (£)</label>
                         <input id="maxDiscountAmount" name="maxDiscountAmount" type="number" min="0" step="0.01"
                             defaultValue={initial?.maxDiscountAmount ?? ""} className={input} placeholder="No cap" />
                     </div>
-                )}
-            </fieldset>
+                    <div className="sm:col-span-3 text-sm text-slate-600">
+                        <p className="font-bold text-slate-800">Buy {buy || "X"} Get {free || "Y"} Free, on play session tickets</p>
+                        <p className={hint}>
+                            Every ticket in the booking is one person. For each full group of {buy + free || "X + Y"} people,
+                            {" "}{free || "Y"} {free === 1 ? "goes" : "go"} free, and the free ones are always the cheapest tickets.
+                        </p>
+                        <ul className="mt-2 text-xs text-slate-600 list-disc pl-5">
+                            {offerExamples(buy, free).map(line => <li key={line}>{line}</li>)}
+                        </ul>
+                    </div>
+                </fieldset>
+            ) : (
+                <fieldset className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label className={label} htmlFor="discountValue">{type === "PERCENTAGE" ? "Percent off" : "Pounds off"}</label>
+                        <input id="discountValue" name="discountValue" type="number" required min="0.01" step="0.01"
+                            max={type === "PERCENTAGE" ? 100 : undefined}
+                            defaultValue={initial?.discountType === type ? initial?.discountValue ?? "" : ""} className={input} />
+                    </div>
+                    {type === "PERCENTAGE" && (
+                        <div>
+                            <label className={label} htmlFor="maxDiscountAmount">Most off (£)</label>
+                            <input id="maxDiscountAmount" name="maxDiscountAmount" type="number" min="0" step="0.01"
+                                defaultValue={initial?.maxDiscountAmount ?? ""} className={input} placeholder="No cap" />
+                        </div>
+                    )}
+                </fieldset>
+            )}
 
             <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label className={label} htmlFor="appliesTo">Works on</label>
-                    <select id="appliesTo" name="appliesTo" defaultValue={initial?.appliesTo || "ALL"} className={input}>
-                        <option value="ALL">Play sessions and parties</option>
-                        <option value="SESSION">Play sessions only</option>
-                        <option value="PARTY">Parties only</option>
-                    </select>
+                    {isBogo ? (
+                        <>
+                            <input id="appliesTo" value="Play sessions only" disabled className={`${input} bg-slate-100 text-slate-500`} />
+                            <p className={hint}>A party is one package price, so this offer is for play session tickets.</p>
+                        </>
+                    ) : (
+                        <select id="appliesTo" name="appliesTo" defaultValue={initial?.appliesTo || "ALL"} className={input}>
+                            <option value="ALL">Play sessions and parties</option>
+                            <option value="SESSION">Play sessions only</option>
+                            <option value="PARTY">Parties only</option>
+                        </select>
+                    )}
                 </div>
                 <div>
                     <label className={label} htmlFor="minOrderAmount">Minimum spend (£)</label>
@@ -166,7 +234,7 @@ export function VoucherForm({ mode, initial, onSubmit }: {
             <div>
                 <label className={label} htmlFor="description">Description</label>
                 <textarea id="description" name="description" rows={2} maxLength={500} defaultValue={initial?.description || ""}
-                    className={input} placeholder="Shown to the customer when the code is applied, e.g. Summer holiday 10% off" />
+                    className={input} placeholder="Shown to the customer when the code is applied, e.g. Half-term: Buy 2 Get 1 Free" />
             </div>
 
             {mode !== "generate" && (

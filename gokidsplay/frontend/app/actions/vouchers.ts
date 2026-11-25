@@ -9,6 +9,8 @@ export interface VoucherInput {
     code?: string;
     discountType?: string;
     discountValue?: number;
+    buyQuantity?: number | null;   // Buy X Get Y Free: X
+    freeQuantity?: number | null;  // Buy X Get Y Free: Y
     minOrderAmount?: number | null;
     maxDiscountAmount?: number | null;
     validFrom?: string | null;   // ISO date-time
@@ -29,6 +31,8 @@ function toPayload(data: VoucherInput) {
         ["code", "code", v => String(v).trim().toUpperCase()],
         ["discountType", "discount_type", v => v],
         ["discountValue", "discount_value", money],
+        ["buyQuantity", "buy_quantity", count],
+        ["freeQuantity", "free_quantity", count],
         ["minOrderAmount", "min_order_amount", money],
         ["maxDiscountAmount", "max_discount_amount", money],
         ["validFrom", "valid_from", v => v || null],

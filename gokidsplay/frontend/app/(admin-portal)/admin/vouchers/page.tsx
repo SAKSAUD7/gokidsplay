@@ -86,9 +86,9 @@ export default async function VouchersPage({ searchParams }: { searchParams?: { 
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className="font-bold text-slate-700">
-                                        {v.discountType === "PERCENTAGE" ? `${Number(v.discountValue)}%` : `£${Number(v.discountValue).toFixed(2)}`}
+                                        {v.offer || (v.discountType === "PERCENTAGE" ? `${Number(v.discountValue)}% off` : `£${Number(v.discountValue).toFixed(2)} off`)}
                                     </span>
-                                    {v.discountType === "PERCENTAGE" && v.maxDiscountAmount && (
+                                    {v.discountType !== "FLAT" && v.maxDiscountAmount && (
                                         <p className="text-xs text-slate-500">up to £{Number(v.maxDiscountAmount).toFixed(2)}</p>
                                     )}
                                 </td>

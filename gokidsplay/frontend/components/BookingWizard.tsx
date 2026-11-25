@@ -31,7 +31,7 @@ import { useToast } from "./ToastProvider";
 
 import { PaymentStep } from "./PaymentStep";
 import { useAccount } from "../state/account/AccountContext";
-import { validateVoucher } from "../app/actions/validateVoucher";
+import { validateVoucher, type FreeTicket } from "../app/actions/validateVoucher";
 import { createBooking } from "../app/actions/createBooking";
 import { PageSection } from "../lib/cms/types";
 import { SmartCalendar } from "./SmartCalendar";
@@ -171,6 +171,9 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
     const [voucherMessage, setVoucherMessage] = useState("");
 
     const [appliedVoucher, setAppliedVoucher] = useState<string | null>(null);
+
+    // What the applied code did (e.g. Buy 2 Get 1 Free: which tickets are free), from the server
+    const [voucherOffer, setVoucherOffer] = useState<{ summary: string; freeItems: FreeTicket[] } | null>(null);
 
     const [config, setConfig] = useState<any>(null);
 
@@ -534,7 +537,7 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
         try {
 
-            const result = await validateVoucher(voucher, totals.subtotal, bookingDateTime, "session", formData.email);
+            const result = await validateVoucher(voucher, totals.subtotal, bookingDateTime, "session", formData.email, ticketQty);
 
             if (result.success && result.discount) {
 
@@ -542,7 +545,11 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
                 setAppliedVoucher(result.code || voucher);
 
-                setVoucherMessage(`✅ Voucher applied: £${Number(result.discount).toFixed(2)} off`);
+                setVoucherOffer({ summary: result.summary || "", freeItems: result.freeItems || [] });
+
+                setVoucherMessage(result.freeItems?.length
+                    ? `✅ ${result.offer} applied: £${Number(result.discount).toFixed(2)} off`
+                    : `✅ Voucher applied: £${Number(result.discount).toFixed(2)} off`);
 
                 setValue("voucherCode", result.code);
 
@@ -550,7 +557,7 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
             } else {
 
-                setDiscount(0); setAppliedVoucher(null);
+                setDiscount(0); setAppliedVoucher(null); setVoucherOffer(null);
 
                 setVoucherMessage(result.error || "Invalid voucher");
 
@@ -561,6 +568,19 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
         } catch { setVoucherMessage("Error validating voucher"); }
 
     };
+
+    const removeVoucher = (message = "") => {
+        setDiscount(0); setAppliedVoucher(null); setVoucherOffer(null);
+        setVoucherMessage(message);
+        setValue("voucherCode", ""); setValue("discountAmount", 0);
+    };
+
+    // A code is worked out for the tickets chosen when it was applied: if they change, apply it again
+    const ticketKey = JSON.stringify(ticketQty);
+    useEffect(() => {
+        if (appliedVoucher) removeVoucher("Your tickets changed, so please apply your code again.");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ticketKey]);
 
 
 
@@ -1779,10 +1799,24 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
                                                     <div className="flex justify-between text-green-400 text-sm mb-1">
 
-                                                        <span>Discount</span><span>- £{(discount / 100).toFixed(2)}</span>
+                                                        <span>Discount{appliedVoucher ? ` (${appliedVoucher})` : ""}</span><span>- £{(discount / 100).toFixed(2)}</span>
 
                                                     </div>
 
+                                                )}
+
+                                                {/* Buy X Get Y Free: which tickets are free */}
+                                                {discount > 0 && voucherOffer && voucherOffer.freeItems.length > 0 && (
+                                                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2 mb-1 text-xs text-green-300 space-y-0.5">
+                                                        <p className="font-bold">🎁 {voucherOffer.summary}</p>
+                                                        {voucherOffer.freeItems.map(item => (
+                                                            <p key={`${item.label}-${item.price_each}`} className="flex justify-between">
+                                                                <span>{item.qty} × {item.label} free</span>
+                                                                <span>- £{Number(item.total).toFixed(2)}</span>
+                                                            </p>
+                                                        ))}
+                                                        <p className="text-green-300/60">The cheapest tickets are the free ones.</p>
+                                                    </div>
                                                 )}
 
                                                 <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
@@ -1821,15 +1855,18 @@ export const BookingWizard = ({ onSubmit = createBooking, cmsContent = [] }: Boo
 
                                                     className="flex-1 bg-white/5 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-primary transition-colors uppercase text-sm" />
 
-                                                <button type="button" onClick={applyVoucher}
-
-                                                    disabled={!voucher || !!appliedVoucher}
-
-                                                    className="px-5 py-3 bg-primary hover:bg-primary/90 text-black font-bold rounded-xl transition-colors disabled:opacity-50 text-sm">
-
-                                                    Apply
-
-                                                </button>
+                                                {appliedVoucher ? (
+                                                    <button type="button" onClick={() => { removeVoucher(); setVoucher(""); }}
+                                                        className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-colors text-sm">
+                                                        Remove
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" onClick={applyVoucher}
+                                                        disabled={!voucher}
+                                                        className="px-5 py-3 bg-primary hover:bg-primary/90 text-black font-bold rounded-xl transition-colors disabled:opacity-50 text-sm">
+                                                        Apply
+                                                    </button>
+                                                )}
 
                                             </div>
 
